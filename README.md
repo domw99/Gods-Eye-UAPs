@@ -19,7 +19,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 ---
 
-**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. files and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
+**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. files and the MUFON files, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
 
 <div align="center">
 
@@ -32,7 +32,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 | | | |
 |:---:|:---:|:---:|
 | **126** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> |
-| **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> | **1,542** military airspace volumes<br><sub>FAA special-use airspace in 3D</sub> | **~10,000** live satellites<br><sub>Starlink, ISS & bright satellites</sub> |
+| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> | **1,542** military airspace volumes<br><sub>FAA special-use airspace in 3D</sub> |
 
 ## Features
 
@@ -106,9 +106,23 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 </tr>
 <tr>
 <td><sub><b>All 174 official UAP videos and images</b> that the Department of War / AARO have published on DVIDS, including the 2026 <b>PURSUE</b> releases. They play inside the app. A release that names only a region is drawn as a ring, not a made-up pin. A weekly job syncs new ones.</sub></td>
-<td><sub><b>Project Blue Book on the map.</b> 10,096 USAF case files, geocoded offline. Click one to read the original scan and its OCR text. The <b>government files library</b> (<kbd>G</kbd>) links PURSUE, AARO, ODNI, NASA, NARA, Condon, Robertson, the FBI Vault, CIA, AAWSAP, the UK MoD files, GEIPAN, Brazil and Australia.</sub></td>
+<td><sub><b>Project Blue Book on the map.</b> 10,096 USAF case files, geocoded offline. Click one to read the original scan and its OCR text. The <b>files library</b> (<kbd>G</kbd>) links PURSUE, AARO, ODNI, NASA, NARA, Condon, Robertson, the FBI Vault, CIA, AAWSAP, the UK MoD files, GEIPAN, Brazil and Australia.</sub></td>
 </tr>
 </table>
+
+### 🛸 The MUFON files
+
+<img src="docs/media/mufon.jpg" alt="The MUFON files layer across the United States, with the May 2002 MUFON UFO Journal cover (a map of the Levelland, Texas sightings) open in the dossier" width="100%" />
+
+MUFON and The Black Vault released the Mutual UFO Network's journal free as "The MUFON Archive". The app brings it onto the map:
+
+- **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
+- **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
+- **Case dossiers list the journal pages that discuss them.** 71 of the 126 cases have coverage, for example:
+  - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
+  - 60 on Travis Walton;
+  - 39 on the 2008 Stephenville lights.
+- **MUFON's live case database** (CMS) is members-only, and its terms forbid redistribution, so the app links to it and to MUFON's reporting form rather than copying it.
 
 ### 🎬 Story mode and side-by-side comparison
 
@@ -174,7 +188,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>1</kbd>–<kbd>5</kbd> | Sensor modes | <kbd>E</kbd> | What did I see? |
 | <kbd>/</kbd> | Search | <kbd>V</kbd> | Witness view (during playback) |
 | <kbd>[</kbd> <kbd>]</kbd> | Previous / next case | <kbd>M</kbd> | 3D map settings |
-| <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Government files |
+| <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Files library (government + MUFON) |
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>H</kbd> | Hide the HUD | <kbd>Esc</kbd> | Close |
 
@@ -190,8 +204,9 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | [`#/case/nimitz-tic-tac-2004`](https://domw99.github.io/Gods-Eye-UAPs/#/case/nimitz-tic-tac-2004) | A curated case |
 | [`#/official/1007777`](https://domw99.github.io/Gods-Eye-UAPs/#/official/1007777) | An official release (DVIDS id) |
 | [`#/bluebook/1952-07-7273984-Tremonton-Utah-1377-`](https://domw99.github.io/Gods-Eye-UAPs/#/bluebook/1952-07-7273984-Tremonton-Utah-1377-) | A Blue Book file |
+| [`#/mufon/2002_05/1`](https://domw99.github.io/Gods-Eye-UAPs/#/mufon/2002_05/1) | A MUFON Journal page (issue, page index) |
 | [`?mode=nvg`](https://domw99.github.io/Gods-Eye-UAPs/?mode=nvg) | Start in a sensor mode |
-| [`?layers=bluebook,nuforc,launches`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,nuforc,launches) | Start with extra layers on |
+| [`?layers=bluebook,mufon,launches`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,mufon,launches) | Start with extra layers on |
 | [`?view=-104.5,33.7,25000,0,-35`](https://domw99.github.io/Gods-Eye-UAPs/?view=-104.5,33.7,25000,0,-35) | Start at a camera position (lon, lat, height m, heading°, pitch°) |
 
 </details>
@@ -208,8 +223,9 @@ flowchart LR
     IA["Internet Archive<br/>Blue Book scans"] --> S2["build-bluebook.mjs"]
     FAA["FAA special-use<br/>airspace"] --> S3["build-airspace.mjs"]
     NUF["NUFORC<br/>(geocoded)"] --> S4["build-nuforc.mjs"]
+    MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
   end
-  S1 & S2 & S3 & S4 --> DATA[("public/data/*.json")]
+  S1 & S2 & S3 & S4 & S5 --> DATA[("public/data/*.json")]
   CASES["src/data/cases/*.js<br/>126 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
@@ -220,8 +236,8 @@ flowchart LR
 | Globe, imagery, terrain, 3D tiles, key handling | `src/app/viewer.js` |
 | NVG / FLIR / Ironbow / CRT shaders | `src/app/effects.js` |
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
-| Blue Book & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
-| Sky, weather, launches, airspace lookups, sighting-checker scoring | `src/services/*.js` |
+| Blue Book, MUFON & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
+| Sky, weather, launches, airspace, MUFON Journal pages, sighting-checker scoring | `src/services/*.js` |
 | Dossier, list, timeline, modals, sky chart, story mode | `src/ui/*.js` |
 
 <details>
@@ -237,10 +253,10 @@ src/
               airspace.js (military airspace volumes)
   services/   wiki.js (Wikipedia summaries, Commons media & geosearch) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
-              explain.js (sighting checker scoring)
+              explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
-              verify-media.mjs · fix-cesium-base.mjs
+              build-mufon.mjs · verify-media.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
 tests/        Vitest suites
 docs/SPEC.md  the full product spec (the improved prompt this was built from)
 ```
@@ -257,6 +273,7 @@ All datasets ship in `public/data/` and are rebuilt by scripts:
 | `npm run build:bluebook` | Internet Archive collection [`project-blue-book`](https://archive.org/details/project-blue-book), geocoded offline with [GeoNames](https://www.geonames.org/) cities1000 | `bluebook.json` |
 | `npm run build:airspace` | FAA special-use airspace (ArcGIS open data), simplified | `airspace.json` |
 | `npm run build:nuforc` | [planetsig/ufo-reports](https://github.com/planetsig/ufo-reports) (geocoded NUFORC), facts only with the narratives removed | `nuforc.json` |
+| `npm run build:mufon` | The MUFON Archive on the Internet Archive ([`MUFON_UFO_Journal_-_Skylook`](https://archive.org/details/MUFON_UFO_Journal_-_Skylook)). It reads each issue's OCR text page by page, finds "Town, State" places in sighting reports (skipping addresses, meetings and hometowns), geocodes them with GeoNames and matches pages to curated cases. Only places, page numbers and short quotes are stored. | `mufon.json` |
 | `npm run verify:media` | Checks every Commons file, Wikipedia title, DVIDS id and Blue Book id that the case files reference | — |
 | `npm test` | Vitest: case-file integrity (coordinates, taxonomy, track times, plausible altitudes), the region resolver, sky, weather, airspace and launch helpers, sighting-checker scoring, story text, OSM building tiles and dataset schemas | — |
 
@@ -279,6 +296,7 @@ It then appears on the globe.
 - **Official releases are often region-only.** The magenta ring is the whole area named in the release.
 - **Blue Book pins mark the town in the file name**, not the exact spot.
 - **NUFORC reports are unverified.** They show where people report things.
+- **MUFON places are found automatically.** A violet pin is a town named in a journal report. That's usually where the sighting was, but sometimes it's a witness's hometown or where a report was filed. Every pin links to its page so you can check.
 - **Times can be approximate.** 36 older cases record only the date or part of the day. They are marked *time approx.*, and the sky, weather and story say so.
 
 ## Deploy your own
@@ -317,6 +335,7 @@ Corrections and new cases are welcome, especially with sources.
   - Media: Wikimedia Commons. The licence and author of each file are shown in the app.
   - Summaries: Wikipedia (CC BY-SA).
   - Blue Book scans: Internet Archive / NARA.
+  - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
 - **Other data:**
   - Launches: [Launch Library 2](https://thespacedevs.com/llapi) by The Space Devs.
   - Weather: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0), ERA5 reanalysis by ECMWF / Copernicus.

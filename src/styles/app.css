@@ -265,6 +265,7 @@ details.filters .active-count { color: var(--accent); margin-left: 6px; }
 .badge.status-explained, .badge.status-identified { color: var(--status-explained); }
 .badge.official { color: var(--official); border-color: rgba(255, 92, 225, 0.4); }
 .badge.path { color: var(--uap); border-color: rgba(125, 255, 178, 0.4); }
+.badge.mufon { color: #b58cff; border-color: rgba(181, 140, 255, 0.45); }
 
 /* ── Dossier ───────────────────────────────────── */
 .d-title { font-size: 20px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
@@ -348,6 +349,13 @@ details.filters .active-count { color: var(--accent); margin-left: 6px; }
 .source-list { list-style: none; display: grid; gap: 6px; }
 .source-list li { font-size: 12px; line-height: 1.4; display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; }
 .source-list .badge { margin-top: 1px; }
+.mufon-quote { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 11.5px; line-height: 1.45; overflow-wrap: anywhere; }
+blockquote.mufon-quote.big { margin: 0; padding: 8px 10px; border-left: 2px solid #b58cff; background: rgba(181, 140, 255, 0.07); border-radius: 0 8px 8px 0; font-size: 12.5px; color: var(--text-primary); }
+.mufon-years { display: grid; gap: 4px; }
+.mufon-years details { border: 1px solid var(--glass-border); border-radius: 8px; padding: 5px 9px; }
+.mufon-years summary { cursor: pointer; font: 600 11px var(--font-mono); letter-spacing: 0.08em; color: #b58cff; }
+.mufon-years .links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.ocr-text { white-space: pre-wrap; font-size: 11px; line-height: 1.45; max-height: 320px; overflow: auto; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--glass-border); border-radius: 9px; padding: 10px; margin-top: 8px; }
 
 .site-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .site-links a { display: block; text-align: center; }

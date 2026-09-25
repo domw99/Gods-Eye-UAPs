@@ -5,6 +5,7 @@ import { STATUS, CATEGORY, EVIDENCE, SHAPES, evidenceScore, shapeClasses } from 
 import { trackStats } from '../layers/tracks.js';
 import { skyAt } from '../services/sky.js';
 import { formatDuration } from '../util/geo.js';
+import { issueDate } from '../services/mufon.js';
 
 /** Modal dialogs: government files library, sighting log, about, lightbox. */
 const root = () => document.getElementById('modal-root');
@@ -29,20 +30,23 @@ function modal(title, content, { wide = true } = {}) {
   const backdrop = root().querySelector('.modal-backdrop');
   backdrop.addEventListener('click', (e) => {
     if (e.target.hasAttribute('data-close') || e.target.closest('button[data-close]')) closeModal();
+    // In-app links (#/case/…, #/mufon/…) open a record behind the dialog, so close it.
+    else if (e.target.closest('a[href^="#/"]')) closeModal();
   });
   backdrop.querySelector('.modal button, .modal input, .modal a')?.focus();
   return backdrop;
 }
 
-export function openGovFiles(stats, officialUnplaced = []) {
+export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) {
   const groups = [...new Set(GOV_FILES.map((f) => f.group))];
   const content = html`
-    <h2>Government UFO / UAP files</h2>
-    <p class="lead">Primary sources from the U.S. government and others. Official videos are on the globe (magenta), Project Blue Book case files are a map layer (amber), and every link below opens the original archive.</p>
+    <h2>UFO / UAP files</h2>
+    <p class="lead">Primary sources from the U.S. government, other governments and MUFON. Official videos are on the globe (magenta), Project Blue Book case files (amber) and the MUFON files (violet) are map layers, and every link below opens the original archive.</p>
     <div class="stat-row">
       <div class="stat"><div class="v">${stats.cases}</div><div class="k">CURATED CASE FILES</div></div>
       <div class="stat"><div class="v">${stats.official}</div><div class="k">OFFICIAL U.S. RELEASES</div></div>
       <div class="stat"><div class="v">${stats.bluebook}</div><div class="k">BLUE BOOK FILES</div></div>
+      <div class="stat"><div class="v">${stats.mufon}</div><div class="k">MUFON JOURNAL ISSUES</div></div>
       <div class="stat"><div class="v">${stats.nuforc}</div><div class="k">CIVILIAN REPORTS</div></div>
     </div>
     ${groups.map(
@@ -57,7 +61,7 @@ export function openGovFiles(stats, officialUnplaced = []) {
             ${(f.commons || []).map((d) => html`<a class="chip small" href="${commonsPage(d.file)}" target="_blank" rel="noopener">📄 ${d.label}</a>`)}
           </div>
         </article>`,
-      )}</div>`,
+      )}</div>${group === 'The MUFON files' ? html`<div id="mufon-browse" class="mufon-browse"><div class="loading-line">Loading the journal index…</div></div>` : ''}`,
     )}
     ${officialUnplaced.length
       ? html`<div class="section-label" style="margin-top:18px">OFFICIAL RECORDS WITHOUT A LOCATION (${officialUnplaced.length})</div>
@@ -65,7 +69,38 @@ export function openGovFiles(stats, officialUnplaced = []) {
           (o) => html`<li><span class="badge official">${o.type === 'video' ? 'VIDEO' : 'IMAGE'}</span><a href="#/official/${o.dvidsId}">${o.title}</a></li>`,
         )}</ul>`
       : ''}`;
-  modal('GOV FILES', content);
+  modal('FILES', content);
+  if (mufonPromise) fillMufonBrowse(mufonPromise);
+}
+
+/** Every journal issue by year, and the chapter newsletters by chapter. */
+async function fillMufonBrowse(promise) {
+  const el = document.getElementById('mufon-browse');
+  try {
+    const m = await promise;
+    if (!document.body.contains(el)) return;
+    const years = [...new Set(m.issues.map((is) => is.year))];
+    const first = (is) => (is.cover ? 1 : 0);
+    mount(
+      el,
+      html`<div class="section-label" style="margin-top:12px">MUFON UFO JOURNAL — EVERY ISSUE (${m.issues.length})</div>
+      <div class="mufon-years">${years.map(
+        (y) => html`<details><summary>${y}</summary><div class="links">${m.issues
+          .filter((is) => is.year === y)
+          .map((is) => html`<a class="chip small" href="#/mufon/${encodeURIComponent(is.id)}/${first(is)}">${issueDate(is).replace(` ${y}`, '')}${is.number ? ` · No. ${is.number}` : ''}</a>`)}</div></details>`,
+      )}</div>
+      ${m.chapters.length
+        ? html`<div class="section-label" style="margin-top:12px">CHAPTER NEWSLETTERS (${m.chapters.reduce((n, c) => n + c.items.length, 0)})</div>
+          <div class="mufon-years">${m.chapters.map(
+            (c) => html`<details><summary>${c.name} <span class="dim">· ${c.items.length}</span></summary><div class="links">${c.items.map(
+              ([id, title, date]) => html`<a class="chip small" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">${date ? date.slice(0, 7) : title} ↗</a>`,
+            )}</div></details>`,
+          )}</div>`
+        : ''}`,
+    );
+  } catch {
+    if (document.body.contains(el)) mount(el, html`<div class="loading-line">The journal index could not be loaded.</div>`);
+  }
 }
 
 export function openAbout(meta) {
@@ -77,6 +112,7 @@ export function openAbout(meta) {
       <p><b style="color:#00d4ff">Case files</b> — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).</p>
       <p><b style="color:#ff5ce1">Official U.S. footage</b> — every UAP video and image the Department of War / AARO has published on DVIDS (PURSUE, war.gov/UFO). Most releases give only a region, shown as a ring.</p>
       <p><b style="color:#ffb547">Project Blue Book</b> — scanned U.S. Air Force case files (1947–1969), geocoded from their file names.</p>
+      <p><b style="color:#b58cff">MUFON files</b> — the Mutual UFO Network’s journal (Skylook and the MUFON UFO Journal, 1967–2008), released free by MUFON and The Black Vault. Towns named in its sighting reports are on the map, found automatically in the OCR text, and each links to its page. Case dossiers list the journal pages that discuss them.</p>
       <p><b style="color:#ff7a45">Civilian reports</b> — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.</p>
       <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
       <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>

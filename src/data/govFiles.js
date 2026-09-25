@@ -1,5 +1,6 @@
 /**
- * Government UFO/UAP file library — primary sources the console links to.
+ * UFO/UAP file library — primary sources the console links to: government
+ * records, then the MUFON files and civilian databases.
  * `commons` entries are public-domain copies hosted on Wikimedia Commons.
  */
 export const GOV_FILES = [
@@ -240,6 +241,45 @@ export const GOV_FILES = [
     links: [
       { label: 'nuforc.org', url: 'https://nuforc.org/' },
       { label: 'Geocoded dataset (planetsig)', url: 'https://github.com/planetsig/ufo-reports' },
+    ],
+  },
+  // ── MUFON ─────────────────────────────────────────────
+  {
+    id: 'mufon-journal',
+    group: 'The MUFON files',
+    title: 'MUFON UFO Journal & Skylook (1967–2008)',
+    agency: 'Mutual UFO Network (MUFON)',
+    years: '1967–2008',
+    kind: 'archive',
+    text: 'MUFON’s monthly journal: field investigations, sighting reports, radar and trace cases, and research. MUFON and The Black Vault released the back issues free as “The MUFON Archive”. The MUFON files layer (violet) places the towns named in its reports, and each case dossier lists the journal pages that discuss it. Browse every issue below.',
+    links: [
+      { label: 'Internet Archive (with OCR)', url: 'https://archive.org/details/MUFON_UFO_Journal_-_Skylook' },
+      { label: 'The Black Vault PDFs', url: 'https://documents.theblackvault.com/documents/MUFON/Journals/' },
+      { label: 'Current MUFON Journal', url: 'https://mufon.com/mufon-journal/' },
+    ],
+  },
+  {
+    id: 'mufon-chapters',
+    group: 'The MUFON files',
+    title: 'MUFON state chapter newsletters',
+    agency: 'MUFON state and regional chapters',
+    years: '1970s–2000s',
+    kind: 'archive',
+    text: 'Newsletters from MUFON chapters, including Minnesota, Arizona, Massachusetts, New Mexico, Ohio, Michigan, Missouri, New Hampshire and Pennsylvania. The Archives for the Unexplained (Sweden) scanned them, and the Internet Archive hosts them. They are listed below by chapter.',
+    links: [{ label: 'Internet Archive: UFO newsletters', url: 'https://archive.org/search?query=collection%3Aufonewsletters+AND+title%3AMUFON' }],
+  },
+  {
+    id: 'mufon-cms',
+    group: 'The MUFON files',
+    title: 'MUFON Case Management System (CMS)',
+    agency: 'Mutual UFO Network',
+    years: '2006–',
+    kind: 'database',
+    text: 'MUFON’s database of sightings reported by the public and followed up by its field investigators. The latest reports are public; full case narratives are for members. MUFON’s terms forbid copying and redistributing the database, so it is linked here, not mirrored.',
+    links: [
+      { label: 'Report a sighting / MUFON CMS', url: 'https://www.mufoncms.com/' },
+      { label: 'Latest 20 reports', url: 'https://mufoncms.com/last_20_public.html' },
+      { label: 'Database terms', url: 'https://mufon.com/search_database-terms-and-conditions/' },
     ],
   },
 ];

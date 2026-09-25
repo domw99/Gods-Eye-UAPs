@@ -10,6 +10,7 @@ import { skySection } from './skychart.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
 import { relativeTime } from '../layers/launches.js';
+import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, MUFON_LICENSE } from '../services/mufon.js';
 
 /**
  * Right-hand dossier. One renderer per record type; async sections (Commons
@@ -451,6 +452,9 @@ export function renderCase(item, ctx) {
     ${section('GOVERNMENT FILES — PROJECT BLUE BOOK', html`<div id="d-bluebook"><div class="loading-line">${
       date.getUTCFullYear() >= 1947 && date.getUTCFullYear() <= 1969 ? 'Searching Blue Book case files…' : 'Outside Blue Book’s 1947–1969 coverage.'
     }</div></div>`)}
+    ${section('MUFON FILES — MUFON UFO JOURNAL', html`<div id="d-mufon"><div class="loading-line">${
+      date.getUTCFullYear() <= 2008 ? 'Searching the MUFON UFO Journal (1967–2008)…' : 'After the journal archive ends (1967–2008).'
+    }</div></div>`)}
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
     ${section(
       'THE LOCATION',
@@ -479,6 +483,16 @@ export function renderCase(item, ctx) {
     fillNearby(token, document.getElementById('d-nearby'), c.lat, c.lon, radius);
   }
   const year = date.getUTCFullYear();
+  if (year <= 2008 && ctx.mufonFor)
+    ctx
+      .mufonFor(c)
+      .then((m) => {
+        if (token !== renderToken) return;
+        mount(document.getElementById('d-mufon'), mufonCaseBlock(m));
+      })
+      .catch(() => {
+        if (token === renderToken) mount(document.getElementById('d-mufon'), html`<div class="loading-line">The MUFON files could not be loaded.</div>`);
+      });
   if (year >= 1947 && year <= 1969)
     ctx
       .bluebookNear(c, 150)
@@ -557,6 +571,90 @@ export async function showOcr(id) {
   }
 }
 
+/* ── MUFON files ───────────────────────────────────────── */
+
+const mufonHref = (is, leaf) => `#/mufon/${encodeURIComponent(is.id)}/${leaf}`;
+
+function mufonHitList(hits) {
+  return html`<ul class="source-list mufon-hits">${hits.map(
+    (h) => html`<li><span class="badge mufon">MUFON</span><span><a href="${mufonHref(h.is, h.leaf)}">${issueDate(h.is)} · p. ${pageNumber(h.is, h.leaf)}</a>${
+      h.place ? html` · ${h.place}` : ''
+    }${h.distKm != null ? html` · ${Math.round(h.distKm)} km away` : ''}<span class="mufon-quote">${h.quote}</span></span></li>`,
+  )}</ul>`;
+}
+
+function mufonCaseBlock(m) {
+  if (!m.hits.length && !m.near.length)
+    return html`<div class="loading-line">No pages in the journal archive matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of Skylook and the MUFON UFO Journal (1967–2008) for “${m.term || 'the case name'}”.</p>`;
+  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">Pages that mention <b>${m.term}</b>${m.total > m.hits.length ? ` (first ${m.hits.length} of ${m.total})` : ''}:</p>${mufonHitList(m.hits)}` : ''}
+    ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in the journal:</p>${mufonHitList(m.near)}` : ''}
+    <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>`;
+}
+
+/**
+ * One journal page: the place picked on the map (if any), the page itself in
+ * the Internet Archive reader, and the other places named in the issue.
+ */
+export function renderMufon({ is, leaf, record, onPage, inIssue }) {
+  const token = open('MUFON FILES');
+  const page = pageNumber(is, leaf);
+  const others = inIssue.filter((r) => r !== record);
+  const content = html`
+    <div class="d-title">${record ? html`${record.place} <span class="dim">in</span> ${issueDate(is)}` : issueLabel(is)}</div>
+    <div class="d-sub">${issueLabel(is)} · page ${page}${record ? html`<br />${formatDMS(record.lat, record.lon)} · TOWN NAMED IN THE TEXT` : ''}</div>
+    <div class="d-badges">${statusBadge('unassessed')}<span class="badge mufon">MUFON FILES</span><span class="badge">CIVILIAN INVESTIGATION</span></div>
+    ${record
+      ? section('WHAT THE PAGE SAYS', html`<blockquote class="mufon-quote big">${record.quote}</blockquote>
+        <p class="caveat">This place was found automatically in the OCR text. It is usually where a sighting happened, but it can be where a witness lived or a report came from. Read the page to check.</p>`)
+      : ''}
+    ${onPage.length > (record ? 1 : 0)
+      ? section('PLACES ON THIS PAGE', mufonHitList(onPage.filter((r) => r !== record).map((r) => ({ is, leaf, place: r.place, quote: r.quote }))))
+      : ''}
+    ${section(
+      'THE JOURNAL PAGE',
+      html`<div class="video-wrap" style="aspect-ratio:3/4"><iframe src="${embedUrl(is, leaf)}" title="${issueLabel(is)}, page ${page}" loading="lazy" allowfullscreen></iframe></div>
+      <div class="btn-row">
+        ${leaf > (is.cover ? 1 : 0) ? html`<a class="chip" href="${mufonHref(is, leaf - 1)}">◀ PAGE ${page - 1}</a>` : ''}
+        ${leaf < is.pages - 1 ? html`<a class="chip" href="${mufonHref(is, leaf + 1)}">PAGE ${page + 1} ▶</a>` : ''}
+        <button class="chip" data-action="mufon-text" data-issue="${is.id}" data-leaf="${leaf}">READ PAGE TEXT</button>
+        <a class="chip" target="_blank" rel="noopener" href="${readerUrl(is, leaf)}">Internet Archive ↗</a>
+        <a class="chip" target="_blank" rel="noopener" href="${pdfUrl(is)}">PDF ↗</a>
+        <button class="chip" data-action="share">⧉ COPY LINK</button>
+      </div>
+      <div id="d-mufon-text"></div>`,
+    )}
+    ${others.length
+      ? section(
+          `ELSEWHERE IN THIS ISSUE (${others.length})`,
+          mufonHitList(others.slice(0, 40).map((r) => ({ is, leaf: r.leaf, place: r.place, quote: r.quote }))),
+        )
+      : ''}
+    ${record ? section('THE LOCATION', siteLinks(record.lat, record.lon)) : ''}
+    ${section(
+      'SOURCE',
+      html`<ul class="source-list">
+        <li><span class="badge mufon">MUFON</span><span>${is.title}, published by the Mutual UFO Network. Released free as “The MUFON Archive” by MUFON and <a href="https://www.theblackvault.com/" target="_blank" rel="noopener">The Black Vault</a>.</span></li>
+        <li><span class="badge">ARCHIVE</span><a href="${itemUrl()}" target="_blank" rel="noopener">Internet Archive: MUFON UFO Journal / Skylook, 1967–2008</a></li>
+        <li><span class="badge">LICENCE</span><a href="${MUFON_LICENSE}" target="_blank" rel="noopener">CC BY-NC-ND 4.0 (as published on the Internet Archive)</a></li>
+      </ul>`,
+    )}`;
+  mount(body(), content);
+  return token;
+}
+
+export async function showMufonText(is, leaf) {
+  const el = document.getElementById('d-mufon-text');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-line">Fetching the page text…</div>';
+  try {
+    const text = await pageText(is, leaf);
+    if (!document.body.contains(el)) return;
+    mount(el, html`<pre class="mono ocr-text">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
+  } catch {
+    mount(el, html`<div class="loading-line">Page text unavailable. Try the Internet Archive reader.</div>`);
+  }
+}
+
 export function renderNuforc(r) {
   open('NUFORC REPORT');
   mount(
@@ -589,7 +687,7 @@ export function renderUser(item, { onDelete }) {
     ${launchBlock(u.lat, u.lon, u.date)}
     ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
-    ${section('REPORT IT OFFICIALLY', html`<div class="btn-row"><a class="chip" href="https://nuforc.org/" target="_blank" rel="noopener">NUFORC ↗</a><a class="chip" href="https://www.aaro.mil/" target="_blank" rel="noopener">AARO (gov/mil personnel) ↗</a><a class="chip" href="https://www.cnes-geipan.fr/" target="_blank" rel="noopener">GEIPAN (France) ↗</a></div>`)}
+    ${section('REPORT IT OFFICIALLY', html`<div class="btn-row"><a class="chip" href="https://nuforc.org/" target="_blank" rel="noopener">NUFORC ↗</a><a class="chip" href="https://www.mufoncms.com/" target="_blank" rel="noopener">MUFON ↗</a><a class="chip" href="https://www.aaro.mil/" target="_blank" rel="noopener">AARO (gov/mil personnel) ↗</a><a class="chip" href="https://www.cnes-geipan.fr/" target="_blank" rel="noopener">GEIPAN (France) ↗</a></div>`)}
     ${section('THE LOCATION', siteLinks(u.lat, u.lon))}
     <div class="btn-row" style="margin-top:14px"><button class="chip" data-action="export-user">⇩ EXPORT MY SIGHTINGS (GeoJSON)</button><button class="chip" data-action="delete-user">Delete this entry</button></div>`,
   );

@@ -13,6 +13,7 @@ export function createTimeline({ onPlayToggle }) {
   let bars = new Array(N).fill(0);
   let barKinds = new Array(N).fill(null).map(() => ({ case: 0, official: 0, user: 0 }));
   let bluebook = null;
+  let mufon = null;
   let nuforc = null;
   let drag = null;
   let hoverYear = null;
@@ -83,6 +84,19 @@ export function createTimeline({ onPlayToggle }) {
       g.lineWidth = 1.5;
       g.stroke();
     }
+    // MUFON Journal line.
+    if (mufon) {
+      const mmax = Math.max(1, ...mufon);
+      g.beginPath();
+      mufon.forEach((v, i) => {
+        const x = xOf(YEAR_MIN + i, w) + bw / 2;
+        const y = pad.t + plotH - (v / mmax) * plotH * 0.95;
+        i ? g.lineTo(x, y) : g.moveTo(x, y);
+      });
+      g.strokeStyle = '#b58cff';
+      g.lineWidth = 1.5;
+      g.stroke();
+    }
     // Axis labels.
     g.fillStyle = 'rgba(232,234,237,0.45)';
     g.font = '10px JetBrains Mono, monospace';
@@ -97,6 +111,7 @@ export function createTimeline({ onPlayToggle }) {
       g.fillRect(x + bw / 2, pad.t, 1, plotH);
       const parts = [`${hoverYear}: ${bars[i]} records`];
       if (bluebook) parts.push(`${bluebook[i]} Blue Book`);
+      if (mufon) parts.push(`${mufon[i]} MUFON`);
       if (nuforc) parts.push(`${nuforc[i]} NUFORC`);
       const text = parts.join(' · ');
       g.font = '10.5px JetBrains Mono, monospace';
@@ -156,6 +171,10 @@ export function createTimeline({ onPlayToggle }) {
     },
     setBlueBook(counts) {
       bluebook = counts;
+      draw();
+    },
+    setMufon(counts) {
+      mufon = counts;
       draw();
     },
     setNuforc(counts) {

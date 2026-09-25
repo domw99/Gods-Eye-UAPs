@@ -17,8 +17,9 @@ import { renderLayers, renderFilters, renderList, bindList, markSelected } from 
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText,
 } from './ui/dossier.js';
+import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
 import { skyAt } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -38,6 +39,7 @@ const effects = createEffects(viewer);
 const itemLayer = createItemLayer(viewer);
 const trackLayer = createTrackLayer(viewer);
 const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', pixelSize: 5 });
+const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', pixelSize: 4.5 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', pixelSize: 2.5, alpha: 0.55, near: 1.6, far: 0.7 });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
@@ -52,7 +54,8 @@ let officialById = new Map();
 let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+let mufon = null; // { issues, records, byIssueId, cases, chapters }
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', mufon: '485 issues', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -95,6 +98,15 @@ function bluebookPasses(r) {
   return inYearRange(r.year);
 }
 
+/** MUFON journal mentions: civilian investigations with no per-report assessment or shape. */
+function mufonPasses(r) {
+  if (state.evidence.size) return false;
+  if (state.status.size && !state.status.has('unassessed')) return false;
+  if (state.shape.size) return false;
+  if (state.search && !r.place.toLowerCase().includes(state.search) && !r.quote.toLowerCase().includes(state.search)) return false;
+  return inYearRange(r.year);
+}
+
 const timeline = createTimeline({ onPlayToggle: toggleHistorySweep });
 
 let nuforcShapeClasses = null;
@@ -108,6 +120,10 @@ function refresh() {
   if (bluebook && state.layers.bluebook) {
     const n = bluebookLayer.filter((i) => bluebookPasses(bluebook.records[i]));
     layerCounts.bluebook = n.toLocaleString();
+  }
+  if (mufon && state.layers.mufon) {
+    const n = mufonLayer.filter((i) => mufonPasses(mufon.records[i]));
+    layerCounts.mufon = n.toLocaleString();
   }
   if (nuforc && state.layers.nuforc) {
     const evOk = !state.evidence.size && (!state.status.size || state.status.has('unassessed'));
@@ -137,6 +153,7 @@ subscribe((s, reason) => {
 async function applyLayers() {
   const L = state.layers;
   bluebookLayer.show = L.bluebook;
+  mufonLayer.show = L.mufon;
   nuforcLayer.show = L.nuforc;
   satLayer.show = L.satellites;
   buildingLayer.show = L.buildings;
@@ -145,8 +162,10 @@ async function applyLayers() {
   airspaceLayer.show = L.airspace;
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
   if (L.bluebook && !bluebook) await ensureBlueBook();
+  if (L.mufon && !mufon) await ensureMufon();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
+  timeline.setMufon(L.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
   timeline.setNuforc(L.nuforc && nuforc ? countByYear(Array.from(nuforc.date, (d) => Math.floor(d / 10000))) : null);
   refresh();
 }
@@ -220,6 +239,46 @@ function ensureBlueBook() {
   return bluebookPromise;
 }
 
+let mufonPromise = null;
+function ensureMufon() {
+  mufonPromise ||= (async () => {
+    renderLayersNow({ mufon: 'loading…' });
+    mufon = await loadMufon(BASE);
+    mufonLayer.setData(mufon.records, {
+      lat: (r) => r.lat,
+      lon: (r) => r.lon,
+      year: (r) => r.year,
+      jitter: (r, i, la, lo) => townJitter(`m${i}`, la, lo, 2.5),
+    });
+    layerCounts.mufon = mufon.records.length.toLocaleString();
+    return mufon;
+  })().catch((e) => {
+    mufonPromise = null;
+    toast('Could not load the MUFON files');
+    throw e;
+  });
+  return mufonPromise;
+}
+
+/** Journal pages about a curated case, plus reports from nearby places in the years after it. */
+async function mufonFor(c) {
+  const m = await ensureMufon();
+  const found = m.cases[c.id];
+  const hits = (found?.hits || []).map(([ii, leaf, quote]) => ({ is: m.issues[ii], leaf, quote }));
+  const seen = new Set(hits.map((h) => `${h.is.id}/${h.leaf}`));
+  const year = new Date(c.date).getUTCFullYear();
+  const near = [];
+  if (c.precision !== 'region')
+    for (const r of m.records) {
+      if (r.year < year || r.year > year + 3) continue;
+      const d = haversineKm(c.lat, c.lon, r.lat, r.lon);
+      const is = m.issues[r.issue];
+      if (d <= 40 && !seen.has(`${is.id}/${r.leaf}`)) near.push({ is, leaf: r.leaf, place: r.place, quote: r.quote, distKm: d });
+    }
+  near.sort((a, b) => a.is.index - b.is.index);
+  return { term: found?.term, total: found?.total || 0, hits, near: near.slice(0, 6), issues: m.issues.length };
+}
+
 let nuforcPromise = null;
 function ensureNuforc() {
   nuforcPromise ||= (async () => {
@@ -287,7 +346,7 @@ function select(key, source = 'api') {
   trackLayer.clear();
   hidePlayback();
   if (item.kind === 'case') {
-    renderCase(item, { officialById, bluebookNear, airspaceFor });
+    renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor });
     const loaded = trackLayer.load(item.ref);
     if (loaded) showPlayback();
     flyToItem(item, { tracks: !!loaded });
@@ -325,6 +384,31 @@ async function selectBlueBook(id) {
   document.getElementById('hud-tgt').textContent = `BLUE BOOK ${rec.place}`.slice(0, 40).toUpperCase();
 }
 
+async function selectMufonPage(issueId, leaf, recordIndex = null) {
+  stopTour();
+  story.stop(true);
+  const m = await ensureMufon();
+  const is = m.byIssueId.get(issueId);
+  if (!is || !(leaf >= 0 && leaf < is.pages)) return toast('That MUFON Journal page was not found');
+  const inIssue = m.records.filter((r) => r.issue === is.index).sort((a, b) => a.leaf - b.leaf);
+  const onPage = inIssue.filter((r) => r.leaf === leaf);
+  const record = recordIndex != null && m.records[recordIndex]?.issue === is.index ? m.records[recordIndex] : onPage[0] || null;
+  if (record && !state.layers.mufon) setLayer('mufon', true);
+  state.selected = null;
+  markSelected(null);
+  trackLayer.clear();
+  hidePlayback();
+  itemLayer.showRegion(null);
+  renderMufon({ is, leaf, record, onPage, inIssue });
+  if (record)
+    viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(record.lon, record.lat), 10), {
+      duration: 2,
+      offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), 60e3),
+    });
+  setHash(`#/mufon/${encodeURIComponent(is.id)}/${leaf}`);
+  document.getElementById('hud-tgt').textContent = `MUFON ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase();
+}
+
 function deselect() {
   story.stop(true);
   state.selected = null;
@@ -346,6 +430,11 @@ function setHash(h) {
 }
 
 function routeFromHash() {
+  const mj = location.hash.match(/^#\/mufon\/([^/]+)\/(\d+)$/);
+  if (mj) {
+    selectMufonPage(decodeURIComponent(mj[1]), +mj[2]);
+    return true;
+  }
   const m = location.hash.match(/^#\/(case|official|user|bluebook)\/(.+)$/);
   if (!m) return false;
   const [, kind, raw] = m;
@@ -381,6 +470,10 @@ handler.setInputAction((click) => {
   if (!hit) return;
   if (hit.type === 'item') select(hit.item.key, 'globe');
   else if (hit.type === 'bluebook') selectBlueBook(bluebook.records[hit.index].id);
+  else if (hit.type === 'mufon') {
+    const r = mufon.records[hit.index];
+    selectMufonPage(mufon.issues[r.issue].id, r.leaf, r.index);
+  }
   else if (hit.type === 'nuforc') {
     const i = hit.index;
     const d = String(nuforc.date[i]);
@@ -426,6 +519,10 @@ handler.setInputAction((move) => {
     else if (hit?.type === 'bluebook') {
       const r = bluebook.records[hit.index];
       lines = [`Blue Book · ${r.place}`, `${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · USAF case file`];
+    } else if (hit?.type === 'mufon') {
+      const r = mufon.records[hit.index];
+      const is = mufon.issues[r.issue];
+      lines = [`MUFON · ${r.place}`, `${issueDate(is)} · journal p. ${pageNumber(is, r.leaf)}`];
     } else if (hit?.type === 'nuforc')
       lines = [nuforc.places[nuforc.place[hit.index]], `${String(nuforc.date[hit.index]).slice(0, 4)} · ${nuforc.shapes[nuforc.shape[hit.index]]}`];
     else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || 'Satellite', 'live position'];
@@ -548,6 +645,7 @@ bindDossierActions({
     });
   },
   ocr: (btn) => showOcr(btn.dataset.id),
+  'mufon-text': (btn) => mufon && showMufonText(mufon.byIssueId.get(btn.dataset.issue), +btn.dataset.leaf),
   skycheck: () => {
     const item = itemByKey(state.selected);
     if (!item) return;
@@ -792,9 +890,11 @@ const openFiles = () =>
       cases: CASE_ITEMS.length,
       official: officialItems.length,
       bluebook: bluebook ? bluebook.records.length.toLocaleString() : '10,763',
+      mufon: mufon ? mufon.issues.length : 485,
       nuforc: nuforc ? nuforc.count.toLocaleString() : '80,332',
     },
     officialMeta ? officialMeta.items.filter((o) => !o.location) : [],
+    ensureMufon(),
   );
 document.getElementById('btn-files').addEventListener('click', openFiles);
 document.getElementById('btn-log').addEventListener('click', openLog);
@@ -984,4 +1084,4 @@ if (!routed && !viewFromParam(params.get('view')))
 setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, select, selectBlueBook, selectMufonPage, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

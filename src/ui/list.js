@@ -8,6 +8,7 @@ export const LAYER_DEFS = [
   { id: 'cases', name: 'Case files', sub: 'Curated encounters with reconstructed paths', color: '#00d4ff' },
   { id: 'official', name: 'Official U.S. footage', sub: 'PURSUE / AARO releases via DVIDS', color: '#ff5ce1' },
   { id: 'bluebook', name: 'Project Blue Book', sub: 'USAF case files 1947–1969 (scans)', color: '#ffb547' },
+  { id: 'mufon', name: 'MUFON files', sub: 'MUFON UFO Journal 1967–2008 · places named', color: '#b58cff' },
   { id: 'nuforc', name: 'Civilian reports', sub: 'NUFORC, ~80k unverified reports', color: '#ff7a45' },
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
   { id: 'launches', name: 'Rocket launches', sub: 'Last 14 days and next 30 · Launch Library 2', color: '#ffcf5c' },
