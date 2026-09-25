@@ -21,6 +21,16 @@ const panel = () => document.getElementById('dossier');
 const body = () => document.getElementById('dossier-body');
 let renderToken = 0;
 
+/**
+ * Wait a moment before calling remote services, and skip the call if another
+ * record has been opened meanwhile. Stepping quickly through cases ([ ], the
+ * tour) otherwise fires a burst of requests that rate limits then refuse.
+ */
+async function settle(token, ms = 350) {
+  await new Promise((r) => setTimeout(r, ms));
+  return token === renderToken;
+}
+
 const fmtDate = (d, opts = {}) =>
   d.toLocaleString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', ...opts });
 
@@ -88,7 +98,7 @@ const windLine = (speed, from) =>
 
 async function fillWeather(token, lat, lon, when, uapTrack, approx = false) {
   const el = document.getElementById('d-weather');
-  if (!el) return;
+  if (!el || !(await settle(token))) return;
   let wx;
   try {
     wx = await weatherAt(lat, lon, when);
@@ -321,6 +331,7 @@ function imageCard(info, caption) {
 }
 
 async function fillMedia(token, container, media, officialById) {
+  if (!(await settle(token))) return;
   const commonsTitles = media.filter((m) => m.commons).map((m) => m.commons);
   let infos = new Map();
   try {
@@ -352,6 +363,7 @@ async function fillMedia(token, container, media, officialById) {
 }
 
 async function fillWiki(token, container, title) {
+  if (!(await settle(token))) return;
   try {
     const s = await wikiSummary(title.split('#')[0]);
     if (token !== renderToken) return;
@@ -368,6 +380,7 @@ async function fillWiki(token, container, title) {
 }
 
 async function fillNearby(token, container, lat, lon, radiusM) {
+  if (!(await settle(token))) return;
   try {
     const photos = (await photosNear(lat, lon, radiusM, 30)).slice(0, 12);
     if (token !== renderToken) return;

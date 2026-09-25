@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { horizonOf } from '../app/horizon.js';
 import { TRACK_KINDS } from '../data/taxonomy.js';
 import { densifyTrack, trackLengthKm } from '../util/geo.js';
 
@@ -40,6 +41,7 @@ function dotImage(color, size = 18) {
 }
 
 export function createTrackLayer(viewer) {
+  const horizon = horizonOf(viewer);
   const source = new Cesium.CustomDataSource('uap-tracks');
   viewer.dataSources.add(source);
   let current = null; // { caseData, start, stop, movers: [], primary }
@@ -121,7 +123,7 @@ export function createTrackLayer(viewer) {
             color: color,
             outlineColor: Cesium.Color.BLACK.withAlpha(0.6),
             outlineWidth: 1,
-            disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            disableDepthTestDistance: horizon.property,
           },
           label: p[4]
             ? {
@@ -138,7 +140,7 @@ export function createTrackLayer(viewer) {
                 backgroundColor: Cesium.Color.fromCssColorString('#05070c').withAlpha(0.7),
                 backgroundPadding: new Cesium.Cartesian2(6, 4),
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 6e5),
-                disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                disableDepthTestDistance: horizon.property,
               }
             : undefined,
         });
@@ -164,7 +166,7 @@ export function createTrackLayer(viewer) {
         position: sampled,
         billboard: {
           image: dotImage(color.toCssColorString(), track.kind === 'uap' ? 20 : 14),
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          disableDepthTestDistance: horizon.property,
           scaleByDistance: new Cesium.NearFarScalar(1e4, 1.4, 5e6, 0.6),
         },
         label: {
@@ -176,7 +178,7 @@ export function createTrackLayer(viewer) {
           style: Cesium.LabelStyle.FILL_AND_OUTLINE,
           pixelOffset: new Cesium.Cartesian2(14, 14),
           horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          disableDepthTestDistance: horizon.property,
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 4e6),
         },
         path: {
@@ -199,7 +201,7 @@ export function createTrackLayer(viewer) {
           color: Cesium.Color.fromCssColorString('#ffd166'),
           outlineColor: Cesium.Color.BLACK,
           outlineWidth: 1,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          disableDepthTestDistance: horizon.property,
         },
         label: {
           text: `◉ ${obs.label}`,
@@ -211,7 +213,7 @@ export function createTrackLayer(viewer) {
           pixelOffset: new Cesium.Cartesian2(10, 0),
           horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2e6),
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          disableDepthTestDistance: horizon.property,
         },
       });
       allPositions.push(Cesium.Cartesian3.fromDegrees(obs.lon, obs.lat, 0));

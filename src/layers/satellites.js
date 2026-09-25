@@ -13,6 +13,34 @@ const GROUPS = [
   { id: 'starlink', color: '#7dd3ff', size: 2.5, label: 'Starlink' },
 ];
 
+// CelesTrak asks clients not to download the same data more than once every
+// two hours and blocks those that do, so element sets are kept that long.
+const TLE_TTL = 2 * 3600e3;
+async function fetchTle(url) {
+  let cache = null;
+  try {
+    cache = await caches.open('gods-eye-uap-tle');
+  } catch {
+    /* Cache Storage needs a secure context */
+  }
+  const hit = cache ? await cache.match(url) : null;
+  if (hit && Date.now() - Number(hit.headers.get('x-fetched') || 0) < TLE_TTL) return hit.text();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`CelesTrak ${res.status}`);
+    const text = await res.text();
+    try {
+      await cache?.put(url, new Response(text, { headers: { 'content-type': 'text/plain', 'x-fetched': String(Date.now()) } }));
+    } catch {
+      /* storage full: fine, just not cached */
+    }
+    return text;
+  } catch (error) {
+    if (hit) return hit.text(); // an older copy beats nothing; positions drift slowly
+    throw error;
+  }
+}
+
 function parseTle(text) {
   const lines = text.split(/\r?\n/).map((l) => l.trimEnd()).filter(Boolean);
   const out = [];
@@ -46,9 +74,8 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     for (const g of GROUPS) {
       try {
         onStatus(`Loading ${g.label}…`);
-        const res = await fetch(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g.id}&FORMAT=tle`);
-        if (!res.ok) throw new Error(res.status);
-        for (const s of parseTle(await res.text())) {
+        const text = await fetchTle(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g.id}&FORMAT=tle`);
+        for (const s of parseTle(text)) {
           if (seen.has(s.norad)) continue;
           seen.add(s.norad);
           const point = collection.add({
@@ -61,6 +88,13 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
       } catch (error) {
         console.warn('[satellites]', g.id, error);
       }
+    }
+    if (!sats.length) {
+      // Nothing loaded (offline or CelesTrak down): allow a retry next time.
+      loaded = false;
+      loading = null;
+      onStatus('offline');
+      return;
     }
     onStatus(`${sats.length.toLocaleString()} satellites (CelesTrak, live)`);
     tick();

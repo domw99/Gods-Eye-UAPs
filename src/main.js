@@ -335,9 +335,14 @@ function flyToItem(item, { tracks } = {}) {
   );
 }
 
+// Blue Book and MUFON selections wait for their data; a newer selection wins.
+let selectToken = 0;
+
 function select(key, source = 'api') {
   const item = itemByKey(key);
   if (!item) return false;
+  selectToken++;
+  hideHover();
   if (source !== 'tour') stopTour();
   story.stop(true);
   state.selected = key;
@@ -365,7 +370,10 @@ function select(key, source = 'api') {
 async function selectBlueBook(id) {
   stopTour();
   story.stop(true);
+  const token = ++selectToken;
+  hideHover();
   const bb = await ensureBlueBook();
+  if (token !== selectToken) return;
   const rec = bb.byId.get(id);
   if (!rec) return toast('Blue Book file not found');
   if (!state.layers.bluebook) setLayer('bluebook', true);
@@ -387,7 +395,10 @@ async function selectBlueBook(id) {
 async function selectMufonPage(issueId, leaf, recordIndex = null) {
   stopTour();
   story.stop(true);
+  const token = ++selectToken;
+  hideHover();
   const m = await ensureMufon();
+  if (token !== selectToken) return;
   const is = m.byIssueId.get(issueId);
   if (!is || !(leaf >= 0 && leaf < is.pages)) return toast('That MUFON Journal page was not found');
   const inIssue = m.records.filter((r) => r.issue === is.index).sort((a, b) => a.leaf - b.leaf);
@@ -410,6 +421,8 @@ async function selectMufonPage(issueId, leaf, recordIndex = null) {
 }
 
 function deselect() {
+  selectToken++;
+  hideHover();
   story.stop(true);
   state.selected = null;
   markSelected(null);
@@ -464,8 +477,26 @@ function describePick(picked) {
   return null;
 }
 
+function hideHover() {
+  hoverEl.classList.add('hidden');
+  viewer.scene.canvas.style.cursor = '';
+}
+// Touch has no hover, and a tap would otherwise leave the label stuck on screen.
+let pointerIsTouch = false;
+viewer.scene.canvas.addEventListener('pointerdown', (e) => (pointerIsTouch = e.pointerType !== 'mouse'), true);
+viewer.scene.canvas.addEventListener('pointermove', (e) => (pointerIsTouch = e.pointerType !== 'mouse'), true);
+viewer.scene.canvas.addEventListener('wheel', hideHover, { passive: true });
+// When the camera moves under a still pointer, the label would describe the wrong spot.
+let cameraMoving = false;
+viewer.camera.moveStart.addEventListener(() => {
+  cameraMoving = true;
+  hideHover();
+});
+viewer.camera.moveEnd.addEventListener(() => (cameraMoving = false));
+
 handler.setInputAction((click) => {
   stopTour();
+  hideHover();
   const hit = describePick(viewer.scene.pick(click.position));
   if (!hit) return;
   if (hit.type === 'item') select(hit.item.key, 'globe');
@@ -510,6 +541,7 @@ handler.setInputAction((click) => {
 let hoverPending = false;
 handler.setInputAction((move) => {
   if (hoverPending) return;
+  if (pointerIsTouch || cameraMoving) return hideHover();
   hoverPending = true;
   requestAnimationFrame(() => {
     hoverPending = false;
@@ -540,17 +572,11 @@ handler.setInputAction((move) => {
       hoverEl.style.top = `${move.endPosition.y}px`;
       hoverEl.classList.remove('hidden');
       viewer.scene.canvas.style.cursor = 'pointer';
-    } else {
-      hoverEl.classList.add('hidden');
-      viewer.scene.canvas.style.cursor = '';
-    }
+    } else hideHover();
   });
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 viewer.scene.canvas.addEventListener('pointerdown', () => stopTour());
-viewer.scene.canvas.addEventListener('pointerleave', () => {
-  hoverEl.classList.add('hidden');
-  viewer.scene.canvas.style.cursor = '';
-});
+viewer.scene.canvas.addEventListener('pointerleave', hideHover);
 
 /* ── Playback bar ──────────────────────────────────────── */
 const pb = {
@@ -729,7 +755,9 @@ function exportUserLog() {
   };
   const blob = new Blob([JSON.stringify(fc, null, 2)], { type: 'application/geo+json' });
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'my-uap-sightings.geojson' });
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 function viewCenter() {
@@ -853,11 +881,13 @@ const TOUR = [
   'aguadilla-2013', 'gimbal-gofast-2015', 'north-american-shootdowns-2023',
 ].filter((id) => CASES.some((c) => c.id === id));
 let tourTimer = null;
+let tourPlayTimer = null;
 let tourIndex = 0;
 function tourStep() {
   const id = TOUR[tourIndex % TOUR.length];
   select(`case:${id}`, 'tour');
-  setTimeout(() => {
+  clearTimeout(tourPlayTimer);
+  tourPlayTimer = setTimeout(() => {
     if (tourTimer && trackLayer.current) trackLayer.play();
   }, 2600);
   toast(`TOUR ${tourIndex + 1}/${TOUR.length} — ${CASES.find((c) => c.id === id).title}`, 3500);
@@ -878,6 +908,7 @@ function startTour() {
 function stopTour() {
   if (!tourTimer) return;
   clearTimeout(tourTimer);
+  clearTimeout(tourPlayTimer);
   tourTimer = null;
   document.getElementById('btn-tour').textContent = '▶ TOUR';
 }
@@ -888,6 +919,7 @@ function stopTour() {
 const HOME_VIEW = { lon: -45, lat: 28, height: 17_500_000 };
 
 function flyHome(duration = 1.8) {
+  hideHover();
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(HOME_VIEW.lon, HOME_VIEW.lat, HOME_VIEW.height),
     orientation: { heading: 0, pitch: -Cesium.Math.PI_OVER_TWO, roll: 0 },
@@ -913,6 +945,7 @@ function resetView() {
 let zoomTarget = null; // where a running zoom is heading, so quick clicks add up
 
 function zoomView(dir) {
+  hideHover();
   const cam = viewer.camera;
   // Chase cam and story orbits look at a target: zoom toward it.
   if (viewer.trackedEntity || !Cesium.Matrix4.equals(cam.transform, Cesium.Matrix4.IDENTITY)) {
@@ -1017,9 +1050,10 @@ window.addEventListener('keydown', (e) => {
     document.getElementById('search').focus();
   } else if (e.key === '[') neighbour(-1);
   else if (e.key === ']') neighbour(1);
-  else if (e.key === ' ' && trackLayer.current) {
+  else if (e.key === ' ') {
     e.preventDefault();
-    pb.play.click();
+    if (trackLayer.current) pb.play.click();
+    else toggleHistorySweep();
   } else if (e.key.toLowerCase() === 't') startTour();
   else if (e.key.toLowerCase() === 'g') openFiles();
   else if (e.key.toLowerCase() === 'l') openLog();
@@ -1071,6 +1105,7 @@ subscribe((s, reason) => {
     placeAbort = new AbortController();
     try {
       const res = await fetch(`https://photon.komoot.io/api/?${new URLSearchParams({ q, limit: '3', lang: 'en' })}`, { signal: placeAbort.signal });
+      if (!res.ok) throw new Error(`Photon ${res.status}`);
       const json = await res.json();
       const places = (json.features || []).map((f) => ({
         name: f.properties.name,
@@ -1090,6 +1125,7 @@ subscribe((s, reason) => {
         if (!b) return;
         const p = places[Number(b.dataset.place)];
         const [w, n, east, sth] = p.extent || [];
+        hideHover();
         viewer.camera.flyTo({
           destination: p.extent
             ? Cesium.Rectangle.fromDegrees(w, sth, east, n)
@@ -1102,7 +1138,9 @@ subscribe((s, reason) => {
         toast(`${p.name} — case files, Blue Book and civilian layers show what was reported here`, 3500);
       };
     } catch (error) {
-      if (error.name !== 'AbortError') console.warn('[places]', error);
+      if (error.name === 'AbortError') return;
+      console.warn('[places]', error);
+      mount(placeList, html``);
     }
   }, 450);
 });

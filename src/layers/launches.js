@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { horizonOf } from '../app/horizon.js';
 
 /**
  * Launch pads with recent and upcoming launches (Launch Library 2). One glyph
@@ -67,6 +68,12 @@ export function createLaunchLayer(viewer) {
   const pastImg = rocketGlyph('#9aa7b5');
   let pads = [];
   let visible = false;
+  // Pads skip the depth test only up to the horizon (see app/horizon.js).
+  const horizon = horizonOf(viewer);
+  horizon.onChange((d) => {
+    for (let i = 0; i < billboards.length; i++) billboards.get(i).disableDepthTestDistance = d;
+    for (let i = 0; i < labels.length; i++) labels.get(i).disableDepthTestDistance = d;
+  });
 
   function setLaunches(launches) {
     billboards.removeAll();
@@ -82,7 +89,7 @@ export function createLaunchLayer(viewer) {
         height: 26,
         id,
         heightReference: Cesium.HeightReference.NONE,
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        disableDepthTestDistance: horizon.distance,
         scaleByDistance: new Cesium.NearFarScalar(2e5, 1.3, 2e7, 0.7),
       });
       const l = p.next || p.last;
@@ -97,7 +104,7 @@ export function createLaunchLayer(viewer) {
         style: Cesium.LabelStyle.FILL_AND_OUTLINE,
         pixelOffset: new Cesium.Cartesian2(16, -4),
         horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        disableDepthTestDistance: horizon.distance,
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 9e6),
       });
     });

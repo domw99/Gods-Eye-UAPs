@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { horizonOf } from '../app/horizon.js';
 
 /**
  * Large point layers (Project Blue Book ~10k files, NUFORC ~80k reports)
@@ -14,6 +15,21 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
   const points = [];
   let years = [];
   let rowIndex = [];
+
+  // Points skip the depth test only up to the horizon, so the globe hides the
+  // far side (see app/horizon.js). Rewriting tens of thousands of points is
+  // costly, so the applied distance keeps a 15% margin inside the horizon and
+  // only changes when the horizon moves inside it (far-side points would
+  // show) or grows well beyond it.
+  const horizon = horizonOf(viewer);
+  let applied = horizon.distance * 0.85;
+  function applyHorizon(d, force = false) {
+    if (!force && d > applied && d < applied / 0.7) return;
+    applied = d * 0.85;
+    if (!collection.show) return; // applied again when the layer is shown
+    for (const p of points) p.disableDepthTestDistance = applied;
+  }
+  horizon.onChange((d) => applyHorizon(d));
 
   function setData(rows, { lat, lon, year, jitter = null }) {
     collection.removeAll();
@@ -32,7 +48,7 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
         outlineColor: Cesium.Color.BLACK.withAlpha(0.5),
         outlineWidth: pixelSize > 3 ? 1 : 0,
         scaleByDistance: new Cesium.NearFarScalar(1e5, near, 1.5e7, far),
-        disableDepthTestDistance: 5e6,
+        disableDepthTestDistance: applied,
         id: { layer: name, index },
       });
       points.push(p);
@@ -60,7 +76,9 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       return points.length;
     },
     set show(v) {
+      const was = collection.show;
       collection.show = v;
+      if (v && !was) applyHorizon(horizon.distance, true);
     },
     get show() {
       return collection.show;

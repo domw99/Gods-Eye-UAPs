@@ -165,7 +165,7 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
     const entry = {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
       title: f.get('title').trim(),
-      date: new Date(f.get('date')).toISOString(),
+      date: when.toISOString(),
       lat: Number(f.get('lat')),
       lon: Number(f.get('lon')),
       shape: f.get('shape'),
@@ -335,9 +335,12 @@ export function openExplain(o) {
     );
   });
   const results = el.querySelector('#ex-results');
+  let runId = 0;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = new FormData(form);
+    const when = new Date(f.get('date'));
+    if (Number.isNaN(when.getTime())) return toast('Check the date and time');
     const num = (k) => (f.get(k) === '' || f.get(k) == null ? null : Number(f.get(k)));
     const input = {
       date: new Date(f.get('date')).toISOString(),
@@ -356,14 +359,18 @@ export function openExplain(o) {
     };
     if (!Number.isFinite(input.lat) || !Number.isFinite(input.lon)) return toast('Check the coordinates');
     mount(results, html`<div class="loading-line">Checking the sky, satellites, launches and wind…</div>`);
+    // A second press starts a new check; only the latest one may show its results.
+    const id = ++runId;
     let r;
     try {
       r = await o.run(input);
     } catch (error) {
+      if (id !== runId) return;
       console.warn('[explain]', error);
       mount(results, html`<p class="caveat">The check failed: ${String(error?.message || error)}. Please try again.</p>`);
       return;
     }
+    if (id !== runId) return;
     const top = r.candidates.slice(0, 6);
     mount(
       results,

@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { horizonOf } from '../app/horizon.js';
 import { STATUS } from '../data/taxonomy.js';
 import { spiralOffset } from '../util/geo.js';
 
@@ -73,6 +74,7 @@ export function itemColor(item) {
 }
 
 export function createItemLayer(viewer) {
+  const horizon = horizonOf(viewer);
   const source = new Cesium.CustomDataSource('uap-items');
   viewer.dataSources.add(source);
   const entities = new Map(); // key -> entity
@@ -94,7 +96,7 @@ export function createItemLayer(viewer) {
       billboard: {
         image: glyph(item.kind, color, item.hasTrack),
         scaleByDistance: new Cesium.NearFarScalar(2e5, 1.0, 2e7, 0.55),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        disableDepthTestDistance: horizon.property,
         heightReference: Cesium.HeightReference.NONE,
       },
       label: {
@@ -107,7 +109,7 @@ export function createItemLayer(viewer) {
         pixelOffset: new Cesium.Cartesian2(16, 0),
         horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, item.kind === 'case' ? 3.5e6 : 9e5),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        disableDepthTestDistance: horizon.property,
       },
       properties: { itemKey: item.key },
     });

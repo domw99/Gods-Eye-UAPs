@@ -133,7 +133,11 @@ export function createTimeline({ onPlayToggle }) {
   canvas.addEventListener('pointerdown', (e) => {
     const w = canvas.getBoundingClientRect().width;
     drag = { start: yearAt(e.offsetX, w) };
-    canvas.setPointerCapture(e.pointerId);
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch {
+      /* the pointer is already gone; pointerup/cancel still end the drag */
+    }
   });
   canvas.addEventListener('pointermove', (e) => {
     const w = canvas.getBoundingClientRect().width;
@@ -149,11 +153,15 @@ export function createTimeline({ onPlayToggle }) {
     hoverYear = null;
     draw();
   });
-  canvas.addEventListener('pointerup', () => {
+  const endDrag = () => {
     if (!drag) return;
     drag = null;
     update({ yearRange: state.yearRange }, 'yearRange');
-  });
+  };
+  canvas.addEventListener('pointerup', endDrag);
+  // A cancelled touch never sends pointerup; without this the brush stayed live.
+  canvas.addEventListener('pointercancel', endDrag);
+  canvas.addEventListener('lostpointercapture', endDrag);
   canvas.addEventListener('dblclick', () => update({ yearRange: null }, 'yearRange'));
   document.getElementById('tl-play').addEventListener('click', onPlayToggle);
   new ResizeObserver(resize).observe(canvas);
