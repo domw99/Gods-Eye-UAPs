@@ -1,4 +1,4 @@
-import { p, commons, link, MIN, HR } from './helpers.js';
+import { p, commons, link, MIN, HR, bluebookPdf } from './helpers.js';
 
 /**
  * More North American cases: Air Force files, police reports, photo cases,
@@ -102,7 +102,9 @@ export default [
         ],
       },
     ],
-    media: [],
+    media: [
+      bluebookPdf('1951-02-7006481-49-50N50-03W-Atlantic-', 'Blue Book record card, 10 February 1951'),
+    ],
     bluebook: ['1951-02-7006481-49-50N50-03W-Atlantic-'],
     sources: [],
   },
@@ -157,7 +159,9 @@ export default [
         ],
       },
     ],
-    media: [],
+    media: [
+      bluebookPdf('1951-09-7010207-Monmouth-NewJersey', 'Blue Book record card: ground radar and visual, 10–11 September 1951'),
+    ],
     bluebook: ['1951-09-7010207-Monmouth-NewJersey'],
     sources: [],
   },
@@ -200,7 +204,9 @@ export default [
       },
     ],
     wiki: 'Flatwoods monster',
-    media: [],
+    media: [
+      commons('Flatwoods monster.png', 'Artist’s impression drawn from the witnesses’ descriptions'),
+    ],
     sources: [],
   },
   {
@@ -307,7 +313,9 @@ export default [
         ],
       },
     ],
-    media: [],
+    media: [
+      bluebookPdf('1954-06-8714325-Labador-Canada', 'Blue Book record card, 30 June 1954'),
+    ],
     bluebook: ['1954-06-8714325-Labador-Canada'],
     sources: [
       link(
@@ -388,7 +396,9 @@ export default [
       { t: 'Nov 4–5', text: 'Reports picked up by the press during the Levelland wave.' },
     ],
     tracks: [],
-    media: [],
+    media: [
+      bluebookPdf('1957-11-7228923-WhiteSands-NewMexico', 'Blue Book record card, 3 November 1957'),
+    ],
     bluebook: ['1957-11-7228923-WhiteSands-NewMexico'],
     sources: [],
   },
@@ -558,7 +568,9 @@ export default [
       { t: '1968', text: 'Reviewed by the Condon Committee; Blue Book lists it as a hoax.' },
     ],
     tracks: [],
-    media: [],
+    media: [
+      bluebookPdf('1965-08-6978001-SantaAna-California-9654-', 'One of Rex Heflin’s Polaroids through the truck window, from the Blue Book photo file', 6),
+    ],
     bluebook: ['1965-08-6978001-SantaAna-California-9654-', '1965-08-7461487-SantaAna-California'],
     sources: [],
   },
@@ -654,7 +666,10 @@ export default [
       },
     ],
     observers: [{ label: 'Minot AFB', lat: 48.4158, lon: -101.3581 }],
-    media: [],
+    media: [
+      bluebookPdf('1968-10-6981875-MinotAFB-NorthDakota-12548-', 'The B-52’s radar scope with the unknown return, 24 October 1968 (Blue Book photo file)', 2),
+      bluebookPdf('1968-10-7170577-MinotAFB-NorthDakota', 'Blue Book record card and case file'),
+    ],
     bluebook: ['1968-10-7170577-MinotAFB-NorthDakota', '1968-10-6981875-MinotAFB-NorthDakota-12548-'],
     sources: [],
   },
@@ -976,7 +991,9 @@ export default [
     tracks: [],
     observers: [{ label: 'Marfa Lights Viewing Area', lat: 30.2525, lon: -103.8839 }],
     wiki: 'Marfa lights',
-    media: [],
+    media: [
+      commons('Marfa Mystery Light (cropped twice).jpg', 'A Marfa light (centre) seen from the official viewing area east of Marfa'),
+    ],
     sources: [],
   },
   {
@@ -1008,7 +1025,9 @@ export default [
     tracks: [],
     observers: [{ label: "Wiseman's View overlook", lat: 35.9057, lon: -81.9079 }],
     wiki: 'Brown Mountain lights',
-    media: [],
+    media: [
+      commons('Mansfield Figure 1.png', 'Figure 1 of the U.S. Geological Survey study of the lights (G. R. Mansfield, USGS Circular 646)'),
+    ],
     sources: [],
   },
 ];

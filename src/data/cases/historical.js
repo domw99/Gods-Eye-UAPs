@@ -184,7 +184,9 @@ export default [
     ],
     tracks: [],
     wiki: 'Aurora, Texas, UFO incident',
-    media: [],
+    media: [
+      commons('Haydon article, Aurora, Texas, UFO incident, 1897.jpg', 'S. E. Haydon’s report in The Dallas Morning News, 19 April 1897'),
+    ],
     sources: [],
   },
   {

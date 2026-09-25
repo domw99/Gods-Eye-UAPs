@@ -1,4 +1,4 @@
-import { p, commons, dvids, ia, link, MIN, HR, DAY } from './helpers.js';
+import { p, commons, dvids, ia, link, MIN, HR, DAY, bluebookPdf } from './helpers.js';
 
 /**
  * Curated North American cases. Flight paths are reconstructions from the
@@ -266,7 +266,9 @@ export default [
       },
     ],
     wiki: 'Chiles-Whitted UFO encounter',
-    media: [],
+    media: [
+      bluebookPdf('1948-07-9670642-20Mi-SofMontgomery-Ala--144-', 'Air Force OSI special investigation report, August 1948 (Blue Book)', 2),
+    ],
     sources: [],
   },
   {
@@ -402,7 +404,10 @@ export default [
       },
     ],
     wiki: 'Mariana UFO film',
-    media: [],
+    media: [
+      commons('Nick Mariana UFO Footage 1950 Great Falls Montana.webm', 'Nick Mariana’s 16 mm film, 15 August 1950'),
+      bluebookPdf('1950-08-7273442-GreatFalls-Montana-792-', 'Frames from the film with the water tower, from the Blue Book photo file', 4),
+    ],
     sources: [],
   },
   {
@@ -432,7 +437,10 @@ export default [
     ],
     tracks: [],
     wiki: 'Lubbock Lights',
-    media: [],
+    media: [
+      bluebookPdf('1951-08-7273504-Lubbuck-Texas-978-', 'Carl Hart Jr.’s photograph of the lights, from the Blue Book photo file', 2),
+      bluebookPdf('1951-08-7273504-Lubbuck-Texas-978-', 'Another of Hart’s five photographs, as filed by the Air Force', 6),
+    ],
     sources: [],
   },
   {
@@ -527,7 +535,10 @@ export default [
       { label: 'Andrews AFB', lat: 38.8108, lon: -76.867 },
     ],
     wiki: '1952 Washington, D.C., UFO incident',
-    media: [],
+    media: [
+      commons("Maj. Gen. John A. Samford's Statement on Flying Saucers.webm", 'Maj. Gen. John Samford’s press conference, 29 July 1952 (newsreel)'),
+      commons('1952 UFO Flap - Air Force frequency graph of UFO reports.png', 'Air Force graph of UFO reports during the 1952 wave'),
+    ],
     sources: [],
   },
   {
@@ -678,7 +689,9 @@ export default [
       { label: 'Newell Wright — 10 mi E', lat: 33.5873, lon: -102.205 },
     ],
     wiki: 'Levelland UFO case',
-    media: [],
+    media: [
+      bluebookPdf('1957-11-7229541-VicinityLevelland-Texas', 'Blue Book record card and investigation, 2–3 November 1957'),
+    ],
     bluebook: ['1957-11-6781581-Levelland-Texas', '1957-11-7229541-VicinityLevelland-Texas'],
     sources: [],
   },
@@ -723,7 +736,11 @@ export default [
       },
     ],
     wiki: 'Lonnie Zamora incident',
-    media: [],
+    media: [
+      bluebookPdf('1964-04-6977589-Socorro-NewMexico-8766-', 'The landing site and its marks, photographed for Blue Book', 3),
+      bluebookPdf('1964-04-8694587-Socorro-NewMexico', 'Blue Book record card, 24 April 1964, the start of the case file'),
+      commons('Lonnie Zamora-tuig van 24 April 1964 te Secorro, NM, a.jpg', 'A model of the craft Zamora described, set into a photo of the scene'),
+    ],
     bluebook: ['1964-04-6977589-Socorro-NewMexico-8766-', '1964-04-8694587-Socorro-NewMexico'],
     sources: [],
   },
@@ -810,7 +827,9 @@ export default [
       },
     ],
     wiki: 'Kecksburg UFO incident',
-    media: [],
+    media: [
+      commons('Kecksburg UFO.JPG', 'The replica of the object, built from witness descriptions, on display in Kecksburg'),
+    ],
     sources: [],
   },
   {
@@ -872,7 +891,9 @@ export default [
       },
     ],
     wiki: null,
-    media: [],
+    media: [
+      bluebookPdf('1966-04-7104469-Ravenna-Mantua-Ohio', 'Blue Book record card: conclusion “satellite, then Venus”, 17 April 1966'),
+    ],
     bluebook: ['1966-04-7104469-Ravenna-Mantua-Ohio'],
     sources: [
       link('NICAP — Portage County chase documents', 'https://www.nicap.org/660417ravenna_dir.htm', 'analysis'),
@@ -949,7 +970,9 @@ export default [
       },
     ],
     wiki: 'Cash–Landrum incident',
-    media: [],
+    media: [
+      commons('Cash-Landrum UFO illustration by Kathy Schuessler.jpg', 'Illustration from John Schuessler’s 1998 book on the case'),
+    ],
     sources: [],
   },
   {
@@ -1407,7 +1430,11 @@ export default [
       },
     ],
     wiki: '2023 Chinese balloon incident',
-    media: [],
+    media: [
+      commons('U-2 Pilot over Central Continental United States (7644960) (cropped).jpg', 'A U-2 pilot’s photo of the balloon over the central United States, 3 February 2023'),
+      commons('Chinese Balloon Envelope Recovery.jpg', 'Navy divers recover the balloon’s envelope off South Carolina'),
+      commons('FBI processing Chinese balloon debris.jpg', 'FBI Evidence Response Team processing the recovered debris'),
+    ],
     sources: [],
   },
   {

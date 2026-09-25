@@ -40,6 +40,10 @@ describe('curated case files', () => {
           expect(kinds.length).toBe(1);
           if (m.commons) expect(m.commons).toMatch(/^File:.+\.\w{3,4}$/);
           if (m.dvids) expect(m.dvids).toMatch(/^\d{5,8}$/);
+          if (m.page) {
+            expect(m.commons).toMatch(/\.pdf$/i);
+            expect(Number.isInteger(m.page) && m.page >= 1).toBe(true);
+          }
         }
         for (const s of c.sources || []) expect(s.url).toMatch(/^https?:\/\//);
       });

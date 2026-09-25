@@ -13,8 +13,14 @@ export const DAY = 86400;
 export const p = (lat, lon, altFt, t, note) =>
   note === undefined ? [lon, lat, Math.round(altFt * FT), t] : [lon, lat, Math.round(altFt * FT), t, note];
 
-/** Commons file shorthand. */
-export const commons = (file, caption) => ({ commons: file.startsWith('File:') ? file : `File:${file}`, caption });
+/** Commons file shorthand. For a PDF, `page` picks the page shown (from 1). */
+export const commons = (file, caption, page) => ({
+  commons: file.startsWith('File:') ? file : `File:${file}`,
+  caption,
+  ...(page ? { page } : {}),
+});
+/** A Project Blue Book file as mirrored on Commons, by its Internet Archive id. */
+export const bluebookPdf = (id, caption, page) => commons(`Project Blue Book report - ${id}.pdf`, caption, page);
 /** Official DVIDS video/image shorthand (ID from the DVIDS URL). */
 export const dvids = (id, caption) => ({ dvids: String(id), caption });
 /** Internet Archive document (e.g. a Project Blue Book case file). */

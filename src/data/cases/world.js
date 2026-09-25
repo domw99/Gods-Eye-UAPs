@@ -1,4 +1,4 @@
-import { p, commons, dvids, link, MIN, HR } from './helpers.js';
+import { p, commons, dvids, link, MIN, HR, bluebookPdf } from './helpers.js';
 
 /** Curated cases outside North America. */
 export default [
@@ -144,7 +144,9 @@ export default [
       { label: 'RAF Lakenheath (USAF)', lat: 52.4093, lon: 0.561 },
     ],
     wiki: 'Lakenheath-Bentwaters incident',
-    media: [],
+    media: [
+      bluebookPdf('1956-08-7069309-Bentwaters-Lakenheath-England', 'Blue Book record card for the radar-visual sightings, 13–14 August 1956'),
+    ],
     sources: [],
   },
   {
@@ -406,7 +408,10 @@ export default [
     tracks: [],
     observers: [{ label: 'Plesetsk Cosmodrome (Kosmos-955 launch)', lat: 62.925, lon: 40.577 }],
     wiki: 'Petrozavodsk phenomenon',
-    media: [],
+    media: [
+      commons('USSR Academy of Sciences sheet.jpg', 'USSR Academy of Sciences note sending a team to study the phenomenon'),
+      commons('TASS on Kosmos-955.jpg', 'TASS report on the launch of Kosmos-955 the same night'),
+    ],
     sources: [],
   },
   {

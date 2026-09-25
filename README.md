@@ -42,6 +42,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 - **126 curated case files** from 1561 to 2024. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
+- **The evidence itself, where it survives.** 73 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
 - **Search a place** to fly there, and **share any view**: the address bar keeps the camera position.
 - **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. The **＋ / −** buttons zoom toward the centre of the screen, while wheel zoom heads for the pointer.
@@ -267,7 +268,7 @@ src/
               points.js (Blue Book / GEIPAN / MUFON / NUFORC) · satellites.js (live SGP4)
               buildings.js (keyless OpenStreetMap 3D buildings) · launches.js (launch pads)
               airspace.js (military airspace volumes)
-  services/   wiki.js (Wikipedia summaries, Commons media & geosearch) · sky.js (planets, Moon, stars)
+  services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
               geipan.js (GEIPAN classes, dates, links)

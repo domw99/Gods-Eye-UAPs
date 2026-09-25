@@ -322,10 +322,15 @@ function commonsBlock(info, caption) {
   return null;
 }
 
-function imageCard(info, caption) {
+function imageCard(info, caption, page = null) {
   const credit = [info.artist, info.license].filter(Boolean).join(' · ');
-  return html`<figure class="media-card" data-lightbox="${safeUrl(info.url.endsWith('.pdf') ? info.thumb : info.url)}" data-caption="${caption || info.description || info.title}" data-credit="${credit}" data-href="${safeUrl(info.page)}">
-    <img src="${safeUrl(info.thumb)}" alt="${caption || info.title}" loading="lazy" />
+  const pdf = info.mime === 'application/pdf';
+  // A PDF shows one page: the chosen one, rendered by Commons (larger in the lightbox).
+  const thumb = pdf && page ? info.thumb.replace(/\/page\d+-/, `/page${page}-`) : info.thumb;
+  const big = pdf ? thumb.replace(/-\d+px-/, '-1280px-') : info.url;
+  const href = pdf && page ? `${info.page}?page=${page}` : info.page;
+  return html`<figure class="media-card" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}" data-credit="${credit}" data-href="${safeUrl(href)}">
+    <img src="${safeUrl(thumb)}" alt="${caption || info.title}" loading="lazy" />
     ${info.mime === 'application/pdf' ? html`<span class="badge kind">PDF</span>` : ''}
     <figcaption>${caption || info.title.replace(/^File:/, '')}</figcaption>
   </figure>`;
@@ -351,7 +356,7 @@ async function fillMedia(token, container, media, officialById) {
       const info = infos.get(m.commons);
       const block = info && commonsBlock(info, m.caption);
       if (block) players.push(block);
-      else if (info) images.push(imageCard(info, m.caption));
+      else if (info) images.push(imageCard(info, m.caption, m.page));
       else players.push(html`<div class="loading-line">Could not load ${m.commons}</div>`);
     }
   }
@@ -361,6 +366,14 @@ async function fillMedia(token, container, media, officialById) {
       !players.length && !images.length ? html`<div class="loading-line">No archived media for this case.</div>` : ''
     }`,
   );
+  // Commons renders a PDF page the first time it is asked for, and that first
+  // request can fail; try each image once more.
+  for (const img of container.querySelectorAll('.media-card img'))
+    img.addEventListener('error', () => {
+      if (img.dataset.retried) return;
+      img.dataset.retried = '1';
+      setTimeout(() => (img.src = `${img.src}${img.src.includes('?') ? '&' : '?'}retry=1`), 2500);
+    });
 }
 
 async function fillWiki(token, container, title) {
