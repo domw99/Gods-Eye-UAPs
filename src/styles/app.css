@@ -373,6 +373,17 @@ body.dossier-open .hud-br { right: calc(var(--right-w) + 26px); }
 .crosshair::after { top: 0; bottom: 0; left: 50%; width: 1px; box-shadow: 0 0 4px var(--accent); mask: linear-gradient(#000 35%, transparent 35% 65%, #000 65%); }
 body.hud-off .hud { display: none; }
 
+/* ── Map view controls (zoom about the centre, reset) ── */
+.map-controls { position: fixed; right: 16px; bottom: 164px; z-index: 14; display: grid; padding: 3px; border-radius: 12px; width: 46px; transition: right var(--smooth); }
+body.dossier-open .map-controls { right: calc(var(--right-w) + 26px); }
+.map-controls button { display: grid; place-items: center; gap: 2px; height: 36px; border: 0; border-radius: 9px; background: none; color: var(--text-secondary); cursor: pointer; }
+.map-controls button:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.07); }
+.map-controls button:active { background: var(--accent-dim); color: var(--accent); }
+.map-controls svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.map-controls svg .dot { fill: currentColor; stroke: none; }
+.map-controls .reset { height: 44px; margin-top: 3px; border-top: 1px solid var(--glass-border); border-radius: 0 0 9px 9px; color: var(--accent); }
+.map-controls .reset span { font: 600 8px var(--font-mono); letter-spacing: 0.12em; }
+
 /* ── Timeline ──────────────────────────────────── */
 #timeline {
   position: fixed;
@@ -518,6 +529,7 @@ body.hud-off .hud { display: none; }
   #timeline { left: 8px; right: 8px; bottom: 8px; height: 70px; }
   .tl-labels #tl-hint { display: none; }
   .hud-br { display: none; }
+  .map-controls, body.dossier-open .map-controls { right: 10px; bottom: auto; top: calc(var(--top-h) + 52px); }
   #playback { bottom: 86px; }
   .form-grid { grid-template-columns: 1fr; }
 }

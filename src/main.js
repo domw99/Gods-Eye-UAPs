@@ -882,6 +882,67 @@ function stopTour() {
   document.getElementById('btn-tour').textContent = '▶ TOUR';
 }
 
+/* ── Map view: zoom about the screen centre, reset ─────── */
+// Wheel and pinch zoom head for the point under the pointer, so the globe
+// drifts off centre; these controls zoom along the view axis and reset.
+const HOME_VIEW = { lon: -45, lat: 28, height: 17_500_000 };
+
+function flyHome(duration = 1.8) {
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(HOME_VIEW.lon, HOME_VIEW.lat, HOME_VIEW.height),
+    orientation: { heading: 0, pitch: -Cesium.Math.PI_OVER_TWO, roll: 0 },
+    duration,
+  });
+}
+
+function resetView() {
+  stopTour();
+  if (story.active) story.stop(true);
+  if (trackLayer.witnessOn) toggleWitnessView(false);
+  if (pb.follow.getAttribute('aria-pressed') === 'true') {
+    pb.follow.setAttribute('aria-pressed', 'false');
+    trackLayer.follow(false);
+  }
+  viewer.trackedEntity = undefined;
+  zoomTarget = null;
+  viewer.camera.cancelFlight();
+  viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+  flyHome();
+}
+
+let zoomTarget = null; // where a running zoom is heading, so quick clicks add up
+
+function zoomView(dir) {
+  const cam = viewer.camera;
+  // Chase cam and story orbits look at a target: zoom toward it.
+  if (viewer.trackedEntity || !Cesium.Matrix4.equals(cam.transform, Cesium.Matrix4.IDENTITY)) {
+    const d = Cesium.Cartesian3.magnitude(cam.position);
+    return dir > 0 ? cam.zoomIn(d * 0.4) : cam.zoomOut(d * 0.6);
+  }
+  const from = zoomTarget || cam.positionWC.clone();
+  const orientation = { heading: cam.heading, pitch: cam.pitch, roll: cam.roll };
+  const direction = cam.directionWC.clone();
+  cam.cancelFlight();
+  const carto = Cesium.Cartographic.fromCartesian(from);
+  const ground = viewer.scene.globe.getHeight(carto) ?? 0;
+  const h = Math.max(1, carto.height - Math.max(0, ground));
+  if ((dir < 0 && carto.height > 40e6) || (dir > 0 && h < 150)) return;
+  const move = dir > 0 ? h * 0.5 : -h;
+  const target = Cesium.Cartesian3.add(from, Cesium.Cartesian3.multiplyByScalar(direction, move, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+  zoomTarget = target;
+  const done = () => {
+    if (zoomTarget === target) zoomTarget = null;
+  };
+  cam.flyTo({ destination: target, orientation, duration: 0.45, easingFunction: Cesium.EasingFunction.QUADRATIC_OUT, complete: done, cancel: done });
+}
+
+document.getElementById('map-controls').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-view]');
+  if (!b) return;
+  if (b.dataset.view === 'home') resetView();
+  else zoomView(b.dataset.view === 'in' ? 1 : -1);
+});
+
 /* ── Top bar & keyboard ────────────────────────────────── */
 document.getElementById('btn-tour').addEventListener('click', startTour);
 const openFiles = () =>
@@ -967,6 +1028,9 @@ window.addEventListener('keydown', (e) => {
   else if (e.key === '?') openAboutModal();
   else if (e.key.toLowerCase() === 'm') openMapSettingsNow();
   else if (e.key.toLowerCase() === 'v' && trackLayer.current && trackLayer.witnessLabel) toggleWitnessView();
+  else if (e.key.toLowerCase() === 'r') resetView();
+  else if (e.key === '+' || e.key === '=') zoomView(1);
+  else if (e.key === '-' || e.key === '_') zoomView(-1);
 });
 
 /* ── HUD ───────────────────────────────────────────────── */
@@ -1076,12 +1140,8 @@ if (params.get('layers'))
   for (const l of params.get('layers').split(',')) if (l in state.layers) setLayer(l, true);
 
 const routed = routeFromHash();
-if (!routed && !viewFromParam(params.get('view')))
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(-45, 28, 17_500_000),
-    duration: 2.5,
-  });
+if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, selectMufonPage, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, select, selectBlueBook, selectMufonPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

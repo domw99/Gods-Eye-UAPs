@@ -44,6 +44,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
 - **Search a place** to fly there, and **share any view**: the address bar keeps the camera position.
+- **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. The **＋ / −** buttons zoom toward the centre of the screen, while wheel zoom heads for the pointer.
 
 ### ✈️ Replay the encounter, from the witness's seat
 
@@ -190,6 +191,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>[</kbd> <kbd>]</kbd> | Previous / next case | <kbd>M</kbd> | 3D map settings |
 | <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Files library (government + MUFON) |
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
+| <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>H</kbd> | Hide the HUD | <kbd>Esc</kbd> | Close |
 
 </details>

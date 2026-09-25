@@ -112,6 +112,20 @@
     <div class="crosshair" aria-hidden="true"></div>
   </div>
 
+  <!-- ── Map view controls ───────────────────────────────── -->
+  <div id="map-controls" class="map-controls glass" role="group" aria-label="Map view">
+    <button type="button" data-view="in" title="Zoom in toward the centre (+)" aria-label="Zoom in">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" /></svg>
+    </button>
+    <button type="button" data-view="out" title="Zoom out (−)" aria-label="Zoom out">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" /></svg>
+    </button>
+    <button type="button" data-view="home" class="reset" title="Reset view: whole globe, north up (R)" aria-label="Reset view">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" /><path d="M8 1v3M8 12v3M1 8h3M12 8h3" /><circle cx="8" cy="8" r="1.2" class="dot" /></svg>
+      <span>RESET</span>
+    </button>
+  </div>
+
   <!-- ── Timeline ────────────────────────────────────────── -->
   <footer id="timeline" class="glass" aria-label="Timeline">
     <button id="tl-play" class="icon-btn" title="Sweep through history (Space)" aria-label="Play history">▶</button>
