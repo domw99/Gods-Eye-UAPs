@@ -215,7 +215,7 @@ export default [
     ],
     tracks: [],
     wiki: 'Ängelholm UFO memorial',
-    media: [commons('AngelholmMemorialClearing1963.png', 'The memorial clearing, 1963')],
+    media: [],
     sources: [],
   },
 ];

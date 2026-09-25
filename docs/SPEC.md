@@ -96,9 +96,7 @@ video, radar data, government files) next to each location.
 ## 4. Dossier (click any record)
 - Official video players, archived photos, audio (e.g. the Halt tape) and PDFs, each
   with its licence and author from Commons.
-- **Reference imagery of the place:**
-  - present-day geotagged Commons photos taken near the coordinates, with distance to
-    the site
+- **Reference links for the place:**
   - one-click Google satellite, Street View, Google Earth 3D and OpenStreetMap links
   - an in-globe "ground view" fly-in
 - Wikipedia summary, a timeline, the assessment, sources, a share link and deep links

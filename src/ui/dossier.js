@@ -2,7 +2,7 @@ import { html, raw, mount, esc, safeUrl, toast } from '../util/dom.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
-import { wikiSummary, commonsFiles, photosNear, commonsPage } from '../services/wiki.js';
+import { wikiSummary, commonsFiles, commonsPage } from '../services/wiki.js';
 import { skyAt, bodiesNamedIn, compass } from '../services/sky.js';
 import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsWind } from '../services/weather.js';
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
@@ -14,7 +14,7 @@ import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl
 
 /**
  * Right-hand dossier. One renderer per record type; async sections (Commons
- * media, Wikipedia, nearby photos, Blue Book matches) fill in after the
+ * media, Wikipedia, Blue Book and MUFON matches) fill in after the
  * static part is on screen.
  */
 const panel = () => document.getElementById('dossier');
@@ -379,27 +379,6 @@ async function fillWiki(token, container, title) {
   }
 }
 
-async function fillNearby(token, container, lat, lon, radiusM) {
-  if (!(await settle(token))) return;
-  try {
-    const photos = (await photosNear(lat, lon, radiusM, 30)).slice(0, 12);
-    if (token !== renderToken) return;
-    if (!photos.length) {
-      mount(container, html`<div class="loading-line">No geotagged photos on Wikimedia Commons within ${Math.round(radiusM / 1000)} km.</div>`);
-      return;
-    }
-    mount(
-      container,
-      html`<div class="media-grid">${photos.map((ph) => {
-        const d = ph.lat != null ? haversineKm(lat, lon, ph.lat, ph.lon) : null;
-        return imageCard(ph, `${d != null ? `${d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`} from site · ` : ''}${ph.title.replace(/^File:/, '').replace(/\.[a-z]+$/i, '')}`);
-      })}</div><p class="caveat">Present-day photos geotagged near the coordinates (Wikimedia Commons). They show the place, not the phenomenon.</p>`,
-    );
-  } catch {
-    mount(container, html`<div class="loading-line">Nearby photos unavailable (Commons rate limit?).</div>`);
-  }
-}
-
 function bluebookList(records) {
   if (!records.length) return html`<div class="loading-line">No matching Blue Book files.</div>`;
   return html`<ul class="source-list">${records.map(
@@ -415,7 +394,6 @@ export function renderCase(item, ctx) {
   const token = open(c.id);
   const date = new Date(c.date);
   const tracks = c.tracks || [];
-  const hasSite = c.precision !== 'region';
   const content = html`
     <div class="d-title">${c.title}</div>
     <div class="d-sub">${localAndUtc(c.date, c.timeApprox)}<br />${c.place}<br />
@@ -472,8 +450,7 @@ export function renderCase(item, ctx) {
     ${section(
       'THE LOCATION',
       html`<div class="btn-row" style="margin:0 0 8px"><button class="chip" data-action="ground">⤓ FLY TO GROUND VIEW</button><button class="chip" data-action="share">⧉ COPY LINK</button></div>
-        ${siteLinks(c.lat, c.lon)}
-        ${hasSite ? html`<div id="d-nearby" style="margin-top:10px"><div class="loading-line">Finding photos taken near the site…</div></div>` : html`<p class="caveat">Only a region is known for this case, so no site photos are shown.</p>`}`,
+        ${siteLinks(c.lat, c.lon)}`,
     )}
     ${section(
       'SOURCES',
@@ -491,10 +468,6 @@ export function renderCase(item, ctx) {
   if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
-  if (hasSite) {
-    const radius = { site: 3000, city: 8000, area: 10000 }[c.precision] || 8000;
-    fillNearby(token, document.getElementById('d-nearby'), c.lat, c.lon, radius);
-  }
   const year = date.getUTCFullYear();
   if (year <= 2008 && ctx.mufonFor)
     ctx

@@ -1548,7 +1548,6 @@ export default [
     wiki: 'Shag Harbour UFO incident',
     media: [
       commons('Sighting of Sambro Light, NS by Capt. Leo Howard Mersey on October 4, 1967, RCMP 67-400-23-X.jpg', 'RCMP file on the MV Nickerson sighting'),
-      commons('Shag Harbour Incident Park.jpg', 'Shag Harbour Incident park today'),
     ],
     sources: [],
   },

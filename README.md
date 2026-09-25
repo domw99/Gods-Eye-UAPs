@@ -143,7 +143,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
 
 **Also included:**
-- Reference photos, films and audio for each case, plus geotagged Commons photos taken near the site.
+- Reference photos, films and audio for each case.
 - One-click Google satellite, Street View and Google Earth 3D links.
 - A ground-view fly-in.
 - A guided tour (<kbd>T</kbd>).

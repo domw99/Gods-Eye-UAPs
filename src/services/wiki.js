@@ -53,9 +53,6 @@ function imageInfo(page) {
     artist: stripTags(em.Artist?.value).slice(0, 120),
     description: stripTags(em.ImageDescription?.value).slice(0, 400),
     date: stripTags(em.DateTimeOriginal?.value),
-    lat: page.coordinates?.[0]?.lat,
-    lon: page.coordinates?.[0]?.lon,
-    dist: page.index,
   };
 }
 
@@ -80,29 +77,6 @@ export async function commonsFiles(titles, width = 640) {
     if (info) out.set(norm.get(page.title) || page.title, info);
   }
   return out;
-}
-
-/** Geotagged Commons photos taken near a point, nearest first. */
-export async function photosNear(lat, lon, radiusM = 10000, limit = 24) {
-  const params = new URLSearchParams({
-    action: 'query',
-    format: 'json',
-    formatversion: '2',
-    origin: '*',
-    generator: 'geosearch',
-    ggscoord: `${lat}|${lon}`,
-    ggsradius: String(Math.min(10000, Math.max(10, Math.round(radiusM)))),
-    ggsnamespace: '6',
-    ggslimit: String(limit),
-    prop: 'imageinfo|coordinates',
-    iiprop: 'url|mime|extmetadata',
-    iiurlwidth: '420',
-  });
-  const d = await cachedJson(`https://commons.wikimedia.org/w/api.php?${params}`);
-  return (d.query?.pages || [])
-    .map(imageInfo)
-    .filter((x) => x && /^image\/(jpeg|png|webp)/.test(x.mime))
-    .sort((a, b) => (a.dist ?? 0) - (b.dist ?? 0));
 }
 
 /** Link to view a Commons file page. */
