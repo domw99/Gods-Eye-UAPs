@@ -150,11 +150,11 @@ docs/SPEC.md  the full product spec (the improved prompt this was built from)
 
 ## Deploy
 
-`.github/workflows/pages.yml` tests, builds and publishes to GitHub Pages on every push to `main` or the default branch, and on demand from the Actions tab. To turn it on:
+`.github/workflows/pages.yml` tests and builds the site on every push to `main` (or the default branch) and publishes it to the `gh-pages` branch, which GitHub Pages serves. To turn it on in your own copy:
 
-1. GitHub Pages needs a **public** repository on a free plan (private repos need a paid plan).
-2. Go to **Settings → Pages** and set **Source: GitHub Actions**.
-3. Re-run the "Deploy to GitHub Pages" workflow. The site appears at `https://<user>.github.io/Gods-Eye-UAPs/`.
+1. Make the repository **public** (free GitHub plans only serve Pages from public repositories).
+2. Push once so the workflow creates the `gh-pages` branch, then go to **Settings → Pages → Build and deployment → Deploy from a branch** and pick `gh-pages` / `(root)`.
+3. The site appears at `https://<user>.github.io/<repository>/`.
 
 CI (`ci.yml`) runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site.
 
