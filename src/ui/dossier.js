@@ -8,6 +8,7 @@ import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsW
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
 import { skySection } from './skychart.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
+import { correctionUrl, REPO_URL } from '../config.js';
 import { relativeTime } from '../layers/launches.js';
 
 /**
@@ -459,7 +460,8 @@ export function renderCase(item, ctx) {
         ${c.wiki ? html`<li><span class="badge">WIKI</span><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(c.wiki.replace(/ /g, '_'))}" target="_blank" rel="noopener">${c.wiki}</a></li>` : ''}
         ${(c.sources || []).map((s) => html`<li><span class="badge ${s.kind === 'official' ? 'official' : ''}">${(s.kind || 'ref').toUpperCase()}</span><a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${s.label}</a></li>`)}
         ${(c.media || []).filter((m) => m.commons).map((m) => html`<li><span class="badge">MEDIA</span><a href="${commonsPage(m.commons)}" target="_blank" rel="noopener">${m.caption || m.commons}</a></li>`)}
-      </ul>`,
+      </ul>
+      <div class="btn-row"><a class="chip" href="${correctionUrl(c.id, c.title)}" target="_blank" rel="noopener">✎ SUGGEST A CORRECTION ↗</a><a class="chip" href="${REPO_URL}/issues/new?template=new-case.yml" target="_blank" rel="noopener">+ SUGGEST A CASE ↗</a></div>`,
     )}`;
   mount(body(), content);
 

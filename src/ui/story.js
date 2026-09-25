@@ -12,7 +12,25 @@ import { STATUS } from '../data/taxonomy.js';
 const VOICE_KEY = 'gods-eye-uap:story-voice';
 const RANGE = { site: 9000, city: 22000, area: 140000, region: 1600000 };
 
-const sentences = (text) => text.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((s) => s.trim()) || [text];
+// Titles and initials that end in a full stop but don't end a sentence.
+const ABBREV = /(?:^|[\s(])(?:[A-Z]|U\.S|U\.K|Lt|Cdr|Capt|Col|Gen|Sgt|Cst|Flt|Dr|Mr|Mrs|Ms|St|Mt|Ft|No|Jr|Sr|vs|approx|e\.g|i\.e|a\.m|p\.m)$/;
+
+/** Split prose into sentences without breaking at "U.S.", "Lt." or initials. */
+export function sentences(text) {
+  const out = [];
+  let start = 0;
+  const re = /[.!?]+["”’)]?(?=\s+["“(]?[A-Z0-9]|\s*$)/g;
+  let m;
+  while ((m = re.exec(text))) {
+    const before = text.slice(start, m.index);
+    if (m[0][0] === '.' && ABBREV.test(before)) continue;
+    out.push(text.slice(start, m.index + m[0].length).trim());
+    start = m.index + m[0].length;
+  }
+  const rest = text.slice(start).trim();
+  if (rest) out.push(rest);
+  return out.length ? out : [text];
+}
 
 function skySentence(c) {
   try {

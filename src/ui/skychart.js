@@ -28,19 +28,32 @@ export function skyChartSvg(sky, named = new Set()) {
     marks.push(`<text x="${(x + 10).toFixed(1)}" y="${(y + 4).toFixed(1)}" class="sky-label">Sun</text>`);
   }
   const labelled = sky.bodies.filter((b) => b.alt > 0 && (b.kind !== 'star' || b.mag < 0.6 || named.has(b.name)));
+  // Place labels brightest-first (named ones before all), skipping any that would overlap.
+  const boxes = [];
+  const fits = (x0, y0, w) => !boxes.some(([bx, by, bw]) => x0 < bx + bw && x0 + w > bx && Math.abs(y0 - by) < 11);
+  const labelOrder = [...labelled].sort((a, b) => (named.has(b.name) ? 1 : 0) - (named.has(a.name) ? 1 : 0) || a.mag - b.mag);
+  const placed = new Map();
+  for (const b of labelOrder) {
+    const [x, y] = project(b.alt, b.az);
+    const w = b.name.length * 5.6;
+    const right = [x + dotSize(b) + 3, 'start', x + dotSize(b) + 3];
+    const left = [x - dotSize(b) - 3, 'end', x - dotSize(b) - 3 - w];
+    const prefer = x > C + R * 0.35 ? [left, right] : [right, left];
+    const spot = prefer.find(([, , x0]) => fits(x0, y, w)) || (named.has(b.name) ? prefer[0] : null);
+    if (!spot) continue;
+    boxes.push([spot[2], y, w]);
+    placed.set(b, spot);
+  }
   for (const b of sky.bodies.filter((b) => b.alt > 0)) {
     const [x, y] = project(b.alt, b.az);
     const isNamed = named.has(b.name);
     if (isNamed) marks.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(dotSize(b) + 5).toFixed(1)}" fill="none" stroke="#ff5ce1" stroke-width="1.5" />`);
     marks.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotSize(b).toFixed(1)}" fill="${KIND_COLOR[b.kind]}" />`);
-    if (labelled.includes(b)) {
-      // Keep labels inside the disc: put them on the left of objects low in the west.
-      const left = x > C + R * 0.35;
-      const lx = left ? x - dotSize(b) - 3 : x + dotSize(b) + 3;
+    const spot = placed.get(b);
+    if (spot)
       marks.push(
-        `<text x="${lx.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${left ? 'end' : 'start'}" class="sky-label${isNamed ? ' named' : ''}">${b.name}</text>`,
+        `<text x="${spot[0].toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${spot[1]}" class="sky-label${isNamed ? ' named' : ''}">${b.name}</text>`,
       );
-    }
   }
   const rings = [30, 60].map((alt) => `<circle cx="${C}" cy="${C}" r="${(((90 - alt) / 90) * R).toFixed(1)}" class="sky-ring" />`);
   const bg = sky.sun.alt > -0.833 ? 'sky-day' : sky.sun.alt > -12 ? 'sky-twilight' : 'sky-night';

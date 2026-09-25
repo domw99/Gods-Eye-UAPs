@@ -1,0 +1,63 @@
+name: Sync official UAP releases
+
+# Weekly: re-scrape the Department of War / AARO releases on DVIDS, and if
+# anything new appeared, commit the updated catalogue and redeploy the site.
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sync-official
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run sync:official
+      - name: Keep the old file if only the timestamp changed
+        run: |
+          node -e "
+            const { execSync } = require('node:child_process');
+            const fs = require('node:fs');
+            const file = 'public/data/official-uap-media.json';
+            const before = JSON.parse(execSync('git show HEAD:' + file, { encoding: 'utf8' }));
+            const after = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (JSON.stringify(before.items) === JSON.stringify(after.items)) {
+              execSync('git checkout -- ' + file);
+              console.log('No new or changed releases.');
+            } else console.log('Catalogue changed:', before.count, '->', after.count);
+          "
+      - run: npm test
+      - name: Commit if changed
+        id: commit
+        run: |
+          if git diff --quiet -- public/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          git commit -m "Sync official UAP releases from DVIDS"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Redeploy the site
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Pushes made with the workflow token don't trigger other workflows, so
+        # start the Pages deploy explicitly. Harmless if Pages isn't enabled.
+        run: gh workflow run pages.yml --ref "${{ github.ref_name }}" || echo "Pages deploy not started (is Pages enabled?)"

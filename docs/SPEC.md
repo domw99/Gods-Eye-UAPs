@@ -68,6 +68,15 @@ video, radar data, government files) next to each location.
   per-case check for launches within 12 hours, with distance from the sighting.
 - **Witness view.** During playback, put the camera at the witness (aircraft, car or
   ground observer) looking at the object.
+- **Weather at the time.** Historical weather (Open-Meteo ERA5, 1940–) with wind drift,
+  compared against slow UAP tracks.
+- **Military airspace.** FAA special-use airspace as 3D volumes, and which areas each U.S.
+  case falls in.
+- **"What did I see?"** A checker that ranks planets, stars, the Moon, satellites, launches,
+  wind-borne lanterns/balloons and aircraft for a user's own sighting.
+- **Story mode.** A narrated fly-through of each case.
+- **Compare and shape filter.** Side-by-side cases; filtering by broad shape class.
+- **Corrections.** Every case links to a pre-filled GitHub issue form.
 
 ## 3. Flight paths
 - Reconstruct paths from the cited reports as time-stamped 3D tracks: longitude,

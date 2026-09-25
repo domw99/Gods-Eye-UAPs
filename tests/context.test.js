@@ -213,3 +213,23 @@ describe('sighting checker', () => {
     expect(isSunlit({ x: -3000, y: 6800, z: 0 }, sun)).toBe(true);
   });
 });
+
+import { sentences, buildStory } from '../src/ui/story.js';
+
+describe('story mode', () => {
+  it('splits sentences without breaking abbreviations or initials', () => {
+    expect(sentences('It is one of the most-witnessed UFO events in U.S. history. Then it ended.')).toEqual([
+      'It is one of the most-witnessed UFO events in U.S. history.',
+      'Then it ended.',
+    ]);
+    expect(sentences('Cdr. David Fravor and Lt. Cdr. Alex Dietrich saw it. It left.')).toHaveLength(2);
+    expect(sentences("It struck Judge J. S. Proctor's windmill. Nobody was hurt.")).toHaveLength(2);
+  });
+  it('builds a story for every case', () => {
+    for (const c of CASES) {
+      const steps = buildStory(c);
+      expect(steps.length).toBeGreaterThan(2);
+      for (const s of steps) expect(s.text.length).toBeGreaterThan(3);
+    }
+  });
+});

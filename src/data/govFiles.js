@@ -28,10 +28,12 @@ export const GOV_FILES = [
     text: 'The Pentagon office that investigates UAP reports from all domains (air, sea, space). Publishes case resolutions, official imagery, annual reports and the Historical Record Report reviewing U.S. government involvement with UAP since 1945.',
     links: [
       { label: 'aaro.mil', url: 'https://www.aaro.mil/' },
+      { label: 'UAP reporting trends & hotspot map', url: 'https://www.aaro.mil/UAP-Cases/UAP-Reporting-Trends/' },
       { label: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/All-domain_Anomaly_Resolution_Office' },
     ],
     commons: [
       { label: 'Historical Record Report, Vol. 1 (2024)', file: 'File:AARO Historical Record Report Volume 1 2024.pdf' },
+      { label: 'Reporting hotspots, 1996–2024 (map image)', file: 'File:AARO Trends 1996 2024 Hotspots.jpg' },
     ],
   },
   {

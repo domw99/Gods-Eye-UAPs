@@ -623,3 +623,6 @@ body.pov #globe::after {
 .cmp-bar i { display: block; height: 100%; background: var(--accent); }
 .cmp-val { font: 500 11px var(--font-mono); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 @media (max-width: 720px) { .cmp-table tbody th { width: 72px; } .cmp-table { font-size: 11.5px; } }
+@media (max-width: 720px) {
+  body.story-on #left { display: none; }
+}

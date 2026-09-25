@@ -1,0 +1,29 @@
+name: Case correction
+description: Something in a case file is wrong, missing or badly sourced.
+title: 'Correction: '
+labels: ['case-correction']
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping keep the case files accurate. Please link a primary or reliable source for every change.
+  - type: input
+    id: case-id
+    attributes:
+      label: Case id
+      description: From the dossier header or the link (`#/case/<id>`).
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong or missing?
+      description: Dates, places, the flight path, the explanation, media, anything.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: Official documents, archive scans or reliable publications.
+    validations:
+      required: true

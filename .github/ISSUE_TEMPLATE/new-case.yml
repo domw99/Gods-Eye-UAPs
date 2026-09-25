@@ -1,0 +1,34 @@
+name: Suggest a case
+description: A documented UAP encounter that should be on the globe.
+title: 'New case: '
+labels: ['new-case']
+body:
+  - type: markdown
+    attributes:
+      value: Cases need evidence beyond a single anecdote (radar, video, photos, official documents, physical traces, or many independent witnesses).
+  - type: input
+    id: name
+    attributes:
+      label: Case name
+    validations:
+      required: true
+  - type: input
+    id: when-where
+    attributes:
+      label: Date, time and place
+      description: As precise as the sources allow; coordinates if known.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and what happened
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links to official files, archive scans, media and reliable write-ups. Mention any official explanation.
+    validations:
+      required: true
