@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>God's Eye // UAP</title>
+  <meta name="description" content="A 3D globe console for Unidentified Anomalous Phenomena: documented encounters, reconstructed flight paths, official U.S. government footage and files, and reference imagery." />
+  <link rel="icon" type="image/svg+xml" href="./logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/styles/app.css" />
+</head>
+<body>
+  <div id="globe" aria-label="3D globe"></div>
+  <div id="scope" aria-hidden="true"></div>
+
+  <!-- ── Top bar ─────────────────────────────────────────── -->
+  <header class="topbar glass">
+    <div class="brand">
+      <img src="./logo.svg" alt="" width="26" height="26" />
+      <div>
+        <div class="brand-name">GOD'S EYE <span class="accent">// UAP</span></div>
+        <div class="brand-sub">UNIDENTIFIED ANOMALOUS PHENOMENA CONSOLE</div>
+      </div>
+    </div>
+    <nav class="modes" role="radiogroup" aria-label="Sensor mode">
+      <button data-mode="normal" role="radio" aria-checked="true" title="Normal (1)">NORMAL</button>
+      <button data-mode="nvg" role="radio" aria-checked="false" title="Night vision (2)">NVG</button>
+      <button data-mode="flir" role="radio" aria-checked="false" title="FLIR white-hot (3)">FLIR</button>
+      <button data-mode="ironbow" role="radio" aria-checked="false" title="FLIR ironbow (4)">IRONBOW</button>
+      <button data-mode="crt" role="radio" aria-checked="false" title="CRT (5)">CRT</button>
+    </nav>
+    <div class="top-actions">
+      <button id="btn-tour" class="chip" title="Guided tour of landmark cases (T)">▶ TOUR</button>
+      <button id="btn-files" class="chip" title="U.S. and international government UAP files (G)">GOV FILES</button>
+      <button id="btn-log" class="chip" title="Log your own sighting (L)">+ LOG SIGHTING</button>
+      <button id="btn-about" class="chip" title="About the data (?)">?</button>
+    </div>
+  </header>
+
+  <!-- ── Left rail: case files ───────────────────────────── -->
+  <aside id="left" class="panel glass" aria-label="Case files">
+    <div class="panel-head">
+      <span class="panel-title">CASE FILES</span>
+      <span id="case-count" class="muted mono"></span>
+      <button id="left-collapse" class="icon-btn" aria-label="Collapse panel" title="Collapse">‹</button>
+    </div>
+    <div class="panel-body">
+      <input id="search" type="search" placeholder="Search cases, places, evidence…  ( / )" autocomplete="off" />
+      <div class="section-label">LAYERS</div>
+      <div id="layers" class="layer-list"></div>
+      <details class="filters" id="filters">
+        <summary class="section-label"><span>FILTERS<span id="filter-count" class="active-count"></span></span></summary>
+        <div class="section-label" style="margin-top:4px">EVIDENCE</div>
+        <div id="evidence-filters" class="chips"></div>
+        <div class="section-label">STATUS</div>
+        <div id="status-filters" class="chips"></div>
+      </details>
+      <div class="section-label list-label">
+        <span>RESULTS</span>
+        <select id="sort" aria-label="Sort cases">
+          <option value="date-desc">Newest first</option>
+          <option value="date-asc">Oldest first</option>
+          <option value="evidence">Strongest evidence</option>
+          <option value="name">A–Z</option>
+        </select>
+      </div>
+      <ul id="case-list" class="case-list" role="listbox" aria-label="Cases"></ul>
+    </div>
+  </aside>
+
+  <!-- ── Right rail: dossier ─────────────────────────────── -->
+  <aside id="dossier" class="panel glass hidden" aria-label="Case dossier">
+    <div class="panel-head">
+      <span class="panel-title">DOSSIER</span>
+      <span id="dossier-id" class="muted mono"></span>
+      <button id="dossier-peek" class="icon-btn mobile-only" aria-label="Shrink dossier to see the globe" title="Show globe">⌄</button>
+      <button id="dossier-close" class="icon-btn" aria-label="Close dossier" title="Close (Esc)">✕</button>
+    </div>
+    <div id="dossier-body" class="panel-body"></div>
+  </aside>
+
+  <!-- ── HUD ─────────────────────────────────────────────── -->
+  <div id="hud" class="hud mono" aria-live="off">
+    <div class="hud-tl">
+      <div><span class="muted">UTC</span> <span id="hud-utc">--</span></div>
+      <div><span class="muted">SENSOR</span> <span id="hud-mode">EO / NORMAL</span></div>
+      <div><span class="muted">MAP</span> <span id="hud-map">--</span></div>
+    </div>
+    <div class="hud-br">
+      <div><span class="muted">CAM</span> <span id="hud-cam">--</span></div>
+      <div><span class="muted">ALT</span> <span id="hud-alt">--</span></div>
+      <div><span class="muted">TGT</span> <span id="hud-tgt">NONE</span></div>
+    </div>
+    <div class="crosshair" aria-hidden="true"></div>
+  </div>
+
+  <!-- ── Timeline ────────────────────────────────────────── -->
+  <footer id="timeline" class="glass" aria-label="Timeline">
+    <button id="tl-play" class="icon-btn" title="Sweep through history (Space)" aria-label="Play history">▶</button>
+    <div class="tl-main">
+      <div class="tl-labels mono"><span id="tl-range">ALL YEARS</span><span id="tl-hint" class="muted">drag on the histogram to filter by year · double-click to reset</span></div>
+      <canvas id="tl-canvas" height="54"></canvas>
+    </div>
+  </footer>
+
+  <!-- ── Playback bar (shown while a flight path is loaded) ─ -->
+  <div id="playback" class="glass hidden" aria-label="Flight path playback">
+    <button id="pb-play" class="icon-btn" aria-label="Play">▶</button>
+    <button id="pb-restart" class="icon-btn" aria-label="Restart" title="Restart">⟲</button>
+    <input id="pb-scrub" type="range" min="0" max="1000" value="0" aria-label="Playback position" />
+    <span id="pb-time" class="mono"></span>
+    <select id="pb-speed" aria-label="Playback speed">
+      <option value="0.5">0.5×</option>
+      <option value="1" selected>1×</option>
+      <option value="2">2×</option>
+      <option value="4">4×</option>
+    </select>
+    <button id="pb-follow" class="chip" aria-pressed="false" title="Chase camera">CHASE CAM</button>
+    <button id="pb-close" class="icon-btn" aria-label="Stop playback">✕</button>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <div id="loading" class="mono">
+    <div class="loading-ring"></div>
+    <div>ACQUIRING GLOBE…</div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
