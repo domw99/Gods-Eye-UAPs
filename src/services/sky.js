@@ -51,6 +51,22 @@ function horizonOf(body, time, observer) {
   return A.Horizon(time, observer, eq.ra, eq.dec, 'normal');
 }
 
+/** Sun altitude in degrees at a place and moment (negative below the horizon). */
+export function sunAltitude(lat, lon, when) {
+  return horizonOf(A.Body.Sun, A.MakeTime(new Date(when)), new A.Observer(lat, lon, 0)).altitude;
+}
+
+/**
+ * How bright to draw the ground when zoomed in on a case: full in daylight,
+ * dimming through twilight to a readable night (never black).
+ */
+export function nightDim(sunAlt) {
+  if (sunAlt >= 0) return 1;
+  if (sunAlt >= -6) return 1 - (0.25 * -sunAlt) / 6; // civil twilight: 1 → 0.75
+  if (sunAlt >= -12) return 0.75 - (0.15 * (-sunAlt - 6)) / 6; // nautical: 0.75 → 0.6
+  return 0.58;
+}
+
 /**
  * @param {number} lat
  * @param {number} lon

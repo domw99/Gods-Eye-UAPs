@@ -21,7 +21,7 @@ import {
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
-import { skyAt } from './services/sky.js';
+import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
 import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
@@ -319,6 +319,60 @@ async function bluebookNear(c, radiusKm) {
   return out.sort((a, b) => (b.linked ? 1 : 0) - (a.linked ? 1 : 0) || a.distKm - b.distKm).slice(0, 20);
 }
 
+/* ── Day and night at the moment of a case ─────────────── */
+// With a case open, the globe is lit by the sun at that moment: the day/night
+// line shows from high up, and close up the ground dims to dusk or night.
+let sceneMoment = null; // { lat, lon, approx } while a record's time drives the lighting
+
+function setSceneMoment(rec) {
+  const globe = viewer.scene.globe;
+  const imagery = viewer.imageryLayers.get(0);
+  if (!rec || rec.lat == null || !rec.date) {
+    sceneMoment = null;
+    globe.enableLighting = false;
+    if (imagery) imagery.brightness = 1;
+    if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.now();
+    return;
+  }
+  sceneMoment = { lat: rec.lat, lon: rec.lon, approx: Boolean(rec.approx), dim: 1 };
+  globe.enableLighting = true;
+  // From high up, Cesium shades the night side (the terminator shows from
+  // 1,500 km). Closer in, the ground is dimmed gently instead, so a night
+  // case still reads; the two hand over between 1,500 and 4,000 km.
+  // Cesium measures these fade distances from the Earth's centre.
+  globe.lightingFadeOutDistance = EARTH_RADIUS + LIGHT_NEAR;
+  globe.lightingFadeInDistance = EARTH_RADIUS + LIGHT_FAR;
+  if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(rec.date));
+  updateNightDim();
+}
+const LIGHT_NEAR = 1.5e6; // camera heights above the ground
+const LIGHT_FAR = 4e6;
+const EARTH_RADIUS = 6_371_000;
+
+/** Recompute the sun at the site for the current clock time. */
+function updateNightDim() {
+  if (!sceneMoment) return;
+  try {
+    const when = Cesium.JulianDate.toDate(viewer.clock.currentTime);
+    sceneMoment.dim = nightDim(sunAltitude(sceneMoment.lat, sceneMoment.lon, when));
+  } catch {
+    sceneMoment.dim = 1;
+  }
+}
+viewer.scene.preRender.addEventListener(() => {
+  const imagery = viewer.imageryLayers.get(0);
+  if (!sceneMoment || !imagery) return;
+  const h = viewer.camera.positionCartographic.height;
+  const t = Math.min(1, Math.max(0, (h - LIGHT_NEAR) / (LIGHT_FAR - LIGHT_NEAR)));
+  imagery.brightness = sceneMoment.dim + (1 - sceneMoment.dim) * t;
+});
+let lastDim = 0;
+trackLayer.onTick(() => {
+  if (performance.now() - lastDim < 400) return;
+  lastDim = performance.now();
+  updateNightDim();
+});
+
 /* ── Selection & camera ────────────────────────────────── */
 const itemByKey = (key) => allItems().find((i) => i.key === key);
 
@@ -347,6 +401,7 @@ function select(key, source = 'api') {
   story.stop(true);
   state.selected = key;
   markSelected(key);
+  itemLayer.setSelected(key);
   itemLayer.showRegion(item.kind === 'official' ? item : null);
   trackLayer.clear();
   hidePlayback();
@@ -354,12 +409,15 @@ function select(key, source = 'api') {
     renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor });
     const loaded = trackLayer.load(item.ref);
     if (loaded) showPlayback();
+    setSceneMoment({ lat: item.ref.lat, lon: item.ref.lon, date: item.ref.date, approx: item.ref.timeApprox });
     flyToItem(item, { tracks: !!loaded });
   } else if (item.kind === 'official') {
     renderOfficial(item, { officialById });
+    setSceneMoment(null);
     flyToItem(item);
   } else if (item.kind === 'user') {
     renderUser(item, { onDelete: deleteUser });
+    setSceneMoment({ lat: item.ref.lat, lon: item.ref.lon, date: item.ref.date });
     flyToItem(item);
   }
   setHash(`#/${item.kind}/${encodeURIComponent(item.id)}`);
@@ -379,7 +437,9 @@ async function selectBlueBook(id) {
   if (!state.layers.bluebook) setLayer('bluebook', true);
   state.selected = null;
   markSelected(null);
+  itemLayer.setSelected(null);
   trackLayer.clear();
+  setSceneMoment(null);
   hidePlayback();
   itemLayer.showRegion(null);
   renderBlueBook(rec);
@@ -407,7 +467,9 @@ async function selectMufonPage(issueId, leaf, recordIndex = null) {
   if (record && !state.layers.mufon) setLayer('mufon', true);
   state.selected = null;
   markSelected(null);
+  itemLayer.setSelected(null);
   trackLayer.clear();
+  setSceneMoment(null);
   hidePlayback();
   itemLayer.showRegion(null);
   renderMufon({ is, leaf, record, onPage, inIssue });
@@ -426,8 +488,10 @@ function deselect() {
   story.stop(true);
   state.selected = null;
   markSelected(null);
+  itemLayer.setSelected(null);
   closeDossier();
   trackLayer.clear();
+  setSceneMoment(null);
   hidePlayback();
   itemLayer.showRegion(null);
   setHash('');
@@ -500,6 +564,7 @@ handler.setInputAction((click) => {
   const hit = describePick(viewer.scene.pick(click.position));
   if (!hit) return;
   if (hit.type === 'item') select(hit.item.key, 'globe');
+  else if (hit.type === 'cluster') itemLayer.zoomToCluster(hit.index);
   else if (hit.type === 'bluebook') selectBlueBook(bluebook.records[hit.index].id);
   else if (hit.type === 'mufon') {
     const r = mufon.records[hit.index];
@@ -548,6 +613,14 @@ handler.setInputAction((move) => {
     const hit = describePick(viewer.scene.pick(move.endPosition));
     let lines = null; // [title, detail] — escaped below, data is external
     if (hit?.type === 'item') lines = [hit.item.title, `${hit.item.year} · ${hit.item.place}`];
+    else if (hit?.type === 'cluster') {
+      const c = itemLayer.cluster(hit.index);
+      if (c) {
+        const official = c.members.filter((m) => m.kind === 'official').length;
+        const parts = [c.members.length - official && `${c.members.length - official} case files`, official && `${official} official releases`].filter(Boolean);
+        lines = [`${c.members.length} records here · click to zoom in`, `${parts.join(' · ')} — ${c.members.slice(0, 2).map((m) => m.title.slice(0, 28)).join('; ')}${c.members.length > 2 ? '…' : ''}`];
+      }
+    }
     else if (hit?.type === 'bluebook') {
       const r = bluebook.records[hit.index];
       lines = [`Blue Book · ${r.place}`, `${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · USAF case file`];
@@ -1076,9 +1149,12 @@ const hud = {
 };
 setInterval(() => {
   const playing = trackLayer.current && (trackLayer.playing || trackLayer.progress() > 0);
+  const clockText = () => Cesium.JulianDate.toDate(viewer.clock.currentTime).toISOString().slice(0, 19).replace('T', ' ');
   hud.utc.textContent = playing
-    ? `▶ ${Cesium.JulianDate.toDate(viewer.clock.currentTime).toISOString().slice(0, 19).replace('T', ' ')}`
-    : new Date().toISOString().slice(0, 19).replace('T', ' ');
+    ? `▶ ${clockText()}`
+    : sceneMoment
+      ? `◷ ${clockText()}${sceneMoment.approx ? ' ≈' : ''}`
+      : new Date().toISOString().slice(0, 19).replace('T', ' ');
   const c = viewer.camera.positionCartographic;
   hud.cam.textContent = formatDMS(Cesium.Math.toDegrees(c.latitude), Cesium.Math.toDegrees(c.longitude));
   hud.alt.textContent = c.height > 1e4 ? `${(c.height / 1000).toFixed(0)} KM` : `${Math.round(c.height)} M`;
