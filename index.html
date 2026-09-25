@@ -56,6 +56,8 @@
         <summary class="section-label"><span>FILTERS<span id="filter-count" class="active-count"></span></span></summary>
         <div class="section-label" style="margin-top:4px">EVIDENCE</div>
         <div id="evidence-filters" class="chips"></div>
+        <div class="section-label">SHAPE</div>
+        <div id="shape-filters" class="chips"></div>
         <div class="section-label">STATUS</div>
         <div id="status-filters" class="chips"></div>
       </details>
@@ -109,6 +111,18 @@
   </footer>
 
   <!-- ── Playback bar (shown while a flight path is loaded) ─ -->
+  <div id="story" class="glass hidden" role="region" aria-label="Story mode" aria-live="polite">
+    <div class="story-kicker"></div>
+    <div class="story-text"></div>
+    <div class="story-foot">
+      <div class="story-progress"><i></i></div>
+      <button class="icon-btn" data-story="prev" aria-label="Previous">◀</button>
+      <button class="icon-btn" data-story="pause" aria-label="Pause or resume">❚❚</button>
+      <button class="icon-btn" data-story="next" aria-label="Next">▶</button>
+      <button class="chip" data-story="voice" aria-pressed="true" title="Narration">VOICE</button>
+      <button class="icon-btn" data-story="stop" aria-label="Stop story">✕</button>
+    </div>
+  </div>
   <div id="playback" class="glass hidden" aria-label="Flight path playback">
     <button id="pb-play" class="icon-btn" aria-label="Play">▶</button>
     <button id="pb-restart" class="icon-btn" aria-label="Restart" title="Restart">⟲</button>

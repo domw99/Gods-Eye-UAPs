@@ -1,6 +1,10 @@
 import { html, mount, safeUrl, toast } from '../util/dom.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { commonsPage } from '../services/wiki.js';
+import { STATUS, CATEGORY, EVIDENCE, SHAPES, evidenceScore, shapeClasses } from '../data/taxonomy.js';
+import { trackStats } from '../layers/tracks.js';
+import { skyAt } from '../services/sky.js';
+import { formatDuration } from '../util/geo.js';
 
 /** Modal dialogs: government files library, sighting log, about, lightbox. */
 const root = () => document.getElementById('modal-root');
@@ -331,5 +335,82 @@ export function openExplain(o) {
     );
     results.querySelector('#ex-log').addEventListener('click', () => o.onLog(input, top[0]));
     results.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+}
+
+/* ── Compare two cases ───────────────────────────────────── */
+function caseFacts(c) {
+  const uap = (c.tracks || []).find((t) => t.kind === 'uap');
+  const st = uap ? trackStats(uap) : null;
+  let light = '—';
+  try {
+    light = skyAt(c.lat, c.lon, c.date).light;
+  } catch {
+    /* ignore */
+  }
+  return {
+    c,
+    year: new Date(c.date).getUTCFullYear(),
+    score: evidenceScore(c.evidence, (c.tracks || []).length > 0),
+    shapes: shapeClasses(c.shape).map((k) => SHAPES[k].label),
+    light,
+    length: st?.length ?? null,
+    speed: st?.avgSpeedKmh ?? null,
+    alt: st ? st.maxAlt * 3.281 : null,
+    duration: st?.duration ?? null,
+  };
+}
+
+function bar(value, max, fmt) {
+  if (value == null) return html`<span class="dim">no path</span>`;
+  const w = max ? Math.max(2, Math.round((value / max) * 100)) : 0;
+  return html`<div class="cmp-bar"><i style="width:${w}%"></i></div><span class="cmp-val">${fmt(value)}</span>`;
+}
+
+export function openCompare({ a, cases, onOpen }) {
+  const others = cases.filter((c) => c.id !== a.id).sort((x, y) => x.title.localeCompare(y.title));
+  const preferred = others.find((c) => c.category === a.category && (c.tracks || []).length) || others[0];
+  const render = (b) => {
+    const A = caseFacts(a);
+    const B = caseFacts(b);
+    const max = (k) => Math.max(A[k] ?? 0, B[k] ?? 0);
+    const row = (label, fa, fb) => html`<tr><th>${label}</th><td>${fa}</td><td>${fb}</td></tr>`;
+    const evidence = (F) => html`${F.c.evidence.map((e) => html`<span class="badge">${EVIDENCE[e]?.label || e}</span>`)}`;
+    return html`
+      <table class="cmp-table">
+        <thead><tr><th></th><th><a href="#/case/${A.c.id}" data-open="${A.c.id}">${A.c.title}</a></th><th><a href="#/case/${B.c.id}" data-open="${B.c.id}">${B.c.title}</a></th></tr></thead>
+        <tbody>
+          ${row('WHEN', `${A.year} · ${A.light}`, `${B.year} · ${B.light}`)}
+          ${row('WHERE', A.c.place, B.c.place)}
+          ${row('STATUS', STATUS[A.c.status]?.label, STATUS[B.c.status]?.label)}
+          ${row('TYPE', CATEGORY[A.c.category] || A.c.category, CATEGORY[B.c.category] || B.c.category)}
+          ${row('SHAPE', A.c.shape || '—', B.c.shape || '—')}
+          ${row('WITNESSES', A.c.witnesses || '—', B.c.witnesses || '—')}
+          ${row('DURATION', A.c.duration || '—', B.c.duration || '—')}
+          ${row('EVIDENCE', html`<b>${A.score}/10</b> ${evidence(A)}`, html`<b>${B.score}/10</b> ${evidence(B)}`)}
+          ${row('PATH LENGTH', bar(A.length, max('length'), (v) => `${v.toFixed(v < 10 ? 1 : 0)} km`), bar(B.length, max('length'), (v) => `${v.toFixed(v < 10 ? 1 : 0)} km`))}
+          ${row('AVG SPEED', bar(A.speed, max('speed'), (v) => `${Math.round(v).toLocaleString()} km/h`), bar(B.speed, max('speed'), (v) => `${Math.round(v).toLocaleString()} km/h`))}
+          ${row('MAX ALTITUDE', bar(A.alt, max('alt'), (v) => `${Math.round(v).toLocaleString()} ft`), bar(B.alt, max('alt'), (v) => `${Math.round(v).toLocaleString()} ft`))}
+          ${row('PATH TIME', A.duration != null ? formatDuration(A.duration) : '—', B.duration != null ? formatDuration(B.duration) : '—')}
+          ${row('EXPLANATION', A.c.explanation || STATUS[A.c.status]?.long, B.c.explanation || STATUS[B.c.status]?.long)}
+        </tbody>
+      </table>
+      <p class="caveat">Speeds and altitudes come from the reconstructed UAP paths and are only as good as the reports behind them.</p>`;
+  };
+  const content = html`
+    <h2>Compare cases</h2>
+    <label class="cmp-pick">COMPARE WITH
+      <select id="cmp-select">${others.map((c) => html`<option value="${c.id}" ${c.id === preferred.id ? 'selected' : ''}>${c.title} (${new Date(c.date).getUTCFullYear()})</option>`)}</select>
+    </label>
+    <div id="cmp-body">${render(preferred)}</div>`;
+  const el = modal('COMPARE', content);
+  const body = el.querySelector('#cmp-body');
+  el.querySelector('#cmp-select').addEventListener('change', (e) => mount(body, render(cases.find((c) => c.id === e.target.value))));
+  body.addEventListener('click', (e) => {
+    const link = e.target.closest('[data-open]');
+    if (!link) return;
+    e.preventDefault();
+    closeModal();
+    onOpen(link.dataset.open);
   });
 }

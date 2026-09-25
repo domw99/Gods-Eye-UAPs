@@ -90,3 +90,17 @@ export function evidenceScore(evidence = [], hasTrack = false) {
   const raw = evidence.reduce((s, e) => s + (EVIDENCE_WEIGHT[e] || 0), 0) + (hasTrack ? 1 : 0);
   return Math.min(10, Math.round(raw * 0.7));
 }
+
+/** Broad shape classes for filtering; a description can fall in several. */
+export const SHAPES = {
+  disc: { label: 'Disc / saucer', re: /\bdiscs?\b|\bdisks?\b|saucer|pancake|heel|\bhat\b|\bdomed?\b|\bplates?\b/i },
+  cylinder: { label: 'Tic Tac / cigar', re: /tic ?tac|cigar|cylind|capsule|\btubes?\b|airship|spindle|fuel tank|railroad car|\bpill\b/i },
+  triangle: { label: 'Triangle / V', re: /triang|delta|\bv\b|v-shaped|v-formation|boomerang|chevron|pyramid|carpenter|diamond/i },
+  sphere: { label: 'Sphere / orb', re: /spher|\borbs?\b|\bballs?\b|globe|\bround\b|circular|\bcircles?\b|\begg|\boval\b/i },
+  lights: { label: 'Lights / fireball', re: /\blights?\b|fireball|\bglow|flash|\bbeams?\b|star-like|luminous|\bflares?\b/i },
+  formation: { label: 'Formation / row', re: /formation|\brow\b|\bline\b|\bchain\b|echelon|several|\btrain\b|group of/i },
+};
+
+export function shapeClasses(text = '') {
+  return Object.keys(SHAPES).filter((k) => SHAPES[k].re.test(text || ''));
+}

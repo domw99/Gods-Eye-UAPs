@@ -11,6 +11,7 @@ export const state = {
   search: '',
   evidence: new Set(), // any-of
   status: new Set(), // any-of
+  shape: new Set(), // any-of
   yearRange: null, // [from, to] or null for all
   sort: 'date-desc',
   layers: {

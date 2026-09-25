@@ -19,13 +19,15 @@ import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
   renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace,
 } from './ui/dossier.js';
-import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, closeModal } from './ui/modals.js';
+import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
 import { skyAt } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
 import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
+import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
+import { shapeClasses } from './data/taxonomy.js';
 
 const BASE = import.meta.env.BASE_URL;
 const LOG_KEY = 'gods-eye-uap:log';
@@ -42,6 +44,7 @@ const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayer
 const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLayer.suspend(active) });
 const launchLayer = createLaunchLayer(viewer);
 const airspaceLayer = createAirspaceLayer(viewer);
+const story = createStory({ viewer, trackLayer });
 
 let officialMeta = null;
 let officialItems = [];
@@ -75,6 +78,7 @@ function passesNonYear(it) {
   if (!state.layers[{ case: 'cases', official: 'official', user: 'user' }[it.kind]]) return false;
   if (state.search && !it.search.includes(state.search)) return false;
   if (state.evidence.size && !it.evidence.some((e) => state.evidence.has(e))) return false;
+  if (state.shape.size && !it.shapes?.some((s) => state.shape.has(s))) return false;
   if (state.status.size) {
     const s = it.status === 'identified' ? 'identified' : it.status;
     if (!state.status.has(s)) return false;
@@ -86,12 +90,14 @@ function passesNonYear(it) {
 function bluebookPasses(r) {
   if (state.evidence.size && !state.evidence.has('official-document')) return false;
   if (state.status.size && !state.status.has('unassessed')) return false;
+  if (state.shape.size) return false; // file names carry no shape
   if (state.search && !r.place.toLowerCase().includes(state.search) && !r.id.toLowerCase().includes(state.search)) return false;
   return inYearRange(r.year);
 }
 
 const timeline = createTimeline({ onPlayToggle: toggleHistorySweep });
 
+let nuforcShapeClasses = null;
 function refresh() {
   const base = allItems().filter(passesNonYear);
   const visible = base.filter((it) => inYearRange(it.year));
@@ -105,7 +111,9 @@ function refresh() {
   }
   if (nuforc && state.layers.nuforc) {
     const evOk = !state.evidence.size && (!state.status.size || state.status.has('unassessed'));
-    const n = nuforcLayer.filter((i) => evOk && inYearRange(Math.floor(nuforc.date[i] / 10000)) && (!state.search || nuforc.places[nuforc.place[i]].toLowerCase().includes(state.search) || nuforc.shapes[nuforc.shape[i]] === state.search));
+    nuforcShapeClasses ||= nuforc.shapes.map((s) => shapeClasses(s));
+    const shapeOk = (i) => !state.shape.size || nuforcShapeClasses[nuforc.shape[i]].some((s) => state.shape.has(s));
+    const n = nuforcLayer.filter((i) => evOk && shapeOk(i) && inYearRange(Math.floor(nuforc.date[i] / 10000)) && (!state.search || nuforc.places[nuforc.place[i]].toLowerCase().includes(state.search) || nuforc.shapes[nuforc.shape[i]] === state.search));
     layerCounts.nuforc = n.toLocaleString();
   }
   layerCounts.user = userItems.length;
@@ -120,8 +128,8 @@ function renderLayersNow(extra = {}) {
 
 subscribe((s, reason) => {
   if (reason === 'layers') applyLayers();
-  if (['search', 'evidence', 'status', 'yearRange', 'sort', 'layers'].includes(reason)) {
-    if (reason === 'evidence' || reason === 'status') renderFilters();
+  if (['search', 'evidence', 'status', 'shape', 'yearRange', 'sort', 'layers'].includes(reason)) {
+    if (reason === 'evidence' || reason === 'status' || reason === 'shape') renderFilters();
     refresh();
   }
 });
@@ -315,6 +323,7 @@ async function selectBlueBook(id) {
 }
 
 function deselect() {
+  story.stop(true);
   state.selected = null;
   markSelected(null);
   closeDossier();
@@ -537,6 +546,17 @@ bindDossierActions({
     renderSkyCheck(satLayer.overhead(item.lat, item.lon));
   },
   'export-user': exportUserLog,
+  compare: () => {
+    const item = itemByKey(state.selected);
+    if (item?.kind === 'case') openCompare({ a: item.ref, cases: CASES, onOpen: (id) => select(`case:${id}`, 'compare') });
+  },
+  story: () => {
+    const item = itemByKey(state.selected);
+    if (item?.kind === 'case') {
+      stopTour();
+      story.start(item.ref);
+    }
+  },
   'explain-user': () => {
     const item = itemByKey(state.selected);
     if (item?.ref) openExplainNow({ date: item.ref.date, lat: item.ref.lat, lon: item.ref.lon });
@@ -802,6 +822,7 @@ window.addEventListener('keydown', (e) => {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return closeModal();
+    if (story.active) return story.stop();
     if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
     return deselect();

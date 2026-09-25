@@ -93,7 +93,14 @@ export async function weatherAt(lat, lon, when) {
     params.set('end_date', day(t.getTime() + DAY));
     url = `${ARCHIVE}?${params}`;
   }
-  const res = await fetch(url);
+  let res;
+  try {
+    res = await fetch(url);
+  } catch {
+    // Busy moments return errors without CORS headers; one retry usually works.
+    await new Promise((r) => setTimeout(r, 1500));
+    res = await fetch(url);
+  }
   if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
   const wx = pickHour(await res.json(), when);
   if (wx) {

@@ -1,5 +1,5 @@
 import { html, mount } from '../util/dom.js';
-import { EVIDENCE, STATUS, evidenceScore } from '../data/taxonomy.js';
+import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer } from '../state.js';
 import { itemColor } from '../layers/items.js';
 
@@ -35,12 +35,18 @@ export function renderLayers(counts) {
 }
 
 export function renderFilters() {
-  const n = state.evidence.size + state.status.size;
+  const n = state.evidence.size + state.status.size + state.shape.size;
   document.getElementById('filter-count').textContent = n ? `· ${n} ACTIVE` : '';
   mount(
     document.getElementById('evidence-filters'),
     html`${EVIDENCE_FILTERS.map(
       (e) => html`<button class="chip small ${state.evidence.has(e) ? 'on' : ''}" data-evidence="${e}" title="${EVIDENCE[e].long}">${EVIDENCE[e].label}</button>`,
+    )}`,
+  );
+  mount(
+    document.getElementById('shape-filters'),
+    html`${Object.entries(SHAPES).map(
+      ([k, s]) => html`<button class="chip small ${state.shape.has(k) ? 'on' : ''}" data-shape="${k}">${s.label}</button>`,
     )}`,
   );
   mount(
@@ -107,6 +113,10 @@ export function bindList({ onSelect }) {
   document.getElementById('evidence-filters').addEventListener('click', (e) => {
     const b = e.target.closest('[data-evidence]');
     if (b) toggleIn('evidence', b.dataset.evidence);
+  });
+  document.getElementById('shape-filters').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-shape]');
+    if (b) toggleIn('shape', b.dataset.shape);
   });
   document.getElementById('status-filters').addEventListener('click', (e) => {
     const b = e.target.closest('[data-status]');

@@ -405,6 +405,7 @@ export function renderCase(item, ctx) {
       tracks.length ? html`<span class="badge path">${tracks.length} TRACK${tracks.length > 1 ? 'S' : ''}</span>` : ''
     }${evidenceBadges(c.evidence)}</div>
 
+    <div class="btn-row" style="margin:10px 0 0"><button class="chip on" data-action="story">▶ STORY MODE</button><button class="chip" data-action="compare">⇄ COMPARE</button></div>
     ${section('ASSESSMENT', html`<div class="explain"><b>${STATUS[c.status]?.label}</b>${c.explanation || STATUS[c.status]?.long}</div>`)}
     ${section('SUMMARY', html`<div class="d-text"><p>${c.summary}</p></div>
       <dl class="d-kv" style="margin-top:10px">

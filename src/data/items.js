@@ -1,4 +1,5 @@
 import { CASES } from './cases/index.js';
+import { shapeClasses } from './taxonomy.js';
 
 /**
  * Normalise curated cases, official releases and the user's own log into one
@@ -25,6 +26,7 @@ export function caseToItem(c) {
     country: c.country,
     category: c.category,
     hasTrack: (c.tracks || []).length > 0,
+    shapes: shapeClasses(c.shape),
     search: [c.title, c.place, c.country, c.summary, c.shape, c.category, c.status, ...(c.evidence || [])]
       .join(' ')
       .toLowerCase(),
@@ -41,6 +43,7 @@ export function officialToItem(o) {
   if (/audio/i.test(o.title)) evidence.push('audio');
   if (/law enforcement|police|officer/i.test(o.description)) evidence.push('police-witness');
   return {
+    shapes: shapeClasses(`${o.title} ${o.description || ''}`),
     key: `official:${o.dvidsId}`,
     kind: 'official',
     id: o.dvidsId,
@@ -81,6 +84,7 @@ export function userToItem(u) {
     country: '',
     category: 'close-encounter',
     hasTrack: false,
+    shapes: shapeClasses(`${u.shape || ''} ${u.title || ''}`),
     search: [u.title, u.place, u.shape, u.description].join(' ').toLowerCase(),
     ref: u,
   };
