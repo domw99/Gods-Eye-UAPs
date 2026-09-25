@@ -60,6 +60,15 @@ video, radar data, government files) next to each location.
    exportable as GeoJSON). The form links to NUFORC, AARO and GEIPAN for official
    reporting.
 
+## 2b. Context that explains sightings
+- **Sky at the time.** For every case and logged sighting, chart the Sun, Moon (with
+  phase), planets and brightest stars for that moment and place, and circle any body
+  the official explanation names.
+- **Rocket launches.** A layer of recent and upcoming launches (Launch Library 2), and a
+  per-case check for launches within 12 hours, with distance from the sighting.
+- **Witness view.** During playback, put the camera at the witness (aircraft, car or
+  ground observer) looking at the object.
+
 ## 3. Flight paths
 - Reconstruct paths from the cited reports as time-stamped 3D tracks: longitude,
   latitude, altitude and time, with an optional note per point. Tracks can be the UAP,

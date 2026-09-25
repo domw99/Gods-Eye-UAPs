@@ -9,14 +9,16 @@ import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
 import { createBuildingLayer } from './layers/buildings.js';
+import { createLaunchLayer } from './layers/launches.js';
+import { launchesAroundNow, RateLimitError } from './services/launches.js';
 import { renderLayers, renderFilters, renderList, bindList, markSelected } from './ui/list.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad,
 } from './ui/dossier.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, closeModal } from './ui/modals.js';
-import { toast, esc } from './util/dom.js';
+import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -32,6 +34,7 @@ const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45',
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
 const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLayer.suspend(active) });
+const launchLayer = createLaunchLayer(viewer);
 
 let officialMeta = null;
 let officialItems = [];
@@ -39,7 +42,7 @@ let officialById = new Map();
 let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', buildings: 'zoom in', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', launches: 'LL2', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -122,6 +125,8 @@ async function applyLayers() {
   nuforcLayer.show = L.nuforc;
   satLayer.show = L.satellites;
   buildingLayer.show = L.buildings;
+  launchLayer.show = L.launches;
+  if (L.launches) ensureLaunches();
   if (L.bluebook && !bluebook) await ensureBlueBook();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
@@ -130,6 +135,22 @@ async function applyLayers() {
 }
 
 /* ── Lazy data layers ──────────────────────────────────── */
+let launchesLoaded = 0;
+async function ensureLaunches() {
+  if (Date.now() - launchesLoaded < 30 * 60e3) return;
+  launchesLoaded = Date.now();
+  renderLayersNow({ launches: 'loading…' });
+  try {
+    launchLayer.setLaunches(await launchesAroundNow(14, 30));
+    renderLayersNow({ launches: launchLayer.count });
+  } catch (error) {
+    launchesLoaded = 0;
+    console.warn(error);
+    renderLayersNow({ launches: 'offline' });
+    toast(error instanceof RateLimitError ? 'Launch Library limit reached (about 15 look-ups an hour). Try again later.' : 'Launch Library unavailable');
+  }
+}
+
 let bluebookPromise = null;
 function ensureBlueBook() {
   bluebookPromise ||= (async () => {
@@ -327,6 +348,12 @@ handler.setInputAction((click) => {
   } else if (hit.type === 'satellite') {
     const info = satLayer.info(hit.index);
     if (info) renderSatellite(info);
+  } else if (hit.type === 'launch') {
+    const pad = launchLayer.info(hit.index);
+    if (pad) {
+      deselect();
+      renderLaunchPad(pad);
+    }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
@@ -345,6 +372,11 @@ handler.setInputAction((move) => {
     } else if (hit?.type === 'nuforc')
       lines = [nuforc.places[nuforc.place[hit.index]], `${String(nuforc.date[hit.index]).slice(0, 4)} · ${nuforc.shapes[nuforc.shape[hit.index]]}`];
     else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || 'Satellite', 'live position'];
+    else if (hit?.type === 'launch') {
+      const p = launchLayer.info(hit.index);
+      const l = p?.next || p?.last;
+      if (p) lines = [p.location || p.pad, l ? `${p.next ? 'Next' : 'Last'}: ${l.name}` : `${p.launches.length} launches`];
+    }
     if (lines) {
       hoverEl.innerHTML = `${esc(lines[0])}<br><span class="dim">${esc(lines[1])}</span>`;
       hoverEl.style.left = `${move.endPosition.x}px`;
@@ -367,15 +399,22 @@ const pb = {
   time: document.getElementById('pb-time'),
   speed: document.getElementById('pb-speed'),
   follow: document.getElementById('pb-follow'),
+  pov: document.getElementById('pb-pov'),
 };
 function showPlayback() {
   pb.bar.classList.remove('hidden');
   pb.follow.setAttribute('aria-pressed', 'false');
+  pb.pov.setAttribute('aria-pressed', 'false');
+  const who = trackLayer.witnessLabel;
+  pb.pov.classList.toggle('hidden', !who);
+  pb.pov.title = who ? `See it from: ${who} (V)` : '';
   pb.speed.value = '1';
   updatePlaybackUi();
 }
 function hidePlayback() {
   pb.bar.classList.add('hidden');
+  if (trackLayer.witnessOn) trackLayer.witnessView(false);
+  document.body.classList.remove('pov');
 }
 function updatePlaybackUi() {
   const cur = trackLayer.current;
@@ -399,11 +438,27 @@ pb.speed.addEventListener('change', () => trackLayer.setSpeed(Number(pb.speed.va
 pb.follow.addEventListener('click', () => {
   const on = pb.follow.getAttribute('aria-pressed') !== 'true';
   pb.follow.setAttribute('aria-pressed', String(on));
+  pb.pov.setAttribute('aria-pressed', 'false');
   trackLayer.follow(on);
   if (on && !trackLayer.playing) trackLayer.play();
 });
+function toggleWitnessView(force) {
+  const on = force ?? pb.pov.getAttribute('aria-pressed') !== 'true';
+  const who = trackLayer.witnessView(on);
+  pb.pov.setAttribute('aria-pressed', String(Boolean(on && who)));
+  if (on && who) {
+    pb.follow.setAttribute('aria-pressed', 'false');
+    document.body.classList.add('pov');
+    toast(`Witness view: ${who}. Press V or Esc to leave.`, 3500);
+    if (!trackLayer.playing) trackLayer.play();
+  } else {
+    document.body.classList.remove('pov');
+  }
+}
+pb.pov.addEventListener('click', () => toggleWitnessView());
 document.getElementById('pb-close').addEventListener('click', () => {
   trackLayer.pause();
+  toggleWitnessView(false);
   trackLayer.follow(false);
   hidePlayback();
 });
@@ -640,6 +695,7 @@ window.addEventListener('keydown', (e) => {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return closeModal();
+    if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
     return deselect();
   }
@@ -660,6 +716,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'h') document.body.classList.toggle('hud-off');
   else if (e.key === '?') openAboutModal();
   else if (e.key.toLowerCase() === 'm') openMapSettingsNow();
+  else if (e.key.toLowerCase() === 'v' && trackLayer.current && trackLayer.witnessLabel) toggleWitnessView();
 });
 
 /* ── HUD ───────────────────────────────────────────────── */
@@ -686,13 +743,90 @@ renderFilters();
 renderLayersNow();
 refresh();
 
+/* ── Place search (Photon, keyless) ────────────────────── */
+const placeList = document.getElementById('place-results');
+let placeTimer = null;
+let placeAbort = null;
+subscribe((s, reason) => {
+  if (reason !== 'search') return;
+  clearTimeout(placeTimer);
+  placeAbort?.abort();
+  const q = s.search;
+  if (!q || q.length < 3 || q.startsWith('#')) return mount(placeList, html``);
+  placeTimer = setTimeout(async () => {
+    placeAbort = new AbortController();
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?${new URLSearchParams({ q, limit: '3', lang: 'en' })}`, { signal: placeAbort.signal });
+      const json = await res.json();
+      const places = (json.features || []).map((f) => ({
+        name: f.properties.name,
+        detail: [f.properties.state, f.properties.country].filter(Boolean).join(', '),
+        lon: f.geometry.coordinates[0],
+        lat: f.geometry.coordinates[1],
+        extent: f.properties.extent, // [west, north, east, south]
+      }));
+      mount(
+        placeList,
+        html`${places.map(
+          (p, i) => html`<li><button type="button" data-place="${i}">⌖ <span>${p.name}${p.detail ? html` <span class="dim">· ${p.detail}</span>` : ''}</span><span class="go">FLY</span></button></li>`,
+        )}`,
+      );
+      placeList.onclick = (e) => {
+        const b = e.target.closest('[data-place]');
+        if (!b) return;
+        const p = places[Number(b.dataset.place)];
+        const [w, n, east, sth] = p.extent || [];
+        viewer.camera.flyTo({
+          destination: p.extent
+            ? Cesium.Rectangle.fromDegrees(w, sth, east, n)
+            : Cesium.Cartesian3.fromDegrees(p.lon, p.lat, 40000),
+          duration: 2.5,
+        });
+        const input = document.getElementById('search');
+        input.value = '';
+        update({ search: '' }, 'search');
+        toast(`${p.name} — case files, Blue Book and civilian layers show what was reported here`, 3500);
+      };
+    } catch (error) {
+      if (error.name !== 'AbortError') console.warn('[places]', error);
+    }
+  }, 450);
+});
+
+/* ── Shareable camera view: ?view=lon,lat,height,heading,pitch ── */
+let viewTimer = null;
+viewer.camera.moveEnd.addEventListener(() => {
+  clearTimeout(viewTimer);
+  viewTimer = setTimeout(() => {
+    const c = viewer.camera.positionCartographic;
+    const deg = Cesium.Math.toDegrees;
+    const v = [deg(c.longitude).toFixed(4), deg(c.latitude).toFixed(4), Math.round(c.height), Math.round(deg(viewer.camera.heading)), Math.round(deg(viewer.camera.pitch))].join(',');
+    const u = new URL(location.href);
+    u.searchParams.set('view', v);
+    history.replaceState(history.state, '', u);
+  }, 700);
+});
+function viewFromParam(value) {
+  const [lon, lat, h, heading, pitch] = (value || '').split(',').map(Number);
+  if (![lon, lat, h].every(Number.isFinite) || Math.abs(lat) > 90 || Math.abs(lon) > 180 || h <= 0) return false;
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(lon, lat, h),
+    orientation: {
+      heading: Cesium.Math.toRadians(Number.isFinite(heading) ? heading : 0),
+      pitch: Cesium.Math.toRadians(Number.isFinite(pitch) ? pitch : -90),
+      roll: 0,
+    },
+  });
+  return true;
+}
+
 const params = new URLSearchParams(location.search);
 if (params.get('mode')) setMode(params.get('mode'));
 if (params.get('layers'))
   for (const l of params.get('layers').split(',')) if (l in state.layers) setLayer(l, true);
 
 const routed = routeFromHash();
-if (!routed)
+if (!routed && !viewFromParam(params.get('view')))
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(-45, 28, 17_500_000),
     duration: 2.5,
@@ -700,4 +834,4 @@ if (!routed)
 setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, setMode, setLayer, state, startTour, trackLayer };
+window.__uap = { viewer, select, selectBlueBook, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

@@ -20,6 +20,7 @@ export const state = {
     nuforc: false,
     satellites: false,
     buildings: true,
+    launches: false,
     user: true,
   },
   selected: null, // item key

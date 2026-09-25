@@ -63,3 +63,30 @@ export const PRECISION = {
   area: 'Area (tens of km)',
   region: 'Region only — exact position not released',
 };
+
+/**
+ * A rough "how much evidence is there" score, 0–10: instrument data counts
+ * most, then imagery, official papers and trained observers, then crowds and
+ * after-effects. It measures documentation, not strangeness: a solved case
+ * can score high.
+ */
+const EVIDENCE_WEIGHT = {
+  radar: 3,
+  'sensor-data': 3,
+  video: 3,
+  film: 3,
+  photo: 2,
+  'official-document': 2,
+  'military-witness': 2,
+  'pilot-witness': 2,
+  'police-witness': 2,
+  'physical-trace': 2,
+  'multiple-witnesses': 1,
+  medical: 1,
+  audio: 1,
+  'em-effects': 1,
+};
+export function evidenceScore(evidence = [], hasTrack = false) {
+  const raw = evidence.reduce((s, e) => s + (EVIDENCE_WEIGHT[e] || 0), 0) + (hasTrack ? 1 : 0);
+  return Math.min(10, Math.round(raw * 0.7));
+}

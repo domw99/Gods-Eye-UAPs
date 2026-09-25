@@ -18,11 +18,16 @@
 | 🏙 **3D cities, two ways** | Free **OpenStreetMap 3D buildings** (via OpenFreeMap, no key) appear when you zoom into a town. Or paste **your own Google Maps API key** under **3D MAP** to switch to Google's photorealistic 3D tiles. The key stays in your browser. |
 | 🛸 **126 curated case files** | Documented cases from 1561 to 2024 on every continent, each with evidence tags, witnesses, timeline, status (unresolved / disputed / explained / identified) and the official or best-supported explanation. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, Cosford, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. |
 | ✈️ **Flight paths you can replay** | 3D tracks at altitude for the UAP *and* the witness aircraft, interceptors, cars and balloons. Each has drop lines, a ground track and labelled waypoints. Playback runs on a real clock with a scrubber, speed control and a chase camera. Every track states its basis (radar, official report, witness reports, flight plan or approximate). |
+| 👁 **Witness view** | Replay an encounter from the witness's seat: the camera rides with the pilot, patrol car or ground observer and keeps the object in view (e.g. from Fravor's F/A-18F toward the Tic Tac). Press `V` during playback. |
+| 🌌 **Sky at the time** | Every case and logged sighting shows a sky chart for that moment and place: Sun (day, twilight or night), Moon and phase, planets and the brightest stars. Objects named in the official explanation are circled, so you can check "it was Venus" yourself. At White Sands in 1957, for example, the setting Moon is right where the patrol looked. |
+| 🚀 **Rocket launches** | A live layer of launches from the last 14 days and next 30 (Launch Library 2, no key), plus a button on every case since 1957 that lists launches within 12 hours and how far away they were. Launch plumes are a top source of modern reports. |
 | 🎞 **Official U.S. footage** | All 174 UAP videos and images the Department of War / AARO have published on DVIDS, including the 2026 **PURSUE** releases from war.gov/UFO. They play inside the app. Region-only releases are drawn as rings, not fake pins. |
 | 🗂 **Project Blue Book on the map** | 10,096 of the 10,763 scanned U.S. Air Force case files (1947–1969), geocoded offline. Click a point to read the original document and its OCR text. |
 | 📸 **Reference images & video** | Archived photos, films and audio (e.g. the Trent photos, the Halt memo and tape, FLIR1). **Photos taken near each site** come from geotagged Wikimedia Commons. One-click Google satellite, Street View, Google Earth 3D and OpenStreetMap links, plus a ground-view fly-in. |
 | 👥 **80,000 civilian reports** | NUFORC reports as a density layer (unverified, narratives removed). |
 | 🛰 **Live sky check** | About 10,000 Starlink, ISS and bright satellites propagated live from CelesTrak, showing what is overhead right now. Satellites explain many modern reports. |
+| 🔎 **Search places, sort by evidence** | Type a town to fly there (Photon geocoder, no key). Sort by **Strongest evidence**, a 0–10 documentation score (instrument data, imagery, official papers and trained observers count most) that is also shown on every case. |
+| 🔗 **Shareable views** | The address bar keeps the camera position (`?view=lon,lat,height,heading,pitch`), so any view can be shared as a link. |
 | 📓 **Log your own sighting** | Stored in your browser, exportable as GeoJSON, with links to report officially (NUFORC, AARO, GEIPAN). |
 | 🎛 **God's Eye look** | NVG, FLIR white-hot, FLIR Ironbow and CRT sensor modes (keys `1`–`5`), tactical HUD, year histogram with brush filter, "sweep through history" and a guided tour. |
 | 📚 **Government files library** | PURSUE, AARO, ODNI, NASA, NARA's UAP Records Collection, hearings, Blue Book, Sign/Grudge, Robertson, Condon, FBI Vault, CIA and AAWSAP, plus the UK MoD files, France's GEIPAN, Brazil and Australia. Public-domain PDFs are linked directly. |
@@ -39,6 +44,11 @@
 </tr><tr>
 <td><img src="docs/media/osm-buildings.jpg" alt="Free OpenStreetMap 3D buildings over downtown Montreal (Bonaventure Hotel case)" /></td>
 <td><img src="docs/media/hill-route.jpg" alt="Betty and Barney Hill: the drive and the craft replayed" /></td>
+</tr><tr>
+<td><img src="docs/media/witness-view.jpg" alt="Witness view: from Fravor's F/A-18F toward the Tic Tac" /></td>
+<td><img src="docs/media/sky-at-the-time.jpg" alt="Sky at the time for the Hill case: Moon, Jupiter and Saturn low in the SSW" /></td>
+</tr><tr>
+<td colspan="2"><img src="docs/media/launches.jpg" alt="Rocket launch layer with Cape Canaveral's recent and upcoming launches" /></td>
 </tr></table>
 
 ## Quick start
@@ -68,7 +78,8 @@ Restrict browser keys to your domain at the provider, because anything built int
 - `#/official/1007777` — an official release (DVIDS id)
 - `#/bluebook/1952-07-7273984-Tremonton-Utah-1377-` — a Blue Book file
 - `?mode=nvg` — start in a sensor mode
-- `?layers=bluebook,nuforc` — start with extra layers on
+- `?layers=bluebook,nuforc,launches` — start with extra layers on
+- `?view=-104.5,33.7,25000,0,-35` — start at a camera position
 
 **Keyboard:**
 - `1`–`5` sensor modes
@@ -79,6 +90,7 @@ Restrict browser keys to your domain at the provider, because anything built int
 - `G` government files
 - `L` log a sighting
 - `M` 3D map settings (OSM buildings, your Google key)
+- `V` witness view during flight-path playback
 - `H` hide the HUD
 - `Esc` close
 
@@ -112,8 +124,9 @@ src/
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
   layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
               points.js (Blue Book / NUFORC) · satellites.js (live SGP4)
-              buildings.js (keyless OpenStreetMap 3D buildings)
-  services/   wiki.js (Wikipedia summaries, Commons media & geosearch)
+              buildings.js (keyless OpenStreetMap 3D buildings) · launches.js (launch pads)
+  services/   wiki.js (Wikipedia summaries, Commons media & geosearch) · sky.js (planets, Moon, stars)
+              launches.js (Launch Library 2)
   ui/         list.js · dossier.js · timeline.js · modals.js
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · verify-media.mjs
 tests/        Vitest suites
@@ -132,7 +145,7 @@ CI (`ci.yml`) runs the tests and a build on every push and pull request.
 
 ## Credits & licences
 
-- **Code:** MIT (see [LICENSE](LICENSE)). The visual language follows [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) by Bilawal Sidhu (MIT). The shaders here are original.
+- **Code:** MIT (see [LICENSE](LICENSE)). The visual language follows [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) by Bilawal Sidhu (MIT). Its space-launch layer, cockpit view, in-app key panel and URL-serialised camera inspired the launch layer, witness view, 3D MAP panel and view links here. The shaders and code here are original.
 - **Globe:** [CesiumJS](https://cesium.com/platform/cesiumjs/) (Apache-2.0).
 - **Map data:**
   - Imagery: Esri World Imagery ("Powered by Esri")
@@ -145,6 +158,9 @@ CI (`ci.yml`) runs the tests and a build on every push and pull request.
   - Summaries: Wikipedia (CC BY-SA)
   - Blue Book scans: Internet Archive / NARA
 - **Other data:**
+  - Launches: [Launch Library 2](https://thespacedevs.com/llapi) by The Space Devs
+  - Sky positions: [Astronomy Engine](https://github.com/cosinekitty/astronomy) (MIT)
+  - Place search: [Photon](https://photon.komoot.io/) by komoot (OpenStreetMap data)
   - Geocoding: GeoNames (CC BY 4.0)
   - Civilian reports: NUFORC via planetsig
   - Satellites: CelesTrak

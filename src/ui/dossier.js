@@ -1,8 +1,12 @@
 import { html, raw, mount, esc, safeUrl, toast } from '../util/dom.js';
-import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION } from '../data/taxonomy.js';
+import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
 import { wikiSummary, commonsFiles, photosNear, commonsPage } from '../services/wiki.js';
+import { skyAt, bodiesNamedIn } from '../services/sky.js';
+import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
+import { skySection } from './skychart.js';
+import { relativeTime } from '../layers/launches.js';
 
 /**
  * Right-hand dossier. One renderer per record type; async sections (Commons
@@ -44,6 +48,107 @@ function siteLinks(lat, lon) {
     <a class="chip" target="_blank" rel="noopener" href="https://earth.google.com/web/@${lat},${lon},0a,3000d,35y,0h,60t,0r">Google Earth 3D ↗</a>
     <a class="chip" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}">OpenStreetMap ↗</a>
   </div>`;
+}
+
+/* ── Sky and launch context shared by cases and user sightings ── */
+function skyBlock(lat, lon, when, explanation = '') {
+  try {
+    const sky = skyAt(lat, lon, when);
+    const year = new Date(when).getUTCFullYear();
+    const note = year < 1583 ? '(dates before 1583 are read as Gregorian, so allow for the calendar change)' : '';
+    return skySection(sky, bodiesNamedIn(explanation), { note });
+  } catch (error) {
+    console.warn('[sky]', error);
+    return html`<p class="caveat">Sky positions could not be computed for this date.</p>`;
+  }
+}
+
+function launchBlock(lat, lon, when) {
+  if (new Date(when).getUTCFullYear() < 1957) return '';
+  return section(
+    'ROCKET LAUNCHES AROUND THE TIME',
+    html`<div id="d-launches" data-when="${new Date(when).toISOString()}" data-lat="${lat}" data-lon="${lon}">
+      <p class="d-text">Launch plumes at dusk and dawn, stage separations and re-entries are seen hundreds of kilometres away and cause many modern reports.</p>
+      <div class="btn-row"><button class="chip" data-action="launch-check">CHECK LAUNCHES ±12 H</button></div></div>`,
+  );
+}
+
+const fmtGap = (ms) => {
+  const m = Math.round(Math.abs(ms) / 60000);
+  const s = m < 90 ? `${m} min` : `${(m / 60).toFixed(1)} h`;
+  return ms < 0 ? `${s} before` : `${s} after`;
+};
+
+async function fillLaunches(el) {
+  const when = el.dataset.when;
+  const lat = Number(el.dataset.lat);
+  const lon = Number(el.dataset.lon);
+  mount(el, html`<div class="loading-line">Asking Launch Library 2…</div>`);
+  let list;
+  try {
+    list = await launchesNear(when, 12);
+  } catch (error) {
+    mount(
+      el,
+      html`<p class="caveat">${error instanceof RateLimitError ? 'Launch Library allows about 15 look-ups an hour without a key. Try again later.' : 'Launch Library could not be reached.'}</p>
+        <div class="btn-row"><button class="chip" data-action="launch-check">TRY AGAIN</button></div>`,
+    );
+    return;
+  }
+  showLaunches(el, list, when, lat, lon);
+}
+
+function showLaunches(el, list, when, lat, lon) {
+  const t = Date.parse(when);
+  const rows = list
+    .map((l) => ({ ...l, gap: Date.parse(l.net) - t, km: l.lat != null ? haversineKm(lat, lon, l.lat, l.lon) : null }))
+    .sort((a, b) => Math.abs(a.gap) - Math.abs(b.gap));
+  mount(
+    el,
+    rows.length
+      ? html`<ul class="source-list launch-list">${rows.map(
+          (l) => html`<li class="${l.km != null && l.km < 2000 ? 'near' : ''}"><span class="badge ${l.km != null && l.km < 2000 ? 'official' : ''}">${fmtGap(l.gap)}</span>
+            <span><b>${l.name}</b><br /><span class="dim">${l.location || l.pad}${l.km != null ? ` · ${Math.round(l.km).toLocaleString()} km away` : ''} · ${l.statusName || l.status}</span></span></li>`,
+        )}</ul>
+        <p class="caveat">Launches within 12 hours, nearest in time first; highlighted ones were under 2,000 km away. Source: Launch Library 2 (orbital and many suborbital launches; not military missile tests).</p>`
+      : html`<p class="d-text">No launches are logged within 12 hours of this moment.</p><p class="caveat">Launch Library 2 covers orbital and many suborbital launches, not military missile tests.</p>`,
+  );
+}
+
+function autoFillLaunches() {
+  const el = document.getElementById('d-launches');
+  if (!el) return;
+  const cached = cachedLaunchesNear(el.dataset.when, 12);
+  if (cached) showLaunches(el, cached, el.dataset.when, Number(el.dataset.lat), Number(el.dataset.lon));
+}
+
+export function renderLaunchPad(p) {
+  open('LAUNCH SITE');
+  const now = Date.now();
+  mount(
+    body(),
+    html`<div class="d-title">${p.location || p.pad}</div>
+    <div class="d-sub">${p.pad}<br />${formatDMS(p.lat, p.lon)}</div>
+    ${section(
+      'LAUNCHES (LAST 14 DAYS · NEXT 30)',
+      html`<ul class="source-list launch-list">${p.launches.map(
+        (l) => html`<li class="${Date.parse(l.net) >= now ? 'near' : ''}"><span class="badge ${Date.parse(l.net) >= now ? 'official' : ''}">${relativeTime(l.net, now)}</span>
+          <span><b>${l.name}</b><br /><span class="dim">${fmtDate(new Date(l.net), { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })} · ${l.statusName || l.status}${l.orbit ? ` · ${l.orbit}` : ''}</span>
+          ${l.description ? html`<br /><span class="dim" style="font-size:11.5px">${l.description}</span>` : ''}</span></li>`,
+      )}</ul>`,
+    )}
+    ${section(
+      'WHY IT MATTERS',
+      html`<div class="d-text"><p>Launches shortly after sunset or before sunrise light up their exhaust plumes in sunlight high above a dark sky. The glowing "jellyfish" can be seen hundreds of kilometres away and is regularly reported as a UFO. Stage separations, fuel dumps and re-entering debris do the same.</p></div>
+        <p class="caveat">Data: Launch Library 2 by The Space Devs. Times are the scheduled "no earlier than" time and can slip.</p>`,
+    )}
+    ${section('THE LOCATION', siteLinks(p.lat, p.lon))}`,
+  );
+}
+
+function strengthMeter(score) {
+  const cells = Array.from({ length: 10 }, (_, i) => `<i class="${i < score ? 'on' : ''}"></i>`).join('');
+  return html`<span class="meter" title="Documentation score ${score}/10: instrument data, imagery, official papers and trained observers count most. It measures evidence, not strangeness.">${raw(cells)}<b>${score}/10</b></span>`;
 }
 
 function section(title, content, id = '') {
@@ -204,6 +309,7 @@ export function renderCase(item, ctx) {
         <dt>WITNESSES</dt><dd>${c.witnesses || '—'}</dd>
         <dt>DURATION</dt><dd>${c.duration || '—'}</dd>
         <dt>COUNTRY</dt><dd>${c.country}</dd>
+        <dt>EVIDENCE</dt><dd>${strengthMeter(evidenceScore(c.evidence, tracks.length > 0))}</dd>
       </dl>`)}
 
     ${tracks.length
@@ -227,6 +333,9 @@ export function renderCase(item, ctx) {
       ? section('TIMELINE', html`<ul class="timeline-list">${c.timeline.map((e) => html`<li><span class="when">${e.t}</span>${e.text}</li>`)}</ul>`)
       : ''}
 
+    ${section('SKY AT THE TIME', skyBlock(c.lat, c.lon, c.date, c.explanation))}
+    ${launchBlock(c.lat, c.lon, c.date)}
+
     ${section('EVIDENCE & MEDIA', html`<div id="d-media"><div class="loading-line">Loading archived images and video…</div></div>`)}
     ${section('GOVERNMENT FILES — PROJECT BLUE BOOK', html`<div id="d-bluebook"><div class="loading-line">${
       date.getUTCFullYear() >= 1947 && date.getUTCFullYear() <= 1970 ? 'Searching Blue Book case files…' : 'Outside Blue Book’s 1947–1969 coverage.'
@@ -248,6 +357,7 @@ export function renderCase(item, ctx) {
     )}`;
   mount(body(), content);
 
+  autoFillLaunches();
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
   if (hasSite) {
@@ -354,12 +464,15 @@ export function renderUser(item, { onDelete }) {
       <dl class="d-kv" style="margin-top:8px"><dt>DURATION</dt><dd>${u.duration || '—'}</dd><dt>WITNESSES</dt><dd>${u.witnesses || '—'}</dd>${
         u.media ? html`<dt>MEDIA</dt><dd><a href="${safeUrl(u.media)}" target="_blank" rel="noopener">${u.media}</a></dd>` : ''
       }</dl>`)}
-    ${section('CHECK THE SKY', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
+    ${section('SKY AT THE TIME', skyBlock(u.lat, u.lon, u.date))}
+    ${launchBlock(u.lat, u.lon, u.date)}
+    ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
     ${section('REPORT IT OFFICIALLY', html`<div class="btn-row"><a class="chip" href="https://nuforc.org/" target="_blank" rel="noopener">NUFORC ↗</a><a class="chip" href="https://www.aaro.mil/" target="_blank" rel="noopener">AARO (gov/mil personnel) ↗</a><a class="chip" href="https://www.cnes-geipan.fr/" target="_blank" rel="noopener">GEIPAN (France) ↗</a></div>`)}
     ${section('THE LOCATION', siteLinks(u.lat, u.lon))}
     <div class="btn-row" style="margin-top:14px"><button class="chip" data-action="export-user">⇩ EXPORT MY SIGHTINGS (GeoJSON)</button><button class="chip" data-action="delete-user">Delete this entry</button></div>`,
   );
+  autoFillLaunches();
   body().querySelector('[data-action="delete-user"]').addEventListener('click', (e) => {
     e.stopPropagation();
     if (confirm('Delete this sighting from this browser?')) onDelete(u.id);
@@ -408,6 +521,11 @@ export function bindDossierActions(handlers) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
+    if (action === 'launch-check') {
+      const el = btn.closest('#d-launches');
+      if (el) fillLaunches(el);
+      return;
+    }
     if (action === 'share') {
       navigator.clipboard?.writeText(location.href).then(
         () => toast('Link copied'),

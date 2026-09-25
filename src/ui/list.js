@@ -1,5 +1,5 @@
 import { html, mount } from '../util/dom.js';
-import { EVIDENCE, STATUS } from '../data/taxonomy.js';
+import { EVIDENCE, STATUS, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer } from '../state.js';
 import { itemColor } from '../layers/items.js';
 
@@ -10,6 +10,7 @@ export const LAYER_DEFS = [
   { id: 'bluebook', name: 'Project Blue Book', sub: 'USAF case files 1947–1969 (scans)', color: '#ffb547' },
   { id: 'nuforc', name: 'Civilian reports', sub: 'NUFORC, ~80k unverified reports', color: '#ff7a45' },
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
+  { id: 'launches', name: 'Rocket launches', sub: 'Last 14 days and next 30 · Launch Library 2', color: '#ffcf5c' },
   { id: 'buildings', name: '3D buildings', sub: 'OpenStreetMap, no key needed · zoom into a city', color: '#b7c2ce' },
   { id: 'user', name: 'My sightings', sub: 'Stored only in this browser', color: '#c6ff5c' },
 ];
@@ -52,7 +53,7 @@ export function renderFilters() {
 const SORTERS = {
   'date-desc': (a, b) => b.date - a.date,
   'date-asc': (a, b) => a.date - b.date,
-  evidence: (a, b) => b.evidence.length + (b.hasTrack ? 2 : 0) - (a.evidence.length + (a.hasTrack ? 2 : 0)),
+  evidence: (a, b) => evidenceScore(b.evidence, b.hasTrack) - evidenceScore(a.evidence, a.hasTrack) || b.date - a.date,
   name: (a, b) => a.title.localeCompare(b.title),
 };
 

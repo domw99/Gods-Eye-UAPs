@@ -51,6 +51,7 @@ export function createTrackLayer(viewer) {
   });
 
   function clear() {
+    witnessView(false);
     source.entities.removeAll();
     if (viewer.trackedEntity) viewer.trackedEntity = undefined;
     viewer.clock.shouldAnimate = false;
@@ -187,7 +188,7 @@ export function createTrackLayer(viewer) {
         },
       });
       mover.viewFrom = new Cesium.Cartesian3(-3000, -3000, 2000);
-      movers.push({ entity: mover, track });
+      movers.push({ entity: mover, track, first, last, sampled });
     }
 
     for (const obs of caseData.observers || []) {
@@ -276,11 +277,80 @@ export function createTrackLayer(viewer) {
   function follow(on) {
     if (!current?.primary) return;
     if (on) {
+      witnessView(false);
       const r = Math.max(2000, Math.min(60000, current.sphere.radius * 0.25));
       current.primary.viewFrom = new Cesium.Cartesian3(-r, -r, r * 0.6);
       viewer.trackedEntity = current.primary;
     } else viewer.trackedEntity = undefined;
   }
+  /* ── Witness view: ride with the witness, looking at the object ── */
+  let pov = null; // { from, to, remove }
+  const clampTime = (m, t) =>
+    Cesium.JulianDate.lessThan(t, m.first) ? m.first : Cesium.JulianDate.greaterThan(t, m.last) ? m.last : t;
+
+  /** Who watched what: the first non-UAP track (or a ground observer) paired with the first UAP track. */
+  function witnessPair() {
+    if (!current) return null;
+    const target = current.movers.find((m) => m.track.kind === 'uap');
+    if (!target) return null;
+    const witness = current.movers.find((m) => m.track.kind !== 'uap' && m.track.kind !== 'meteor');
+    if (witness) return { target, witness, label: witness.track.label };
+    const obs = current.caseData.observers?.[0];
+    if (obs) return { target, observer: obs, label: obs.label };
+    return null;
+  }
+
+  function witnessView(on) {
+    const controller = viewer.scene.screenSpaceCameraController;
+    if (pov) {
+      pov.remove();
+      pov = null;
+      controller.enableInputs = true;
+      viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+    }
+    if (!on) return false;
+    const pair = witnessPair();
+    if (!pair) return false;
+    viewer.trackedEntity = undefined;
+    controller.enableInputs = false;
+    const scratchDir = new Cesium.Cartesian3();
+    const scratchUp = new Cesium.Cartesian3();
+    const scratchRight = new Cesium.Cartesian3();
+    const ellipsoid = viewer.scene.globe.ellipsoid;
+    let observerPos = null;
+    if (pair.observer) {
+      const carto = Cesium.Cartographic.fromDegrees(pair.observer.lon, pair.observer.lat);
+      const ground = viewer.scene.globe.getHeight(carto) ?? 0;
+      observerPos = Cesium.Cartesian3.fromDegrees(pair.observer.lon, pair.observer.lat, ground + 30);
+    }
+    const update = () => {
+      const t = viewer.clock.currentTime;
+      const from = observerPos || pair.witness.sampled.getValue(clampTime(pair.witness, t));
+      const to = pair.target.sampled.getValue(clampTime(pair.target, t));
+      if (!from || !to) return;
+      // Sit just behind and above the witness so its own marker doesn't fill the view.
+      Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(to, from, scratchDir), scratchDir);
+      const upAtEye = ellipsoid.geodeticSurfaceNormal(from, scratchUp);
+      const eye = Cesium.Cartesian3.add(
+        from,
+        Cesium.Cartesian3.add(
+          Cesium.Cartesian3.multiplyByScalar(scratchDir, observerPos ? 0 : -60, new Cesium.Cartesian3()),
+          Cesium.Cartesian3.multiplyByScalar(upAtEye, observerPos ? 0 : 12, new Cesium.Cartesian3()),
+          new Cesium.Cartesian3(),
+        ),
+        new Cesium.Cartesian3(),
+      );
+      const dir = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(to, eye, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+      Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(dir, upAtEye, scratchRight), scratchRight);
+      const up = Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(scratchRight, dir, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+      viewer.camera.setView({ destination: eye, orientation: { direction: dir, up } });
+    };
+    const remove = viewer.scene.preRender.addEventListener(update);
+    update();
+    pov = { remove, label: pair.label };
+    return pair.label;
+  }
+
   function fit(duration = 2.0) {
     if (!current) return;
     const s = current.sphere;
@@ -301,6 +371,13 @@ export function createTrackLayer(viewer) {
     progress,
     follow,
     fit,
+    witnessView,
+    get witnessLabel() {
+      return witnessPair()?.label || null;
+    },
+    get witnessOn() {
+      return Boolean(pov);
+    },
     get current() {
       return current;
     },
