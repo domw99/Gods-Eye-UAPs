@@ -14,8 +14,9 @@
 
 | | |
 |---|---|
-| 🌍 **3D globe, no keys needed** | CesiumJS with Esri satellite imagery and keyless terrain (OSM fallback). Add a Google Maps or Cesium ion key for photorealistic 3D cities. |
-| 🛸 **65 curated case files** | Documented cases from 1561 to 2024 on every continent, each with evidence tags, witnesses, timeline, status (unresolved / disputed / explained / identified) and the official or best-supported explanation. Examples: Kenneth Arnold, Washington 1952, the RB-47, Socorro, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla and the 2023 shoot-downs. |
+| 🌍 **3D globe, no keys needed** | CesiumJS with Esri satellite imagery and keyless terrain (OSM fallback). |
+| 🏙 **3D cities, two ways** | Free **OpenStreetMap 3D buildings** (via OpenFreeMap, no key) appear when you zoom into a town. Or paste **your own Google Maps API key** under **3D MAP** to switch to Google's photorealistic 3D tiles. The key stays in your browser. |
+| 🛸 **126 curated case files** | Documented cases from 1561 to 2024 on every continent, each with evidence tags, witnesses, timeline, status (unresolved / disputed / explained / identified) and the official or best-supported explanation. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, Cosford, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. |
 | ✈️ **Flight paths you can replay** | 3D tracks at altitude for the UAP *and* the witness aircraft, interceptors, cars and balloons. Each has drop lines, a ground track and labelled waypoints. Playback runs on a real clock with a scrubber, speed control and a chase camera. Every track states its basis (radar, official report, witness reports, flight plan or approximate). |
 | 🎞 **Official U.S. footage** | All 174 UAP videos and images the Department of War / AARO have published on DVIDS, including the 2026 **PURSUE** releases from war.gov/UFO. They play inside the app. Region-only releases are drawn as rings, not fake pins. |
 | 🗂 **Project Blue Book on the map** | 10,096 of the 10,763 scanned U.S. Air Force case files (1947–1969), geocoded offline. Click a point to read the original document and its OCR text. |
@@ -35,6 +36,9 @@
 </tr><tr>
 <td><img src="docs/media/gov-files.jpg" alt="Government files library" /></td>
 <td align="center"><img src="docs/media/mobile.jpg" alt="Phone layout" width="220" /></td>
+</tr><tr>
+<td><img src="docs/media/osm-buildings.jpg" alt="Free OpenStreetMap 3D buildings over downtown Montreal (Bonaventure Hotel case)" /></td>
+<td><img src="docs/media/hill-route.jpg" alt="Betty and Barney Hill: the drive and the craft replayed" /></td>
 </tr></table>
 
 ## Quick start
@@ -46,14 +50,18 @@ npm ci
 npm run dev        # http://localhost:5173
 ```
 
-Optional upgrades: copy `.env.example` to `.env` and fill in the keys below.
+Nothing needs a key. 3D buildings come from OpenStreetMap for free.
+
+**Google photorealistic 3D (optional):** click **3D MAP** (or press `M`) and paste a Google Maps Platform key with the **Map Tiles API** enabled. The key is stored only in that browser's localStorage and sent only to `tile.googleapis.com`. You can remove it there at any time.
+
+If you host your own copy, you can instead bake keys in: copy `.env.example` to `.env` and fill in the keys below.
 
 | Key | What it adds |
 |---|---|
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Photorealistic 3D Tiles (needs the Map Tiles API enabled) |
+| `VITE_GOOGLE_MAPS_API_KEY` | Google Photorealistic 3D Tiles for every visitor (needs the Map Tiles API enabled) |
 | `VITE_CESIUM_ION_TOKEN` | Cesium World Terrain, plus Google 3D Tiles through ion |
 
-Restrict browser keys to your domain at the provider.
+Restrict browser keys to your domain at the provider, because anything built into the site is public.
 
 **Deep links:**
 - `#/case/nimitz-tic-tac-2004` — a curated case
@@ -70,6 +78,7 @@ Restrict browser keys to your domain at the provider.
 - `T` tour
 - `G` government files
 - `L` log a sighting
+- `M` 3D map settings (OSM buildings, your Google key)
 - `H` hide the HUD
 - `Esc` close
 
@@ -103,6 +112,7 @@ src/
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
   layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
               points.js (Blue Book / NUFORC) · satellites.js (live SGP4)
+              buildings.js (keyless OpenStreetMap 3D buildings)
   services/   wiki.js (Wikipedia summaries, Commons media & geosearch)
   ui/         list.js · dossier.js · timeline.js · modals.js
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · verify-media.mjs
@@ -112,7 +122,13 @@ docs/SPEC.md  the full product spec (the improved prompt this was built from)
 
 ## Deploy
 
-`.github/workflows/pages.yml` builds and publishes to GitHub Pages on every push to `main`. Enable it under **Settings → Pages → Source: GitHub Actions**. CI (`ci.yml`) runs the tests and a build on every push and pull request.
+`.github/workflows/pages.yml` tests, builds and publishes to GitHub Pages on every push to `main` or the default branch, and on demand from the Actions tab. To turn it on:
+
+1. GitHub Pages needs a **public** repository on a free plan (private repos need a paid plan).
+2. Go to **Settings → Pages** and set **Source: GitHub Actions**.
+3. Re-run the "Deploy to GitHub Pages" workflow. The site appears at `https://<user>.github.io/Gods-Eye-UAPs/`.
+
+CI (`ci.yml`) runs the tests and a build on every push and pull request.
 
 ## Credits & licences
 
@@ -122,6 +138,7 @@ docs/SPEC.md  the full product spec (the improved prompt this was built from)
   - Imagery: Esri World Imagery ("Powered by Esri")
   - Terrain: Re:Earth / Mapterhorn (CC BY 4.0)
   - OSM fallback: © OpenStreetMap contributors
+  - 3D buildings: © OpenMapTiles © OpenStreetMap contributors, served by OpenFreeMap
 - **Media & sources:**
   - Official footage: DVIDS / U.S. Department of War (public domain)
   - Media: Wikimedia Commons (the licence and author of each file are shown in the app)

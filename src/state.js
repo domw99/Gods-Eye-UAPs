@@ -19,6 +19,7 @@ export const state = {
     bluebook: false,
     nuforc: false,
     satellites: false,
+    buildings: true,
     user: true,
   },
   selected: null, // item key

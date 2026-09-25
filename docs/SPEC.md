@@ -21,8 +21,12 @@ video, radar data, government files) next to each location.
 
 ## 1. Look and feel (match God's Eye View)
 - CesiumJS globe on Vite. It starts **without API keys** using Esri World Imagery and
-  keyless terrain, with OpenStreetMap as the fallback. Google Photorealistic 3D Tiles and
-  Cesium World Terrain are optional via `.env` keys.
+  keyless terrain, with OpenStreetMap as the fallback.
+- 3D cities without keys: extruded OpenStreetMap buildings from free vector tiles
+  (OpenFreeMap) once the camera is low over a town.
+- Google Photorealistic 3D Tiles are optional. Visitors can paste their own Google Maps
+  key in the app (kept only in their browser), or a site owner can set `.env` keys.
+  Cesium World Terrain is optional via an ion token.
 - Dark glass tactical UI with a tactical HUD: UTC clock, camera coordinates, altitude,
   current target and a crosshair.
 - Sensor modes as GLSL post-processing: Normal, NVG, FLIR white-hot, FLIR Ironbow and CRT.

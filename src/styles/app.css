@@ -421,6 +421,9 @@ body.hud-off .hud { display: none; }
 .form-grid .full { grid-column: 1 / -1; }
 .form-grid input, .form-grid select, .form-grid textarea { padding: 8px 10px; font-size: 13px; font-family: var(--font-sans); color: var(--text-primary); background: rgba(255,255,255,.04); border: 1px solid var(--glass-border); border-radius: 8px; }
 .form-grid textarea { min-height: 80px; resize: vertical; }
+.modal ol.steps { padding-left: 18px; display: grid; gap: 6px; }
+#ms-form { margin-top: 10px; }
+.chip:disabled { opacity: .5; cursor: progress; }
 .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 10px 0 16px; }
 .stat { border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px; background: rgba(255,255,255,.02); }
 .stat .v { font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--accent); }

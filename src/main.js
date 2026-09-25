@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import { createViewer } from './app/viewer.js';
+import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
@@ -8,13 +8,14 @@ import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
+import { createBuildingLayer } from './layers/buildings.js';
 import { renderLayers, renderFilters, renderList, bindList, markSelected } from './ui/list.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
   renderSkyCheck, closeDossier, bindDossierActions, showOcr,
 } from './ui/dossier.js';
-import { openGovFiles, openAbout, openLogForm, openLightbox, closeModal } from './ui/modals.js';
+import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, closeModal } from './ui/modals.js';
 import { toast, esc } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
 
@@ -29,6 +30,8 @@ const trackLayer = createTrackLayer(viewer);
 const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', pixelSize: 5 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', pixelSize: 2.5, alpha: 0.55, near: 1.6, far: 0.7 });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
+const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
+const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLayer.suspend(active) });
 
 let officialMeta = null;
 let officialItems = [];
@@ -36,7 +39,7 @@ let officialById = new Map();
 let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -51,6 +54,11 @@ try {
 
 const allItems = () => [...CASE_ITEMS, ...officialItems, ...userItems];
 itemLayer.setItems(allItems());
+buildingLayer.show = state.layers.buildings;
+if (photoreal.configured)
+  photoreal.load().then((r) => {
+    if (!r.ok && storedGoogleKey()) toast('Your Google key did not load 3D tiles — check Map settings');
+  });
 
 /* ── Filtering ─────────────────────────────────────────── */
 function passesNonYear(it) {
@@ -113,6 +121,7 @@ async function applyLayers() {
   bluebookLayer.show = L.bluebook;
   nuforcLayer.show = L.nuforc;
   satLayer.show = L.satellites;
+  buildingLayer.show = L.buildings;
   if (L.bluebook && !bluebook) await ensureBlueBook();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
@@ -412,6 +421,7 @@ bindDossierActions({
   ground: () => {
     const item = itemByKey(state.selected);
     if (!item || item.lat == null) return;
+    if (!state.layers.buildings && !photoreal.active) setLayer('buildings', true);
     viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(item.lon, item.lat), 10), {
       duration: 2.5,
       offset: new Cesium.HeadingPitchRange(Cesium.Math.toRadians(20), Cesium.Math.toRadians(-12), 2500),
@@ -540,8 +550,9 @@ function toggleHistorySweep() {
 
 /* ── Guided tour ───────────────────────────────────────── */
 const TOUR = [
-  'kenneth-arnold-1947', 'washington-dc-1952', 'rb-47-1957', 'portage-county-1966', 'tehran-1976',
-  'rendlesham-1980', 'jal-1628-1986', 'belgian-wave-1990', 'phoenix-lights-1997', 'nimitz-tic-tac-2004',
+  'kenneth-arnold-1947', 'washington-dc-1952', 'kinross-moncla-1953', 'rb-47-1957', 'hill-abduction-1961',
+  'portage-county-1966', 'minot-afb-1968', 'tehran-1976', 'rendlesham-1980', 'jal-1628-1986', 'belgian-wave-1990',
+  'phoenix-lights-1997', 'nimitz-tic-tac-2004',
   'aguadilla-2013', 'gimbal-gofast-2015', 'north-american-shootdowns-2023',
 ].filter((id) => CASES.some((c) => c.id === id));
 let tourTimer = null;
@@ -592,6 +603,32 @@ const openAboutModal = () =>
   openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated });
 document.getElementById('btn-about').addEventListener('click', openAboutModal);
 
+/* ── Map settings: OSM buildings and the user's own Google key ── */
+function openMapSettingsNow() {
+  openMapSettings({
+    buildingsOn: state.layers.buildings,
+    photoreal: { active: photoreal.active, source: photoreal.source },
+    hasStoredKey: Boolean(storedGoogleKey()),
+    envKey: hasEnvGoogleKey(),
+    ionToken: hasIonToken(),
+    onBuildings: (on) => setLayer('buildings', on),
+    onSaveKey: async (key) => {
+      const r = await photoreal.load({ key });
+      if (r.ok) saveGoogleKey(key);
+      else if (photoreal.configured) await photoreal.load();
+      return r;
+    },
+    onRemoveKey: async () => {
+      saveGoogleKey('');
+      photoreal.unload();
+      if (photoreal.configured) await photoreal.load();
+    },
+    onPhotoreal: async (on) => (on ? photoreal.load() : (photoreal.unload(), { ok: true })),
+    reopen: openMapSettingsNow,
+  });
+}
+document.getElementById('btn-map').addEventListener('click', openMapSettingsNow);
+
 function neighbour(delta) {
   const keys = [...document.querySelectorAll('#case-list [data-key]')].map((li) => li.dataset.key);
   if (!keys.length) return;
@@ -622,6 +659,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'l') openLog();
   else if (e.key.toLowerCase() === 'h') document.body.classList.toggle('hud-off');
   else if (e.key === '?') openAboutModal();
+  else if (e.key.toLowerCase() === 'm') openMapSettingsNow();
 });
 
 /* ── HUD ───────────────────────────────────────────────── */

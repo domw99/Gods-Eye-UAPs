@@ -10,6 +10,7 @@ export const LAYER_DEFS = [
   { id: 'bluebook', name: 'Project Blue Book', sub: 'USAF case files 1947–1969 (scans)', color: '#ffb547' },
   { id: 'nuforc', name: 'Civilian reports', sub: 'NUFORC, ~80k unverified reports', color: '#ff7a45' },
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
+  { id: 'buildings', name: '3D buildings', sub: 'OpenStreetMap, no key needed · zoom into a city', color: '#b7c2ce' },
   { id: 'user', name: 'My sightings', sub: 'Stored only in this browser', color: '#c6ff5c' },
 ];
 

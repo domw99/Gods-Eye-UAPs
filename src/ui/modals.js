@@ -79,7 +79,7 @@ export function openAbout(meta) {
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
-    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Government files</dd><dt>L</dt><dd>Log a sighting</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close</dd></dl>
+    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Government files</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p></div>`;
@@ -154,4 +154,95 @@ export function openLightbox({ lightbox, caption, credit, href }) {
     if (e.target === lb || e.target.closest('button[data-close]')) closeModal();
   });
   lb.querySelector('button').focus();
+}
+
+/**
+ * 3D map settings: the free OpenStreetMap buildings, and Google Photorealistic
+ * 3D Tiles with the user's own API key (kept in this browser only).
+ */
+export function openMapSettings(o) {
+  const google = o.photoreal.active
+    ? `ON — ${o.photoreal.source}`
+    : o.hasStoredKey
+      ? 'OFF — your key is saved in this browser'
+      : o.envKey || o.ionToken
+        ? 'OFF — this site has a key configured'
+        : 'OFF — no key yet';
+  const content = html`
+    <h2>3D map</h2>
+    <p class="lead">There are two ways to see cities in 3D. OpenStreetMap buildings are free and need nothing. Google's photorealistic 3D tiles need your own API key.</p>
+
+    <div class="section-label">FREE — OPENSTREETMAP 3D BUILDINGS</div>
+    <div class="d-text"><p>Building footprints and heights from OpenStreetMap, served keyless by OpenFreeMap and raised on the terrain. They appear when you zoom into a town (below about 9 km altitude). Detail depends on how well the area is mapped. "Fly to ground view" turns them on.</p></div>
+    <div class="btn-row"><button type="button" class="chip ${o.buildingsOn ? 'on' : ''}" id="ms-osm" aria-pressed="${o.buildingsOn ? 'true' : 'false'}">${o.buildingsOn ? '✓ OSM BUILDINGS ON' : 'OSM BUILDINGS OFF'}</button></div>
+
+    <div class="section-label">GOOGLE PHOTOREALISTIC 3D — YOUR OWN KEY</div>
+    <div class="d-text"><p>Paste a Google Maps Platform API key with the <b>Map Tiles API</b> enabled, and the globe switches to Google's photorealistic 3D cities and terrain. OSM buildings are hidden while it is on.</p></div>
+    <form id="ms-form" class="form-grid" autocomplete="off">
+      <label class="full">GOOGLE MAPS API KEY
+        <input name="key" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="${o.hasStoredKey ? 'Saved in this browser — paste a new key to replace it' : 'AIza…'}" />
+      </label>
+      <div class="full btn-row">
+        <button type="submit" class="chip on" id="ms-save">SAVE &amp; LOAD 3D TILES</button>
+        ${o.photoreal.active
+          ? html`<button type="button" class="chip" id="ms-off">TURN GOOGLE 3D OFF</button>`
+          : o.hasStoredKey || o.envKey || o.ionToken
+            ? html`<button type="button" class="chip" id="ms-on">TURN GOOGLE 3D ON</button>`
+            : ''}
+        ${o.hasStoredKey ? html`<button type="button" class="chip" id="ms-remove">REMOVE MY KEY</button>` : ''}
+      </div>
+      <div class="full muted" id="ms-status" role="status">STATUS: ${google}</div>
+    </form>
+
+    <div class="section-label">GETTING A KEY</div>
+    <ol class="d-text steps">
+      <li>Open the <a href="https://console.cloud.google.com/google/maps-apis/" target="_blank" rel="noopener">Google Maps Platform console</a> and create or pick a project. Google asks for a billing account.</li>
+      <li>Enable the <a href="https://console.cloud.google.com/apis/library/tile.googleapis.com" target="_blank" rel="noopener">Map Tiles API</a>.</li>
+      <li>Create an API key under <b>Keys &amp; Credentials</b>. Restrict it to the Map Tiles API and to this site's address (HTTP referrer).</li>
+      <li>Paste it above. Check Google's <a href="https://developers.google.com/maps/documentation/tile/usage-and-billing" target="_blank" rel="noopener">current pricing and free usage limits</a>.</li>
+    </ol>
+    <p class="caveat">Your key is stored only in this browser (localStorage) and sent only to Google's tile server (tile.googleapis.com). It is never uploaded anywhere else. Anyone who uses this browser profile could read it, so remove it on shared computers. If you host your own copy, you can set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> instead.</p>`;
+  const el = modal('3D MAP', content, { wide: false });
+  const status = el.querySelector('#ms-status');
+  const busy = (msg) => {
+    status.textContent = `STATUS: ${msg}`;
+    for (const b of el.querySelectorAll('#ms-form button')) b.disabled = true;
+  };
+  const failMessage = (error) => {
+    const m = String(error?.message || error || '');
+    if (/40[013]/.test(m)) return 'Google refused the key (check that the Map Tiles API is enabled and the key restrictions allow this site).';
+    if (/429/.test(m)) return 'Google says the key is over its quota.';
+    return 'Could not load Google 3D tiles with this key.';
+  };
+
+  el.querySelector('#ms-osm').addEventListener('click', () => {
+    o.onBuildings(!o.buildingsOn);
+    o.reopen();
+  });
+  el.querySelector('#ms-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const key = e.target.key.value.trim();
+    if (!key) return toast('Paste a key first');
+    if (!/^[\w-]{20,60}$/.test(key)) return toast("That doesn't look like a Google API key");
+    busy('Loading Google 3D tiles…');
+    const r = await o.onSaveKey(key);
+    toast(r.ok ? 'Google photorealistic 3D is on — zoom into a city' : failMessage(r.error), r.ok ? 2600 : 6000);
+    o.reopen();
+  });
+  el.querySelector('#ms-remove')?.addEventListener('click', async () => {
+    busy('Removing key…');
+    await o.onRemoveKey();
+    toast('Key removed from this browser');
+    o.reopen();
+  });
+  el.querySelector('#ms-on')?.addEventListener('click', async () => {
+    busy('Loading Google 3D tiles…');
+    const r = await o.onPhotoreal(true);
+    if (!r.ok) toast(failMessage(r.error), 6000);
+    o.reopen();
+  });
+  el.querySelector('#ms-off')?.addEventListener('click', async () => {
+    await o.onPhotoreal(false);
+    o.reopen();
+  });
 }
