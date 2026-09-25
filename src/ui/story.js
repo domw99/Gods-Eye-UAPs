@@ -40,7 +40,8 @@ function skySentence(c) {
       .slice(0, 3)
       .map((b) => `${b.name === 'Moon' ? 'the Moon' : b.name} ${b.alt < 20 ? 'low' : b.alt > 55 ? 'high' : ''} in the ${compass(b.az)}`.replace('  ', ' '));
     const light = sky.light === 'Daylight' ? 'It was daytime' : sky.light === 'Night' ? 'It was night' : `It was ${sky.light.toLowerCase()}`;
-    return shown.length ? `${light}. Above the horizon: ${shown.join(', ')}.` : `${light}.`;
+    const text = shown.length ? `${light}. Above the horizon: ${shown.join(', ')}.` : `${light}.`;
+    return c.timeApprox ? `The exact time isn't recorded, but around then: ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
   } catch {
     return null;
   }
@@ -120,16 +121,18 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
       viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(c.lon, c.lat - 12, 4.5e6), duration: 2.5 });
     } else if (step.camera === 'site') {
       stopOrbit();
+      const run = state; // callbacks below must not act on a later story
       viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(c.lon, c.lat, 0), 10), {
         duration: 3.2,
         offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-32), RANGE[c.precision] || 40000),
-        complete: () => state && !c.tracks?.length && orbit(c),
+        complete: () => state === run && !c.tracks?.length && orbit(c),
       });
     } else if (step.camera === 'path') {
       if (trackLayer.current) {
         stopOrbit();
         trackLayer.fit(2);
-        setTimeout(() => state && trackLayer.restart(), 2100);
+        const run = state;
+        setTimeout(() => state === run && trackLayer.restart(), 2100);
       }
     }
   }

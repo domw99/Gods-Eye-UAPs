@@ -320,7 +320,14 @@ export function openExplain(o) {
     };
     if (!Number.isFinite(input.lat) || !Number.isFinite(input.lon)) return toast('Check the coordinates');
     mount(results, html`<div class="loading-line">Checking the sky, satellites, launches and wind…</div>`);
-    const r = await o.run(input);
+    let r;
+    try {
+      r = await o.run(input);
+    } catch (error) {
+      console.warn('[explain]', error);
+      mount(results, html`<p class="caveat">The check failed: ${String(error?.message || error)}. Please try again.</p>`);
+      return;
+    }
     const top = r.candidates.slice(0, 6);
     mount(
       results,
@@ -345,7 +352,7 @@ function caseFacts(c) {
   const st = uap ? trackStats(uap) : null;
   let light = '—';
   try {
-    light = skyAt(c.lat, c.lon, c.date).light;
+    light = skyAt(c.lat, c.lon, c.date).light + (c.timeApprox ? ' (time approx.)' : '');
   } catch {
     /* ignore */
   }

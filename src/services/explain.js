@@ -82,7 +82,7 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
   if (satellites) {
     const lit = satellites.filter((s) => s.sunlit);
     const moving = { still: 0.1, drift: 0.35, steady: 1, fast: 0.4, formation: 0.9 }[motion];
-    const iss = lit.find((s) => /ISS|ZARYA|TIANHE|CSS/i.test(s.name));
+    const iss = lit.find((s) => /\b(ISS|CSS)\b|ZARYA|TIANHE/i.test(s.name));
     if (iss && dark) {
       const { f, sep } = positionFactor(report, iss.azimuth, iss.elevation);
       out.push({

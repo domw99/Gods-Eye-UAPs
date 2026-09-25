@@ -17,6 +17,7 @@ describe('curated case files', () => {
         expect(c.summary.length).toBeGreaterThan(60);
         expect(Number.isNaN(Date.parse(c.date))).toBe(false);
         expect(c.date).toMatch(/[+-]\d{2}:\d{2}$/); // local offset recorded
+        if ('timeApprox' in c) expect(c.timeApprox).toBe(true);
         if (c.end) expect(Date.parse(c.end)).toBeGreaterThanOrEqual(Date.parse(c.date));
         expect(c.lat).toBeGreaterThanOrEqual(-90);
         expect(c.lat).toBeLessThanOrEqual(90);

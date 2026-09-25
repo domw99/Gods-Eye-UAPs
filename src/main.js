@@ -185,7 +185,7 @@ async function ensureLaunches() {
     launchLayer.setLaunches(await launchesAroundNow(14, 30));
     renderLayersNow({ launches: launchLayer.count });
   } catch (error) {
-    launchesLoaded = 0;
+    launchesLoaded = Date.now() - 25 * 60e3; // retry in about five minutes, not on every toggle
     console.warn(error);
     renderLayersNow({ launches: 'offline' });
     toast(error instanceof RateLimitError ? 'Launch Library limit reached (about 15 look-ups an hour). Try again later.' : 'Launch Library unavailable');
@@ -278,8 +278,9 @@ function flyToItem(item, { tracks } = {}) {
 
 function select(key, source = 'api') {
   const item = itemByKey(key);
-  if (!item) return;
+  if (!item) return false;
   if (source !== 'tour') stopTour();
+  story.stop(true);
   state.selected = key;
   markSelected(key);
   itemLayer.showRegion(item.kind === 'official' ? item : null);
@@ -299,10 +300,12 @@ function select(key, source = 'api') {
   }
   setHash(`#/${item.kind}/${encodeURIComponent(item.id)}`);
   document.getElementById('hud-tgt').textContent = item.title.slice(0, 40).toUpperCase();
+  return true;
 }
 
 async function selectBlueBook(id) {
   stopTour();
+  story.stop(true);
   const bb = await ensureBlueBook();
   const rec = bb.byId.get(id);
   if (!rec) return toast('Blue Book file not found');
@@ -348,7 +351,10 @@ function routeFromHash() {
   const [, kind, raw] = m;
   const id = decodeURIComponent(raw);
   if (kind === 'bluebook') selectBlueBook(id);
-  else select(`${kind}:${id}`, 'hash');
+  else if (!select(`${kind}:${id}`, 'hash')) {
+    toast(kind === 'user' ? 'That sighting is not in this browser’s log' : `Nothing found for “${id}”`);
+    return false;
+  }
   return true;
 }
 window.addEventListener('hashchange', () => {
@@ -389,7 +395,10 @@ handler.setInputAction((click) => {
     });
   } else if (hit.type === 'satellite') {
     const info = satLayer.info(hit.index);
-    if (info) renderSatellite(info);
+    if (info) {
+      deselect();
+      renderSatellite(info);
+    }
   } else if (hit.type === 'airspace') {
     const a = airspaceLayer.info(hit.index);
     if (a) {
@@ -441,6 +450,10 @@ handler.setInputAction((move) => {
   });
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 viewer.scene.canvas.addEventListener('pointerdown', () => stopTour());
+viewer.scene.canvas.addEventListener('pointerleave', () => {
+  hoverEl.classList.add('hidden');
+  viewer.scene.canvas.style.cursor = '';
+});
 
 /* ── Playback bar ──────────────────────────────────────── */
 const pb = {
@@ -490,6 +503,7 @@ pb.follow.addEventListener('click', () => {
   const on = pb.follow.getAttribute('aria-pressed') !== 'true';
   pb.follow.setAttribute('aria-pressed', String(on));
   pb.pov.setAttribute('aria-pressed', 'false');
+  document.body.classList.remove('pov');
   trackLayer.follow(on);
   if (on && !trackLayer.playing) trackLayer.play();
 });
@@ -537,13 +551,9 @@ bindDossierActions({
   skycheck: () => {
     const item = itemByKey(state.selected);
     if (!item) return;
-    if (!state.layers.satellites || !satLayer.count) {
-      setLayer('satellites', true);
-      renderSkyCheck(null);
-      setTimeout(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null), 4000);
-      return;
-    }
-    renderSkyCheck(satLayer.overhead(item.lat, item.lon));
+    if (!state.layers.satellites) setLayer('satellites', true);
+    renderSkyCheck('loading');
+    satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null));
   },
   'export-user': exportUserLog,
   compare: () => {
@@ -554,6 +564,9 @@ bindDossierActions({
     const item = itemByKey(state.selected);
     if (item?.kind === 'case') {
       stopTour();
+      toggleWitnessView(false);
+      pb.follow.setAttribute('aria-pressed', 'false');
+      trackLayer.follow(false);
       story.start(item.ref);
     }
   },
@@ -625,8 +638,8 @@ function viewCenter() {
   const c = viewer.camera.pickEllipsoid(
     new Cesium.Cartesian2(viewer.scene.canvas.clientWidth / 2, viewer.scene.canvas.clientHeight / 2),
   );
-  if (!c) return { lat: 0, lon: 0 };
-  const carto = Cesium.Cartographic.fromCartesian(c);
+  // Looking past the globe's edge: use the point under the camera instead of 0°, 0°.
+  const carto = c ? Cesium.Cartographic.fromCartesian(c) : viewer.camera.positionCartographic;
   return { lat: Cesium.Math.toDegrees(carto.latitude), lon: Cesium.Math.toDegrees(carto.longitude) };
 }
 const openLog = () => openLogForm({ ...viewCenter(), onSave: addUser });
@@ -729,6 +742,11 @@ function toggleHistorySweep() {
   }, 450);
 }
 
+// Brushing the histogram by hand takes over from the automatic sweep.
+document.getElementById('tl-canvas').addEventListener('pointerdown', () => {
+  if (sweepTimer) toggleHistorySweep();
+});
+
 /* ── Guided tour ───────────────────────────────────────── */
 const TOUR = [
   'kenneth-arnold-1947', 'washington-dc-1952', 'kinross-moncla-1953', 'rb-47-1957', 'hill-abduction-1961',
@@ -815,7 +833,8 @@ function neighbour(delta) {
   const keys = [...document.querySelectorAll('#case-list [data-key]')].map((li) => li.dataset.key);
   if (!keys.length) return;
   const i = keys.indexOf(state.selected);
-  select(keys[(i + delta + keys.length) % keys.length], 'list');
+  const next = i < 0 ? (delta > 0 ? 0 : keys.length - 1) : (i + delta + keys.length) % keys.length;
+  select(keys[next], 'list');
 }
 
 window.addEventListener('keydown', (e) => {
@@ -828,6 +847,8 @@ window.addEventListener('keydown', (e) => {
     return deselect();
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (document.getElementById('modal-root').children.length) return; // a dialog is open
+  if (e.key === ' ' && e.target.closest?.('button, a, summary, [role="option"], [tabindex]:not(body)')) return;
   const modes = ['normal', 'nvg', 'flir', 'ironbow', 'crt'];
   if (/^[1-5]$/.test(e.key)) setMode(modes[Number(e.key) - 1]);
   else if (e.key === '/') {
@@ -929,7 +950,7 @@ viewer.camera.moveEnd.addEventListener(() => {
   viewTimer = setTimeout(() => {
     const c = viewer.camera.positionCartographic;
     const deg = Cesium.Math.toDegrees;
-    const v = [deg(c.longitude).toFixed(4), deg(c.latitude).toFixed(4), Math.round(c.height), Math.round(deg(viewer.camera.heading)), Math.round(deg(viewer.camera.pitch))].join(',');
+    const v = [deg(c.longitude).toFixed(4), deg(c.latitude).toFixed(4), Math.round(c.height), Math.round(deg(viewer.camera.heading)) % 360, Math.round(deg(viewer.camera.pitch))].join(',');
     const u = new URL(location.href);
     u.searchParams.set('view', v);
     history.replaceState(history.state, '', u);

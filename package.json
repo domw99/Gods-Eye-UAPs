@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/fix-cesium-base.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "sync:official": "node scripts/sync-dvids.mjs",

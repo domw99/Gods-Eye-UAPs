@@ -24,7 +24,8 @@ const fmtDate = (d, opts = {}) =>
   d.toLocaleString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', ...opts });
 
 /** "13 Mar 1997, 19:55 local (UTC−07:00) · 02:55 UTC" from an ISO string with offset. */
-function localAndUtc(iso) {
+function localAndUtc(iso, approx = false) {
+  if (approx) return `${localAndUtc(iso).replace(/(\d{2}:\d{2}) local/, '~$1 local').replace(/ · \d{2}:\d{2} UTC$/, '')} · time of day approximate`;
   const d = new Date(iso);
   const m = iso.match(/T(\d{2}):(\d{2}).*([+-]\d{2}):?(\d{2})$/);
   const utc = `${d.toISOString().slice(11, 16)} UTC`;
@@ -54,11 +55,14 @@ function siteLinks(lat, lon) {
 }
 
 /* ── Sky and launch context shared by cases and user sightings ── */
-function skyBlock(lat, lon, when, explanation = '') {
+function skyBlock(lat, lon, when, explanation = '', approx = false) {
   try {
     const sky = skyAt(lat, lon, when);
     const year = new Date(when).getUTCFullYear();
-    const note = year < 1583 ? '(dates before 1583 are read as Gregorian, so allow for the calendar change)' : '';
+    const notes = [];
+    if (approx) notes.push('— but the sources give no exact time of day for this case, so treat the chart as indicative');
+    if (year < 1583) notes.push('(dates before 1583 are read as Gregorian, so allow for the calendar change)');
+    const note = notes.join(' ');
     return skySection(sky, bodiesNamedIn(explanation), { note });
   } catch (error) {
     console.warn('[sky]', error);
@@ -81,7 +85,7 @@ const windLine = (speed, from) =>
     ? '—'
     : `${Math.round(speed)} km/h from the ${compass(from)} (blowing toward the ${compass(driftToward(from))})`;
 
-async function fillWeather(token, lat, lon, when, uapTrack) {
+async function fillWeather(token, lat, lon, when, uapTrack, approx = false) {
   const el = document.getElementById('d-weather');
   if (!el) return;
   let wx;
@@ -108,14 +112,14 @@ async function fillWeather(token, lat, lon, when, uapTrack) {
     html`<div class="wx-wrap">
         ${from != null ? windArrow(driftToward(from)) : ''}
         <dl class="d-kv">
-          <dt>SKY</dt><dd>${describeWeatherCode(wx.weather_code)} · cloud ${wx.cloud_cover ?? '—'}% <span class="dim">(low ${wx.cloud_cover_low ?? '—'} · mid ${wx.cloud_cover_mid ?? '—'} · high ${wx.cloud_cover_high ?? '—'})</span></dd>
+          <dt>SKY</dt><dd>${describeWeatherCode(wx.weather_code)}${wx.cloud_cover != null ? html` · cloud ${wx.cloud_cover}% <span class="dim">(low ${wx.cloud_cover_low ?? '—'} · mid ${wx.cloud_cover_mid ?? '—'} · high ${wx.cloud_cover_high ?? '—'})</span>` : ''}</dd>
           <dt>WIND 10 M</dt><dd>${windLine(wx.wind_speed_10m, wx.wind_direction_10m)}${wx.wind_gusts_10m ? html` <span class="dim">· gusts ${Math.round(wx.wind_gusts_10m)}</span>` : ''}</dd>
           <dt>WIND 100 M</dt><dd>${windLine(wx.wind_speed_100m, wx.wind_direction_100m)}</dd>
           <dt>TEMP</dt><dd>${wx.temperature_2m != null ? `${Math.round(wx.temperature_2m)} °C` : '—'}${wx.precipitation ? ` · ${wx.precipitation} mm precipitation` : ''}</dd>
         </dl>
       </div>
       ${verdict ? html`<p class="d-text wx-verdict">${verdict}</p>` : ''}
-      <p class="caveat">${wx.source}, hour of ${wx.hour.slice(0, 13).replace('T', ' ')}:00 UTC, on a ~25 km grid. Local conditions can differ, and winds aloft are often stronger and from a different direction.</p>`,
+      <p class="caveat">${wx.source}, hour of ${wx.hour.slice(0, 13).replace('T', ' ')}:00 UTC, on a ~25 km grid.${approx ? ' The time of day for this case is approximate, so conditions at the real moment may differ.' : ''} Local conditions can differ, and winds aloft are often stronger and from a different direction.</p>`,
   );
 }
 
@@ -400,7 +404,7 @@ export function renderCase(item, ctx) {
   const hasSite = c.precision !== 'region';
   const content = html`
     <div class="d-title">${c.title}</div>
-    <div class="d-sub">${localAndUtc(c.date)}<br />${c.place}<br />
+    <div class="d-sub">${localAndUtc(c.date, c.timeApprox)}<br />${c.place}<br />
       ${formatDMS(c.lat, c.lon)} · <span title="${PRECISION[c.precision]}">${(c.precision || '').toUpperCase()}</span></div>
     <div class="d-badges">${statusBadge(c.status)}<span class="badge">${CATEGORY[c.category] || c.category}</span>${
       tracks.length ? html`<span class="badge path">${tracks.length} TRACK${tracks.length > 1 ? 'S' : ''}</span>` : ''
@@ -438,14 +442,14 @@ export function renderCase(item, ctx) {
       ? section('TIMELINE', html`<ul class="timeline-list">${c.timeline.map((e) => html`<li><span class="when">${e.t}</span>${e.text}</li>`)}</ul>`)
       : ''}
 
-    ${section('SKY AT THE TIME', skyBlock(c.lat, c.lon, c.date, c.explanation))}
+    ${section('SKY AT THE TIME', skyBlock(c.lat, c.lon, c.date, c.explanation, c.timeApprox))}
     ${weatherBlock(c.date)}
     ${launchBlock(c.lat, c.lon, c.date)}
     ${nearUS(c.lat, c.lon) ? section('MILITARY AIRSPACE', html`<div id="d-airspace"><div class="loading-line">Checking FAA special-use airspace…</div></div>`) : ''}
 
     ${section('EVIDENCE & MEDIA', html`<div id="d-media"><div class="loading-line">Loading archived images and video…</div></div>`)}
     ${section('GOVERNMENT FILES — PROJECT BLUE BOOK', html`<div id="d-bluebook"><div class="loading-line">${
-      date.getUTCFullYear() >= 1947 && date.getUTCFullYear() <= 1970 ? 'Searching Blue Book case files…' : 'Outside Blue Book’s 1947–1969 coverage.'
+      date.getUTCFullYear() >= 1947 && date.getUTCFullYear() <= 1969 ? 'Searching Blue Book case files…' : 'Outside Blue Book’s 1947–1969 coverage.'
     }</div></div>`)}
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
     ${section(
@@ -466,7 +470,7 @@ export function renderCase(item, ctx) {
   mount(body(), content);
 
   autoFillLaunches();
-  fillWeather(token, c.lat, c.lon, c.date, tracks.find((t) => t.kind === 'uap'));
+  fillWeather(token, c.lat, c.lon, c.date, tracks.find((t) => t.kind === 'uap'), c.timeApprox);
   if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
@@ -475,14 +479,19 @@ export function renderCase(item, ctx) {
     fillNearby(token, document.getElementById('d-nearby'), c.lat, c.lon, radius);
   }
   const year = date.getUTCFullYear();
-  if (year >= 1947 && year <= 1970)
-    ctx.bluebookNear(c, 150).then((records) => {
-      if (token !== renderToken) return;
-      mount(
-        document.getElementById('d-bluebook'),
-        html`${bluebookList(records)}<p class="caveat">U.S. Air Force case files from the same month within 150 km, plus files linked to this case. Click to open the scanned file.</p>`,
-      );
-    });
+  if (year >= 1947 && year <= 1969)
+    ctx
+      .bluebookNear(c, 150)
+      .then((records) => {
+        if (token !== renderToken) return;
+        mount(
+          document.getElementById('d-bluebook'),
+          html`${bluebookList(records)}<p class="caveat">U.S. Air Force case files from the same month within 150 km, plus files linked to this case. Click to open the scanned file.</p>`,
+        );
+      })
+      .catch(() => {
+        if (token === renderToken) mount(document.getElementById('d-bluebook'), html`<div class="loading-line">Blue Book files could not be loaded.</div>`);
+      });
 }
 
 export function renderOfficial(item, ctx) {
@@ -606,8 +615,12 @@ export function renderSatellite(info) {
 export function renderSkyCheck(list) {
   const el = document.getElementById('d-sky');
   if (!el) return;
+  if (list === 'loading') {
+    mount(el, html`<div class="loading-line">Loading satellite orbits from CelesTrak…</div>`);
+    return;
+  }
   if (!list) {
-    mount(el, html`<div class="loading-line">Turn on the Live satellites layer first, then run the check.</div>`);
+    mount(el, html`<div class="loading-line">Satellite orbits could not be loaded from CelesTrak.</div>`);
     return;
   }
   mount(
@@ -640,9 +653,11 @@ export function bindDossierActions(handlers) {
       return;
     }
     if (action === 'share') {
-      navigator.clipboard?.writeText(location.href).then(
+      // Clipboard access needs a secure context; fall back to showing the link.
+      if (!navigator.clipboard?.writeText) return toast(location.href, 6000);
+      navigator.clipboard.writeText(location.href).then(
         () => toast('Link copied'),
-        () => toast(location.href, 5000),
+        () => toast(location.href, 6000),
       );
       return;
     }

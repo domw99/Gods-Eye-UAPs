@@ -90,5 +90,6 @@ export function launchesNear(when, hours = 12) {
 export function cachedLaunchesNear(when, hours = 12) {
   const t = new Date(when).getTime();
   const from = new Date(t - hours * HOUR).toISOString();
-  return readCache(`ll2:near:${from}:${hours}`, 720 * HOUR);
+  const past = t + hours * HOUR < Date.now();
+  return readCache(`ll2:near:${from}:${hours}`, past ? 720 * HOUR : 0.5 * HOUR);
 }
