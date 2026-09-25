@@ -571,3 +571,17 @@ body.pov #globe::after {
 .wind-arrow line { stroke: var(--accent); stroke-width: 2.4; }
 .wind-arrow path { fill: var(--accent); }
 .wx-verdict { margin-top: 8px; padding: 8px 10px; border-left: 2px solid var(--accent); background: rgba(0, 212, 255, 0.05); border-radius: 0 8px 8px 0; }
+
+/* ── What did I see? ─────────────────────────────────── */
+.ex-looks { border: 1px solid var(--glass-border); border-radius: 8px; padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.ex-looks legend { font: 600 11px var(--font-mono); letter-spacing: 0.05em; color: var(--text-secondary); padding: 0 4px; }
+.ex-looks label { display: flex; gap: 6px; align-items: center; font: 500 12.5px var(--font-sans); color: var(--text-primary); letter-spacing: 0; }
+.ex-list { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 8px; }
+.ex-list li { padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 10px; background: rgba(255, 255, 255, 0.02); }
+.ex-list li.ex-strong { border-color: rgba(0, 212, 255, 0.55); }
+.ex-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.ex-list p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
+.ex-bar { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.07); margin-top: 6px; overflow: hidden; }
+.ex-bar i { display: block; height: 100%; background: var(--accent); }
+.ex-possible .ex-bar i { background: #ffd166; }
+.ex-weak .ex-bar i { background: rgba(255, 255, 255, 0.3); }

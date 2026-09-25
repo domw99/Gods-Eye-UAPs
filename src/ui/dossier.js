@@ -571,6 +571,7 @@ export function renderUser(item, { onDelete }) {
       <dl class="d-kv" style="margin-top:8px"><dt>DURATION</dt><dd>${u.duration || '—'}</dd><dt>WITNESSES</dt><dd>${u.witnesses || '—'}</dd>${
         u.media ? html`<dt>MEDIA</dt><dd><a href="${safeUrl(u.media)}" target="_blank" rel="noopener">${u.media}</a></dd>` : ''
       }</dl>`)}
+    <div class="btn-row" style="margin:12px 0 0"><button class="chip on" data-action="explain-user">WHAT WAS IT? RUN THE CHECKER</button></div>
     ${section('SKY AT THE TIME', skyBlock(u.lat, u.lon, u.date))}
     ${weatherBlock(u.date)}
     ${launchBlock(u.lat, u.lon, u.date)}

@@ -1,5 +1,6 @@
 import * as Cesium from 'cesium';
 import * as satellite from 'satellite.js';
+import * as Astro from 'astronomy-engine';
 
 /**
  * Live "sky check" layer: propagates CelesTrak element sets with satellite.js
@@ -30,10 +31,15 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
   collection.show = false;
   const sats = [];
   let loaded = false;
+  let loading = null;
   let timer = null;
   const scratch = new Cesium.Cartesian3();
 
-  async function load() {
+  function load() {
+    loading ||= doLoad();
+    return loading;
+  }
+  async function doLoad() {
     if (loaded) return;
     loaded = true;
     const seen = new Set();
@@ -119,5 +125,46 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     get count() {
       return sats.length;
     },
+    /** Load the element sets without showing the layer (for the sighting checker). */
+    ensureLoaded: () => load(),
+    /**
+     * Satellites above `minElevationDeg` from an observer at `date`, with
+     * whether each was lit by the Sun. Current element sets are only good for
+     * a few weeks either side of today.
+     */
+    visibleAt(lat, lon, date, minElevationDeg = 10) {
+      const gmst = satellite.gstime(date);
+      const observer = { latitude: satellite.degreesToRadians(lat), longitude: satellite.degreesToRadians(lon), height: 0.1 };
+      const sun = Astro.GeoVector(Astro.Body.Sun, Astro.MakeTime(date), true);
+      const sLen = Math.hypot(sun.x, sun.y, sun.z);
+      const s = { x: sun.x / sLen, y: sun.y / sLen, z: sun.z / sLen };
+      const out = [];
+      for (const sat of sats) {
+        const pv = satellite.propagate(sat.satrec, date);
+        if (!pv?.position || typeof pv.position === 'boolean') continue;
+        const look = satellite.ecfToLookAngles(observer, satellite.eciToEcf(pv.position, gmst));
+        const el = satellite.radiansToDegrees(look.elevation);
+        if (el < minElevationDeg) continue;
+        out.push({
+          name: sat.name,
+          group: sat.group,
+          elevation: el,
+          azimuth: satellite.radiansToDegrees(look.azimuth),
+          rangeKm: look.rangeSat,
+          sunlit: isSunlit(pv.position, s),
+        });
+      }
+      return out.sort((a, b) => b.elevation - a.elevation);
+    },
   };
+}
+
+/** Cylindrical Earth-shadow test; position in km (ECI), sun a unit vector. */
+export function isSunlit(r, s) {
+  const along = r.x * s.x + r.y * s.y + r.z * s.z;
+  if (along > 0) return true;
+  const px = r.x - along * s.x;
+  const py = r.y - along * s.y;
+  const pz = r.z - along * s.z;
+  return Math.hypot(px, py, pz) > 6371;
 }

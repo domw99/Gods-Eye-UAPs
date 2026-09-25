@@ -157,3 +157,59 @@ describe('military airspace', () => {
     expect(nearUS(51.5, -0.1)).toBe(false);
   });
 });
+
+import { rankCandidates, angularSep, confidenceLabel } from '../src/services/explain.js';
+import { isSunlit } from '../src/layers/satellites.js';
+
+describe('sighting checker', () => {
+  const sky = {
+    sun: { alt: -20, az: 300 },
+    bodies: [
+      { name: 'Venus', kind: 'planet', alt: 20, az: 250, mag: -4.3 },
+      { name: 'Sirius', kind: 'star', alt: 8, az: 140, mag: -1.46 },
+      { name: 'Moon', kind: 'moon', alt: 50, az: 170, mag: -11, note: 'Full Moon' },
+    ],
+  };
+  it('measures angles on the sky', () => {
+    expect(angularSep(0, 90, 180, 90)).toBeCloseTo(0);
+    expect(angularSep(0, 0, 90, 0)).toBeCloseTo(90);
+  });
+  it('ranks Venus first for a bright, still light low in the WSW', () => {
+    const r = rankCandidates({ report: { az: 247.5, alt: 20, motion: 'still', bright: true }, sky });
+    expect(r[0].name).toBe('Venus');
+    expect(confidenceLabel(r[0].score)).toBe('Strong match');
+  });
+  it('drops planets when the object moved fast', () => {
+    const r = rankCandidates({ report: { az: 247.5, alt: 20, motion: 'fast' }, sky });
+    expect(r[0].name).not.toBe('Venus');
+  });
+  it('ranks a nearby twilight launch highly', () => {
+    const twilight = { ...sky, sun: { alt: -8, az: 280 } };
+    const r = rankCandidates({
+      report: { motion: 'steady' },
+      sky: twilight,
+      launches: [{ name: 'Falcon 9 | Starlink', gapMin: -12, km: 400 }],
+    });
+    expect(r[0].kind).toBe('launch');
+  });
+  it('matches drifting orange lights with the wind', () => {
+    const r = rankCandidates({
+      report: { motion: 'drift', orange: true, towardAz: 90 },
+      sky: { sun: { alt: -20, az: 0 }, bodies: [] },
+      weather: { wind_speed_100m: 15, wind_direction_100m: 270 },
+    });
+    expect(r[0].kind).toBe('drift');
+    expect(r[0].reason).toMatch(/the way you saw it move/);
+  });
+  it('flags a Starlink train for a line of moving lights', () => {
+    const sats = Array.from({ length: 20 }, (_, i) => ({ name: `STARLINK-${i}`, group: 'Starlink', azimuth: 300 + i * 0.5, elevation: 30, sunlit: true }));
+    const r = rankCandidates({ report: { az: 300, alt: 30, motion: 'formation' }, sky: { sun: { alt: -15, az: 290 }, bodies: [] }, satellites: sats });
+    expect(r[0].name).toBe('Starlink train');
+  });
+  it('tests Earth shadow', () => {
+    const sun = { x: 1, y: 0, z: 0 };
+    expect(isSunlit({ x: 7000, y: 0, z: 0 }, sun)).toBe(true);
+    expect(isSunlit({ x: -7000, y: 0, z: 0 }, sun)).toBe(false);
+    expect(isSunlit({ x: -3000, y: 6800, z: 0 }, sun)).toBe(true);
+  });
+});

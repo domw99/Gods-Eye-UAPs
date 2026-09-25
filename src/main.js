@@ -19,7 +19,11 @@ import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
   renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace,
 } from './ui/dossier.js';
-import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, closeModal } from './ui/modals.js';
+import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, closeModal } from './ui/modals.js';
+import { skyAt } from './services/sky.js';
+import { weatherAt } from './services/weather.js';
+import { launchesNear } from './services/launches.js';
+import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
 
@@ -533,6 +537,10 @@ bindDossierActions({
     renderSkyCheck(satLayer.overhead(item.lat, item.lon));
   },
   'export-user': exportUserLog,
+  'explain-user': () => {
+    const item = itemByKey(state.selected);
+    if (item?.ref) openExplainNow({ date: item.ref.date, lat: item.ref.lat, lon: item.ref.lon });
+  },
 });
 document.getElementById('dossier-close').addEventListener('click', deselect);
 document.getElementById('dossier-peek').addEventListener('click', () => {
@@ -602,6 +610,66 @@ function viewCenter() {
   return { lat: Cesium.Math.toDegrees(carto.latitude), lon: Cesium.Math.toDegrees(carto.longitude) };
 }
 const openLog = () => openLogForm({ ...viewCenter(), onSave: addUser });
+
+/* ── "What did I see?" checker ─────────────────────────── */
+async function explainSighting({ date, lat, lon, report }) {
+  const when = new Date(date);
+  const checked = ['sky (planets, bright stars, Moon)'];
+  const notes = [];
+  const sky = skyAt(lat, lon, when, { minAlt: 0 });
+  const recent = Math.abs(Date.now() - when.getTime()) < 21 * 86400e3;
+  const [satellites, launches, weather] = await Promise.all([
+    recent
+      ? satLayer
+          .ensureLoaded()
+          .then(() => (satLayer.count ? satLayer.visibleAt(lat, lon, when, 10) : null))
+          .catch(() => null)
+      : Promise.resolve(null),
+    when.getUTCFullYear() >= 1957
+      ? launchesNear(when, 12)
+          .then((list) =>
+            list.map((l) => ({
+              ...l,
+              gapMin: (Date.parse(l.net) - when.getTime()) / 60000,
+              km: l.lat != null ? haversineKm(lat, lon, l.lat, l.lon) : null,
+            })),
+          )
+          .catch((e) => {
+            notes.push(e instanceof RateLimitError ? 'Launch Library limit reached, so launches were skipped.' : 'Launch Library was unreachable.');
+            return null;
+          })
+      : Promise.resolve(null),
+    weatherAt(lat, lon, when).catch(() => null),
+  ]);
+  if (satellites) checked.push(`${satellites.length.toLocaleString()} satellites above the horizon`);
+  else if (!recent) notes.push('Satellites were skipped: current orbital data only covers the last three weeks.');
+  if (launches) checked.push('rocket launches ±12 h');
+  if (weather) checked.push('wind and cloud');
+  checked.push('aircraft: not checkable');
+  return { candidates: rankCandidates({ report, sky, satellites, launches, weather }), checked, notes };
+}
+
+function openExplainNow(prefill) {
+  const at = prefill?.lat != null ? { lat: prefill.lat, lon: prefill.lon } : viewCenter();
+  openExplain({
+    ...at,
+    prefill,
+    heights: HEIGHTS,
+    motions: MOTIONS,
+    label: confidenceLabel,
+    run: explainSighting,
+    onLog: (input, best) =>
+      openLogForm({
+        lat: input.lat,
+        lon: input.lon,
+        onSave: addUser,
+        prefill: {
+          date: input.date,
+          description: best ? `Checker's top match: ${best.name} (${confidenceLabel(best.score).toLowerCase()}). ${best.reason}` : '',
+        },
+      }),
+  });
+}
 
 /* ── Sensor modes ──────────────────────────────────────── */
 function setMode(mode) {
@@ -692,6 +760,7 @@ const openFiles = () =>
   );
 document.getElementById('btn-files').addEventListener('click', openFiles);
 document.getElementById('btn-log').addEventListener('click', openLog);
+document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
 const openAboutModal = () =>
   openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated });
 document.getElementById('btn-about').addEventListener('click', openAboutModal);
@@ -751,6 +820,7 @@ window.addEventListener('keydown', (e) => {
   } else if (e.key.toLowerCase() === 't') startTour();
   else if (e.key.toLowerCase() === 'g') openFiles();
   else if (e.key.toLowerCase() === 'l') openLog();
+  else if (e.key.toLowerCase() === 'e') openExplainNow();
   else if (e.key.toLowerCase() === 'h') document.body.classList.toggle('hud-off');
   else if (e.key === '?') openAboutModal();
   else if (e.key.toLowerCase() === 'm') openMapSettingsNow();

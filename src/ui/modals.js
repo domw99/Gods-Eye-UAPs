@@ -79,15 +79,15 @@ export function openAbout(meta) {
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
-    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Government files</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close</dd></dl>
+    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Government files</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p></div>`;
   modal('ABOUT', content, { wide: false });
 }
 
-export function openLogForm({ lat, lon, onSave }) {
-  const now = new Date();
+export function openLogForm({ lat, lon, onSave, prefill = {} }) {
+  const now = prefill.date ? new Date(prefill.date) : new Date();
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   const content = html`
     <h2>Log a sighting</h2>
@@ -100,7 +100,7 @@ export function openLogForm({ lat, lon, onSave }) {
       <label>LONGITUDE<input name="lon" type="number" step="any" min="-180" max="180" required value="${lon.toFixed(5)}" /></label>
       <label>DURATION<input name="duration" maxlength="60" placeholder="e.g. 2 minutes" /></label>
       <label>WITNESSES<input name="witnesses" maxlength="60" placeholder="e.g. 3" /></label>
-      <label class="full">WHAT HAPPENED<textarea name="description" maxlength="4000" placeholder="Direction of travel, altitude/angle, sound, colour, how it left…"></textarea></label>
+      <label class="full">WHAT HAPPENED<textarea name="description" maxlength="4000" placeholder="Direction of travel, altitude/angle, sound, colour, how it left…">${prefill.description || ''}</textarea></label>
       <label class="full">PHOTO / VIDEO LINK (optional)<input name="media" type="url" placeholder="https://…" /></label>
       <div class="full btn-row"><button type="button" class="chip" id="log-geo">⌖ USE MY LOCATION</button><button type="submit" class="chip on">SAVE SIGHTING</button></div>
     </form>`;
@@ -244,5 +244,92 @@ export function openMapSettings(o) {
   el.querySelector('#ms-off')?.addEventListener('click', async () => {
     await o.onPhotoreal(false);
     o.reopen();
+  });
+}
+
+/* ── "What did I see?" checker ───────────────────────────── */
+const POINTS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+const compassOptions = (selected) =>
+  POINTS.map((p, i) => html`<option value="${i * 22.5}" ${selected === i * 22.5 ? 'selected' : ''}>${p}</option>`);
+
+export function openExplain(o) {
+  const p = o.prefill || {};
+  const when = p.date ? new Date(p.date) : new Date();
+  const local = new Date(when.getTime() - when.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  const content = html`
+    <h2>What did I see?</h2>
+    <p class="lead">Describe the sighting and the app checks the ordinary explanations it can: planets, bright stars and the Moon, satellites (for the last three weeks), rocket launches, and the wind for lanterns and balloons.</p>
+    <form id="ex-form" class="form-grid">
+      <label>DATE &amp; TIME <span class="dim">(your time zone)</span><input name="date" type="datetime-local" required value="${local}" /></label>
+      <label>WHAT IT DID<select name="motion">${Object.entries(o.motions).map(([k, v]) => html`<option value="${k}" ${p.motion === k ? 'selected' : ''}>${v}</option>`)}</select></label>
+      <label>LATITUDE<input name="lat" type="number" step="any" min="-90" max="90" required value="${o.lat.toFixed(4)}" /></label>
+      <label>LONGITUDE<input name="lon" type="number" step="any" min="-180" max="180" required value="${o.lon.toFixed(4)}" /></label>
+      <label>DIRECTION YOU LOOKED<select name="az"><option value="">Not sure</option>${compassOptions(p.az)}</select></label>
+      <label>HEIGHT IN THE SKY<select name="alt"><option value="">Not sure</option>${Object.entries(o.heights).map(([k, v]) => html`<option value="${v.alt}">${v.label}</option>`)}</select></label>
+      <label>IT WAS MOVING TOWARD<select name="toward"><option value="">Not sure / didn't move</option>${compassOptions(null)}</select></label>
+      <fieldset class="full ex-looks"><legend>HOW IT LOOKED</legend>
+        <label><input type="checkbox" name="bright" /> Very bright</label>
+        <label><input type="checkbox" name="blinking" /> Blinking or flashing</label>
+        <label><input type="checkbox" name="colours" /> Changing colours</label>
+        <label><input type="checkbox" name="orange" /> Orange, flickering</label>
+      </fieldset>
+      <div class="full btn-row">
+        <button type="button" class="chip" id="ex-geo">⌖ USE MY LOCATION</button>
+        <button type="submit" class="chip on">CHECK IT</button>
+      </div>
+    </form>
+    <div id="ex-results" aria-live="polite"></div>`;
+  const el = modal('WHAT DID I SEE?', content, { wide: false });
+  const form = el.querySelector('#ex-form');
+  el.querySelector('#ex-geo').addEventListener('click', () => {
+    if (!navigator.geolocation) return toast('Geolocation unavailable');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        form.lat.value = pos.coords.latitude.toFixed(4);
+        form.lon.value = pos.coords.longitude.toFixed(4);
+        toast('Location set');
+      },
+      () => toast('Location permission denied'),
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  });
+  const results = el.querySelector('#ex-results');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(form);
+    const num = (k) => (f.get(k) === '' || f.get(k) == null ? null : Number(f.get(k)));
+    const input = {
+      date: new Date(f.get('date')).toISOString(),
+      lat: Number(f.get('lat')),
+      lon: Number(f.get('lon')),
+      report: {
+        az: num('az'),
+        alt: num('alt'),
+        towardAz: num('toward'),
+        motion: f.get('motion'),
+        bright: f.get('bright') === 'on',
+        blinking: f.get('blinking') === 'on',
+        colours: f.get('colours') === 'on',
+        orange: f.get('orange') === 'on',
+      },
+    };
+    if (!Number.isFinite(input.lat) || !Number.isFinite(input.lon)) return toast('Check the coordinates');
+    mount(results, html`<div class="loading-line">Checking the sky, satellites, launches and wind…</div>`);
+    const r = await o.run(input);
+    const top = r.candidates.slice(0, 6);
+    mount(
+      results,
+      html`<div class="section-label" style="margin-top:14px">MOST LIKELY</div>
+        <ol class="ex-list">${top.map(
+          (c) => html`<li class="ex-${c.score >= 0.6 ? 'strong' : c.score >= 0.35 ? 'possible' : 'weak'}">
+            <div class="ex-head"><b>${c.name}</b><span class="badge">${o.label(c.score)}</span></div>
+            <div class="ex-bar"><i style="width:${Math.round(c.score * 100)}%"></i></div>
+            <p>${c.reason}</p></li>`,
+        )}</ol>
+        <p class="caveat">Checked: ${r.checked.join(' · ')}.${r.notes.length ? ` ${r.notes.join(' ')}` : ''} A match means an ordinary object was in the right place at the right time; it doesn't prove that's what you saw.</p>
+        <div class="btn-row"><button type="button" class="chip on" id="ex-log">+ LOG THIS SIGHTING</button></div>`,
+    );
+    results.querySelector('#ex-log').addEventListener('click', () => o.onLog(input, top[0]));
+    results.scrollIntoView({ block: 'start', behavior: 'smooth' });
   });
 }
