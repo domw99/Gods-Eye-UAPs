@@ -19,7 +19,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 ---
 
-**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. files and the MUFON files, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
+**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. and French files and the MUFON files, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
 
 <div align="center">
 
@@ -29,10 +29,10 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 </div>
 
-| | | |
-|:---:|:---:|:---:|
-| **126** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> |
-| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> | **1,542** military airspace volumes<br><sub>FAA special-use airspace in 3D</sub> |
+| | | | |
+|:---:|:---:|:---:|:---:|
+| **126** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> | **1,542** military airspace volumes<br><sub>FAA special-use airspace in 3D</sub> | **Live** satellites and launches<br><sub>CelesTrak · Launch Library 2</sub> |
 
 ## Features
 
@@ -110,6 +110,18 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 <td><sub><b>Project Blue Book on the map.</b> 10,096 USAF case files, geocoded offline. Click one to read the original scan and its OCR text. The <b>files library</b> (<kbd>G</kbd>) links PURSUE, AARO, ODNI, NASA, NARA, Condon, Robertson, the FBI Vault, CIA, AAWSAP, the UK MoD files, GEIPAN, Brazil and Australia.</sub></td>
 </tr>
 </table>
+
+### 🇫🇷 GEIPAN: France's official UAP files
+
+<img src="docs/media/geipan.jpg" alt="The GEIPAN layer over southern France, with the 1981 Trans-en-Provence case file open: class D, unidentified after investigation, and GEIPAN's summary in French" width="100%" />
+
+GEIPAN is the UAP office of CNES, the French space agency, and the longest-running government UAP office in the world (since 1977, first as GEPAN). It has published its case files since 2007. The **GEIPAN layer** (blue) puts all **2,768 cases** from its published files (1937–2018) on the map:
+
+- **Each case sits at its commune**, geocoded offline from GeoNames. 95% are placed to the commune; the rest to their department.
+- **GEIPAN's own finding comes first**: A (identified), B (probably identified), C (not enough information) or D (unidentified after investigation). The status filters use it, and the unexplained D cases are drawn brightest.
+- **The dossier shows GEIPAN's summary in French**, with a link to the full file (testimonies, investigation, often photos) and a one-click English translation.
+- **2,607 cases have an observation time**, so the dossier adds the sky, the weather and the day/night lighting at that moment, as it does for curated cases.
+- **Curated French cases list their GEIPAN files.** Trans-en-Provence and Valensole both link to their class D files.
 
 ### 🛸 The MUFON files
 
@@ -206,9 +218,10 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | [`#/case/nimitz-tic-tac-2004`](https://domw99.github.io/Gods-Eye-UAPs/#/case/nimitz-tic-tac-2004) | A curated case |
 | [`#/official/1007777`](https://domw99.github.io/Gods-Eye-UAPs/#/official/1007777) | An official release (DVIDS id) |
 | [`#/bluebook/1952-07-7273984-Tremonton-Utah-1377-`](https://domw99.github.io/Gods-Eye-UAPs/#/bluebook/1952-07-7273984-Tremonton-Utah-1377-) | A Blue Book file |
+| [`#/geipan/1981-01-00849`](https://domw99.github.io/Gods-Eye-UAPs/#/geipan/1981-01-00849) | A GEIPAN file (Trans-en-Provence) |
 | [`#/mufon/2002_05/1`](https://domw99.github.io/Gods-Eye-UAPs/#/mufon/2002_05/1) | A MUFON Journal page (issue, page index) |
 | [`?mode=nvg`](https://domw99.github.io/Gods-Eye-UAPs/?mode=nvg) | Start in a sensor mode |
-| [`?layers=bluebook,mufon,launches`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,mufon,launches) | Start with extra layers on |
+| [`?layers=bluebook,geipan,mufon`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,geipan,mufon) | Start with extra layers on |
 | [`?view=-104.5,33.7,25000,0,-35`](https://domw99.github.io/Gods-Eye-UAPs/?view=-104.5,33.7,25000,0,-35) | Start at a camera position (lon, lat, height m, heading°, pitch°) |
 
 </details>
@@ -226,8 +239,9 @@ flowchart LR
     FAA["FAA special-use<br/>airspace"] --> S3["build-airspace.mjs"]
     NUF["NUFORC<br/>(geocoded)"] --> S4["build-nuforc.mjs"]
     MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
+    GEI["GEIPAN<br/>published CSV"] --> S6["build-geipan.mjs"]
   end
-  S1 & S2 & S3 & S4 & S5 --> DATA[("public/data/*.json")]
+  S1 & S2 & S3 & S4 & S5 & S6 --> DATA[("public/data/*.json")]
   CASES["src/data/cases/*.js<br/>126 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
@@ -238,8 +252,8 @@ flowchart LR
 | Globe, imagery, terrain, 3D tiles, key handling | `src/app/viewer.js` |
 | NVG / FLIR / Ironbow / CRT shaders | `src/app/effects.js` |
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
-| Blue Book, MUFON & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
-| Sky, weather, launches, airspace, MUFON Journal pages, sighting-checker scoring | `src/services/*.js` |
+| Blue Book, GEIPAN, MUFON & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
+| Sky, weather, launches, airspace, GEIPAN classes, MUFON Journal pages, sighting-checker scoring | `src/services/*.js` |
 | Dossier, list, timeline, modals, sky chart, story mode | `src/ui/*.js` |
 
 <details>
@@ -250,15 +264,16 @@ src/
   app/        viewer.js (globe, imagery, terrain, 3D tiles) · effects.js (NVG/FLIR/CRT shaders)
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
   layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
-              points.js (Blue Book / NUFORC) · satellites.js (live SGP4)
+              points.js (Blue Book / GEIPAN / MUFON / NUFORC) · satellites.js (live SGP4)
               buildings.js (keyless OpenStreetMap 3D buildings) · launches.js (launch pads)
               airspace.js (military airspace volumes)
   services/   wiki.js (Wikipedia summaries, Commons media & geosearch) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
+              geipan.js (GEIPAN classes, dates, links)
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
-              build-mufon.mjs · verify-media.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
+              build-mufon.mjs · build-geipan.mjs · verify-media.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
 tests/        Vitest suites
 docs/SPEC.md  the full product spec (the improved prompt this was built from)
 ```
@@ -276,6 +291,7 @@ All datasets ship in `public/data/` and are rebuilt by scripts:
 | `npm run build:airspace` | FAA special-use airspace (ArcGIS open data), simplified | `airspace.json` |
 | `npm run build:nuforc` | [planetsig/ufo-reports](https://github.com/planetsig/ufo-reports) (geocoded NUFORC), facts only with the narratives removed | `nuforc.json` |
 | `npm run build:mufon` | The MUFON Archive on the Internet Archive ([`MUFON_UFO_Journal_-_Skylook`](https://archive.org/details/MUFON_UFO_Journal_-_Skylook)). It reads each issue's OCR text page by page, finds "Town, State" places in sighting reports (skipping addresses, meetings and hometowns), geocodes them with GeoNames and matches pages to curated cases. Only places, page numbers and short quotes are stored. | `mufon.json` |
+| `npm run build:geipan` | GEIPAN's published case and testimony files ([cnes-geipan.fr](https://www.cnes-geipan.fr/fr/recherche/cas), CSV; the current export dates from February 2019). It joins them, restores the accents lost in the case file from the testimony file's vocabulary, geocodes each commune with the GeoNames France dump and converts observation times to UTC. | `geipan.json` |
 | `npm run verify:media` | Checks every Commons file, Wikipedia title, DVIDS id and Blue Book id that the case files reference | — |
 | `npm test` | Vitest: case-file integrity (coordinates, taxonomy, track times, plausible altitudes), the region resolver, sky, weather, airspace and launch helpers, sighting-checker scoring, story text, OSM building tiles and dataset schemas | — |
 
@@ -297,6 +313,7 @@ It then appears on the globe.
 - **Paths are reconstructions** from the cited reports and radar accounts, and each track states its basis. Average speeds are simply distance ÷ time between reported points.
 - **Official releases are often region-only.** The magenta ring is the whole area named in the release.
 - **Blue Book pins mark the town in the file name**, not the exact spot.
+- **GEIPAN pins mark the commune named in the file.** GEIPAN's classification is its own: a class D case is unexplained after investigation, not proven extraordinary.
 - **NUFORC reports are unverified.** They show where people report things.
 - **MUFON places are found automatically.** A violet pin is a town named in a journal report. That's usually where the sighting was, but sometimes it's a witness's hometown or where a report was filed. Every pin links to its page so you can check.
 - **Times can be approximate.** 36 older cases record only the date or part of the day. They are marked *time approx.*, and the sky, weather and story say so.
@@ -337,6 +354,7 @@ Corrections and new cases are welcome, especially with sources.
   - Media: Wikimedia Commons. The licence and author of each file are shown in the app.
   - Summaries: Wikipedia (CC BY-SA).
   - Blue Book scans: Internet Archive / NARA.
+  - GEIPAN files: [GEIPAN](https://www.cnes-geipan.fr/) / CNES. Case data from its published CSV files; each case links to its full file on cnes-geipan.fr.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
 - **Other data:**
   - Launches: [Launch Library 2](https://thespacedevs.com/llapi) by The Space Devs.

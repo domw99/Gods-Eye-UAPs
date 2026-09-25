@@ -41,11 +41,12 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) 
   const groups = [...new Set(GOV_FILES.map((f) => f.group))];
   const content = html`
     <h2>UFO / UAP files</h2>
-    <p class="lead">Primary sources from the U.S. government, other governments and MUFON. Official videos are on the globe (magenta), Project Blue Book case files (amber) and the MUFON files (violet) are map layers, and every link below opens the original archive.</p>
+    <p class="lead">Primary sources from the U.S. government, other governments and MUFON. Official videos are on the globe (magenta); Project Blue Book (amber), France’s GEIPAN files (blue) and the MUFON files (violet) are map layers, and every link below opens the original archive.</p>
     <div class="stat-row">
       <div class="stat"><div class="v">${stats.cases}</div><div class="k">CURATED CASE FILES</div></div>
       <div class="stat"><div class="v">${stats.official}</div><div class="k">OFFICIAL U.S. RELEASES</div></div>
       <div class="stat"><div class="v">${stats.bluebook}</div><div class="k">BLUE BOOK FILES</div></div>
+      <div class="stat"><div class="v">${stats.geipan}</div><div class="k">GEIPAN FILES (FRANCE)</div></div>
       <div class="stat"><div class="v">${stats.mufon}</div><div class="k">MUFON JOURNAL ISSUES</div></div>
       <div class="stat"><div class="v">${stats.nuforc}</div><div class="k">CIVILIAN REPORTS</div></div>
     </div>
@@ -112,13 +113,14 @@ export function openAbout(meta) {
       <p><b style="color:#00d4ff">Case files</b> — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).</p>
       <p><b style="color:#ff5ce1">Official U.S. footage</b> — every UAP video and image the Department of War / AARO has published on DVIDS (PURSUE, war.gov/UFO). Most releases give only a region, shown as a ring.</p>
       <p><b style="color:#ffb547">Project Blue Book</b> — scanned U.S. Air Force case files (1947–1969), geocoded from their file names.</p>
+      <p><b style="color:#5f8bff">GEIPAN (France)</b> — every case in the published files of GEIPAN, the French space agency’s UAP office (1937–2018), placed at its commune, with GEIPAN’s A–D finding and its French summary. Unexplained (D) cases are brightest.</p>
       <p><b style="color:#b58cff">MUFON files</b> — the Mutual UFO Network’s journal (Skylook and the MUFON UFO Journal, 1967–2008), released free by MUFON and The Black Vault. Towns named in its sighting reports are on the map, found automatically in the OCR text, and each links to its page. Case dossiers list the journal pages that discuss them.</p>
       <p><b style="color:#ff7a45">Civilian reports</b> — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.</p>
       <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
       <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>
     </div>
     <div class="section-label">DATA SNAPSHOT</div>
-    <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code> and <code>npm run build:nuforc</code>.</p></div>
+    <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
     <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close</dd></dl>
     <div class="section-label">CREDITS</div>

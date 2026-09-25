@@ -197,9 +197,10 @@ export const GOV_FILES = [
     agency: 'CNES — French space agency',
     years: '1977–',
     kind: 'database',
-    text: 'The only permanent civilian government UAP office. Its public database of ~3,000 French cases classifies each from A (identified) to D (unexplained after investigation) — including Trans-en-Provence.',
+    text: 'The longest-running government UAP office (since 1977), at the French space agency. Its published database classifies each case from A (identified) to D (unexplained after investigation), including Trans-en-Provence. All 2,768 cases in its published files are a map layer here (blue), linked to the full files.',
     links: [
       { label: 'cnes-geipan.fr', url: 'https://www.cnes-geipan.fr/' },
+      { label: 'Case search', url: 'https://www.cnes-geipan.fr/fr/recherche/cas' },
       { label: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/GEIPAN' },
     ],
   },

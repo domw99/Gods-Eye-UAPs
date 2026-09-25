@@ -31,7 +31,14 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
   }
   horizon.onChange((d) => applyHorizon(d));
 
-  function setData(rows, { lat, lon, year, jitter = null }) {
+  const colors = new Map();
+  const colorFor = (css) => {
+    if (!colors.has(css)) colors.set(css, Cesium.Color.fromCssColorString(css).withAlpha(alpha));
+    return colors.get(css);
+  };
+
+  /** `color(row, index)` optionally gives each point its own CSS colour. */
+  function setData(rows, { lat, lon, year, jitter = null, color = null }) {
     collection.removeAll();
     points.length = 0;
     years = [];
@@ -44,7 +51,7 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       const p = collection.add({
         position: Cesium.Cartesian3.fromDegrees(lo, la, 0),
         pixelSize,
-        color: base,
+        color: color ? colorFor(color(row, index)) : base,
         outlineColor: Cesium.Color.BLACK.withAlpha(0.5),
         outlineWidth: pixelSize > 3 ? 1 : 0,
         scaleByDistance: new Cesium.NearFarScalar(1e5, near, 1.5e7, far),

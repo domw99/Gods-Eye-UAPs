@@ -266,6 +266,9 @@ details.filters .active-count { color: var(--accent); margin-left: 6px; }
 .badge.official { color: var(--official); border-color: rgba(255, 92, 225, 0.4); }
 .badge.path { color: var(--uap); border-color: rgba(125, 255, 178, 0.4); }
 .badge.mufon { color: #b58cff; border-color: rgba(181, 140, 255, 0.45); }
+.badge.geipan { border-color: rgba(95, 139, 255, 0.5); }
+.geipan-text p { margin: 0 0 8px; }
+.geipan-text { max-height: 340px; overflow: auto; }
 
 /* ── Dossier ───────────────────────────────────── */
 .d-title { font-size: 20px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }

@@ -11,6 +11,7 @@ import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
 import { relativeTime } from '../layers/launches.js';
 import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, MUFON_LICENSE } from '../services/mufon.js';
+import { classInfo, geipanDate, caseUrl, translateUrl, bodiesNamed, GEIPAN_SITE, GEIPAN_SEARCH, CLASS_COLORS } from '../services/geipan.js';
 
 /**
  * Right-hand dossier. One renderer per record type; async sections (Commons
@@ -387,6 +388,23 @@ function bluebookList(records) {
   )}</ul>`;
 }
 
+/** France and the overseas territories GEIPAN covers. */
+const FRENCH = new Set(['FR', 'GP', 'MQ', 'GF', 'RE', 'YT', 'NC', 'PF', 'PM', 'WF', 'MC']);
+
+function classBadge(cls) {
+  const info = classInfo(cls);
+  return html`<span class="badge geipan" style="color:${CLASS_COLORS[cls] || '#5f8bff'}" title="${info.long}">CLASS ${cls || '?'}</span>`;
+}
+
+function geipanList(records) {
+  if (!records.length) return html`<div class="loading-line">No GEIPAN file matches this case.</div>`;
+  return html`<ul class="source-list">${records.map(
+    (r) => html`<li>${classBadge(r.cls)}<span><a href="#/geipan/${encodeURIComponent(r.id)}">${r.place}</a> · ${geipanDate(r)}${
+      r.distKm != null ? ` · ${Math.round(r.distKm)} km away` : ''
+    }<span class="mufon-quote" lang="fr">${r.short}</span></span></li>`,
+  )}</ul>`;
+}
+
 /* ── Renderers ─────────────────────────────────────────── */
 
 export function renderCase(item, ctx) {
@@ -446,6 +464,7 @@ export function renderCase(item, ctx) {
     ${section('MUFON FILES — MUFON UFO JOURNAL', html`<div id="d-mufon"><div class="loading-line">${
       date.getUTCFullYear() <= 2008 ? 'Searching the MUFON UFO Journal (1967–2008)…' : 'After the journal archive ends (1967–2008).'
     }</div></div>`)}
+    ${FRENCH.has(c.cc) ? section('FRENCH GOVERNMENT FILES — GEIPAN', html`<div id="d-geipan"><div class="loading-line">Searching GEIPAN’s case files…</div></div>`) : ''}
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
     ${section(
       'THE LOCATION',
@@ -468,6 +487,19 @@ export function renderCase(item, ctx) {
   if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
+  if (FRENCH.has(c.cc) && ctx.geipanFor)
+    ctx
+      .geipanFor(c)
+      .then((list) => {
+        if (token !== renderToken) return;
+        mount(
+          document.getElementById('d-geipan'),
+          html`${geipanList(list)}<p class="caveat">Files from GEIPAN, the French space agency’s UAP office, within 40 km and three days of this case.</p>`,
+        );
+      })
+      .catch(() => {
+        if (token === renderToken) mount(document.getElementById('d-geipan'), html`<div class="loading-line">GEIPAN’s files could not be loaded.</div>`);
+      });
   const year = date.getUTCFullYear();
   if (year <= 2008 && ctx.mufonFor)
     ctx
@@ -555,6 +587,56 @@ export async function showOcr(id) {
   } catch {
     mount(el, html`<div class="loading-line">OCR text unavailable for this file.</div>`);
   }
+}
+
+/* ── GEIPAN (France) ───────────────────────────────────── */
+
+const PREC_LABEL = ['NOT PLACED', 'DEPARTMENT', 'COMMUNE'];
+
+/** A GEIPAN case: its classification, GEIPAN's French summary, and the sky and weather when the time is known. */
+export function renderGeipan(r) {
+  const token = open('GEIPAN · FRANCE');
+  const info = classInfo(r.cls);
+  const when = r.utc ? `${geipanDate(r)}, ${r.localTime} local · ${r.utc.slice(11, 16)} UTC` : geipanDate(r);
+  const cut = r.summary.length >= 1200;
+  const content = html`
+    <div class="d-title">GEIPAN case — ${r.place}</div>
+    <div class="d-sub">${when}<br />${r.zone}${r.dept && r.dept !== r.zone ? ` (${r.dept})` : ''} · file ${r.id}<br />${
+      r.lat != null ? `${formatDMS(r.lat, r.lon)} · ${PREC_LABEL[r.prec]}` : 'Location not placed'
+    }</div>
+    <div class="d-badges">${statusBadge(info.status)}${classBadge(r.cls)}<span class="badge official">FRENCH GOV FILE</span>${
+      r.witnesses ? html`<span class="badge">${r.witnesses} WITNESS${r.witnesses > 1 ? 'ES' : ''}</span>` : ''
+    }</div>
+    ${section('GEIPAN’S FINDING', html`<div class="explain"><b>${info.label}</b>${info.long}</div>
+      <blockquote class="mufon-quote big" lang="fr">${r.short}</blockquote>`)}
+    ${section(
+      'CASE SUMMARY (FRENCH)',
+      html`<div class="d-text geipan-text" lang="fr">${r.summary.split(/\n+/).map((p) => html`<p>${p}</p>`)}${cut ? html`<p class="dim">… continued in the full file.</p>` : ''}</div>
+      <div class="btn-row">
+        <a class="chip on" target="_blank" rel="noopener" href="${caseUrl(r)}">Full file on cnes-geipan.fr ↗</a>
+        <a class="chip" target="_blank" rel="noopener" href="${translateUrl(`${r.short}\n\n${r.summary}`)}">Translate to English ↗</a>
+        <button class="chip" data-action="share">⧉ COPY LINK</button>
+      </div>
+      <p class="caveat">GEIPAN’s own summary, in French. The full file on its site holds the testimonies, the investigation and often photos or sketches.</p>`,
+    )}
+    ${r.utc && r.lat != null ? section('SKY AT THE TIME', skyBlock(r.lat, r.lon, r.utc, bodiesNamed(`${r.short} ${r.summary}`))) : ''}
+    ${r.utc && r.lat != null ? weatherBlock(r.utc) : ''}
+    ${r.utc && r.lat != null ? launchBlock(r.lat, r.lon, r.utc) : ''}
+    ${r.lat != null && r.prec === 2 ? section('THE LOCATION', html`${siteLinks(r.lat, r.lon)}<p class="caveat">The pin marks the commune named in the file, not the exact spot.</p>`) : ''}
+    ${section(
+      'SOURCE',
+      html`<ul class="source-list">
+        <li><span class="badge official">CNES</span><span>GEIPAN (Groupe d’études et d’informations sur les phénomènes aérospatiaux non identifiés), the UAP office of CNES, the French space agency, since 1977.</span></li>
+        <li><span class="badge">DATA</span><a href="${GEIPAN_SEARCH}" target="_blank" rel="noopener">GEIPAN case search and published case files (CSV)</a></li>
+        <li><span class="badge">SITE</span><a href="${GEIPAN_SITE}" target="_blank" rel="noopener">cnes-geipan.fr</a></li>
+      </ul>`,
+    )}`;
+  mount(body(), content);
+  if (r.utc && r.lat != null) {
+    autoFillLaunches();
+    fillWeather(token, r.lat, r.lon, r.utc, null);
+  }
+  return token;
 }
 
 /* ── MUFON files ───────────────────────────────────────── */

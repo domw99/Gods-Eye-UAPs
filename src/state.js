@@ -18,6 +18,7 @@ export const state = {
     cases: true,
     official: true,
     bluebook: false,
+    geipan: false,
     mufon: false,
     nuforc: false,
     satellites: false,

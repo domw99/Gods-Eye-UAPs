@@ -17,9 +17,10 @@ import { renderLayers, renderFilters, renderList, bindList, markSelected } from 
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText, renderGeipan,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
+import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -40,6 +41,7 @@ const itemLayer = createItemLayer(viewer);
 const trackLayer = createTrackLayer(viewer);
 const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', pixelSize: 5 });
 const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', pixelSize: 4.5 });
+const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, pixelSize: 5, alpha: 0.9 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', pixelSize: 2.5, alpha: 0.55, near: 1.6, far: 0.7 });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
@@ -55,7 +57,8 @@ let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
 let mufon = null; // { issues, records, byIssueId, cases, chapters }
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', mufon: '485 issues', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+let geipan = null; // { meta, records, byId }
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -107,6 +110,19 @@ function mufonPasses(r) {
   return inYearRange(r.year);
 }
 
+/** GEIPAN files: official French documents, filtered by GEIPAN's own classification. */
+let foldedSearch = ['', ''];
+function geipanPasses(r) {
+  if (state.evidence.size && !state.evidence.has('official-document') && !(r.witnesses > 1 && state.evidence.has('multiple-witnesses'))) return false;
+  if (state.status.size && !state.status.has(r.status)) return false;
+  if (state.shape.size) return false; // the files carry no shape field
+  if (state.search) {
+    if (foldedSearch[0] !== state.search) foldedSearch = [state.search, fold(state.search)];
+    if (!r.search.includes(foldedSearch[1])) return false;
+  }
+  return inYearRange(r.year);
+}
+
 const timeline = createTimeline({ onPlayToggle: toggleHistorySweep });
 
 let nuforcShapeClasses = null;
@@ -124,6 +140,10 @@ function refresh() {
   if (mufon && state.layers.mufon) {
     const n = mufonLayer.filter((i) => mufonPasses(mufon.records[i]));
     layerCounts.mufon = n.toLocaleString();
+  }
+  if (geipan && state.layers.geipan) {
+    const n = geipanLayer.filter((i) => geipanPasses(geipan.records[i]));
+    layerCounts.geipan = n.toLocaleString();
   }
   if (nuforc && state.layers.nuforc) {
     const evOk = !state.evidence.size && (!state.status.size || state.status.has('unassessed'));
@@ -154,6 +174,7 @@ async function applyLayers() {
   const L = state.layers;
   bluebookLayer.show = L.bluebook;
   mufonLayer.show = L.mufon;
+  geipanLayer.show = L.geipan;
   nuforcLayer.show = L.nuforc;
   satLayer.show = L.satellites;
   buildingLayer.show = L.buildings;
@@ -163,9 +184,11 @@ async function applyLayers() {
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
   if (L.bluebook && !bluebook) await ensureBlueBook();
   if (L.mufon && !mufon) await ensureMufon();
+  if (L.geipan && !geipan) await ensureGeipan();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
   timeline.setMufon(L.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
+  timeline.setGeipan(L.geipan && geipan ? countByYear(geipan.records.map((r) => r.year)) : null);
   timeline.setNuforc(L.nuforc && nuforc ? countByYear(Array.from(nuforc.date, (d) => Math.floor(d / 10000))) : null);
   refresh();
 }
@@ -258,6 +281,44 @@ function ensureMufon() {
     throw e;
   });
   return mufonPromise;
+}
+
+let geipanPromise = null;
+function ensureGeipan() {
+  geipanPromise ||= (async () => {
+    renderLayersNow({ geipan: 'loading…' });
+    geipan = await loadGeipan(BASE);
+    geipanLayer.setData(geipan.records, {
+      lat: (r) => r.lat,
+      lon: (r) => r.lon,
+      year: (r) => r.year,
+      color: (r) => CLASS_COLORS[r.cls] || GEIPAN_COLOR,
+      // Many cases share a commune; department-level cases spread wider.
+      jitter: (r, i, la, lo) => townJitter(`g${r.id}`, la, lo, r.prec === 1 ? 20 : 2),
+    });
+    layerCounts.geipan = geipan.records.filter((r) => r.lat != null).length.toLocaleString();
+    return geipan;
+  })().catch((e) => {
+    geipanPromise = null;
+    toast('Could not load the GEIPAN files');
+    throw e;
+  });
+  return geipanPromise;
+}
+
+/** GEIPAN files within 40 km and three days of a curated French case. */
+async function geipanFor(c) {
+  const g = await ensureGeipan();
+  const t = Date.parse(c.date);
+  const out = [];
+  for (const r of g.records) {
+    if (r.lat == null || !r.month || !r.day) continue;
+    const rt = r.utc ? Date.parse(r.utc) : Date.UTC(r.year, r.month - 1, r.day, 12);
+    if (Math.abs(rt - t) > 3 * 86400e3) continue;
+    const distKm = haversineKm(c.lat, c.lon, r.lat, r.lon);
+    if (distKm <= 40) out.push({ ...r, distKm });
+  }
+  return out.sort((a, b) => a.distKm - b.distKm).slice(0, 8);
 }
 
 /** Journal pages about a curated case, plus reports from nearby places in the years after it. */
@@ -406,7 +467,7 @@ function select(key, source = 'api') {
   trackLayer.clear();
   hidePlayback();
   if (item.kind === 'case') {
-    renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor });
+    renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor, geipanFor });
     const loaded = trackLayer.load(item.ref);
     if (loaded) showPlayback();
     setSceneMoment({ lat: item.ref.lat, lon: item.ref.lon, date: item.ref.date, approx: item.ref.timeApprox });
@@ -450,6 +511,34 @@ async function selectBlueBook(id) {
     });
   setHash(`#/bluebook/${encodeURIComponent(id)}`);
   document.getElementById('hud-tgt').textContent = `BLUE BOOK ${rec.place}`.slice(0, 40).toUpperCase();
+}
+
+async function selectGeipan(id) {
+  stopTour();
+  story.stop(true);
+  const token = ++selectToken;
+  hideHover();
+  const g = await ensureGeipan();
+  if (token !== selectToken) return;
+  const rec = g.byId.get(id);
+  if (!rec) return toast('GEIPAN file not found');
+  if (!state.layers.geipan) setLayer('geipan', true);
+  state.selected = null;
+  markSelected(null);
+  itemLayer.setSelected(null);
+  trackLayer.clear();
+  hidePlayback();
+  itemLayer.showRegion(null);
+  // With an observation time, light the globe for that moment as for a case.
+  setSceneMoment(rec.utc && rec.lat != null ? { lat: rec.lat, lon: rec.lon, date: rec.utc } : null);
+  renderGeipan(rec);
+  if (rec.lat != null)
+    viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(rec.lon, rec.lat), 10), {
+      duration: 2,
+      offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), rec.prec === 1 ? 400e3 : 45e3),
+    });
+  setHash(`#/geipan/${encodeURIComponent(id)}`);
+  document.getElementById('hud-tgt').textContent = `GEIPAN ${rec.place}`.slice(0, 40).toUpperCase();
 }
 
 async function selectMufonPage(issueId, leaf, recordIndex = null) {
@@ -512,11 +601,12 @@ function routeFromHash() {
     selectMufonPage(decodeURIComponent(mj[1]), +mj[2]);
     return true;
   }
-  const m = location.hash.match(/^#\/(case|official|user|bluebook)\/(.+)$/);
+  const m = location.hash.match(/^#\/(case|official|user|bluebook|geipan)\/(.+)$/);
   if (!m) return false;
   const [, kind, raw] = m;
   const id = decodeURIComponent(raw);
   if (kind === 'bluebook') selectBlueBook(id);
+  else if (kind === 'geipan') selectGeipan(id);
   else if (!select(`${kind}:${id}`, 'hash')) {
     toast(kind === 'user' ? 'That sighting is not in this browser’s log' : `Nothing found for “${id}”`);
     return false;
@@ -566,6 +656,7 @@ handler.setInputAction((click) => {
   if (hit.type === 'item') select(hit.item.key, 'globe');
   else if (hit.type === 'cluster') itemLayer.zoomToCluster(hit.index);
   else if (hit.type === 'bluebook') selectBlueBook(bluebook.records[hit.index].id);
+  else if (hit.type === 'geipan') selectGeipan(geipan.records[hit.index].id);
   else if (hit.type === 'mufon') {
     const r = mufon.records[hit.index];
     selectMufonPage(mufon.issues[r.issue].id, r.leaf, r.index);
@@ -624,6 +715,9 @@ handler.setInputAction((move) => {
     else if (hit?.type === 'bluebook') {
       const r = bluebook.records[hit.index];
       lines = [`Blue Book · ${r.place}`, `${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · USAF case file`];
+    } else if (hit?.type === 'geipan') {
+      const r = geipan.records[hit.index];
+      lines = [`GEIPAN · ${r.place}`, `${geipanDate(r)} · class ${r.cls} — ${classInfo(r.cls).label.replace(/^\w+ · /, '').toLowerCase()}`];
     } else if (hit?.type === 'mufon') {
       const r = mufon.records[hit.index];
       const is = mufon.issues[r.issue];
@@ -1057,6 +1151,7 @@ const openFiles = () =>
       cases: CASE_ITEMS.length,
       official: officialItems.length,
       bluebook: bluebook ? bluebook.records.length.toLocaleString() : '10,763',
+      geipan: geipan ? geipan.records.length.toLocaleString() : '2,768',
       mufon: mufon ? mufon.issues.length : 485,
       nuforc: nuforc ? nuforc.count.toLocaleString() : '80,332',
     },
@@ -1258,4 +1353,4 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, selectMufonPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, select, selectBlueBook, selectGeipan, selectMufonPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

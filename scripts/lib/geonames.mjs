@@ -48,6 +48,31 @@ export function unzipFirst(buf) {
   return method === 0 ? data : inflateRawSync(data);
 }
 
+/** Read one named file from a ZIP (GeoNames country dumps also carry a readme). */
+export function unzipEntry(buf, name) {
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  const entries = buf.readUInt16LE(eocd + 10);
+  let p = buf.readUInt32LE(eocd + 16);
+  for (let i = 0; i < entries; i++) {
+    const method = buf.readUInt16LE(p + 10);
+    const compSize = buf.readUInt32LE(p + 20);
+    const nameLen = buf.readUInt16LE(p + 28);
+    const extraLen = buf.readUInt16LE(p + 30);
+    const commentLen = buf.readUInt16LE(p + 32);
+    const localOffset = buf.readUInt32LE(p + 42);
+    const entryName = buf.subarray(p + 46, p + 46 + nameLen).toString('utf8');
+    if (entryName === name) {
+      const lNameLen = buf.readUInt16LE(localOffset + 26);
+      const lExtraLen = buf.readUInt16LE(localOffset + 28);
+      const start = localOffset + 30 + lNameLen + lExtraLen;
+      const data = buf.subarray(start, start + compSize);
+      return method === 0 ? data : inflateRawSync(data);
+    }
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  throw new Error(`${name} not found in ZIP`);
+}
+
 export const norm = (s) =>
   s
     .normalize('NFKD')

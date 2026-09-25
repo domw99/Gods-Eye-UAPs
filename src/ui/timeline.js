@@ -2,9 +2,14 @@ import { state, update, YEAR_MIN, YEAR_MAX } from '../state.js';
 
 /**
  * Year histogram with brush selection. Bars: curated + official + user items
- * (after non-year filters). Overlays: Blue Book files per year (amber line)
- * and NUFORC reports per year (orange area), each on its own scale.
+ * (after non-year filters). Overlays, each on its own scale: NUFORC reports
+ * per year (orange area) and a line each for Blue Book, GEIPAN and MUFON.
  */
+const LINES = [
+  { key: 'bluebook', color: '#ffb547', label: 'Blue Book' },
+  { key: 'geipan', color: '#5f8bff', label: 'GEIPAN' },
+  { key: 'mufon', color: '#b58cff', label: 'MUFON' },
+];
 export function createTimeline({ onPlayToggle }) {
   const canvas = document.getElementById('tl-canvas');
   const label = document.getElementById('tl-range');
@@ -12,8 +17,7 @@ export function createTimeline({ onPlayToggle }) {
   const N = YEAR_MAX - YEAR_MIN + 1;
   let bars = new Array(N).fill(0);
   let barKinds = new Array(N).fill(null).map(() => ({ case: 0, official: 0, user: 0 }));
-  let bluebook = null;
-  let mufon = null;
+  const lines = {}; // key -> counts per year, for the layers that are on
   let nuforc = null;
   let drag = null;
   let hoverYear = null;
@@ -71,29 +75,18 @@ export function createTimeline({ onPlayToggle }) {
       }
     });
     g.globalAlpha = 1;
-    // Blue Book line.
-    if (bluebook) {
-      const bmax = Math.max(1, ...bluebook);
+    // One line per archive layer.
+    for (const { key, color } of LINES) {
+      const counts = lines[key];
+      if (!counts) continue;
+      const lmax = Math.max(1, ...counts);
       g.beginPath();
-      bluebook.forEach((v, i) => {
+      counts.forEach((v, i) => {
         const x = xOf(YEAR_MIN + i, w) + bw / 2;
-        const y = pad.t + plotH - (v / bmax) * plotH * 0.95;
+        const y = pad.t + plotH - (v / lmax) * plotH * 0.95;
         i ? g.lineTo(x, y) : g.moveTo(x, y);
       });
-      g.strokeStyle = '#ffb547';
-      g.lineWidth = 1.5;
-      g.stroke();
-    }
-    // MUFON Journal line.
-    if (mufon) {
-      const mmax = Math.max(1, ...mufon);
-      g.beginPath();
-      mufon.forEach((v, i) => {
-        const x = xOf(YEAR_MIN + i, w) + bw / 2;
-        const y = pad.t + plotH - (v / mmax) * plotH * 0.95;
-        i ? g.lineTo(x, y) : g.moveTo(x, y);
-      });
-      g.strokeStyle = '#b58cff';
+      g.strokeStyle = color;
       g.lineWidth = 1.5;
       g.stroke();
     }
@@ -110,8 +103,7 @@ export function createTimeline({ onPlayToggle }) {
       g.fillStyle = 'rgba(255,255,255,0.8)';
       g.fillRect(x + bw / 2, pad.t, 1, plotH);
       const parts = [`${hoverYear}: ${bars[i]} records`];
-      if (bluebook) parts.push(`${bluebook[i]} Blue Book`);
-      if (mufon) parts.push(`${mufon[i]} MUFON`);
+      for (const { key, label } of LINES) if (lines[key]) parts.push(`${lines[key][i]} ${label}`);
       if (nuforc) parts.push(`${nuforc[i]} NUFORC`);
       const text = parts.join(' · ');
       g.font = '10.5px JetBrains Mono, monospace';
@@ -178,11 +170,15 @@ export function createTimeline({ onPlayToggle }) {
       draw();
     },
     setBlueBook(counts) {
-      bluebook = counts;
+      lines.bluebook = counts;
+      draw();
+    },
+    setGeipan(counts) {
+      lines.geipan = counts;
       draw();
     },
     setMufon(counts) {
-      mufon = counts;
+      lines.mufon = counts;
       draw();
     },
     setNuforc(counts) {
