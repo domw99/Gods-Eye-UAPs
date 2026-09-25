@@ -11,6 +11,7 @@ export const LAYER_DEFS = [
   { id: 'nuforc', name: 'Civilian reports', sub: 'NUFORC, ~80k unverified reports', color: '#ff7a45' },
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
   { id: 'launches', name: 'Rocket launches', sub: 'Last 14 days and next 30 · Launch Library 2', color: '#ffcf5c' },
+  { id: 'airspace', name: 'Military airspace', sub: 'U.S. restricted, warning & training areas (FAA)', color: '#ff9f1c' },
   { id: 'buildings', name: '3D buildings', sub: 'OpenStreetMap, no key needed · zoom into a city', color: '#b7c2ce' },
   { id: 'user', name: 'My sightings', sub: 'Stored only in this browser', color: '#c6ff5c' },
 ];

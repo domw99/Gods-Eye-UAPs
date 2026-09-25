@@ -561,3 +561,13 @@ body.pov #globe::after {
 #place-results button:hover, #place-results button:focus-visible { background: rgba(125, 211, 255, 0.12); }
 #place-results .go { margin-left: auto; font: 600 10px var(--font-mono); letter-spacing: 0.08em; color: var(--accent); }
 #place-results .dim { font-size: 11px; }
+
+/* ── Weather ─────────────────────────────────────────── */
+.wx-wrap { display: grid; grid-template-columns: 46px 1fr; gap: 10px; align-items: start; }
+.wx-wrap .d-kv { margin: 0; }
+.wind-arrow { width: 46px; height: 46px; }
+.wind-arrow circle { fill: rgba(125, 211, 255, 0.06); stroke: rgba(125, 211, 255, 0.35); }
+.wind-arrow text { fill: var(--text-dim); font: 600 6px var(--font-mono); }
+.wind-arrow line { stroke: var(--accent); stroke-width: 2.4; }
+.wind-arrow path { fill: var(--accent); }
+.wx-verdict { margin-top: 8px; padding: 8px 10px; border-left: 2px solid var(--accent); background: rgba(0, 212, 255, 0.05); border-radius: 0 8px 8px 0; }

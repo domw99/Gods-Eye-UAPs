@@ -10,12 +10,14 @@ import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
 import { createBuildingLayer } from './layers/buildings.js';
 import { createLaunchLayer } from './layers/launches.js';
+import { createAirspaceLayer } from './layers/airspace.js';
+import { loadAirspace, areasAt, AIRSPACE_TYPES, formatFt } from './services/airspace.js';
 import { launchesAroundNow, RateLimitError } from './services/launches.js';
 import { renderLayers, renderFilters, renderList, bindList, markSelected } from './ui/list.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace,
 } from './ui/dossier.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, closeModal } from './ui/modals.js';
 import { toast, esc, html, mount } from './util/dom.js';
@@ -35,6 +37,7 @@ const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satelli
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
 const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLayer.suspend(active) });
 const launchLayer = createLaunchLayer(viewer);
+const airspaceLayer = createAirspaceLayer(viewer);
 
 let officialMeta = null;
 let officialItems = [];
@@ -42,7 +45,7 @@ let officialById = new Map();
 let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', launches: 'LL2', buildings: 'zoom in', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -127,6 +130,8 @@ async function applyLayers() {
   buildingLayer.show = L.buildings;
   launchLayer.show = L.launches;
   if (L.launches) ensureLaunches();
+  airspaceLayer.show = L.airspace;
+  if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
   if (L.bluebook && !bluebook) await ensureBlueBook();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
@@ -135,6 +140,30 @@ async function applyLayers() {
 }
 
 /* ── Lazy data layers ──────────────────────────────────── */
+async function ensureAirspaceLayer() {
+  renderLayersNow({ airspace: 'loading…' });
+  try {
+    const { areas } = await loadAirspace(BASE);
+    airspaceLayer.setAreas(areas);
+    renderLayersNow({ airspace: areas.length.toLocaleString() });
+  } catch (error) {
+    console.warn(error);
+    renderLayersNow({ airspace: 'offline' });
+  }
+}
+
+/** Which military areas contain the case location or any track point (at its altitude)? */
+async function airspaceFor(c) {
+  const { areas } = await loadAirspace(BASE);
+  const hits = new Map();
+  for (const a of areasAt(areas, c.lon, c.lat)) hits.set(a.index, { area: a, why: 'location' });
+  for (const t of c.tracks || [])
+    for (const [lon, lat, altM] of t.points)
+      for (const a of areasAt(areas, lon, lat, altM / 0.3048))
+        if (!hits.has(a.index)) hits.set(a.index, { area: a, why: t.label });
+  return [...hits.values()];
+}
+
 let launchesLoaded = 0;
 async function ensureLaunches() {
   if (Date.now() - launchesLoaded < 30 * 60e3) return;
@@ -245,7 +274,7 @@ function select(key, source = 'api') {
   trackLayer.clear();
   hidePlayback();
   if (item.kind === 'case') {
-    renderCase(item, { officialById, bluebookNear });
+    renderCase(item, { officialById, bluebookNear, airspaceFor });
     const loaded = trackLayer.load(item.ref);
     if (loaded) showPlayback();
     flyToItem(item, { tracks: !!loaded });
@@ -348,6 +377,12 @@ handler.setInputAction((click) => {
   } else if (hit.type === 'satellite') {
     const info = satLayer.info(hit.index);
     if (info) renderSatellite(info);
+  } else if (hit.type === 'airspace') {
+    const a = airspaceLayer.info(hit.index);
+    if (a) {
+      deselect();
+      renderAirspace(a);
+    }
   } else if (hit.type === 'launch') {
     const pad = launchLayer.info(hit.index);
     if (pad) {
@@ -372,7 +407,10 @@ handler.setInputAction((move) => {
     } else if (hit?.type === 'nuforc')
       lines = [nuforc.places[nuforc.place[hit.index]], `${String(nuforc.date[hit.index]).slice(0, 4)} · ${nuforc.shapes[nuforc.shape[hit.index]]}`];
     else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || 'Satellite', 'live position'];
-    else if (hit?.type === 'launch') {
+    else if (hit?.type === 'airspace') {
+      const a = airspaceLayer.info(hit.index);
+      if (a) lines = [a.name, `${AIRSPACE_TYPES[a.type]?.label || a.type} · ${formatFt(a.lowerFt)} to ${formatFt(a.upperFt)}`];
+    } else if (hit?.type === 'launch') {
       const p = launchLayer.info(hit.index);
       const l = p?.next || p?.last;
       if (p) lines = [p.location || p.pad, l ? `${p.next ? 'Next' : 'Last'}: ${l.name}` : `${p.launches.length} launches`];

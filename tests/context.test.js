@@ -89,3 +89,71 @@ describe('evidence score', () => {
     }
   });
 });
+
+import { readFileSync } from 'node:fs';
+import { nearestHourIndex, pickHour, driftToward, trackVsWind, weatherAvailable } from '../src/services/weather.js';
+import { toArea, pointInRing, areasAt, formatFt, nearUS } from '../src/services/airspace.js';
+import { altitudeFt } from '../scripts/build-airspace.mjs';
+
+describe('weather helpers', () => {
+  const json = {
+    elevation: 10,
+    hourly: {
+      time: ['2013-04-26T00:00', '2013-04-26T01:00', '2013-04-26T02:00'],
+      wind_speed_10m: [20, 24, 26],
+      wind_direction_10m: [40, 45, 50],
+    },
+  };
+  it('picks the nearest hour within 90 minutes', () => {
+    expect(nearestHourIndex(json.hourly.time, '2013-04-26T01:20:00Z')).toBe(1);
+    expect(nearestHourIndex(json.hourly.time, '2013-04-27T01:20:00Z')).toBe(-1);
+    expect(pickHour(json, '2013-04-26T01:40:00Z').wind_speed_10m).toBe(26);
+  });
+  it('turns wind "from" into drift "toward"', () => {
+    expect(driftToward(45)).toBe(225);
+    expect(driftToward(270)).toBe(90);
+  });
+  it('recognises a path drifting with the wind', () => {
+    // ~20 km east in an hour, wind from the west at 20 km/h.
+    const track = { points: [[-100, 40, 1000, 0], [-99.765, 40, 1000, 3600]] };
+    const wx = { wind_speed_100m: 20, wind_direction_100m: 270 };
+    expect(trackVsWind(track, wx).verdict).toBe('with-wind');
+    expect(trackVsWind(track, { wind_speed_100m: 20, wind_direction_100m: 90 }).verdict).toBe('against-wind');
+    expect(trackVsWind({ points: [[-100, 40, 1000, 0], [-90, 40, 1000, 600]] }, wx).verdict).toBe('fast');
+  });
+  it('knows the archive starts in 1940', () => {
+    expect(weatherAvailable('1939-06-01T00:00:00Z')).toBe(false);
+    expect(weatherAvailable('1947-06-24T21:59:00Z')).toBe(true);
+  });
+});
+
+describe('military airspace', () => {
+  const data = JSON.parse(readFileSync(new URL('../public/data/airspace.json', import.meta.url)));
+  const areas = data.features.map(toArea);
+  it('has a sane dataset', () => {
+    expect(areas.length).toBeGreaterThan(1000);
+    for (const a of areas) {
+      expect(a.upperFt).toBeGreaterThanOrEqual(a.lowerFt);
+      expect(a.polygons.length).toBeGreaterThan(0);
+    }
+  });
+  it('puts the Nimitz encounter inside warning area W-291', () => {
+    const c = CASES.find((x) => x.id === 'nimitz-tic-tac-2004');
+    expect(areasAt(areas, c.lon, c.lat).map((a) => a.name).join(' ')).toMatch(/W-291/);
+  });
+  it('puts the White House inside prohibited area P-56', () => {
+    expect(areasAt(areas, -77.0365, 38.8977).map((a) => a.name).join(' ')).toMatch(/P-56/);
+  });
+  it('ray-casts simple rings and formats altitudes', () => {
+    const square = [0, 0, 1, 0, 1, 1, 0, 1, 0, 0];
+    expect(pointInRing(0.5, 0.5, square)).toBe(true);
+    expect(pointInRing(1.5, 0.5, square)).toBe(false);
+    expect(formatFt(0)).toBe('surface');
+    expect(formatFt(80000)).toBe('FL800');
+    expect(formatFt(99999)).toBe('unlimited');
+    expect(altitudeFt('180', 'FL', 'STD')).toBe(18000);
+    expect(altitudeFt('-9998', null, 'UNLTD')).toBe(99999);
+    expect(nearUS(40, -100)).toBe(true);
+    expect(nearUS(51.5, -0.1)).toBe(false);
+  });
+});

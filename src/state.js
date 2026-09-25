@@ -21,6 +21,7 @@ export const state = {
     satellites: false,
     buildings: true,
     launches: false,
+    airspace: false,
     user: true,
   },
   selected: null, // item key

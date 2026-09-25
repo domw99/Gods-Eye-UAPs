@@ -85,3 +85,17 @@ export function spiralOffset(index, radiusKm, lat) {
   const dLon = (r * Math.sin(θ)) / (111.32 * Math.max(0.2, Math.cos(toRad(lat))));
   return [dLat, dLon];
 }
+
+/** Initial great-circle bearing from point 1 to point 2, degrees clockwise from north. */
+export function bearingDeg(lat1, lon1, lat2, lon2) {
+  const r = Math.PI / 180;
+  const y = Math.sin((lon2 - lon1) * r) * Math.cos(lat2 * r);
+  const x = Math.cos(lat1 * r) * Math.sin(lat2 * r) - Math.sin(lat1 * r) * Math.cos(lat2 * r) * Math.cos((lon2 - lon1) * r);
+  return ((Math.atan2(y, x) / r) + 360) % 360;
+}
+
+/** Smallest absolute difference between two bearings, 0–180°. */
+export function angleDiff(a, b) {
+  const d = Math.abs((((a - b) % 360) + 360) % 360);
+  return d > 180 ? 360 - d : d;
+}

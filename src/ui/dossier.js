@@ -3,9 +3,11 @@ import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, eviden
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
 import { wikiSummary, commonsFiles, photosNear, commonsPage } from '../services/wiki.js';
-import { skyAt, bodiesNamedIn } from '../services/sky.js';
+import { skyAt, bodiesNamedIn, compass } from '../services/sky.js';
+import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsWind } from '../services/weather.js';
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
 import { skySection } from './skychart.js';
+import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { relativeTime } from '../layers/launches.js';
 
 /**
@@ -61,6 +63,59 @@ function skyBlock(lat, lon, when, explanation = '') {
     console.warn('[sky]', error);
     return html`<p class="caveat">Sky positions could not be computed for this date.</p>`;
   }
+}
+
+function weatherBlock(when) {
+  if (!weatherAvailable(when)) return '';
+  return section('WEATHER AT THE TIME', html`<div id="d-weather"><div class="loading-line">Loading historical weather…</div></div>`);
+}
+
+function windArrow(towardDeg) {
+  return raw(`<svg class="wind-arrow" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" /><text x="20" y="8" text-anchor="middle">N</text>
+    <g transform="rotate(${towardDeg.toFixed(0)} 20 20)"><line x1="20" y1="30" x2="20" y2="11" /><path d="M20 8 L25 16 L15 16 Z" /></g></svg>`);
+}
+
+const windLine = (speed, from) =>
+  speed == null || from == null
+    ? '—'
+    : `${Math.round(speed)} km/h from the ${compass(from)} (blowing toward the ${compass(driftToward(from))})`;
+
+async function fillWeather(token, lat, lon, when, uapTrack) {
+  const el = document.getElementById('d-weather');
+  if (!el) return;
+  let wx;
+  try {
+    wx = await weatherAt(lat, lon, when);
+  } catch (error) {
+    console.warn('[weather]', error);
+  }
+  if (token !== renderToken || !document.getElementById('d-weather')) return;
+  if (!wx) {
+    mount(el, html`<p class="caveat">No weather record could be loaded for this time.</p>`);
+    return;
+  }
+  const cmp = trackVsWind(uapTrack, wx);
+  const from = wx.wind_direction_100m ?? wx.wind_direction_10m;
+  const verdict = {
+    'with-wind': `The reconstructed path runs with the wind (heading ${compass(cmp?.heading ?? 0)} at about ${Math.round(cmp?.speed ?? 0)} km/h). That fits something drifting, like a balloon or lantern, though the path is itself a reconstruction.`,
+    'against-wind': `The reconstructed path runs against the wind (heading ${compass(cmp?.heading ?? 0)}), so simple drifting doesn't explain it.`,
+    'across-wind': `The reconstructed path (heading ${compass(cmp?.heading ?? 0)}) doesn't follow the wind.`,
+    fast: `The reconstructed path is far faster than the wind (about ${Math.round(cmp?.speed ?? 0).toLocaleString()} km/h), so wind drift doesn't apply.`,
+  }[cmp?.verdict];
+  mount(
+    el,
+    html`<div class="wx-wrap">
+        ${from != null ? windArrow(driftToward(from)) : ''}
+        <dl class="d-kv">
+          <dt>SKY</dt><dd>${describeWeatherCode(wx.weather_code)} · cloud ${wx.cloud_cover ?? '—'}% <span class="dim">(low ${wx.cloud_cover_low ?? '—'} · mid ${wx.cloud_cover_mid ?? '—'} · high ${wx.cloud_cover_high ?? '—'})</span></dd>
+          <dt>WIND 10 M</dt><dd>${windLine(wx.wind_speed_10m, wx.wind_direction_10m)}${wx.wind_gusts_10m ? html` <span class="dim">· gusts ${Math.round(wx.wind_gusts_10m)}</span>` : ''}</dd>
+          <dt>WIND 100 M</dt><dd>${windLine(wx.wind_speed_100m, wx.wind_direction_100m)}</dd>
+          <dt>TEMP</dt><dd>${wx.temperature_2m != null ? `${Math.round(wx.temperature_2m)} °C` : '—'}${wx.precipitation ? ` · ${wx.precipitation} mm precipitation` : ''}</dd>
+        </dl>
+      </div>
+      ${verdict ? html`<p class="d-text wx-verdict">${verdict}</p>` : ''}
+      <p class="caveat">${wx.source}, hour of ${wx.hour.slice(0, 13).replace('T', ' ')}:00 UTC, on a ~25 km grid. Local conditions can differ, and winds aloft are often stronger and from a different direction.</p>`,
+  );
 }
 
 function launchBlock(lat, lon, when) {
@@ -120,6 +175,54 @@ function autoFillLaunches() {
   if (!el) return;
   const cached = cachedLaunchesNear(el.dataset.when, 12);
   if (cached) showLaunches(el, cached, el.dataset.when, Number(el.dataset.lat), Number(el.dataset.lon));
+}
+
+const airspaceRow = (a, why) => html`<li><span class="badge" style="color:${AIRSPACE_TYPES[a.type]?.color}">${a.type}</span>
+  <span><b>${a.name}</b> · ${AIRSPACE_TYPES[a.type]?.label || a.type}<br /><span class="dim">${formatFt(a.lowerFt)} to ${formatFt(a.upperFt)}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}${a.timesOfUse ? ` · in use: ${a.timesOfUse.toLowerCase()}` : ''}${why && why !== 'location' ? ` · crossed by: ${why}` : ''}</span></span></li>`;
+
+async function fillAirspace(token, promise) {
+  const el = document.getElementById('d-airspace');
+  if (!el) return;
+  let hits;
+  try {
+    hits = await promise;
+  } catch {
+    hits = null;
+  }
+  if (token !== renderToken || !document.getElementById('d-airspace')) return;
+  if (!hits) return mount(el, html`<p class="caveat">Airspace data could not be loaded.</p>`);
+  mount(
+    el,
+    hits.length
+      ? html`<ul class="source-list">${hits.map((h) => airspaceRow(h.area, h.why))}</ul>
+        <p class="caveat">Military training and test areas concentrate aircraft, drones, targets, flares and sensors, and AARO notes many reports come from them. Boundaries are the FAA's current ones and may differ from the time of the case. Turn on the Military airspace layer to see them in 3D.</p>`
+      : html`<p class="d-text">Not inside any current U.S. special-use airspace.</p>`,
+  );
+}
+
+export function renderAirspace(a) {
+  open('AIRSPACE');
+  mount(
+    body(),
+    html`<div class="d-title">${a.name}</div>
+    <div class="d-sub">${AIRSPACE_TYPES[a.type]?.label || a.type}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}</div>
+    ${section(
+      'LIMITS',
+      html`<dl class="d-kv"><dt>FLOOR</dt><dd>${formatFt(a.lowerFt)}</dd><dt>CEILING</dt><dd>${formatFt(a.upperFt)}</dd><dt>IN USE</dt><dd>${a.timesOfUse || '—'}</dd><dt>CONTROL</dt><dd>${a.controller || '—'}</dd></dl>`,
+    )}
+    ${section(
+      'WHAT IT MEANS',
+      html`<div class="d-text"><p>${{
+        R: 'Restricted areas hold hazardous activity such as live firing, missile tests and guided weapons. Other aircraft need permission to enter while they are active.',
+        W: 'Warning areas lie over international waters, beyond 3 nautical miles from the coast. They hold the same kind of hazardous military activity as restricted areas: carrier air wings train here.',
+        MOA: 'Military operations areas separate military training (combat manoeuvres, aerobatics, intercepts) from other traffic.',
+        A: 'Alert areas warn of a high volume of pilot training or unusual activity.',
+        P: 'Prohibited areas are closed to aircraft, for security (for example over the White House).',
+        D: 'Danger areas hold activities dangerous to aircraft at specified times.',
+      }[a.type] || ''}</p></div>
+      <p class="caveat">Data: FAA Aeronautical Information Services, special-use airspace (current boundaries).</p>`,
+    )}`,
+  );
 }
 
 export function renderLaunchPad(p) {
@@ -334,7 +437,9 @@ export function renderCase(item, ctx) {
       : ''}
 
     ${section('SKY AT THE TIME', skyBlock(c.lat, c.lon, c.date, c.explanation))}
+    ${weatherBlock(c.date)}
     ${launchBlock(c.lat, c.lon, c.date)}
+    ${nearUS(c.lat, c.lon) ? section('MILITARY AIRSPACE', html`<div id="d-airspace"><div class="loading-line">Checking FAA special-use airspace…</div></div>`) : ''}
 
     ${section('EVIDENCE & MEDIA', html`<div id="d-media"><div class="loading-line">Loading archived images and video…</div></div>`)}
     ${section('GOVERNMENT FILES — PROJECT BLUE BOOK', html`<div id="d-bluebook"><div class="loading-line">${
@@ -358,6 +463,8 @@ export function renderCase(item, ctx) {
   mount(body(), content);
 
   autoFillLaunches();
+  fillWeather(token, c.lat, c.lon, c.date, tracks.find((t) => t.kind === 'uap'));
+  if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
   if (hasSite) {
@@ -454,7 +561,7 @@ export function renderNuforc(r) {
 
 export function renderUser(item, { onDelete }) {
   const u = item.ref;
-  open('MY SIGHTING');
+  const token = open('MY SIGHTING');
   mount(
     body(),
     html`<div class="d-title">${u.title || 'My sighting'}</div>
@@ -465,6 +572,7 @@ export function renderUser(item, { onDelete }) {
         u.media ? html`<dt>MEDIA</dt><dd><a href="${safeUrl(u.media)}" target="_blank" rel="noopener">${u.media}</a></dd>` : ''
       }</dl>`)}
     ${section('SKY AT THE TIME', skyBlock(u.lat, u.lon, u.date))}
+    ${weatherBlock(u.date)}
     ${launchBlock(u.lat, u.lon, u.date)}
     ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
@@ -473,6 +581,7 @@ export function renderUser(item, { onDelete }) {
     <div class="btn-row" style="margin-top:14px"><button class="chip" data-action="export-user">⇩ EXPORT MY SIGHTINGS (GeoJSON)</button><button class="chip" data-action="delete-user">Delete this entry</button></div>`,
   );
   autoFillLaunches();
+  fillWeather(token, u.lat, u.lon, u.date, null);
   body().querySelector('[data-action="delete-user"]').addEventListener('click', (e) => {
     e.stopPropagation();
     if (confirm('Delete this sighting from this browser?')) onDelete(u.id);

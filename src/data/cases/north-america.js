@@ -1304,9 +1304,9 @@ export default [
     tracks: [
       {
         id: 'object',
-        label: 'Objects (AARO reconstruction: moving at wind speed)',
+        label: 'Objects (approximate path; AARO: moving at wind speed)',
         kind: 'balloon',
-        basis: 'official-report',
+        basis: 'approximate',
         points: [
           p(18.487, -67.14, 400, 0, 'Near the runway'),
           p(18.495, -67.128, 450, 60, 'Crossing the airport'),
