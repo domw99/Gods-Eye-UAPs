@@ -26,6 +26,7 @@ import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
 import { shareLink } from './app/links.js';
+import { createZoomOut } from './app/zoom.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -1483,9 +1484,37 @@ function setGrouping(on, { save = true } = {}) {
   setGrouping(saved !== '0', { save: false });
 }
 
+// Zooming out stays centred and levels the view as it rises (see app/zoom.js).
+// Zooming in with the wheel is Cesium's own, toward the cursor.
+const zoomer = createZoomOut(viewer, {
+  blocked: () =>
+    Boolean(viewer.trackedEntity) || !Cesium.Matrix4.equals(viewer.camera.transform, Cesium.Matrix4.IDENTITY) || story.active || trackLayer.witnessOn,
+});
+viewer.container.addEventListener(
+  'wheel',
+  (e) => {
+    if (e.deltaY <= 0) return zoomer.cancel();
+    const px = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
+    const factor = 1.35 ** Math.min(4, Math.max(0.05, px / 100)); // one wheel notch ≈ ×1.35
+    hideHover();
+    zoomTarget = null;
+    if (zoomer.zoomOut(factor)) {
+      e.preventDefault();
+      e.stopPropagation(); // keep it from Cesium's zoom, which backs away from the cursor
+    }
+  },
+  { capture: true, passive: false },
+);
+viewer.container.addEventListener('pointerdown', () => zoomer.cancel(), { capture: true });
+viewer.camera.moveEnd.addEventListener(() => zoomer.levelIfHigh());
+
 function zoomView(dir) {
   hideHover();
   const cam = viewer.camera;
+  if (dir < 0 && zoomer.zoomOut(2)) {
+    zoomTarget = null;
+    return;
+  }
   // Chase cam and story orbits look at a target: zoom toward it.
   if (viewer.trackedEntity || !Cesium.Matrix4.equals(cam.transform, Cesium.Matrix4.IDENTITY)) {
     const d = Cesium.Cartesian3.magnitude(cam.position);
@@ -1774,4 +1803,5 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 // Expose for debugging and automated screenshots.
 window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
   // Used by scripts/build-cards.mjs to render the case pages' preview images.
+  zoomer: () => zoomer,
   cardFor: async (key, url) => (await makeCard(itemByKey(key), url)).toDataURL('image/jpeg', 0.84) };

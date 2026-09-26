@@ -6,10 +6,13 @@ import * as Cesium from 'cesium';
  * while something animates. A still globe then costs almost nothing, which
  * keeps the panels and scrolling smooth and saves battery.
  *
- * Antialiasing and pixel ratio suit the device, and the resolution drops a
- * step when frames get slow while the camera moves.
+ * A still view is always drawn at the screen's full sharpness. Only while
+ * the view moves (camera, playback, animations) does it render at a lower
+ * pixel ratio, which drops further if frames get slow; a moment after the
+ * motion stops the next frame is sharp again.
  */
 const IDLE_MS = 500; // a slow heartbeat catches anything that changed without asking
+const SETTLE_MS = 180; // this long after the last moving frame, draw a sharp one
 
 export function deviceProfile() {
   const coarse = globalThis.matchMedia?.('(pointer: coarse)').matches ?? false;
@@ -18,12 +21,15 @@ export function deviceProfile() {
   const low = coarse || memory <= 4;
   return {
     low,
-    // Phones and tablets: native-looking but cheap. Desktops: sharper on high-DPI screens.
-    pixelRatio: low ? Math.min(dpr, 1.25) : Math.min(dpr, 1.5),
+    // At rest: the screen's own pixel ratio (up to 2×), so text, markers and imagery are crisp.
+    pixelRatio: Math.min(dpr, 2),
+    // While moving: cheaper, especially on phones and tablets.
+    motionPixelRatio: low ? Math.min(dpr, 1.25) : Math.min(dpr, 1.5),
     msaa: low ? 1 : dpr >= 1.5 ? 2 : 4,
     fxaa: low,
-    screenSpaceError: low ? 2.5 : 1.75,
-    tileCache: low ? 150 : 400,
+    // Imagery detail: lower is sharper (more tiles). High-DPI screens get finer tiles.
+    screenSpaceError: low ? 2 : dpr >= 1.5 ? 1.25 : 1.5,
+    tileCache: low ? 250 : 600,
   };
 }
 
@@ -31,8 +37,9 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
   const { scene } = viewer;
   const dpr = globalThis.devicePixelRatio || 1;
   viewer.useBrowserRecommendedResolution = false;
-  const baseScale = profile.pixelRatio / dpr;
-  viewer.resolutionScale = baseScale;
+  const sharpScale = profile.pixelRatio / dpr;
+  const baseScale = (profile.motionPixelRatio ?? profile.pixelRatio) / dpr;
+  viewer.resolutionScale = sharpScale;
   scene.msaaSamples = profile.msaa;
   scene.postProcessStages.fxaa.enabled = profile.fxaa;
   scene.globe.maximumScreenSpaceError = profile.screenSpaceError;
@@ -60,15 +67,24 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
     if (!document.hidden) scene.requestRender();
   }, IDLE_MS);
 
-  // Dynamic resolution: while the view is in motion (camera moving, clock
-  // running, an animation pumping), slow frames lower the resolution a step
-  // and a long run of fast ones restores it. Idle heartbeat frames don't count.
+  // Motion resolution: while the view is in motion (camera moving, clock
+  // running, an animation pumping) frames use `scale`, which slow frames
+  // lower a step and a run of fast ones raises again. When the motion stops,
+  // the view is redrawn at full sharpness. Idle heartbeat frames don't count.
   let last = 0;
-  let wasActive = false;
   let slow = 0;
   let fast = 0;
-  let scale = baseScale;
-  const minScale = baseScale * 0.55;
+  let scale = Math.min(baseScale, sharpScale);
+  const minScale = scale * 0.55;
+  const maxScale = scale;
+  let settle = 0;
+  const sharpen = () => {
+    settle = 0;
+    if (viewer.resolutionScale !== sharpScale) {
+      viewer.resolutionScale = sharpScale;
+      scene.requestRender();
+    }
+  };
   const lastView = new Cesium.Matrix4();
   scene.postRender.addEventListener(() => {
     const now = performance.now();
@@ -77,9 +93,11 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
     const moved = !Cesium.Matrix4.equalsEpsilon(scene.camera.viewMatrix, lastView, 1e-7);
     Cesium.Matrix4.clone(scene.camera.viewMatrix, lastView);
     const active = moved || viewer.clock.shouldAnimate || raf !== 0;
-    const measured = active && wasActive && dt < 2000;
-    wasActive = active;
-    if (!measured) return;
+    if (!active) return;
+    clearTimeout(settle);
+    settle = setTimeout(sharpen, SETTLE_MS);
+    if (viewer.resolutionScale !== scale) viewer.resolutionScale = scale;
+    if (dt > 250) return; // the first frame of a new motion: no frame time to judge yet
     if (dt > 34) {
       slow += dt > 80 ? 3 : 1;
       fast = 0;
@@ -89,11 +107,9 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
     }
     if (slow > 30 && scale > minScale) {
       scale = Math.max(minScale, scale * 0.85);
-      viewer.resolutionScale = scale;
       slow = 0;
-    } else if (fast > 240 && scale < baseScale) {
-      scale = Math.min(baseScale, scale / 0.85);
-      viewer.resolutionScale = scale;
+    } else if (fast > 90 && scale < maxScale) {
+      scale = Math.min(maxScale, scale / 0.85);
       fast = 0;
     }
   });
@@ -107,6 +123,7 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
       wake();
       return () => keepAlive.delete(fn);
     },
+    /** The resolution used while the view moves (a still view is always at full sharpness). */
     get resolutionScale() {
       return scale;
     },

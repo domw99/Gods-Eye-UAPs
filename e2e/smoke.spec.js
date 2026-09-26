@@ -21,6 +21,35 @@ test.describe('God’s Eye // UAP', () => {
     await expect(page.locator('#dossier')).toHaveClass(/hidden/);
   });
 
+  test('zooming out with the wheel ends level, with the globe in the middle', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() =>
+      window.__uap.viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(-112.07, 33.2, 30000),
+        orientation: { heading: Cesium.Math.toRadians(40), pitch: Cesium.Math.toRadians(-30), roll: 0 },
+      }),
+    );
+    // Off to one side of the globe, where Cesium's own zoom-out would drift.
+    const box = await page.locator('.cesium-widget canvas').boundingBox();
+    await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.3);
+    for (let i = 0; i < 24; i++) {
+      await page.mouse.wheel(0, 100);
+      await page.waitForTimeout(80);
+    }
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const c = window.__uap.viewer.camera;
+            const toEarth = Cesium.Cartesian3.normalize(Cesium.Cartesian3.negate(c.positionWC, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+            return Cesium.Math.toDegrees(Math.acos(Cesium.Cartesian3.dot(toEarth, c.directionWC)));
+          }),
+        { timeout: 20_000 },
+      )
+      .toBeLessThan(1);
+    expect(await page.evaluate(() => window.__uap.viewer.camera.positionCartographic.height)).toBeGreaterThan(8e6);
+  });
+
   test('filters narrow the list and reset clears them', async ({ page }) => {
     await openApp(page);
     const all = await caseCount(page);
