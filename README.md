@@ -25,9 +25,9 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <div align="center">
 
-<img src="docs/media/playback.webp" alt="Replaying the Betty and Barney Hill encounter in 3D over the White Mountains while switching between Normal, NVG, FLIR and Ironbow sensor modes" width="100%" />
+<a href="docs/media/demo.mp4"><img src="docs/media/demo.webp" alt="From the whole globe of cases into the USS Nimitz Tic Tac encounter: the flight paths replay while the view circles, then switch to night vision" width="100%" /></a>
 
-<sub><b>Betty and Barney Hill, 1961.</b> The car's route and the craft's reported path replayed over the White Mountains, cycling through Normal → NVG → FLIR → Ironbow.</sub>
+<sub><b>USS Nimitz "Tic Tac", 2004.</b> From the globe of cases into the encounter off San Diego: the flight paths replay as the view circles, then it switches to night vision. <a href="docs/media/demo.mp4">▶ Watch the 22-second video (MP4)</a></sub>
 
 </div>
 
@@ -68,6 +68,10 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 ### 🎛 See it through a sensor
 
 <img src="docs/media/sensor-modes.jpg" alt="The same view of downtown Montreal in Normal, NVG, FLIR white-hot, FLIR Ironbow and CRT modes" width="100%" />
+
+<img src="docs/media/playback.webp" alt="Replaying the Betty and Barney Hill encounter in 3D over the White Mountains while switching between Normal, NVG, FLIR and Ironbow sensor modes" width="100%" />
+
+<sub><b>Betty and Barney Hill, 1961.</b> The car's route and the craft's reported path replayed over the White Mountains, cycling through Normal → NVG → FLIR → Ironbow.</sub>
 
 There are five sensor looks, rendered as real-time post-processing shaders (keys <kbd>1</kbd>–<kbd>5</kbd>):
 - **Normal**
