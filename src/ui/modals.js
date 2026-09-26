@@ -5,7 +5,9 @@ import { STATUS, CATEGORY, EVIDENCE, SHAPES, evidenceScore, shapeClasses } from 
 import { trackStats } from '../layers/tracks.js';
 import { skyAt } from '../services/sky.js';
 import { formatDuration } from '../util/geo.js';
-import { issueDate } from '../services/mufon.js';
+import { issueDate, issueLabel, pageNumber, readerUrl } from '../services/mufon.js';
+import { SERIES_SHORT } from '../services/journals.js';
+import { tiles, yearMultiples, barList, makeTooltip, dataTable } from './stats.js';
 
 /** Modal dialogs: government files library, sighting log, about, lightbox. */
 const root = () => document.getElementById('modal-root');
@@ -37,7 +39,7 @@ function modal(title, content, { wide = true } = {}) {
   return backdrop;
 }
 
-export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) {
+export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null, onJournalSearch = null) {
   const groups = [...new Set(GOV_FILES.map((f) => f.group))];
   const content = html`
     <h2>UFO / UAP files</h2>
@@ -50,6 +52,9 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) 
       <div class="stat"><div class="v">${stats.mufon}</div><div class="k">MUFON JOURNAL ISSUES</div></div>
       <div class="stat"><div class="v">${stats.nuforc}</div><div class="k">CIVILIAN REPORTS</div></div>
     </div>
+    ${onJournalSearch
+      ? html`<form class="js-form files-search" id="files-js" role="search"><input name="q" type="search" minlength="4" required placeholder="Search inside ~22,000 journal pages: MUFON, APRO, NICAP, CUFOS…" aria-label="Search inside the journals" /><button class="chip on" type="submit">SEARCH</button></form>`
+      : ''}
     ${groups.map(
       (group) => html`<div class="section-label" style="margin-top:16px">${group.toUpperCase()}</div>
       <div class="files-grid">${GOV_FILES.filter((f) => f.group === group).map(
@@ -70,8 +75,13 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) 
           (o) => html`<li><span class="badge official">${o.type === 'video' ? 'VIDEO' : 'IMAGE'}</span><a href="#/official/${o.dvidsId}">${o.title}</a></li>`,
         )}</ul>`
       : ''}`;
-  modal('FILES', content);
+  const root = modal('FILES', content);
   if (mufonPromise) fillMufonBrowse(mufonPromise);
+  root.querySelector('#files-js')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = e.target.q.value.trim();
+    if (q) onJournalSearch(q);
+  });
 }
 
 /** Every journal issue by year, and the chapter newsletters by chapter. */
@@ -102,6 +112,106 @@ async function fillMufonBrowse(promise) {
   } catch {
     if (document.body.contains(el)) mount(el, html`<div class="loading-line">The journal index could not be loaded.</div>`);
   }
+}
+
+/**
+ * Search inside every journal page. `run(query)` resolves to
+ * { terms, common, missing, hits: [{ is, leaf }] } with hits in date order.
+ */
+export function openJournalSearch({ query = '', run }) {
+  const content = html`
+    <h2>Search inside the journals</h2>
+    <p class="lead">Every page of the MUFON UFO Journal, the APRO Bulletin, NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON’s chapter newsletters: about 22,000 pages of OCR text. Words need four letters or more, and a page must contain all of them.</p>
+    <form id="js-form" class="js-form" role="search">
+      <input name="q" type="search" required minlength="4" value="${query}" placeholder="e.g. Delphos ring · Kecksburg acorn · Hynek Socorro" aria-label="Words to find" autocomplete="off" />
+      <button class="chip on" type="submit">SEARCH</button>
+    </form>
+    <div id="js-results" aria-live="polite"></div>`;
+  const root = modal('JOURNAL SEARCH', content);
+  const form = root.querySelector('#js-form');
+  const out = root.querySelector('#js-results');
+  let seq = 0;
+  const go = async (q) => {
+    const my = ++seq;
+    mount(out, html`<div class="loading-line">Searching…</div>`);
+    try {
+      const r = await run(q);
+      if (my !== seq) return;
+      const notes = [
+        r.common.length ? `“${r.common.join('”, “')}” ${r.common.length > 1 ? 'are' : 'is'} on too many pages to narrow the search.` : '',
+        r.missing.length ? `“${r.missing.join('”, “')}” ${r.missing.length > 1 ? 'are' : 'is'} on fewer than three pages or nowhere, so nothing matches every word.` : '',
+        !r.terms.length && !r.missing.length ? 'Add a less common word of four letters or more.' : '',
+      ].filter(Boolean);
+      const shown = r.hits.slice(0, 250);
+      const q1 = r.terms[0] || '';
+      mount(
+        out,
+        html`<p class="d-text js-summary"><b>${r.hits.length.toLocaleString()}</b> page${r.hits.length === 1 ? '' : 's'}${r.terms.length ? html` mention <b>${r.terms.join(' + ')}</b>` : ''}${r.hits.length > shown.length ? ` · first ${shown.length} shown` : ''}</p>
+        ${notes.map((n) => html`<p class="caveat">${n}</p>`)}
+        <ul class="source-list js-hits">${shown.map(
+          ({ is, leaf }) => html`<li><span class="badge ${is.series ? 'journal' : 'mufon'}">${is.series ? SERIES_SHORT[is.series] : 'MUFON'}</span><span><a href="${is.series ? `#/journal/${encodeURIComponent(is.id)}/${leaf}` : `#/mufon/${encodeURIComponent(is.id)}/${leaf}`}">${issueLabel(is)} · p. ${pageNumber(is, leaf)}</a>
+            <a class="dim" href="${readerUrl(is, leaf)}${q1 ? `?q=${encodeURIComponent(q1)}` : ''}" target="_blank" rel="noopener">reader ↗</a></span></li>`,
+        )}</ul>
+        ${r.hits.length ? html`<p class="caveat">Found in machine OCR of the scans, so some pages are missed and a few matches are misreadings. Open a page to read it.</p>` : ''}`,
+      );
+    } catch {
+      if (my === seq) mount(out, html`<div class="loading-line">The search index could not be loaded.</div>`);
+    }
+  };
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = form.q.value.trim();
+    if (q) go(q);
+  });
+  form.q.focus();
+  if (query) go(query);
+}
+
+/** Statistics: `load(withNuforc)` resolves to the numbers (see main.js statsData). */
+export function openStats({ load }) {
+  const root = modal(
+    'STATISTICS',
+    html`<h2>What the archives hold</h2>
+    <p class="lead">Every layer in the app, counted: the curated cases, the official files and the civilian archives. Hover the charts for exact numbers.</p>
+    <div id="st-body" class="stats-body"><div class="loading-line">Loading the archives…</div></div>`,
+  );
+  const body = root.querySelector('#st-body');
+  const tip = makeTooltip(root.querySelector('.modal .panel-body'));
+  const draw = async (withNuforc) => {
+    let d;
+    try {
+      d = await load(withNuforc);
+    } catch {
+      if (document.body.contains(body)) mount(body, html`<div class="loading-line">Some archives could not be loaded.</div>`);
+      return;
+    }
+    if (!document.body.contains(body)) return;
+    const years = yearMultiples(d.years, d.from, d.to);
+    mount(
+      body,
+      html`${tiles(d.tiles)}
+      <div class="section-label" style="margin-top:18px">RECORDS PER YEAR, EACH ARCHIVE ON ITS OWN SCALE</div>
+      ${years.svg}
+      <p class="caveat">Each row has its own vertical scale, because the archives differ a hundredfold in size; compare shapes, not heights. Report places in the journals count by issue date.${d.nuforcLoaded ? '' : ' '}</p>
+      ${d.nuforcLoaded ? '' : html`<div class="btn-row"><button class="chip" data-stats-nuforc>ADD THE ~80,000 CIVILIAN REPORTS (NUFORC)</button></div>`}
+      ${dataTable('Records per decade', ['Decade', ...d.years.map((r) => r.label)], d.decades)}
+      <div class="stats-grid">
+        <section><div class="section-label">CURATED CASES BY STATUS</div>${barList(d.status, { color: '#00d4ff' })}</section>
+        <section><div class="section-label">GEIPAN’S FINDINGS (FRANCE)</div>${barList(d.geipan, { color: '#5f8bff', emphasis: true })}
+          <p class="caveat">Highlighted: cases GEIPAN could not explain after investigation.</p></section>
+        <section><div class="section-label">EVIDENCE IN CURATED CASES</div>${barList(d.evidence, { color: '#00d4ff' })}
+          <p class="caveat">Cases with each kind of evidence; most cases have several.</p></section>
+        <section><div class="section-label">CURATED CASES BY COUNTRY (TOP 10)</div>${barList(d.countries, { color: '#00d4ff' })}</section>
+      </div>`,
+    );
+    years.bind(body, tip);
+    body.querySelector('[data-stats-nuforc]')?.addEventListener('click', (e) => {
+      e.target.disabled = true;
+      e.target.textContent = 'LOADING…';
+      draw(true);
+    });
+  };
+  draw(false);
 }
 
 export function openAbout(meta) {

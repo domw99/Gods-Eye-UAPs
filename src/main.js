@@ -18,12 +18,13 @@ import { renderLayers, renderFilters, renderList, bindList, markSelected } from 
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText, renderGeipan,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
-import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
+import { searchJournals } from './services/textsearch.js';
+import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
@@ -31,7 +32,8 @@ import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/ex
 import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
-import { shapeClasses } from './data/taxonomy.js';
+import { shapeClasses, STATUS, EVIDENCE } from './data/taxonomy.js';
+import { classInfo as geipanClassInfo } from './services/geipan.js';
 
 const BASE = import.meta.env.BASE_URL;
 const LOG_KEY = 'gods-eye-uap:log';
@@ -670,6 +672,7 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
 
 function deselect() {
   selectToken++;
+  nearPoint = null;
   hideHover();
   story.stop(true);
   state.selected = null;
@@ -713,6 +716,150 @@ function routeFromHash() {
 window.addEventListener('hashchange', () => {
   if (!suppressHash) routeFromHash();
 });
+
+/* ── Search inside the journals ────────────────────────── */
+async function runJournalSearch(q) {
+  const [r, m, j] = await Promise.all([searchJournals(BASE, q), ensureMufon(), ensureJournals()]);
+  const hits = r.hits
+    .map((h) => ({ is: (h.archive === 'mufon' ? m : j).issues[h.issue], leaf: h.leaf }))
+    .filter((h) => h.is)
+    .sort((a, b) => a.is.year - b.is.year || (a.is.month || 0) - (b.is.month || 0) || a.leaf - b.leaf);
+  return { ...r, hits };
+}
+const openSearchJournals = (q = '') => openJournalSearch({ query: q, run: runJournalSearch });
+
+/* ── Statistics ────────────────────────────────────────── */
+const EVIDENCE_NAMES = {
+  video: 'Video', film: 'Film', photo: 'Photographs', radar: 'Radar', 'sensor-data': 'Infrared / sensor',
+  'official-document': 'Government files', 'military-witness': 'Military witnesses', 'pilot-witness': 'Pilot witnesses',
+  'police-witness': 'Police witnesses', 'multiple-witnesses': 'Many witnesses', 'physical-trace': 'Physical traces',
+  medical: 'Medical effects', audio: 'Audio', 'em-effects': 'EM effects',
+};
+async function statsData(withNuforc) {
+  const [bb, g, m, j] = await Promise.all([ensureBlueBook(), ensureGeipan(), ensureMufon(), ensureJournals()]);
+  if (withNuforc) await ensureNuforc();
+  const from = 1940;
+  const to = YEAR_MAX;
+  const row = (label, color, years) => {
+    const counts = countByYear(years);
+    return { label, color, counts, from: YEAR_MIN, total: years.filter((y) => y != null).length };
+  };
+  const years = [
+    row('Curated cases', '#00d4ff', CASE_ITEMS.map((i) => i.year)),
+    row('Official U.S. releases', '#ff5ce1', officialItems.map((i) => i.year)),
+    row('Project Blue Book', '#ffb547', bb.records.map((r) => r.year)),
+    row('GEIPAN (France)', '#5f8bff', g.records.map((r) => r.year)),
+    row('MUFON Journal places', '#b58cff', m.records.map((r) => r.year)),
+    row('Research archive places', '#3fd4b0', j.records.map((r) => r.year)),
+  ];
+  if (nuforc) years.push(row('Civilian reports (NUFORC)', '#ff7a45', Array.from(nuforc.date, (d) => Math.floor(d / 10000))));
+  const decades = [];
+  for (let d = 1940; d <= to; d += 10)
+    decades.push([`${d}s`, ...years.map((r) => r.counts.slice(d - r.from, d - r.from + 10).reduce((a, b) => a + b, 0))]);
+  const tally = (list) => [...list.reduce((mp, k) => mp.set(k, (mp.get(k) || 0) + 1), new Map())];
+  const cases = CASE_ITEMS.map((i) => i.ref);
+  const geipanOrder = ['A', 'B', 'C', 'D', 'D1', 'D2'];
+  return {
+    from,
+    to,
+    years,
+    decades,
+    nuforcLoaded: Boolean(nuforc),
+    tiles: [
+      { value: CASE_ITEMS.length, label: 'CURATED CASES' },
+      { value: cases.filter((c) => c.tracks?.length).length, label: 'WITH FLIGHT PATHS' },
+      { value: officialItems.length, label: 'OFFICIAL U.S. RELEASES' },
+      { value: bb.records.length.toLocaleString(), label: 'BLUE BOOK FILES' },
+      { value: g.records.length.toLocaleString(), label: 'GEIPAN FILES' },
+      { value: (m.issues.length + j.issues.length).toLocaleString(), label: 'JOURNAL ISSUES' },
+    ],
+    status: ['unresolved', 'disputed', 'explained', 'identified', 'unassessed']
+      .map((k) => ({ label: STATUS[k].label.toLowerCase().replace(/^./, (c) => c.toUpperCase()), value: cases.filter((c) => c.status === k).length, hint: STATUS[k].long }))
+      .filter((x) => x.value),
+    geipan: tally(g.records.map((r) => r.cls))
+      .sort((a, b) => geipanOrder.indexOf(a[0]) - geipanOrder.indexOf(b[0]))
+      .map(([cls, n]) => ({ label: geipanClassInfo(cls).label, value: n, strong: cls.startsWith('D'), hint: geipanClassInfo(cls).long })),
+    evidence: tally(cases.flatMap((c) => c.evidence || []))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([k, n]) => ({ label: EVIDENCE_NAMES[k] || EVIDENCE[k]?.long || k, value: n, hint: EVIDENCE[k]?.long })),
+    countries: tally(cases.map((c) => c.country))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([k, n]) => ({ label: k, value: n })),
+  };
+}
+const openStatsNow = () => openStats({ load: statsData });
+
+/* ── Near me / near a place ───────────────────────────── */
+let nearPoint = null; // { lat, lon } while the nearby dossier is open
+
+/** Everything reported near a point, filled in as each archive loads. */
+async function showNearby(lat, lon, label, { fly = true } = {}) {
+  deselect();
+  const token = selectToken;
+  nearPoint = { lat, lon };
+  if (fly)
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 420_000), duration: 2 });
+  const within = (list, r, pos = (x) => x) =>
+    list
+      .map((x) => ({ x, p: pos(x) }))
+      .filter(({ p }) => p && p.lat != null)
+      .map(({ x, p }) => ({ ...x, distKm: haversineKm(lat, lon, p.lat, p.lon) }))
+      .filter((x) => x.distKm <= r)
+      .sort((a, b) => a.distKm - b.distKm);
+  const pagesNear = (m) =>
+    within(m.records, 60)
+      .slice(0, 25)
+      .map((r) => ({ is: m.issues[r.issue], leaf: r.leaf, place: r.place, quote: r.quote, distKm: r.distKm }));
+  // GEIPAN only covers France and its territories.
+  const inFrance = (lat > 41 && lat < 51.5 && lon > -5.5 && lon < 10) || geipan;
+  const data = {
+    cases: within(allItems().filter((i) => i.kind !== 'official' || i.precision !== 'region'), 250).slice(0, 25),
+    bluebook: null,
+    geipan: inFrance ? null : undefined,
+    mufon: null,
+    journals: null,
+    nuforc: nuforc ? countNuforc(lat, lon) : null,
+  };
+  const draw = () => {
+    if (token !== selectToken) return;
+    data.done = ['bluebook', 'mufon', 'journals'].every((k) => data[k] != null) && data.geipan !== null;
+    renderNearby({ label, lat, lon, data });
+  };
+  draw();
+  document.getElementById('hud-tgt').textContent = `NEAR ${label}`.slice(0, 40).toUpperCase();
+  const fill = (key, promise, pick) =>
+    promise.then(
+      (d) => ((data[key] = pick(d)), draw()),
+      () => ((data[key] = []), draw()),
+    );
+  await Promise.all([
+    fill('bluebook', ensureBlueBook(), (bb) => within(bb.records.filter((r) => r.prec >= 2), 100).slice(0, 25)),
+    fill('mufon', ensureMufon(), pagesNear),
+    fill('journals', ensureJournals(), pagesNear),
+    inFrance ? fill('geipan', ensureGeipan(), (g) => within(g.records, 50).slice(0, 25)) : null,
+  ]);
+}
+
+function countNuforc(lat, lon) {
+  let n = 0;
+  for (let i = 0; i < nuforc.lat.length; i++) if (Math.abs(nuforc.lat[i] - lat) < 0.5 && haversineKm(lat, lon, nuforc.lat[i], nuforc.lon[i]) <= 50) n++;
+  return n;
+}
+
+function nearMe() {
+  if (!navigator.geolocation) return toast('Location isn’t available in this browser. Search a place instead.', 4000);
+  toast('Finding your location…', 2500);
+  navigator.geolocation.getCurrentPosition(
+    (pos) => showNearby(pos.coords.latitude, pos.coords.longitude, 'you'),
+    (err) => {
+      toast(err.code === 1 ? 'Location permission was declined. Search a place instead.' : 'Could not get your location. Search a place instead.', 4500);
+      document.getElementById('search').focus();
+    },
+    { enableHighAccuracy: false, timeout: 12000, maximumAge: 10 * 60e3 },
+  );
+}
 
 /* ── Globe picking & hover ─────────────────────────────── */
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -945,7 +1092,7 @@ bindDossierActions({
   'mufon-text': (btn) => mufon && showMufonText(mufon.byIssueId.get(btn.dataset.issue), +btn.dataset.leaf),
   'journal-text': (btn) => journals && showMufonText(journals.byIssueId.get(btn.dataset.issue), +btn.dataset.leaf),
   skycheck: () => {
-    const item = itemByKey(state.selected);
+    const item = itemByKey(state.selected) || nearPoint;
     if (!item) return;
     if (!state.layers.satellites) setLayer('satellites', true);
     renderSkyCheck('loading');
@@ -965,6 +1112,18 @@ bindDossierActions({
       trackLayer.follow(false);
       story.start(item.ref);
       render.request();
+    }
+  },
+  'journal-search': (btn) => openSearchJournals(btn.dataset.q || ''),
+  'explain-here': () => nearPoint && openExplainNow({ lat: nearPoint.lat, lon: nearPoint.lon }),
+  'near-nuforc': async () => {
+    if (!nearPoint) return;
+    const at = nearPoint;
+    await ensureNuforc();
+    if (nearPoint === at) toast(`${countNuforc(at.lat, at.lon).toLocaleString()} civilian reports within 50 km`, 4000);
+    if (nearPoint === at) {
+      const label = document.querySelector('#dossier-body .d-title')?.textContent.replace(/^Reported near /, '') || 'here';
+      showNearby(at.lat, at.lon, label, { fly: false });
     }
   },
   'explain-user': () => {
@@ -1247,6 +1406,7 @@ document.getElementById('map-controls').addEventListener('click', (e) => {
   const b = e.target.closest('[data-view]');
   if (!b) return;
   if (b.dataset.view === 'home') resetView();
+  else if (b.dataset.view === 'near') nearMe();
   else zoomView(b.dataset.view === 'in' ? 1 : -1);
 });
 
@@ -1264,8 +1424,10 @@ const openFiles = () =>
     },
     officialMeta ? officialMeta.items.filter((o) => !o.location) : [],
     ensureMufon(),
+    openSearchJournals,
   );
 document.getElementById('btn-files').addEventListener('click', openFiles);
+document.getElementById('btn-stats').addEventListener('click', () => openStatsNow());
 document.getElementById('btn-log').addEventListener('click', openLog);
 document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
 const openAboutModal = () =>
@@ -1338,6 +1500,8 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'm') openMapSettingsNow();
   else if (e.key.toLowerCase() === 'v' && trackLayer.current && trackLayer.witnessLabel) toggleWitnessView();
   else if (e.key.toLowerCase() === 'r') resetView();
+  else if (e.key.toLowerCase() === 'n') nearMe();
+  else if (e.key.toLowerCase() === 's') openStatsNow();
   else if (e.key === '+' || e.key === '=') zoomView(1);
   else if (e.key === '-' || e.key === '_') zoomView(-1);
 });
@@ -1371,6 +1535,10 @@ refresh();
 
 /* ── Place search (Photon, keyless) ────────────────────── */
 const placeList = document.getElementById('place-results');
+// The "search inside the journals" row works whether or not place search answered.
+placeList.addEventListener('click', (e) => {
+  if (e.target.closest('[data-journals]')) openSearchJournals(document.getElementById('search').value.trim());
+});
 let placeTimer = null;
 let placeAbort = null;
 subscribe((s, reason) => {
@@ -1379,6 +1547,9 @@ subscribe((s, reason) => {
   placeAbort?.abort();
   const q = s.search;
   if (!q || q.length < 3 || q.startsWith('#')) return mount(placeList, html``);
+  // Searching the journals' full text is always offered for a real word.
+  const journalRow = q.length >= 4 ? html`<li><button type="button" data-journals>⌕ <span>Search inside the journals for “${q}”</span><span class="go">TEXT</span></button></li>` : '';
+  mount(placeList, journalRow);
   placeTimer = setTimeout(async () => {
     placeAbort = new AbortController();
     try {
@@ -1394,7 +1565,7 @@ subscribe((s, reason) => {
       }));
       mount(
         placeList,
-        html`${places.map(
+        html`${journalRow}${places.map(
           (p, i) => html`<li><button type="button" data-place="${i}">⌖ <span>${p.name}${p.detail ? html` <span class="dim">· ${p.detail}</span>` : ''}</span><span class="go">FLY</span></button></li>`,
         )}`,
       );
@@ -1413,12 +1584,12 @@ subscribe((s, reason) => {
         const input = document.getElementById('search');
         input.value = '';
         update({ search: '' }, 'search');
-        toast(`${p.name} — case files, Blue Book and civilian layers show what was reported here`, 3500);
+        showNearby(p.lat, p.lon, p.name, { fly: false });
       };
     } catch (error) {
       if (error.name === 'AbortError') return;
       console.warn('[places]', error);
-      mount(placeList, html``);
+      mount(placeList, journalRow);
     }
   }, 450);
 });
@@ -1479,4 +1650,4 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 }
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, showNearby, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

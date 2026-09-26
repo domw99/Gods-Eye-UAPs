@@ -17,11 +17,12 @@
     "build:bluebook": "node scripts/build-bluebook.mjs",
     "build:nuforc": "node scripts/build-nuforc.mjs",
     "verify:media": "node scripts/verify-media.mjs",
-    "data": "npm run sync:official && npm run build:bluebook && npm run build:nuforc && npm run build:airspace && npm run build:geipan && npm run build:mufon && npm run build:journals && npm run verify:media",
+    "data": "npm run sync:official && npm run build:bluebook && npm run build:nuforc && npm run build:airspace && npm run build:geipan && npm run build:mufon && npm run build:journals && npm run build:textindex && npm run verify:media",
     "build:airspace": "node scripts/build-airspace.mjs",
     "build:mufon": "node scripts/build-mufon.mjs",
     "build:geipan": "node scripts/build-geipan.mjs",
-    "build:journals": "node scripts/build-journals.mjs"
+    "build:journals": "node scripts/build-journals.mjs",
+    "build:textindex": "node scripts/build-textindex.mjs"
   },
   "dependencies": {
     "@mapbox/vector-tile": "^3.0.0",

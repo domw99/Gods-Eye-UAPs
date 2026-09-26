@@ -685,7 +685,8 @@ function mufonCaseBlock(m) {
     return html`<div class="loading-line">No pages in the journal archive matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of Skylook and the MUFON UFO Journal (1967–2008) for “${m.term || 'the case name'}”.</p>`;
   return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">Pages that mention <b>${m.term}</b>${m.total > m.hits.length ? ` (first ${m.hits.length} of ${m.total})` : ''}:</p>${mufonHitList(m.hits)}` : ''}
     ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in the journal:</p>${mufonHitList(m.near)}` : ''}
-    <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>`;
+    <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>
+    ${m.term ? html`<div class="btn-row"><button class="chip" data-action="journal-search" data-q="${m.term}">⌕ SEARCH ALL JOURNALS FOR “${m.term}”</button></div>` : ''}`;
 }
 
 function journalCaseBlock(m) {
@@ -767,6 +768,42 @@ export async function showMufonText(is, leaf) {
   } catch {
     mount(el, html`<div class="loading-line">Page text unavailable. Try the Internet Archive reader.</div>`);
   }
+}
+
+/* ── Near a place ──────────────────────────────────────── */
+
+const km = (d) => (d < 10 ? d.toFixed(1) : Math.round(d).toLocaleString());
+
+/**
+ * What has been reported near a point: curated cases and every archive layer,
+ * nearest first. `data` fields arrive as they load; missing ones show a note.
+ */
+export function renderNearby({ label, lat, lon, data }) {
+  const token = open('NEAR HERE');
+  const list = (rows, row) => (rows.length ? html`<ul class="source-list">${rows.map(row)}</ul>` : html`<div class="loading-line">Nothing within range.</div>`);
+  const pending = html`<div class="loading-line">Loading…</div>`;
+  const block = (rows, row, note) => (rows == null ? pending : html`${list(rows, row)}${note ? html`<p class="caveat">${note}</p>` : ''}`);
+  const d = data;
+  const total = ['cases', 'bluebook', 'geipan', 'mufon', 'journals'].reduce((n, k) => n + (d[k]?.length || 0), 0);
+  mount(
+    body(),
+    html`<div class="d-title">Reported near ${label}</div>
+    <div class="d-sub">${formatDMS(lat, lon)}${d.done ? html`<br />${total.toLocaleString()} records within range${d.nuforc != null ? ` · ${d.nuforc.toLocaleString()} civilian reports within 50 km` : ''}` : ''}</div>
+    ${section('CASE FILES WITHIN 250 KM', block(d.cases, (c) => html`<li>${statusBadge(c.status)}<span><a href="#/${c.kind}/${encodeURIComponent(c.id)}">${c.title}</a> · ${c.year} · ${km(c.distKm)} km</span></li>`))}
+    ${section('PROJECT BLUE BOOK WITHIN 100 KM', block(d.bluebook, (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · ${km(r.distKm)} km</span></li>`, 'Air Force case files placed at the town in their file name.'))}
+    ${d.geipan !== undefined ? section('GEIPAN (FRANCE) WITHIN 50 KM', block(d.geipan, (r) => html`<li>${classBadge(r.cls)}<span><a href="#/geipan/${encodeURIComponent(r.id)}">${r.place}</a> · ${geipanDate(r)} · ${km(r.distKm)} km<span class="mufon-quote" lang="fr">${r.short}</span></span></li>`)) : ''}
+    ${section('MUFON JOURNAL WITHIN 60 KM', block(d.mufon, (h) => html`<li>${pageBadge(h.is)}<span><a href="${pageHref(h.is, h.leaf)}">${h.place}</a> · ${issueDate(h.is)} · ${km(h.distKm)} km<span class="mufon-quote">${h.quote}</span></span></li>`))}
+    ${section('APRO, NICAP, CUFOS & MUFON CHAPTERS WITHIN 60 KM', block(d.journals, (h) => html`<li>${pageBadge(h.is)}<span><a href="${pageHref(h.is, h.leaf)}">${h.place}</a> · ${issueDate(h.is)} · ${km(h.distKm)} km<span class="mufon-quote">${h.quote}</span></span></li>`))}
+    ${section(
+      'CIVILIAN REPORTS (NUFORC)',
+      d.nuforc == null
+        ? html`<div class="btn-row"><button class="chip" data-action="near-nuforc">COUNT REPORTS WITHIN 50 KM</button></div><p class="caveat">Loads the ~80,000-report layer.</p>`
+        : html`<p class="d-text"><b>${d.nuforc.toLocaleString()}</b> unverified reports within 50 km (1906–2014). Turn on <b>Civilian reports</b> to see them.</p>`,
+    )}
+    ${section('WHAT’S OVERHEAD NOW', html`<div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button><button class="chip on" data-action="explain-here">WHAT DID I SEE?</button></div><div id="d-sky"></div>`)}
+    ${section('THE LOCATION', siteLinks(lat, lon))}`,
+  );
+  return token;
 }
 
 export function renderNuforc(r) {
