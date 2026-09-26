@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { horizonOf } from '../app/horizon.js';
-import { STATUS } from '../data/taxonomy.js';
+import { STATUS, evidenceScore } from '../data/taxonomy.js';
+import { declutter } from './declutter.js';
 import { spiralOffset } from '../util/geo.js';
 
 /**
@@ -8,60 +9,98 @@ import { spiralOffset } from '../util/geo.js';
  * Glyphs are drawn once to canvases and reused as billboard images.
  */
 const glyphCache = new Map();
+const PX = 2; // canvases are drawn at twice their size so markers stay sharp on high-DPI screens
 
+/** A marker glyph and its on-screen size: rings for cases (a reticle when there is a flight path), a diamond for official releases, a triangle for the user's own sightings. */
 function glyph(kind, color, emphasis = false) {
   const key = `${kind}|${color}|${emphasis}`;
   if (glyphCache.has(key)) return glyphCache.get(key);
   const s = emphasis ? 40 : 32;
   const c = document.createElement('canvas');
-  c.width = c.height = s;
+  c.width = c.height = s * PX;
   const g = c.getContext('2d');
+  g.scale(PX, PX);
   const m = s / 2;
-  g.shadowColor = color;
-  g.shadowBlur = 8;
-  g.strokeStyle = color;
-  g.fillStyle = color;
-  g.lineWidth = 2;
+  const shape = (path) => {
+    // A dark backdrop keeps the glyph readable over snow, desert and cloud.
+    path();
+    g.fillStyle = 'rgba(4, 8, 14, 0.6)';
+    g.fill();
+    g.globalAlpha = 0.22;
+    g.fillStyle = color;
+    g.fill();
+    g.globalAlpha = 1;
+    g.shadowColor = color;
+    g.shadowBlur = 7;
+    g.strokeStyle = color;
+    g.lineWidth = 2;
+    path();
+    g.stroke();
+  };
   if (kind === 'official') {
-    g.beginPath();
-    g.moveTo(m, 5);
-    g.lineTo(s - 5, m);
-    g.lineTo(m, s - 5);
-    g.lineTo(5, m);
-    g.closePath();
-    g.globalAlpha = 0.25;
-    g.fill();
-    g.globalAlpha = 1;
-    g.stroke();
-    g.beginPath();
-    g.arc(m, m, 3, 0, Math.PI * 2);
-    g.fill();
-  } else if (kind === 'user') {
-    g.beginPath();
-    g.moveTo(m, 5);
-    g.lineTo(s - 6, s - 7);
-    g.lineTo(6, s - 7);
-    g.closePath();
-    g.globalAlpha = 0.25;
-    g.fill();
-    g.globalAlpha = 1;
-    g.stroke();
-  } else {
-    g.beginPath();
-    g.arc(m, m, m - 6, 0, Math.PI * 2);
-    g.stroke();
-    if (emphasis) {
-      g.setLineDash([3, 3]);
+    shape(() => {
       g.beginPath();
-      g.arc(m, m, m - 2, 0, Math.PI * 2);
+      g.moveTo(m, 5);
+      g.lineTo(s - 5, m);
+      g.lineTo(m, s - 5);
+      g.lineTo(5, m);
+      g.closePath();
+    });
+  } else if (kind === 'user') {
+    shape(() => {
+      g.beginPath();
+      g.moveTo(m, 5);
+      g.lineTo(s - 6, s - 7);
+      g.lineTo(6, s - 7);
+      g.closePath();
+    });
+  } else {
+    const r = emphasis ? m - 8 : m - 6;
+    shape(() => {
+      g.beginPath();
+      g.arc(m, m, r, 0, Math.PI * 2);
+    });
+    if (emphasis) {
+      // Reticle ticks: this case has a reconstructed flight path.
+      g.lineWidth = 2;
+      g.beginPath();
+      for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+        g.moveTo(m + dx * (r + 3), m + dy * (r + 3));
+        g.lineTo(m + dx * (m - 1.5), m + dy * (m - 1.5));
+      }
       g.stroke();
-      g.setLineDash([]);
     }
-    g.beginPath();
-    g.arc(m, m, 4, 0, Math.PI * 2);
-    g.fill();
   }
-  glyphCache.set(key, c);
+  g.shadowBlur = 4;
+  g.fillStyle = '#ffffff';
+  g.beginPath();
+  g.arc(m, m, 2.2, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = color;
+  g.beginPath();
+  g.arc(m, m, 1.4, 0, Math.PI * 2);
+  g.fill();
+  const out = { image: c, size: s };
+  glyphCache.set(key, out);
+  return out;
+}
+
+/** The ring that pings around the selected marker. */
+const haloCache = new Map();
+function haloImage(color) {
+  if (haloCache.has(color)) return haloCache.get(color);
+  const s = 64;
+  const c = document.createElement('canvas');
+  c.width = c.height = s * PX;
+  const g = c.getContext('2d');
+  g.scale(PX, PX);
+  g.strokeStyle = g.shadowColor = color;
+  g.shadowBlur = 10;
+  g.lineWidth = 2.5;
+  g.beginPath();
+  g.arc(s / 2, s / 2, s / 2 - 8, 0, Math.PI * 2);
+  g.stroke();
+  haloCache.set(color, c);
   return c;
 }
 
@@ -84,8 +123,9 @@ function clusterImage(count, caseShare) {
   const r = Math.min(24, 15 + Math.log2(count) * 2.2);
   const s = Math.ceil(r * 2 + 10);
   const c = document.createElement('canvas');
-  c.width = c.height = s;
+  c.width = c.height = s * PX;
   const g = c.getContext('2d');
+  g.scale(PX, PX);
   const m = s / 2;
   g.fillStyle = 'rgba(5, 9, 16, 0.82)';
   g.beginPath();
@@ -110,8 +150,9 @@ function clusterImage(count, caseShare) {
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText(String(count), m, m + 0.5);
-  clusterImages.set(key, c);
-  return c;
+  const out = { image: c, size: s };
+  clusterImages.set(key, out);
+  return out;
 }
 
 export function itemColor(item) {
@@ -130,6 +171,9 @@ export function createItemLayer(viewer) {
   let selectedKey = null;
   let clusters = []; // [{ members: [item], position }]
   const clusterBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
+  const haloBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
+  const halo = { ping: null, ring: null, since: 0 };
+  const PING_MS = 2400;
   horizon.onChange((d) => {
     for (let i = 0; i < clusterBoards.length; i++) clusterBoards.get(i).disableDepthTestDistance = d;
   });
@@ -144,23 +188,28 @@ export function createItemLayer(viewer) {
       lon += dLon;
     }
     const color = itemColor(item);
+    const gl = glyph(item.kind, color, item.hasTrack);
+    const label = item.title.length > 46 ? `${item.title.slice(0, 44)}…` : item.title;
     const entity = source.entities.add({
       id: item.key,
       position: Cesium.Cartesian3.fromDegrees(lon, lat),
       billboard: {
-        image: glyph(item.kind, color, item.hasTrack),
-        scaleByDistance: new Cesium.NearFarScalar(2e5, 1.0, 2e7, 0.55),
+        image: gl.image,
+        width: gl.size,
+        height: gl.size,
+        scaleByDistance: new Cesium.NearFarScalar(2e5, 1.0, 2e7, 0.6),
         disableDepthTestDistance: horizon.property,
         heightReference: Cesium.HeightReference.NONE,
       },
       label: {
-        text: item.title.length > 46 ? `${item.title.slice(0, 44)}…` : item.title,
+        text: label,
         font: '500 12px Inter, sans-serif',
         fillColor: Cesium.Color.fromCssColorString('#e8eaed'),
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 3,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        pixelOffset: new Cesium.Cartesian2(16, 0),
+        style: Cesium.LabelStyle.FILL,
+        showBackground: true,
+        backgroundColor: Cesium.Color.fromCssColorString('#05080e').withAlpha(0.74),
+        backgroundPadding: new Cesium.Cartesian2(7, 4),
+        pixelOffset: new Cesium.Cartesian2(item.hasTrack ? 22 : 18, 0),
         horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, item.kind === 'case' ? 3.5e6 : 9e5),
         disableDepthTestDistance: horizon.property,
@@ -168,6 +217,7 @@ export function createItemLayer(viewer) {
       properties: { itemKey: item.key },
     });
     entity.__item = item;
+    entity.__label = label;
     entity.__lat = lat;
     entity.__lon = lon;
     entity.__pos = Cesium.Cartesian3.fromDegrees(lon, lat);
@@ -199,8 +249,29 @@ export function createItemLayer(viewer) {
 
   function setSelected(key) {
     selectedKey = key;
+    haloBoards.removeAll();
+    halo.ping = halo.ring = null;
+    const e = key && entities.get(key);
+    if (e) {
+      const image = haloImage(itemColor(e.__item));
+      const common = { position: e.__pos, image, width: 64, height: 64, disableDepthTestDistance: horizon.distance };
+      halo.ring = haloBoards.add({ ...common, scale: 0.8 });
+      halo.ping = haloBoards.add({ ...common, scale: 0.8 });
+      halo.since = performance.now();
+    }
     recluster();
   }
+
+  // The selected marker pings three times, then keeps a steady ring.
+  viewer.scene.preRender.addEventListener(() => {
+    if (!halo.ping) return;
+    const t = (performance.now() - halo.since) / PING_MS;
+    const phase = (t * 3) % 1;
+    halo.ping.show = t < 1;
+    halo.ping.scale = 0.8 + phase * 1.2;
+    halo.ping.color = Cesium.Color.WHITE.withAlpha(t < 1 ? 1 - phase : 0);
+    halo.ring.disableDepthTestDistance = halo.ping.disableDepthTestDistance = horizon.distance;
+  });
 
   /**
    * Group markers that overlap on screen. Only markers on the side of the
@@ -214,15 +285,40 @@ export function createItemLayer(viewer) {
     clusterBoards.removeAll();
     clusters = [];
     const on = camera.positionCartographic.height > CLUSTER_BELOW_M;
+    scene.requestRender(); // marker visibility changes show on the next frame
     const occluder = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, camera.positionWC);
     const pts = [];
+    const front = []; // markers on the camera's side of the Earth, for labels
     for (const [key, e] of entities) {
       const visible = !visibleKeys || visibleKeys.has(key);
       e.show = visible;
-      if (!visible || !on || key === selectedKey || !occluder.isPointVisible(e.__pos)) continue;
+      if (!visible || !occluder.isPointVisible(e.__pos)) continue;
+      front.push(e);
+      if (!on || key === selectedKey) continue;
       const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, e.__pos, scratch);
       if (w) pts.push({ e, x: w.x, y: w.y });
     }
+    clusterPoints(pts);
+    // Labels: the selected case first, then cases with flight paths and stronger evidence.
+    declutter(
+      scene,
+      front
+        .filter((e) => e.show)
+        .map((e) => ({
+          entity: e,
+          position: e.__pos,
+          text: e.__label,
+          priority: (e.id === selectedKey ? 1000 : 0) + (e.__item.hasTrack ? 40 : 0) + (e.__item.kind === 'case' ? 20 : 0) + evidenceScore(e.__item.evidence || [], e.__item.hasTrack),
+          dx: e.__item.hasTrack ? 22 : 18,
+          dy: 0,
+          charPx: 6.6,
+          maxDistance: e.__item.kind === 'case' ? 3.5e6 : 9e5,
+        })),
+    );
+  }
+
+  function clusterPoints(pts) {
+    const scene = viewer.scene;
     if (pts.length < CLUSTER_MIN) return;
     // Bucket by screen cell, then grow each group from an unused seed.
     const grid = new Map();
@@ -269,6 +365,7 @@ export function createItemLayer(viewer) {
           }
         }
     }
+    viewer.scene.requestRender();
     for (const group of groups) {
       const sum = new Cesium.Cartesian3();
       let cases = 0;
@@ -282,7 +379,10 @@ export function createItemLayer(viewer) {
       clusters.push({ members, position, positions: group.map((j) => pts[j].e.__pos) });
       clusterBoards.add({
         position,
-        image: clusterImage(group.length, cases / group.length),
+        ...(() => {
+          const ci = clusterImage(group.length, cases / group.length);
+          return { image: ci.image, width: ci.size, height: ci.size };
+        })(),
         id: { layer: 'cluster', index: clusters.length - 1 },
         disableDepthTestDistance: horizon.distance,
       });
@@ -304,6 +404,7 @@ export function createItemLayer(viewer) {
     Cesium.Cartesian3.clone(cam.directionWC, lastDir);
     const now = performance.now();
     if (now - lastCluster < 120) {
+      if (!queued) setTimeout(() => viewer.scene.requestRender(), 130); // regroup after the camera stops
       queued = true;
       return;
     }
@@ -360,5 +461,9 @@ export function createItemLayer(viewer) {
     positionOf,
     zoomToCluster,
     cluster: (index) => clusters[index] || null,
+    /** True while the selection ping animates. */
+    get animating() {
+      return Boolean(halo.ping) && performance.now() - halo.since < PING_MS;
+    },
   };
 }

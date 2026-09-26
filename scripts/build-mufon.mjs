@@ -262,10 +262,10 @@ async function loadChapters() {
     .sort((a, b) => b.items.length - a.items.length || a.name.localeCompare(b.name));
 }
 
-/* ── Build ─────────────────────────────────────────────────────────── */
+/* ── Places and case pages (shared with build-journals.mjs) ────────── */
 
-async function main() {
-  const gz = await loadGazetteer();
+/** Region and town lookups over the GeoNames gazetteer. */
+export function makeResolvers(gz) {
   const regionCache = new Map();
   const resolveRegion = (t) => {
     if (!regionCache.has(t)) {
@@ -280,11 +280,15 @@ async function main() {
     const hits = (gz.byName.get(norm(cand)) || []).filter((r) => inRegion(region, r));
     return hits.sort((a, b) => b.pop - a.pop)[0] || null;
   };
+  return { resolveRegion, lookup };
+}
 
-  const issues = await loadIssues();
-  console.log(`Issues with OCR: ${issues.length}`);
-
-  // 1. Places named in sighting reports.
+/**
+ * Places named in sighting reports, one per place per issue. `issues` carry
+ * { year, pages[], cover }; `groupOf(issue)` names the publication whose
+ * mastheads are filtered out (a place in most of its issues in a year).
+ */
+export function extractPlaces(issues, { resolveRegion, lookup }, groupOf = () => '') {
   const raw = []; // { issue, leaf, place, lat, lon, quote }
   for (const [ii, is] of issues.entries()) {
     const seen = new Set();
@@ -299,23 +303,29 @@ async function main() {
   }
   // A place named in most issues of a year is a masthead or office address.
   const perYear = new Map();
+  const key = (is, place) => `${groupOf(is)}|${is.year}|${place}`;
   for (const r of raw) {
-    const k = `${issues[r.issue].year}|${r.place}`;
+    const k = key(issues[r.issue], r.place);
     perYear.set(k, (perYear.get(k) || 0) + 1);
   }
   const issuesInYear = new Map();
-  for (const is of issues) issuesInYear.set(is.year, (issuesInYear.get(is.year) || 0) + 1);
+  for (const is of issues) {
+    const k = `${groupOf(is)}|${is.year}`;
+    issuesInYear.set(k, (issuesInYear.get(k) || 0) + 1);
+  }
   const kept = raw.filter((r) => {
-    const y = issues[r.issue].year;
-    return perYear.get(`${y}|${r.place}`) / issuesInYear.get(y) < 0.5;
+    const is = issues[r.issue];
+    const n = issuesInYear.get(`${groupOf(is)}|${is.year}`);
+    return n < 2 || perYear.get(key(is, r.place)) / n < 0.5;
   });
   const placeNames = [...new Set(kept.map((r) => r.place))].sort();
   const placeIdx = new Map(placeNames.map((p, i) => [p, i]));
   const places = kept.map((r) => [+r.lat.toFixed(4), +r.lon.toFixed(4), r.issue, r.leaf, placeIdx.get(r.place), r.quote]);
-  console.log(`Place mentions: ${raw.length} found, ${kept.length} kept, ${placeNames.length} distinct places`);
+  return { raw: raw.length, placeNames, places };
+}
 
-  // 2. Pages that discuss each curated case.
-  const { CASES } = await import('../src/data/cases/index.js');
+/** The pages that discuss each curated case: { caseId: { term, total, hits: [[issue, leaf, quote]] } }. */
+export function matchCases(issues, CASES, gz) {
   const lowerIssues = issues.map((is) => is.pages.join(' ').toLowerCase());
   const df = (term) => lowerIssues.reduce((n, t) => n + (t.includes(term.toLowerCase()) ? 1 : 0), 0);
   // Place words must be towns, not states, provinces or countries ("Montana", "Belgium").
@@ -340,7 +350,7 @@ async function main() {
     const pagesFor = (x) => {
       const out = [];
       issues.forEach((is, ii) => {
-        const gap = is.year * 12 + is.month - 1 - ym;
+        const gap = is.year * 12 + (is.month || 1) - 1 - ym;
         is.pages.forEach((page, leaf) => {
           if (leaf === 0 && is.cover) return;
           const m = page.match(x.re);
@@ -374,6 +384,23 @@ async function main() {
     if (best.hits.length)
       cases[c.id] = { term: best.term, total: best.hits.length, hits: best.hits.slice(0, 12).map(([ii, leaf, q]) => [ii, leaf, q]) };
   }
+  return cases;
+}
+
+/* ── Build ─────────────────────────────────────────────────────────── */
+
+async function main() {
+  const gz = await loadGazetteer();
+  const issues = await loadIssues();
+  console.log(`Issues with OCR: ${issues.length}`);
+
+  // 1. Places named in sighting reports.
+  const { raw, placeNames, places } = extractPlaces(issues, makeResolvers(gz));
+  console.log(`Place mentions: ${raw} found, ${places.length} kept, ${placeNames.length} distinct places`);
+
+  // 2. Pages that discuss each curated case.
+  const { CASES } = await import('../src/data/cases/index.js');
+  const cases = matchCases(issues, CASES, gz);
   console.log(`Curated cases with journal coverage: ${Object.keys(cases).length}/${CASES.length}`);
 
   // 3. Chapter newsletters (links only).

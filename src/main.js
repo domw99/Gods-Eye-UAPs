@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
+import { createRenderLoop } from './app/quality.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -21,6 +22,7 @@ import {
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
+import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -36,11 +38,13 @@ const LOG_KEY = 'gods-eye-uap:log';
 
 /* ── Boot ──────────────────────────────────────────────── */
 const viewer = await createViewer(document.getElementById('globe'));
+const render = createRenderLoop(viewer);
 const effects = createEffects(viewer);
 const itemLayer = createItemLayer(viewer);
 const trackLayer = createTrackLayer(viewer);
 const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', pixelSize: 5 });
 const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', pixelSize: 4.5 });
+const journalsLayer = createPointLayer(viewer, { name: 'journals', color: JOURNALS_COLOR, pixelSize: 4.5 });
 const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, pixelSize: 5, alpha: 0.9 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', pixelSize: 2.5, alpha: 0.55, near: 1.6, far: 0.7 });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
@@ -49,6 +53,11 @@ const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLa
 const launchLayer = createLaunchLayer(viewer);
 const airspaceLayer = createAirspaceLayer(viewer);
 const story = createStory({ viewer, trackLayer });
+// Things that animate without moving the camera keep frames coming while they run.
+render.keepAliveWhile(() => effects.mode !== 'normal'); // sensor noise and scanlines
+render.keepAliveWhile(() => story.active);
+render.keepAliveWhile(() => itemLayer.animating); // selection ping
+window.addEventListener('resize', () => render.request());
 
 let officialMeta = null;
 let officialItems = [];
@@ -58,7 +67,8 @@ let bluebook = null; // { meta, records }
 let nuforc = null;
 let mufon = null; // { issues, records, byIssueId, cases, chapters }
 let geipan = null; // { meta, records, byId }
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+let journals = null; // { series, issues, records, byIssueId, cases }
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', journals: 'APRO+', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 try {
   const o = await loadOfficial(BASE);
@@ -110,6 +120,15 @@ function mufonPasses(r) {
   return inYearRange(r.year);
 }
 
+/** Research archive mentions: civilian investigations, like the MUFON files. */
+function journalsPasses(r) {
+  if (state.evidence.size) return false;
+  if (state.status.size && !state.status.has('unassessed')) return false;
+  if (state.shape.size) return false;
+  if (state.search && !r.place.toLowerCase().includes(state.search) && !r.quote.toLowerCase().includes(state.search)) return false;
+  return inYearRange(r.year);
+}
+
 /** GEIPAN files: official French documents, filtered by GEIPAN's own classification. */
 let foldedSearch = ['', ''];
 function geipanPasses(r) {
@@ -141,6 +160,10 @@ function refresh() {
     const n = mufonLayer.filter((i) => mufonPasses(mufon.records[i]));
     layerCounts.mufon = n.toLocaleString();
   }
+  if (journals && state.layers.journals) {
+    const n = journalsLayer.filter((i) => journalsPasses(journals.records[i]));
+    layerCounts.journals = n.toLocaleString();
+  }
   if (geipan && state.layers.geipan) {
     const n = geipanLayer.filter((i) => geipanPasses(geipan.records[i]));
     layerCounts.geipan = n.toLocaleString();
@@ -155,6 +178,7 @@ function refresh() {
   layerCounts.user = userItems.length;
   renderLayersNow();
   markSelected(state.selected);
+  render.request();
 }
 
 function renderLayersNow(extra = {}) {
@@ -174,6 +198,7 @@ async function applyLayers() {
   const L = state.layers;
   bluebookLayer.show = L.bluebook;
   mufonLayer.show = L.mufon;
+  journalsLayer.show = L.journals;
   geipanLayer.show = L.geipan;
   nuforcLayer.show = L.nuforc;
   satLayer.show = L.satellites;
@@ -184,10 +209,12 @@ async function applyLayers() {
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
   if (L.bluebook && !bluebook) await ensureBlueBook();
   if (L.mufon && !mufon) await ensureMufon();
+  if (L.journals && !journals) await ensureJournals();
   if (L.geipan && !geipan) await ensureGeipan();
   if (L.nuforc && !nuforc) await ensureNuforc();
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
   timeline.setMufon(L.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
+  timeline.setJournals(L.journals && journals ? countByYear(journals.records.map((r) => r.year)) : null);
   timeline.setGeipan(L.geipan && geipan ? countByYear(geipan.records.map((r) => r.year)) : null);
   timeline.setNuforc(L.nuforc && nuforc ? countByYear(Array.from(nuforc.date, (d) => Math.floor(d / 10000))) : null);
   refresh();
@@ -323,7 +350,10 @@ async function geipanFor(c) {
 
 /** Journal pages about a curated case, plus reports from nearby places in the years after it. */
 async function mufonFor(c) {
-  const m = await ensureMufon();
+  return pagesAbout(c, await ensureMufon());
+}
+
+function pagesAbout(c, m) {
   const found = m.cases[c.id];
   const hits = (found?.hits || []).map(([ii, leaf, quote]) => ({ is: m.issues[ii], leaf, quote }));
   const seen = new Set(hits.map((h) => `${h.is.id}/${h.leaf}`));
@@ -338,6 +368,33 @@ async function mufonFor(c) {
     }
   near.sort((a, b) => a.is.index - b.is.index);
   return { term: found?.term, total: found?.total || 0, hits, near: near.slice(0, 6), issues: m.issues.length };
+}
+
+let journalsPromise = null;
+function ensureJournals() {
+  journalsPromise ||= (async () => {
+    renderLayersNow({ journals: 'loading…' });
+    journals = await loadJournals(BASE);
+    journalsLayer.setData(journals.records, {
+      lat: (r) => r.lat,
+      lon: (r) => r.lon,
+      year: (r) => r.year,
+      jitter: (r, i, la, lo) => townJitter(`j${i}`, la, lo, 2.5),
+    });
+    layerCounts.journals = journals.records.length.toLocaleString();
+    return journals;
+  })().catch((e) => {
+    journalsPromise = null;
+    toast('Could not load the research archives');
+    throw e;
+  });
+  return journalsPromise;
+}
+
+/** Research-archive pages about a curated case, plus nearby reports in the years after it. */
+async function journalsFor(c) {
+  const j = await ensureJournals();
+  return pagesAbout(c, j);
 }
 
 let nuforcPromise = null;
@@ -393,6 +450,7 @@ function setSceneMoment(rec) {
     globe.enableLighting = false;
     if (imagery) imagery.brightness = 1;
     if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.now();
+    render.request();
     return;
   }
   sceneMoment = { lat: rec.lat, lon: rec.lon, approx: Boolean(rec.approx), dim: 1 };
@@ -405,6 +463,7 @@ function setSceneMoment(rec) {
   globe.lightingFadeInDistance = EARTH_RADIUS + LIGHT_FAR;
   if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(rec.date));
   updateNightDim();
+  render.request();
 }
 const LIGHT_NEAR = 1.5e6; // camera heights above the ground
 const LIGHT_FAR = 4e6;
@@ -463,11 +522,12 @@ function select(key, source = 'api') {
   state.selected = key;
   markSelected(key);
   itemLayer.setSelected(key);
+  render.request(); // runs the selection ping
   itemLayer.showRegion(item.kind === 'official' ? item : null);
   trackLayer.clear();
   hidePlayback();
   if (item.kind === 'case') {
-    renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor, geipanFor });
+    renderCase(item, { officialById, bluebookNear, airspaceFor, mufonFor, journalsFor, geipanFor });
     const loaded = trackLayer.load(item.ref);
     if (loaded) showPlayback();
     setSceneMoment({ lat: item.ref.lat, lon: item.ref.lon, date: item.ref.date, approx: item.ref.timeApprox });
@@ -541,19 +601,23 @@ async function selectGeipan(id) {
   document.getElementById('hud-tgt').textContent = `GEIPAN ${rec.place}`.slice(0, 40).toUpperCase();
 }
 
-async function selectMufonPage(issueId, leaf, recordIndex = null) {
+const selectMufonPage = (issueId, leaf, recordIndex = null) => selectArchivePage('mufon', issueId, leaf, recordIndex);
+const selectJournalPage = (issueId, leaf, recordIndex = null) => selectArchivePage('journals', issueId, leaf, recordIndex);
+
+/** Open a page of the MUFON Journal ('mufon') or of the research archives ('journals'). */
+async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
   stopTour();
   story.stop(true);
   const token = ++selectToken;
   hideHover();
-  const m = await ensureMufon();
+  const m = await (layer === 'mufon' ? ensureMufon() : ensureJournals());
   if (token !== selectToken) return;
   const is = m.byIssueId.get(issueId);
-  if (!is || !(leaf >= 0 && leaf < is.pages)) return toast('That MUFON Journal page was not found');
+  if (!is || !(leaf >= 0 && leaf < is.pages)) return toast('That journal page was not found');
   const inIssue = m.records.filter((r) => r.issue === is.index).sort((a, b) => a.leaf - b.leaf);
   const onPage = inIssue.filter((r) => r.leaf === leaf);
   const record = recordIndex != null && m.records[recordIndex]?.issue === is.index ? m.records[recordIndex] : onPage[0] || null;
-  if (record && !state.layers.mufon) setLayer('mufon', true);
+  if (record && !state.layers[layer]) setLayer(layer, true);
   state.selected = null;
   markSelected(null);
   itemLayer.setSelected(null);
@@ -561,14 +625,15 @@ async function selectMufonPage(issueId, leaf, recordIndex = null) {
   setSceneMoment(null);
   hidePlayback();
   itemLayer.showRegion(null);
-  renderMufon({ is, leaf, record, onPage, inIssue });
+  renderMufon({ is, leaf, record, onPage, inIssue, org: is.series ? m.series[is.series]?.org : null });
   if (record)
     viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(record.lon, record.lat), 10), {
       duration: 2,
       offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), 60e3),
     });
-  setHash(`#/mufon/${encodeURIComponent(is.id)}/${leaf}`);
-  document.getElementById('hud-tgt').textContent = `MUFON ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase();
+  setHash(`#/${layer === 'mufon' ? 'mufon' : 'journal'}/${encodeURIComponent(is.id)}/${leaf}`);
+  const tag = layer === 'mufon' ? 'MUFON' : SERIES_SHORT[is.series] || 'ARCHIVE';
+  document.getElementById('hud-tgt').textContent = `${tag} ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase();
 }
 
 function deselect() {
@@ -596,9 +661,9 @@ function setHash(h) {
 }
 
 function routeFromHash() {
-  const mj = location.hash.match(/^#\/mufon\/([^/]+)\/(\d+)$/);
+  const mj = location.hash.match(/^#\/(mufon|journal)\/([^/]+)\/(\d+)$/);
   if (mj) {
-    selectMufonPage(decodeURIComponent(mj[1]), +mj[2]);
+    (mj[1] === 'mufon' ? selectMufonPage : selectJournalPage)(decodeURIComponent(mj[2]), +mj[3]);
     return true;
   }
   const m = location.hash.match(/^#\/(case|official|user|bluebook|geipan)\/(.+)$/);
@@ -660,6 +725,9 @@ handler.setInputAction((click) => {
   else if (hit.type === 'mufon') {
     const r = mufon.records[hit.index];
     selectMufonPage(mufon.issues[r.issue].id, r.leaf, r.index);
+  } else if (hit.type === 'journals') {
+    const r = journals.records[hit.index];
+    selectJournalPage(journals.issues[r.issue].id, r.leaf, r.index);
   }
   else if (hit.type === 'nuforc') {
     const i = hit.index;
@@ -722,6 +790,10 @@ handler.setInputAction((move) => {
       const r = mufon.records[hit.index];
       const is = mufon.issues[r.issue];
       lines = [`MUFON · ${r.place}`, `${issueDate(is)} · journal p. ${pageNumber(is, r.leaf)}`];
+    } else if (hit?.type === 'journals') {
+      const r = journals.records[hit.index];
+      const is = journals.issues[r.issue];
+      lines = [`${SERIES_SHORT[is.series]} · ${r.place}`, `${is.title} · ${issueDate(is)} · p. ${pageNumber(is, r.leaf)}`];
     } else if (hit?.type === 'nuforc')
       lines = [nuforc.places[nuforc.place[hit.index]], `${String(nuforc.date[hit.index]).slice(0, 4)} · ${nuforc.shapes[nuforc.shape[hit.index]]}`];
     else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || 'Satellite', 'live position'];
@@ -839,6 +911,7 @@ bindDossierActions({
   },
   ocr: (btn) => showOcr(btn.dataset.id),
   'mufon-text': (btn) => mufon && showMufonText(mufon.byIssueId.get(btn.dataset.issue), +btn.dataset.leaf),
+  'journal-text': (btn) => journals && showMufonText(journals.byIssueId.get(btn.dataset.issue), +btn.dataset.leaf),
   skycheck: () => {
     const item = itemByKey(state.selected);
     if (!item) return;
@@ -859,6 +932,7 @@ bindDossierActions({
       pb.follow.setAttribute('aria-pressed', 'false');
       trackLayer.follow(false);
       story.start(item.ref);
+      render.request();
     }
   },
   'explain-user': () => {
@@ -1000,6 +1074,7 @@ function openExplainNow(prefill) {
 /* ── Sensor modes ──────────────────────────────────────── */
 function setMode(mode) {
   const m = effects.set(mode);
+  render.request(); // keeps rendering while a sensor effect animates
   for (const b of document.querySelectorAll('.modes button')) b.setAttribute('aria-checked', String(b.dataset.mode === m));
   document.getElementById('hud-mode').textContent = MODE_LABELS[m];
   const url = new URL(location.href);
@@ -1353,4 +1428,4 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, select, selectBlueBook, selectGeipan, selectMufonPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

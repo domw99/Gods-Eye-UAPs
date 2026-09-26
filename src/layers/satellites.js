@@ -125,6 +125,7 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
       sat.point.position = Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.altKm * 1000, undefined, scratch);
       sat.last = p;
     }
+    viewer.scene.requestRender();
   }
 
   return {

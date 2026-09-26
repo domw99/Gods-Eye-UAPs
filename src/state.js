@@ -20,6 +20,7 @@ export const state = {
     bluebook: false,
     geipan: false,
     mufon: false,
+    journals: false,
     nuforc: false,
     satellites: false,
     buildings: true,

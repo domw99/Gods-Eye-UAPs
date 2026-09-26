@@ -62,6 +62,7 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       years.push(year(row, index));
       rowIndex.push(index);
     });
+    viewer.scene.requestRender();
   }
 
   /** predicate(rowIndex, year) → boolean */
@@ -72,6 +73,7 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       points[i].show = show;
       if (show) shown++;
     }
+    viewer.scene.requestRender();
     return shown;
   }
 
@@ -86,6 +88,7 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       const was = collection.show;
       collection.show = v;
       if (v && !was) applyHorizon(horizon.distance, true);
+      viewer.scene.requestRender();
     },
     get show() {
       return collection.show;

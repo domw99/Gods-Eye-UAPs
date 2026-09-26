@@ -11,22 +11,34 @@ export const MUFON_LICENSE = 'https://creativecommons.org/licenses/by-nc-nd/4.0/
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-/** "January 1978" or "February–March 1968". */
+/** "January 1978", "February–March 1968" or "1985" when the month is unknown. */
 export function issueDate(is) {
-  const m = MONTHS[is.month - 1] || '';
+  const m = MONTHS[is.month - 1];
+  if (!m) return String(is.year);
   return is.monthTo ? `${m}–${MONTHS[is.monthTo - 1]} ${is.year}` : `${m} ${is.year}`;
 }
 
-/** "MUFON UFO Journal No. 122, January 1978". */
-export const issueLabel = (is) => `${is.title}${is.number ? ` No. ${is.number}` : ''}, ${issueDate(is)}`;
+/** "MUFON UFO Journal No. 122, January 1978"; other archives give "Vol. 26 No. 2". */
+export const issueLabel = (is) =>
+  `${is.title}${is.number ? (typeof is.number === 'number' ? ` No. ${is.number}` : ` ${is.number}`) : ''}, ${issueDate(is)}`;
 
 /** Printed page number: most scans start with a one-page Black Vault cover sheet. */
 export const pageNumber = (is, leaf) => (is.cover ? leaf : leaf + 1);
 
-export const readerUrl = (is, leaf = 0) => `https://archive.org/details/${MUFON_ITEM}/${is.id}/page/n${leaf}/mode/1up`;
-export const embedUrl = (is, leaf = 0) => `https://archive.org/embed/${MUFON_ITEM}/${is.id}/page/n${leaf}/mode/1up`;
-export const pdfUrl = (is) => `https://archive.org/download/${MUFON_ITEM}/${is.id}.pdf`;
-export const itemUrl = () => `https://archive.org/details/${MUFON_ITEM}`;
+/*
+ * An issue is either one PDF inside a shared item (the MUFON Journal: item
+ * MUFON_ITEM, file = issue id) or an item of its own (item = file = id).
+ */
+const itemOf = (is) => is.item || MUFON_ITEM;
+const fileOf = (is) => is.file || is.id;
+const bookPath = (is) =>
+  is.item && !is.sub ? encodeURIComponent(is.item) : `${encodeURIComponent(itemOf(is))}/${encodeURIComponent(fileOf(is))}`;
+const download = (is, suffix) => `https://archive.org/download/${encodeURIComponent(itemOf(is))}/${encodeURIComponent(fileOf(is))}${suffix}`;
+
+export const readerUrl = (is, leaf = 0) => `https://archive.org/details/${bookPath(is)}/page/n${leaf}/mode/1up`;
+export const embedUrl = (is, leaf = 0) => `https://archive.org/embed/${bookPath(is)}/page/n${leaf}/mode/1up`;
+export const pdfUrl = (is) => download(is, '.pdf');
+export const itemUrl = (is = null) => `https://archive.org/details/${encodeURIComponent(is ? itemOf(is) : MUFON_ITEM)}`;
 
 /** Unpack the compact JSON written by the build script. */
 export function decodeMufon(data) {
@@ -55,7 +67,7 @@ export async function pageText(is, leaf) {
       is.id,
       (async () => {
         const get = async (suffix) => {
-          const res = await fetch(`https://archive.org/download/${MUFON_ITEM}/${is.id}${suffix}`);
+          const res = await fetch(download(is, suffix));
           if (!res.ok) throw new Error(`archive.org ${res.status}`);
           const buf = new Uint8Array(await res.arrayBuffer());
           // Gzip files arrive as raw bytes; some proxies decode them on the way.
@@ -63,6 +75,8 @@ export async function pageText(is, leaf) {
           const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'));
           return new Response(stream).text();
         };
+        // Some scans have no page index; their djvu.xml marks every page instead.
+        if (is.text === 'djvu') return { pages: djvuPages(await get('_djvu.xml')) };
         const [text, index] = await Promise.all([get('_hocr_searchtext.txt.gz'), get('_hocr_pageindex.json.gz')]);
         return { cps: Array.from(text), index: JSON.parse(index) };
       })().catch((e) => {
@@ -71,7 +85,19 @@ export async function pageText(is, leaf) {
       }),
     );
   }
-  const { cps, index } = await textCache.get(is.id);
+  const { cps, index, pages } = await textCache.get(is.id);
+  if (pages) return pages[leaf] || '';
   const span = index[leaf];
   return span ? cps.slice(span[0], span[1]).join('').trim() : '';
+}
+
+/** Page texts from a djvu.xml: one OBJECT per page, WORDs grouped in LINEs. */
+export function djvuPages(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  return [...doc.getElementsByTagName('OBJECT')].map((obj) =>
+    [...obj.getElementsByTagName('LINE')]
+      .map((line) => [...line.getElementsByTagName('WORD')].map((w) => w.textContent).join(' '))
+      .join('\n')
+      .trim(),
+  );
 }

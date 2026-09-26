@@ -9,6 +9,7 @@ const LINES = [
   { key: 'bluebook', color: '#ffb547', label: 'Blue Book' },
   { key: 'geipan', color: '#5f8bff', label: 'GEIPAN' },
   { key: 'mufon', color: '#b58cff', label: 'MUFON' },
+  { key: 'journals', color: '#3fd4b0', label: 'archives' },
 ];
 export function createTimeline({ onPlayToggle }) {
   const canvas = document.getElementById('tl-canvas');
@@ -179,6 +180,10 @@ export function createTimeline({ onPlayToggle }) {
     },
     setMufon(counts) {
       lines.mufon = counts;
+      draw();
+    },
+    setJournals(counts) {
+      lines.journals = counts;
       draw();
     },
     setNuforc(counts) {

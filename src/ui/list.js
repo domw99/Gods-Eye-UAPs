@@ -10,6 +10,7 @@ export const LAYER_DEFS = [
   { id: 'bluebook', name: 'Project Blue Book', sub: 'USAF case files 1947–1969 (scans)', color: '#ffb547' },
   { id: 'geipan', name: 'GEIPAN (France)', sub: 'French space agency files 1937–2018 · A–D findings', color: '#5f8bff' },
   { id: 'mufon', name: 'MUFON files', sub: 'MUFON UFO Journal 1967–2008 · places named', color: '#b58cff' },
+  { id: 'journals', name: 'Research archives', sub: 'APRO, NICAP & CUFOS journals, MUFON chapters · places named', color: '#3fd4b0' },
   { id: 'nuforc', name: 'Civilian reports', sub: 'NUFORC, ~80k unverified reports', color: '#ff7a45' },
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
   { id: 'launches', name: 'Rocket launches', sub: 'Last 14 days and next 30 · Launch Library 2', color: '#ffcf5c' },

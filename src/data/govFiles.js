@@ -266,7 +266,7 @@ export const GOV_FILES = [
     agency: 'MUFON state and regional chapters',
     years: '1970s–2000s',
     kind: 'archive',
-    text: 'Newsletters from MUFON chapters, including Minnesota, Arizona, Massachusetts, New Mexico, Ohio, Michigan, Missouri, New Hampshire and Pennsylvania. The Archives for the Unexplained (Sweden) scanned them, and the Internet Archive hosts them. They are listed below by chapter.',
+    text: 'Newsletters from MUFON chapters, including Minnesota, Arizona, Massachusetts, New Mexico, Ohio, Michigan, Missouri, New Hampshire and Pennsylvania. The Archives for the Unexplained (Sweden) scanned them, and the Internet Archive hosts them. They are listed below by chapter, and the places named in their reports are on the Research archives layer.',
     links: [{ label: 'Internet Archive: UFO newsletters', url: 'https://archive.org/search?query=collection%3Aufonewsletters+AND+title%3AMUFON' }],
   },
   {
@@ -281,6 +281,43 @@ export const GOV_FILES = [
       { label: 'Report a sighting / MUFON CMS', url: 'https://www.mufoncms.com/' },
       { label: 'Latest 20 reports', url: 'https://mufoncms.com/last_20_public.html' },
       { label: 'Database terms', url: 'https://mufon.com/search_database-terms-and-conditions/' },
+    ],
+  },
+  // ── Other civilian research groups ─────────────────────
+  {
+    id: 'apro-bulletin',
+    group: 'Civilian research archives',
+    title: 'The A.P.R.O. Bulletin (1952–1988)',
+    agency: 'Aerial Phenomena Research Organization (APRO)',
+    years: '1952–1988',
+    kind: 'archive',
+    text: 'Founded by Coral and Jim Lorenzen in 1952, APRO ran scientific consultants and field investigators worldwide and covered Latin American and landing cases early. About 250 issues of its bulletin are on the Research archives layer (teal): the towns named in its reports, linked to each page.',
+    links: [{ label: 'Internet Archive: APRO Bulletin', url: 'https://archive.org/search?query=collection%3Aufonewsletters+AND+title%3A%28APRO+Bulletin%29' }],
+  },
+  {
+    id: 'nicap-investigator',
+    group: 'Civilian research archives',
+    title: 'The U.F.O. Investigator (NICAP)',
+    agency: 'National Investigations Committee on Aerial Phenomena',
+    years: '1957–1980',
+    kind: 'archive',
+    text: 'NICAP, led by Maj. Donald Keyhoe, lobbied Congress for open hearings and collected military and pilot reports. The first 15 issues of its newsletter (1957–1961) are digitised and on the Research archives layer.',
+    links: [
+      { label: 'Internet Archive: U.F.O. Investigator', url: 'https://archive.org/details/pub_u-f-o-investigator' },
+      { label: 'nicap.org case directory', url: 'https://www.nicap.org/' },
+    ],
+  },
+  {
+    id: 'cufos-iur',
+    group: 'Civilian research archives',
+    title: 'International UFO Reporter (CUFOS)',
+    agency: 'J. Allen Hynek Center for UFO Studies',
+    years: '1976–2011',
+    kind: 'archive',
+    text: 'The journal of the Center for UFO Studies, founded by Blue Book’s scientific consultant J. Allen Hynek. About 100 issues are on the Research archives layer, and case dossiers list the pages that discuss each case.',
+    links: [
+      { label: 'Internet Archive: IUR collection', url: 'https://archive.org/details/iur-vol.-31-no.-4' },
+      { label: 'cufos.org', url: 'https://www.cufos.org/' },
     ],
   },
 ];

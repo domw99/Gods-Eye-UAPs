@@ -41,7 +41,7 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null) 
   const groups = [...new Set(GOV_FILES.map((f) => f.group))];
   const content = html`
     <h2>UFO / UAP files</h2>
-    <p class="lead">Primary sources from the U.S. government, other governments and MUFON. Official videos are on the globe (magenta); Project Blue Book (amber), France’s GEIPAN files (blue) and the MUFON files (violet) are map layers, and every link below opens the original archive.</p>
+    <p class="lead">Primary sources from the U.S. government, other governments and MUFON. Official videos are on the globe (magenta); Project Blue Book (amber), France’s GEIPAN files (blue), the MUFON files (violet) and the research archives (teal) are map layers, and every link below opens the original archive.</p>
     <div class="stat-row">
       <div class="stat"><div class="v">${stats.cases}</div><div class="k">CURATED CASE FILES</div></div>
       <div class="stat"><div class="v">${stats.official}</div><div class="k">OFFICIAL U.S. RELEASES</div></div>
@@ -115,6 +115,7 @@ export function openAbout(meta) {
       <p><b style="color:#ffb547">Project Blue Book</b> — scanned U.S. Air Force case files (1947–1969), geocoded from their file names.</p>
       <p><b style="color:#5f8bff">GEIPAN (France)</b> — every case in the published files of GEIPAN, the French space agency’s UAP office (1937–2018), placed at its commune, with GEIPAN’s A–D finding and its French summary. Unexplained (D) cases are brightest.</p>
       <p><b style="color:#b58cff">MUFON files</b> — the Mutual UFO Network’s journal (Skylook and the MUFON UFO Journal, 1967–2008), released free by MUFON and The Black Vault. Towns named in its sighting reports are on the map, found automatically in the OCR text, and each links to its page. Case dossiers list the journal pages that discuss them.</p>
+      <p><b style="color:#3fd4b0">Research archives</b> — the journals of the other big civilian UFO groups: the APRO Bulletin (1952–1988), NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON’s chapter newsletters, read from their scans on the Internet Archive. Places named in their reports are on the map, and case dossiers list the pages about each case.</p>
       <p><b style="color:#ff7a45">Civilian reports</b> — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.</p>
       <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
       <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>

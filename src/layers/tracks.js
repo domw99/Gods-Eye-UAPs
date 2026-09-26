@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 import { horizonOf } from '../app/horizon.js';
 import { TRACK_KINDS } from '../data/taxonomy.js';
 import { densifyTrack, trackLengthKm } from '../util/geo.js';
+import { declutter, onCameraSettle } from './declutter.js';
 
 /**
  * Flight-path renderer and playback for one case at a time.
@@ -40,12 +41,36 @@ function dotImage(color, size = 18) {
   return c;
 }
 
+/** A vertical fade for the curtain under a flight path: strong at the path, clear at the ground. */
+const curtains = new Map();
+function curtainImage(css, strength) {
+  const key = `${css}|${strength}`;
+  if (curtains.has(key)) return curtains.get(key);
+  const c = document.createElement('canvas');
+  c.width = 4;
+  c.height = 128;
+  const g = c.getContext('2d');
+  const grad = g.createLinearGradient(0, 0, 0, 128);
+  const col = Cesium.Color.fromCssColorString(css);
+  const rgba = (a) => `rgba(${Math.round(col.red * 255)},${Math.round(col.green * 255)},${Math.round(col.blue * 255)},${a})`;
+  grad.addColorStop(0, rgba(strength));
+  grad.addColorStop(0.08, rgba(strength * 0.55));
+  grad.addColorStop(1, rgba(0));
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 4, 128);
+  curtains.set(key, c);
+  return c;
+}
+
 export function createTrackLayer(viewer) {
   const horizon = horizonOf(viewer);
   const source = new Cesium.CustomDataSource('uap-tracks');
   viewer.dataSources.add(source);
   let current = null; // { caseData, start, stop, movers: [], primary }
   const tickListeners = new Set();
+  let waypointLabels = []; // declutter candidates for the loaded case
+  const tidyLabels = () => waypointLabels.length && declutter(viewer.scene, waypointLabels);
+  onCameraSettle(viewer, tidyLabels);
 
   viewer.clock.onTick.addEventListener((clock) => {
     if (!current) return;
@@ -55,9 +80,11 @@ export function createTrackLayer(viewer) {
   function clear() {
     witnessView(false);
     source.entities.removeAll();
+    waypointLabels = [];
     if (viewer.trackedEntity) viewer.trackedEntity = undefined;
     viewer.clock.shouldAnimate = false;
     current = null;
+    viewer.scene.requestRender();
   }
 
   function load(caseData) {
@@ -97,6 +124,17 @@ export function createTrackLayer(viewer) {
           }),
         },
       });
+      // A translucent curtain from the path down to the ground shows its height at a glance.
+      if (Math.max(...track.points.map((p) => p[2])) > 150)
+        source.entities.add({
+          wall: {
+            positions,
+            material: new Cesium.ImageMaterialProperty({
+              image: curtainImage(track.color || kind.color, track.kind === 'uap' ? 0.34 : 0.2),
+              transparent: true,
+            }),
+          },
+        });
       source.entities.add({
         polyline: {
           positions: dense.map((p) => Cesium.Cartesian3.fromDegrees(p[0], p[1], 0)),
@@ -116,7 +154,7 @@ export function createTrackLayer(viewer) {
               material: color.withAlpha(0.35),
             },
           });
-        source.entities.add({
+        const wp = source.entities.add({
           position: top,
           point: {
             pixelSize: i === 0 ? 8 : 6,
@@ -144,6 +182,18 @@ export function createTrackLayer(viewer) {
               }
             : undefined,
         });
+        if (p[4])
+          waypointLabels.push({
+            entity: wp,
+            position: top,
+            text: p[4],
+            // First and last points of the main track matter most.
+            priority: (track.kind === 'uap' ? 20 : 0) + (i === 0 || i === track.points.length - 1 ? 10 : 0) - trackIndex,
+            dx: 10,
+            dy: -10 - trackIndex * 18,
+            charPx: 6.1,
+            maxDistance: 6e5,
+          });
       });
 
       // Moving contact.
@@ -240,6 +290,7 @@ export function createTrackLayer(viewer) {
     };
     clock.multiplier = current.baseMultiplier;
     clock.shouldAnimate = false;
+    viewer.scene.requestRender();
     return current;
   }
 

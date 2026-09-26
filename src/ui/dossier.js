@@ -11,6 +11,7 @@ import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
 import { relativeTime } from '../layers/launches.js';
 import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, MUFON_LICENSE } from '../services/mufon.js';
+import { SERIES_SHORT, SERIES_LINKS } from '../services/journals.js';
 import { classInfo, geipanDate, caseUrl, translateUrl, bodiesNamed, GEIPAN_SITE, GEIPAN_SEARCH, CLASS_COLORS } from '../services/geipan.js';
 
 /**
@@ -477,6 +478,7 @@ export function renderCase(item, ctx) {
     ${section('MUFON FILES — MUFON UFO JOURNAL', html`<div id="d-mufon"><div class="loading-line">${
       date.getUTCFullYear() <= 2008 ? 'Searching the MUFON UFO Journal (1967–2008)…' : 'After the journal archive ends (1967–2008).'
     }</div></div>`)}
+    ${date.getUTCFullYear() <= 2011 ? section('RESEARCH ARCHIVES — APRO, NICAP, CUFOS', html`<div id="d-journals"><div class="loading-line">Searching the APRO, NICAP and CUFOS journals…</div></div>`) : ''}
     ${FRENCH.has(c.cc) ? section('FRENCH GOVERNMENT FILES — GEIPAN', html`<div id="d-geipan"><div class="loading-line">Searching GEIPAN’s case files…</div></div>`) : ''}
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
     ${section(
@@ -514,6 +516,15 @@ export function renderCase(item, ctx) {
         if (token === renderToken) mount(document.getElementById('d-geipan'), html`<div class="loading-line">GEIPAN’s files could not be loaded.</div>`);
       });
   const year = date.getUTCFullYear();
+  if (year <= 2011 && ctx.journalsFor)
+    ctx
+      .journalsFor(c)
+      .then((m) => {
+        if (token === renderToken) mount(document.getElementById('d-journals'), journalCaseBlock(m));
+      })
+      .catch(() => {
+        if (token === renderToken) mount(document.getElementById('d-journals'), html`<div class="loading-line">The research archives could not be loaded.</div>`);
+      });
   if (year <= 2008 && ctx.mufonFor)
     ctx
       .mufonFor(c)
@@ -655,10 +666,15 @@ export function renderGeipan(r) {
 /* ── MUFON files ───────────────────────────────────────── */
 
 const mufonHref = (is, leaf) => `#/mufon/${encodeURIComponent(is.id)}/${leaf}`;
+const journalHref = (is, leaf) => `#/journal/${encodeURIComponent(is.id)}/${leaf}`;
+// Pages from the research archives carry their series; the MUFON Journal's do not.
+const pageHref = (is, leaf) => (is.series ? journalHref(is, leaf) : mufonHref(is, leaf));
+const pageBadge = (is) =>
+  is.series ? html`<span class="badge journal">${SERIES_SHORT[is.series] || 'ARCHIVE'}</span>` : html`<span class="badge mufon">MUFON</span>`;
 
 function mufonHitList(hits) {
   return html`<ul class="source-list mufon-hits">${hits.map(
-    (h) => html`<li><span class="badge mufon">MUFON</span><span><a href="${mufonHref(h.is, h.leaf)}">${issueDate(h.is)} · p. ${pageNumber(h.is, h.leaf)}</a>${
+    (h) => html`<li>${pageBadge(h.is)}<span><a href="${pageHref(h.is, h.leaf)}">${h.is.series === 'chapters' ? `${h.is.title} · ` : h.is.series && h.is.number ? `${h.is.number} · ` : ''}${issueDate(h.is)} · p. ${pageNumber(h.is, h.leaf)}</a>${
       h.place ? html` · ${h.place}` : ''
     }${h.distKm != null ? html` · ${Math.round(h.distKm)} km away` : ''}<span class="mufon-quote">${h.quote}</span></span></li>`,
   )}</ul>`;
@@ -672,18 +688,28 @@ function mufonCaseBlock(m) {
     <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>`;
 }
 
+function journalCaseBlock(m) {
+  if (!m.hits.length && !m.near.length)
+    return html`<div class="loading-line">No pages in these archives matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of the APRO Bulletin, NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON chapter newsletters for “${m.term || 'the case name'}”.</p>`;
+  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">Pages that mention <b>${m.term}</b>${m.total > m.hits.length ? ` (first ${m.hits.length} of ${m.total})` : ''}:</p>${mufonHitList(m.hits)}` : ''}
+    ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in these journals:</p>${mufonHitList(m.near)}` : ''}
+    <p class="caveat">Found automatically in the OCR text of the scans on the Internet Archive. Open a page to read it in context.</p>`;
+}
+
 /**
  * One journal page: the place picked on the map (if any), the page itself in
- * the Internet Archive reader, and the other places named in the issue.
+ * the Internet Archive reader, and the other places named in the issue. The
+ * same view serves the MUFON Journal and the research archives (`org` names
+ * the publisher of an archive issue).
  */
-export function renderMufon({ is, leaf, record, onPage, inIssue }) {
-  const token = open('MUFON FILES');
+export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
+  const token = open(is.series ? 'RESEARCH ARCHIVES' : 'MUFON FILES');
   const page = pageNumber(is, leaf);
   const others = inIssue.filter((r) => r !== record);
   const content = html`
     <div class="d-title">${record ? html`${record.place} <span class="dim">in</span> ${issueDate(is)}` : issueLabel(is)}</div>
     <div class="d-sub">${issueLabel(is)} · page ${page}${record ? html`<br />${formatDMS(record.lat, record.lon)} · TOWN NAMED IN THE TEXT` : ''}</div>
-    <div class="d-badges">${statusBadge('unassessed')}<span class="badge mufon">MUFON FILES</span><span class="badge">CIVILIAN INVESTIGATION</span></div>
+    <div class="d-badges">${statusBadge('unassessed')}${is.series ? pageBadge(is) : html`<span class="badge mufon">MUFON FILES</span>`}<span class="badge">CIVILIAN INVESTIGATION</span></div>
     ${record
       ? section('WHAT THE PAGE SAYS', html`<blockquote class="mufon-quote big">${record.quote}</blockquote>
         <p class="caveat">This place was found automatically in the OCR text. It is usually where a sighting happened, but it can be where a witness lived or a report came from. Read the page to check.</p>`)
@@ -695,9 +721,9 @@ export function renderMufon({ is, leaf, record, onPage, inIssue }) {
       'THE JOURNAL PAGE',
       html`<div class="video-wrap" style="aspect-ratio:3/4"><iframe src="${embedUrl(is, leaf)}" title="${issueLabel(is)}, page ${page}" loading="lazy" allowfullscreen></iframe></div>
       <div class="btn-row">
-        ${leaf > (is.cover ? 1 : 0) ? html`<a class="chip" href="${mufonHref(is, leaf - 1)}">◀ PAGE ${page - 1}</a>` : ''}
-        ${leaf < is.pages - 1 ? html`<a class="chip" href="${mufonHref(is, leaf + 1)}">PAGE ${page + 1} ▶</a>` : ''}
-        <button class="chip" data-action="mufon-text" data-issue="${is.id}" data-leaf="${leaf}">READ PAGE TEXT</button>
+        ${leaf > (is.cover ? 1 : 0) ? html`<a class="chip" href="${pageHref(is, leaf - 1)}">◀ PAGE ${page - 1}</a>` : ''}
+        ${leaf < is.pages - 1 ? html`<a class="chip" href="${pageHref(is, leaf + 1)}">PAGE ${page + 1} ▶</a>` : ''}
+        <button class="chip" data-action="${is.series ? 'journal-text' : 'mufon-text'}" data-issue="${is.id}" data-leaf="${leaf}">READ PAGE TEXT</button>
         <a class="chip" target="_blank" rel="noopener" href="${readerUrl(is, leaf)}">Internet Archive ↗</a>
         <a class="chip" target="_blank" rel="noopener" href="${pdfUrl(is)}">PDF ↗</a>
         <button class="chip" data-action="share">⧉ COPY LINK</button>
@@ -713,7 +739,14 @@ export function renderMufon({ is, leaf, record, onPage, inIssue }) {
     ${record ? section('THE LOCATION', siteLinks(record.lat, record.lon)) : ''}
     ${section(
       'SOURCE',
-      html`<ul class="source-list">
+      is.series
+        ? html`<ul class="source-list">
+        <li>${pageBadge(is)}<span>${is.title}, published by ${org || 'its organisation'}.</span></li>
+        <li><span class="badge">ARCHIVE</span><a href="${itemUrl(is)}" target="_blank" rel="noopener">This scan on the Internet Archive</a></li>
+        ${SERIES_LINKS[is.series] ? html`<li><span class="badge">SERIES</span><a href="${SERIES_LINKS[is.series].url}" target="_blank" rel="noopener">${SERIES_LINKS[is.series].label}</a></li>` : ''}
+      </ul>
+      <p class="caveat">The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.</p>`
+        : html`<ul class="source-list">
         <li><span class="badge mufon">MUFON</span><span>${is.title}, published by the Mutual UFO Network. Released free as “The MUFON Archive” by MUFON and <a href="https://www.theblackvault.com/" target="_blank" rel="noopener">The Black Vault</a>.</span></li>
         <li><span class="badge">ARCHIVE</span><a href="${itemUrl()}" target="_blank" rel="noopener">Internet Archive: MUFON UFO Journal / Skylook, 1967–2008</a></li>
         <li><span class="badge">LICENCE</span><a href="${MUFON_LICENSE}" target="_blank" rel="noopener">CC BY-NC-ND 4.0 (as published on the Internet Archive)</a></li>
