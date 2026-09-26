@@ -1,0 +1,23 @@
+name: Tell search engines
+
+# After each deploy, send the pages in the sitemap to IndexNow (Bing and the
+# other engines that share it), so new case pages are crawled soon.
+on:
+  workflow_run:
+    workflows: [Deploy to GitHub Pages]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  indexnow:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for GitHub Pages to publish the deploy
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: sleep 90
+      - run: node scripts/indexnow.mjs

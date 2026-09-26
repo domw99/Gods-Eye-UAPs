@@ -6,6 +6,8 @@
 
 It runs in your browser with nothing to install and no sign-up or API keys.
 
+<sub>made by <a href="https://github.com/domw99">domw99</a></sub>
+
 [![Live app](https://img.shields.io/badge/live%20app-domw99.github.io-00d4ff?style=flat-square&logo=githubpages&logoColor=white)](https://domw99.github.io/Gods-Eye-UAPs/)
 [![CI](https://img.shields.io/github/actions/workflow/status/domw99/Gods-Eye-UAPs/ci.yml?style=flat-square&label=tests)](https://github.com/domw99/Gods-Eye-UAPs/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/github/actions/workflow/status/domw99/Gods-Eye-UAPs/pages.yml?style=flat-square&label=deploy)](https://github.com/domw99/Gods-Eye-UAPs/actions/workflows/pages.yml)
@@ -163,7 +165,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 <tr>
 <td><sub><b>Statistics</b> (<kbd>S</kbd>): what every archive holds, year by year, each on its own scale; the curated cases by status, evidence and country; and GEIPAN's findings, where 4% remain unexplained after investigation.</sub></td>
-<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet.</sub></td>
+<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet. Every case also has its own link, like <a href="https://domw99.github.io/Gods-Eye-UAPs/case/phoenix-lights-1997/"><code>…/case/phoenix-lights-1997/</code></a>, that shows the case's card when posted on X, Reddit or Discord and opens it on the globe.</sub></td>
 </tr>
 </table>
 
@@ -316,7 +318,10 @@ src/
               stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
-              verify-media.mjs · check-links.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
+              build-cards.mjs (case preview images) · indexnow.mjs (search engines)
+              verify-media.mjs · check-links.mjs · fix-cesium-base.mjs
+              lib/ (GeoNames gazetteer · case-pages.mjs: a page per case + sitemap, made at build)
+public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
 docs/SPEC.md  the full product spec (the improved prompt this was built from)
 ```
@@ -374,7 +379,9 @@ It then appears on the globe.
 3. Go to **Settings → Pages → Deploy from a branch** and pick `gh-pages` / `(root)`.
 4. Your copy appears at `https://<user>.github.io/<repository>/`.
 
-`ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site.
+`ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
+
+The build writes a page per case (`case/<id>/`) and a `sitemap.xml`. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build. For IndexNow, replace `public/<key>.txt` with your own key.
 
 ## Contributing
 
@@ -385,6 +392,7 @@ Corrections and new cases are welcome, especially with sources.
 
 ## Credits & licences
 
+- **Made by** [domw99](https://github.com/domw99).
 - **Code:** MIT (see [LICENSE](LICENSE)).
 - **Inspiration:**
   - The visual language follows [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) by Bilawal Sidhu (MIT).
@@ -418,5 +426,6 @@ Corrections and new cases are welcome, especially with sources.
 Third-party data keeps its own licence; the MIT licence covers only the code.
 
 <div align="center">
-<sub>This project presents evidence and official assessments. It does not claim that any case is extraterrestrial.</sub>
+<sub>This project presents evidence and official assessments. It does not claim that any case is extraterrestrial.</sub><br>
+<sub>made by <a href="https://github.com/domw99">domw99</a></sub>
 </div>

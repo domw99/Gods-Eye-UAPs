@@ -4,6 +4,8 @@
  * evidence score and link. Shared through the system share sheet where the
  * browser supports files, otherwise downloaded.
  */
+import { AUTHOR } from '../config.js';
+
 const W = 1200;
 const H = 630;
 
@@ -167,16 +169,19 @@ export async function drawCard(c, snap) {
   y += 44;
   g.fillStyle = 'rgba(232,234,237,0.82)';
   g.font = '400 20px Inter, sans-serif';
-  const room = Math.max(1, Math.floor((H - 70 - y) / 29));
+  const room = Math.max(1, Math.floor((H - 84 - y) / 29));
   for (const l of wrapText((t) => g.measureText(t).width, c.summary, width, Math.min(6, room))) {
     g.fillText(l, x, y);
     y += 29;
   }
 
-  // Link.
+  // Link, and who made it.
   g.fillStyle = 'rgba(0,212,255,0.9)';
   g.font = '500 15px "JetBrains Mono", monospace';
-  g.fillText(c.url.replace(/^https?:\/\//, '').slice(0, 64), x, H - 40);
+  g.fillText(c.url.replace(/^https?:\/\//, '').replace(/\/$/, '').slice(0, 64), x, H - 44);
+  g.fillStyle = 'rgba(232,234,237,0.45)';
+  g.font = '500 12px "JetBrains Mono", monospace';
+  g.fillText(`made by ${AUTHOR}`, x, H - 22);
   return canvas;
 }
 

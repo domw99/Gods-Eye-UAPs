@@ -25,6 +25,7 @@ import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } f
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
+import { shareLink } from './app/links.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -536,6 +537,28 @@ trackLayer.onTick(() => {
   lastDim = performance.now();
   updateNightDim();
 });
+
+/** The share card for an item: the globe as it is now, with the case's details and link. */
+async function makeCard(item, url) {
+  const ref = item.ref || {};
+  return drawCard(
+    {
+      title: item.title,
+      when: String(item.year),
+      place: item.place || '',
+      status: STATUS[item.status]?.label || item.status,
+      statusColor: STATUS[item.status]?.color || '#00d4ff',
+      score: item.kind === 'case' ? evidenceScore(ref.evidence || [], Boolean(ref.tracks?.length)) : null,
+      summary: ref.summary || ref.description || item.description || '',
+      url,
+      kind: item.kind === 'official' ? 'OFFICIAL U.S. RELEASE' : item.kind === 'user' ? 'MY SIGHTING' : 'CASE FILE',
+    },
+    await snapshotGlobe(viewer, (() => {
+      const at = itemLayer.positionOf(item.key);
+      return at ? Cesium.Cartesian3.fromDegrees(at.lon, at.lat) : null;
+    })()),
+  );
+}
 
 /* ── Selection & camera ────────────────────────────────── */
 const itemByKey = (key) => allItems().find((i) => i.key === key);
@@ -1163,25 +1186,8 @@ bindDossierActions({
     btn.disabled = true;
     btn.textContent = 'MAKING CARD…';
     try {
-      const ref = item.ref || {};
-      const url = `${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`;
-      const canvas = await drawCard(
-        {
-          title: item.title,
-          when: String(item.year),
-          place: item.place || '',
-          status: STATUS[item.status]?.label || item.status,
-          statusColor: STATUS[item.status]?.color || '#00d4ff',
-          score: item.kind === 'case' ? evidenceScore(ref.evidence || [], Boolean(ref.tracks?.length)) : null,
-          summary: ref.summary || ref.description || item.description || '',
-          url,
-          kind: item.kind === 'official' ? 'OFFICIAL U.S. RELEASE' : item.kind === 'user' ? 'MY SIGHTING' : 'CASE FILE',
-        },
-        await snapshotGlobe(viewer, (() => {
-          const at = itemLayer.positionOf(item.key);
-          return at ? Cesium.Cartesian3.fromDegrees(at.lon, at.lat) : null;
-        })()),
-      );
+      const url = shareLink(`${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`);
+      const canvas = await makeCard(item, url);
       const how = await shareCard(canvas, { title: item.title, url, filename: `gods-eye-uap-${item.id}.png` });
       if (how === 'downloaded') {
         navigator.clipboard?.writeText(url).catch(() => {});
@@ -1766,4 +1772,6 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
+  // Used by scripts/build-cards.mjs to render the case pages' preview images.
+  cardFor: async (key, url) => (await makeCard(itemByKey(key), url)).toDataURL('image/jpeg', 0.84) };

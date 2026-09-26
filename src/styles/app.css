@@ -713,3 +713,13 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .layers-label { display: flex; justify-content: space-between; align-items: center; }
 .link-btn { background: none; border: 0; padding: 0; font: 10px var(--font-mono); letter-spacing: 0.14em; color: var(--accent); cursor: pointer; }
 @media (hover: hover) { .link-btn:hover { text-decoration: underline; } }
+
+/* ── "made by" small print ───────────────────────────── */
+.made-by { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--text-dim); opacity: 0.75; text-transform: none; }
+.made-by a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; pointer-events: auto; }
+.made-by a:hover { color: var(--accent); }
+#left .made-by { margin: 14px 0 2px; text-align: center; }
+.hud-br .made-by { margin-top: 4px; }
+#loading .made-by { position: absolute; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; letter-spacing: 0.2em; }
+.modal .made-by { margin: 6px 0 0; }
+.stats-by { margin-top: 20px !important; text-align: right; }

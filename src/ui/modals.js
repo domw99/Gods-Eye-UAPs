@@ -8,6 +8,7 @@ import { formatDuration } from '../util/geo.js';
 import { issueDate, issueLabel, pageNumber, readerUrl } from '../services/mufon.js';
 import { SERIES_SHORT } from '../services/journals.js';
 import { tiles, yearMultiples, barList, makeTooltip, dataTable } from './stats.js';
+import { AUTHOR, AUTHOR_URL, REPO_URL } from '../config.js';
 
 /** Modal dialogs: government files library, sighting log, about, lightbox. */
 const root = () => document.getElementById('modal-root');
@@ -219,7 +220,8 @@ export function openStats({ load }) {
         <section><div class="section-label">EVIDENCE IN CURATED CASES</div>${barList(d.evidence, { color: '#00d4ff' })}
           <p class="caveat">Cases with each kind of evidence; most cases have several.</p></section>
         <section><div class="section-label">CURATED CASES BY COUNTRY (TOP 10)</div>${barList(d.countries, { color: '#00d4ff' })}</section>
-      </div>`,
+      </div>
+      <p class="made-by stats-by">God’s Eye // UAP · made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p>`,
     );
     years.bind(body, tip);
     body.querySelector('[data-stats-nuforc]')?.addEventListener('click', (e) => {
@@ -235,6 +237,7 @@ export function openAbout(meta) {
   const content = html`
     <h2>About God’s Eye // UAP</h2>
     <p class="lead">A UAP-only edition of the God’s Eye View globe: documented encounters, reconstructed flight paths, the official U.S. government footage and files, and reference imagery of each place.</p>
+    <p class="made-by">made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">source on GitHub</a></p>
     <div class="section-label">WHAT YOU ARE LOOKING AT</div>
     <div class="d-text">
       <p><b style="color:#00d4ff">Case files</b> — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).</p>
@@ -253,7 +256,8 @@ export function openAbout(meta) {
     <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Night-side city lights: NASA Black Marble (VIIRS, 2016 — today’s lights, not those of the case year). Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
-    <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p></div>`;
+    <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p>
+    <p class="made-by">God’s Eye // UAP · made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p></div>`;
   modal('ABOUT', content, { wide: false });
 }
 

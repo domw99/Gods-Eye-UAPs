@@ -9,6 +9,7 @@ import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/la
 import { skySection } from './skychart.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
+import { shareLink } from '../app/links.js';
 import { relativeTime } from '../layers/launches.js';
 import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, MUFON_LICENSE } from '../services/mufon.js';
 import { SERIES_SHORT, SERIES_LINKS } from '../services/journals.js';
@@ -903,10 +904,11 @@ export function bindDossierActions(handlers) {
     }
     if (action === 'share') {
       // Clipboard access needs a secure context; fall back to showing the link.
-      if (!navigator.clipboard?.writeText) return toast(location.href, 6000);
-      navigator.clipboard.writeText(location.href).then(
+      const url = shareLink();
+      if (!navigator.clipboard?.writeText) return toast(url, 6000);
+      navigator.clipboard.writeText(url).then(
         () => toast('Link copied'),
-        () => toast(location.href, 6000),
+        () => toast(url, 6000),
       );
       return;
     }

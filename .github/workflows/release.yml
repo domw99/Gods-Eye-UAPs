@@ -1,0 +1,33 @@
+name: Release
+
+# Publish a GitHub release from the notes in .github/release-notes/<tag>.md,
+# tagging the commit this runs on. Run it from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to create, e.g. v1.0
+        required: true
+      title:
+        description: Release title
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          TITLE: ${{ inputs.title }}
+        run: |
+          notes=".github/release-notes/${TAG}.md"
+          test -f "$notes" || { echo "Missing $notes"; exit 1; }
+          assets=()
+          for f in docs/media/demo.mp4 docs/media/share-card.jpg; do [ -f "$f" ] && assets+=("$f"); done
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" --notes-file "$notes" --latest "${assets[@]}"

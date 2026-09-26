@@ -5,6 +5,7 @@
   "description": "God's Eye // UAP — a 3D globe intelligence console for Unidentified Anomalous Phenomena: documented encounters, reconstructed flight paths, official government footage and files, and reference imagery.",
   "type": "module",
   "license": "MIT",
+  "author": "domw99 (https://github.com/domw99)",
   "engines": {
     "node": ">=20"
   },

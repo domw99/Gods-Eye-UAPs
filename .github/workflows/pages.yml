@@ -29,6 +29,8 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
+          # Case pages and the sitemap need the public address.
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
       - name: Publish dist/ to the gh-pages branch
         if: ${{ !github.event.repository.private }}
         env:
