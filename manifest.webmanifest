@@ -1,0 +1,17 @@
+{
+  "name": "God's Eye // UAP",
+  "short_name": "God's Eye UAP",
+  "description": "Every well-documented UFO/UAP encounter on a 3D globe, with replayable flight paths, official files from the U.S. and France, the MUFON and research archives, and tools to check each sighting yourself.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05070c",
+  "theme_color": "#05070c",
+  "categories": ["education", "reference", "science"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
