@@ -120,19 +120,24 @@ function clusterImage(count, caseShare) {
   const bucket = Math.round(caseShare * 8) / 8;
   const key = `${count}|${bucket}`;
   if (clusterImages.has(key)) return clusterImages.get(key);
-  const r = Math.min(24, 15 + Math.log2(count) * 2.2);
+  const r = Math.min(20, 12 + Math.log2(count) * 1.9);
   const s = Math.ceil(r * 2 + 10);
   const c = document.createElement('canvas');
   c.width = c.height = s * PX;
   const g = c.getContext('2d');
   g.scale(PX, PX);
   const m = s / 2;
-  g.fillStyle = 'rgba(5, 9, 16, 0.82)';
+  g.fillStyle = 'rgba(5, 9, 16, 0.72)';
   g.beginPath();
   g.arc(m, m, r, 0, Math.PI * 2);
   g.fill();
-  g.lineWidth = 3;
-  g.shadowBlur = 8;
+  g.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.arc(m, m, r - 4, 0, Math.PI * 2);
+  g.stroke();
+  g.lineWidth = 2.4;
+  g.shadowBlur = 6;
   const start = -Math.PI / 2;
   const split = start + Math.PI * 2 * bucket;
   const arc = (from, to, color) => {
@@ -146,7 +151,7 @@ function clusterImage(count, caseShare) {
   arc(split, start + Math.PI * 2, KIND_COLORS.official);
   g.shadowBlur = 0;
   g.fillStyle = '#e8f6ff';
-  g.font = `600 ${count > 99 ? 11 : 12}px JetBrains Mono, monospace`;
+  g.font = `600 ${count > 99 ? 10 : 11}px JetBrains Mono, monospace`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText(String(count), m, m + 0.5);

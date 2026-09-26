@@ -37,6 +37,14 @@ const BASE = import.meta.env.BASE_URL;
 const LOG_KEY = 'gods-eye-uap:log';
 
 /* ── Boot ──────────────────────────────────────────────── */
+const loadingStep = (text, pct) => {
+  document.getElementById('loading-step').textContent = text;
+  document.getElementById('loading-fill').style.width = `${pct}%`;
+  document.getElementById('loading').setAttribute('aria-valuenow', String(pct));
+};
+loadingStep('STARTING GLOBE…', 25);
+// The catalogue downloads while the globe starts.
+const officialPromise = loadOfficial(BASE).catch((e) => e);
 const viewer = await createViewer(document.getElementById('globe'));
 const render = createRenderLoop(viewer);
 const effects = createEffects(viewer);
@@ -70,8 +78,10 @@ let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
 const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', journals: 'APRO+', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
+loadingStep('LOADING CASE FILES…', 45);
 try {
-  const o = await loadOfficial(BASE);
+  const o = await officialPromise;
+  if (o instanceof Error) throw o;
   officialMeta = o.meta;
   officialItems = o.items;
   officialById = new Map(o.meta.items.map((i) => [i.dvidsId, i]));
@@ -442,12 +452,33 @@ async function bluebookNear(c, radiusKm) {
 // line shows from high up, and close up the ground dims to dusk or night.
 let sceneMoment = null; // { lat, lon, approx } while a record's time drives the lighting
 
+// City lights on the night side while the globe is lit for a moment (NASA Black
+// Marble, public domain). Loaded the first time it is needed.
+let nightLights = null;
+function showNightLights(on) {
+  if (on && !nightLights) {
+    nightLights = viewer.imageryLayers.addImageryProvider(
+      new Cesium.UrlTemplateImageryProvider({
+        url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png',
+        maximumLevel: 8,
+        credit: 'City lights: NASA Earth Observatory Black Marble (VIIRS 2016)',
+      }),
+    );
+    nightLights.dayAlpha = 0;
+    nightLights.nightAlpha = 1;
+    nightLights.brightness = 1.9;
+    nightLights.contrast = 1.25;
+  }
+  if (nightLights) nightLights.show = on;
+}
+
 function setSceneMoment(rec) {
   const globe = viewer.scene.globe;
   const imagery = viewer.imageryLayers.get(0);
   if (!rec || rec.lat == null || !rec.date) {
     sceneMoment = null;
     globe.enableLighting = false;
+    showNightLights(false);
     if (imagery) imagery.brightness = 1;
     if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.now();
     render.request();
@@ -455,6 +486,7 @@ function setSceneMoment(rec) {
   }
   sceneMoment = { lat: rec.lat, lon: rec.lon, approx: Boolean(rec.approx), dim: 1 };
   globe.enableLighting = true;
+  showNightLights(true);
   // From high up, Cesium shades the night side (the terminator shows from
   // 1,500 km). Closer in, the ground is dimmed gently instead, so a night
   // case still reads; the two hand over between 1,500 and 4,000 km.
@@ -1425,7 +1457,26 @@ if (params.get('layers'))
 
 const routed = routeFromHash();
 if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
-setTimeout(() => document.getElementById('loading').classList.add('done'), 700);
+// The loading screen follows the first imagery tiles, then gets out of the way.
+{
+  const loading = document.getElementById('loading');
+  let peak = 0;
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    loadingStep('READY', 100);
+    setTimeout(() => loading.classList.add('done'), 250);
+    removeProgress();
+  };
+  loadingStep('ACQUIRING IMAGERY…', 60);
+  const removeProgress = viewer.scene.globe.tileLoadProgressEvent.addEventListener((pending) => {
+    peak = Math.max(peak, pending);
+    if (peak) loadingStep('ACQUIRING IMAGERY…', Math.round(60 + 40 * (1 - pending / peak)));
+    if (peak && pending === 0) finish();
+  });
+  setTimeout(finish, 6000); // never hold the page for slow tiles
+}
 
 // Expose for debugging and automated screenshots.
 window.__uap = { viewer, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

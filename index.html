@@ -167,9 +167,10 @@
   <div id="modal-root"></div>
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <div id="loading" class="mono">
+  <div id="loading" class="mono" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100">
     <div class="loading-ring"></div>
-    <div>ACQUIRING GLOBE…</div>
+    <div id="loading-step">LOADING GLOBE ENGINE…</div>
+    <div class="loading-bar"><i id="loading-fill"></i></div>
   </div>
 
   <script type="module" src="./src/main.js"></script>

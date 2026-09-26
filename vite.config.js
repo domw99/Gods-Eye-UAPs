@@ -5,7 +5,19 @@ import cesium from 'vite-plugin-cesium';
 // project path (set BASE_PATH=/Gods-Eye-UAPs/ in CI).
 export default defineConfig({
   base: process.env.BASE_PATH || '/',
-  plugins: [cesium()],
+  plugins: [
+    cesium(),
+    // Cesium.js is 6 MB: load it without blocking the page, so the loading
+    // screen paints at once. Deferred scripts still run before the app module.
+    {
+      name: 'defer-cesium',
+      enforce: 'post',
+      transformIndexHtml: {
+        order: 'post',
+        handler: (html) => html.replace(/<script src="([^"]*Cesium\.js)"><\/script>/, '<script defer src="$1"></script>'),
+      },
+    },
+  ],
   server: { port: 5173, host: true },
   preview: { port: 4173 },
   build: { target: 'es2022', chunkSizeWarningLimit: 5000 },

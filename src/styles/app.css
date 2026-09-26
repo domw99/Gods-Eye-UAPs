@@ -496,6 +496,8 @@ body.dossier-open .map-controls { right: calc(var(--right-w) + 26px); }
 #toast.show { opacity: 1; }
 #loading { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg-dark); z-index: 100; font-size: 11px; letter-spacing: 0.25em; color: var(--accent); transition: opacity 600ms; }
 #loading.done { opacity: 0; pointer-events: none; }
+.loading-bar { width: 180px; height: 2px; background: rgba(0, 212, 255, 0.15); border-radius: 2px; overflow: hidden; }
+.loading-bar i { display: block; height: 100%; width: 8%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 300ms ease-out; }
 .loading-ring { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(0, 212, 255, 0.2); border-top-color: var(--accent); animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hover-label { position: fixed; z-index: 30; pointer-events: none; font-family: var(--font-mono); font-size: 11px; padding: 5px 8px; border-radius: 7px; background: var(--glass-strong); border: 1px solid var(--glass-border); transform: translate(12px, 12px); max-width: 280px; }
