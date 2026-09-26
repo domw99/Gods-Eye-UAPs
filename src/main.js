@@ -527,6 +527,8 @@ viewer.scene.preRender.addEventListener(() => {
   const h = viewer.camera.positionCartographic.height;
   const t = Math.min(1, Math.max(0, (h - LIGHT_NEAR) / (LIGHT_FAR - LIGHT_NEAR)));
   imagery.brightness = sceneMoment.dim + (1 - sceneMoment.dim) * t;
+  // City lights belong to the view from space; close in they would cover the ground.
+  if (nightLights) nightLights.alpha = t;
 });
 let lastDim = 0;
 trackLayer.onTick(() => {

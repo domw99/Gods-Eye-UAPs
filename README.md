@@ -19,7 +19,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 ---
 
-**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. and French files and the MUFON files, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
+**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. and French files, search 22,000 pages of the MUFON, APRO, NICAP and CUFOS journals, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
 
 <div align="center">
 
@@ -32,7 +32,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 | | | | |
 |:---:|:---:|:---:|:---:|
 | **126** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
-| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> | **1,542** military airspace volumes<br><sub>FAA special-use airspace in 3D</sub> | **Live** satellites and launches<br><sub>CelesTrak · Launch Library 2</sub> |
+| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **872** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
 
@@ -44,7 +44,10 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 73 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
-- **Search a place** to fly there, and **share any view**: the address bar keeps the camera position.
+- **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports.
+- **Filters stay in view** as chips above the results, each removable, with **RESET ALL**. **Back and Forward** step through the records you opened, and every record has its own link.
+- **Group or ungroup** nearby markers (<kbd>C</kbd>). Labels that would overlap are hidden by priority, so the view stays readable.
+- **Share any view**: the address bar keeps the camera position.
 - **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. The **＋ / −** buttons zoom toward the centre of the screen, while wheel zoom heads for the pointer.
 
 ### ✈️ Replay the encounter, from the witness's seat
@@ -55,7 +58,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 <td width="50%"><img src="docs/media/witness-view.jpg" alt="Witness view in FLIR: from Cdr. Fravor's F/A-18F toward the Tic Tac" /></td>
 </tr>
 <tr>
-<td><sub><b>Flight paths at altitude</b> for the UAP and the witnesses (aircraft, interceptors, cars, ships), with drop lines, ground tracks and labelled waypoints. Each track states its basis: radar, official report, witness reports, flight plan or approximate.</sub></td>
+<td><sub><b>Flight paths at altitude</b> for the UAP and the witnesses (aircraft, interceptors, cars, ships), with a translucent curtain down to the ground, ground tracks and labelled waypoints. Each track states its basis: radar, official report, witness reports, flight plan or approximate.</sub></td>
 <td><sub><b>Witness view</b> (<kbd>V</kbd>) puts the camera with the witness, here Cdr. Fravor's F/A-18F, and keeps it on the object. Here it is in FLIR, like the FLIR1 video. <b>Chase cam</b> follows the object instead.</sub></td>
 </tr>
 </table>
@@ -138,6 +141,32 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
   - 39 on the 2008 Stephenville lights.
 - **MUFON's live case database** (CMS) is members-only, and its terms forbid redistribution, so the app links to it and to MUFON's reporting form rather than copying it.
 
+### 📚 The research archives, searchable
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/journals.jpg" alt="The research archives layer over the United States with an APRO Bulletin page open" /></td>
+<td width="50%"><img src="docs/media/search.jpg" alt="Journal search: pages across the APRO Bulletin, Skylook and the MUFON UFO Journal that mention the Delphos ring" /></td>
+</tr>
+<tr>
+<td><sub><b>The research archives layer</b> (teal) maps <b>2,459 places</b> named in the sighting reports of the other big civilian groups: the <b>APRO Bulletin</b> (1952–1987), NICAP's <b>U.F.O. Investigator</b>, CUFOS's <b>International UFO Reporter</b> (1976–2009) and MUFON's state chapter newsletters. 78 case dossiers list the pages about them.</sub></td>
+<td><sub><b>Search inside the journals</b>: every word of about 22,000 OCR pages is indexed, so a search like “Delphos ring” finds the 44 pages across APRO, Skylook and the MUFON Journal that mention both. Results open the page in the app.</sub></td>
+</tr>
+</table>
+
+### 📊 Statistics, and cards to share
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/stats.jpg" alt="Statistics: records per year for every archive as small multiples, and the curated cases by status" /></td>
+<td width="50%"><img src="docs/media/share-card.jpg" alt="A share card for the Phoenix Lights: the globe with the flight path, the status, the evidence score and the summary" /></td>
+</tr>
+<tr>
+<td><sub><b>Statistics</b> (<kbd>S</kbd>): what every archive holds, year by year, each on its own scale; the curated cases by status, evidence and country; and GEIPAN's findings, where 4% remain unexplained after investigation.</sub></td>
+<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet.</sub></td>
+</tr>
+</table>
+
 ### 🎬 Story mode and side-by-side comparison
 
 <table>
@@ -151,9 +180,11 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 </table>
 
-### 📱 Works on a phone
+### 📱 Works on a phone, and installs like an app
 
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
+
+Add it to your home screen from the browser menu. It reopens quickly and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery.
 
 **Also included:**
 - Reference photos, films and audio for each case.
@@ -205,7 +236,9 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Files library (government + MUFON) |
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
-| <kbd>H</kbd> | Hide the HUD | <kbd>Esc</kbd> | Close |
+| <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
+| <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
+| <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 
 </details>
 
@@ -221,6 +254,8 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | [`#/bluebook/1952-07-7273984-Tremonton-Utah-1377-`](https://domw99.github.io/Gods-Eye-UAPs/#/bluebook/1952-07-7273984-Tremonton-Utah-1377-) | A Blue Book file |
 | [`#/geipan/1981-01-00849`](https://domw99.github.io/Gods-Eye-UAPs/#/geipan/1981-01-00849) | A GEIPAN file (Trans-en-Provence) |
 | [`#/mufon/2002_05/1`](https://domw99.github.io/Gods-Eye-UAPs/#/mufon/2002_05/1) | A MUFON Journal page (issue, page index) |
+| [`#/journal/AFU_19711100_APRO_Bulletin_November-December/0`](https://domw99.github.io/Gods-Eye-UAPs/#/journal/AFU_19711100_APRO_Bulletin_November-December/0) | A research-archive page (APRO Bulletin, Nov–Dec 1971) |
+| [`#/near/33.3943,-104.5230/Roswell`](https://domw99.github.io/Gods-Eye-UAPs/#/near/33.3943,-104.5230/Roswell) | Everything reported near a place |
 | [`?mode=nvg`](https://domw99.github.io/Gods-Eye-UAPs/?mode=nvg) | Start in a sensor mode |
 | [`?layers=bluebook,geipan,mufon`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,geipan,mufon) | Start with extra layers on |
 | [`?view=-104.5,33.7,25000,0,-35`](https://domw99.github.io/Gods-Eye-UAPs/?view=-104.5,33.7,25000,0,-35) | Start at a camera position (lon, lat, height m, heading°, pitch°) |
@@ -241,8 +276,10 @@ flowchart LR
     NUF["NUFORC<br/>(geocoded)"] --> S4["build-nuforc.mjs"]
     MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
     GEI["GEIPAN<br/>published CSV"] --> S6["build-geipan.mjs"]
+    ARC["APRO · NICAP · CUFOS<br/>OCR (Internet Archive)"] --> S7["build-journals.mjs"]
+    S5 & S7 --> S8["build-textindex.mjs"]
   end
-  S1 & S2 & S3 & S4 & S5 & S6 --> DATA[("public/data/*.json")]
+  S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 --> DATA[("public/data/*.json")]
   CASES["src/data/cases/*.js<br/>126 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
@@ -251,11 +288,12 @@ flowchart LR
 | Layer | Code |
 |---|---|
 | Globe, imagery, terrain, 3D tiles, key handling | `src/app/viewer.js` |
+| Rendering on demand, device quality, dynamic resolution | `src/app/quality.js` |
 | NVG / FLIR / Ironbow / CRT shaders | `src/app/effects.js` |
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
-| Blue Book, GEIPAN, MUFON & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
-| Sky, weather, launches, airspace, GEIPAN classes, MUFON Journal pages, sighting-checker scoring | `src/services/*.js` |
-| Dossier, list, timeline, modals, sky chart, story mode | `src/ui/*.js` |
+| Label decluttering; Blue Book, GEIPAN, MUFON, research-archive & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
+| Sky, weather, launches, airspace, GEIPAN classes, journal pages and full-text search, sighting-checker scoring | `src/services/*.js` |
+| Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards | `src/ui/*.js` |
 
 <details>
 <summary><b>Project structure</b></summary>
@@ -263,19 +301,23 @@ flowchart LR
 ```
 src/
   app/        viewer.js (globe, imagery, terrain, 3D tiles) · effects.js (NVG/FLIR/CRT shaders)
+              quality.js (render on demand, device quality) · horizon.js (markers hidden behind the Earth)
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
   layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
               points.js (Blue Book / GEIPAN / MUFON / NUFORC) · satellites.js (live SGP4)
               buildings.js (keyless OpenStreetMap 3D buildings) · launches.js (launch pads)
-              airspace.js (military airspace volumes)
+              airspace.js (military airspace volumes) · declutter.js (label overlap)
   services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
-              geipan.js (GEIPAN classes, dates, links)
+              geipan.js (GEIPAN classes, dates, links) · journals.js (APRO, NICAP, CUFOS)
+              textsearch.js (journal full-text search)
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
+              stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
-              build-mufon.mjs · build-geipan.mjs · verify-media.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
-tests/        Vitest suites
+              build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
+              verify-media.mjs · check-links.mjs · fix-cesium-base.mjs · lib/ (GeoNames gazetteer)
+tests/        Vitest suites · e2e/ Playwright browser tests
 docs/SPEC.md  the full product spec (the improved prompt this was built from)
 ```
 
@@ -293,7 +335,10 @@ All datasets ship in `public/data/` and are rebuilt by scripts:
 | `npm run build:nuforc` | [planetsig/ufo-reports](https://github.com/planetsig/ufo-reports) (geocoded NUFORC), facts only with the narratives removed | `nuforc.json` |
 | `npm run build:mufon` | The MUFON Archive on the Internet Archive ([`MUFON_UFO_Journal_-_Skylook`](https://archive.org/details/MUFON_UFO_Journal_-_Skylook)). It reads each issue's OCR text page by page, finds "Town, State" places in sighting reports (skipping addresses, meetings and hometowns), geocodes them with GeoNames and matches pages to curated cases. Only places, page numbers and short quotes are stored. | `mufon.json` |
 | `npm run build:geipan` | GEIPAN's published case and testimony files ([cnes-geipan.fr](https://www.cnes-geipan.fr/fr/recherche/cas), CSV; the current export dates from February 2019). It joins them, restores the accents lost in the case file from the testimony file's vocabulary, geocodes each commune with the GeoNames France dump and converts observation times to UTC. | `geipan.json` |
+| `npm run build:journals` | Scans on the Internet Archive: the APRO Bulletin and MUFON chapter newsletters (Archives for the Unexplained), NICAP's U.F.O. Investigator (Serials in Microfilm) and CUFOS's International UFO Reporter. Same place finding and case matching as the MUFON build; undated newsletters are dated from their first pages and issue numbers. | `journals.json` |
+| `npm run build:textindex` | The OCR words of every MUFON and research-archive page (after the two builds above), split by first letter so a search downloads only what it needs. The text itself is not stored. | `textindex/` |
 | `npm run verify:media` | Checks every Commons file, Wikipedia title, DVIDS id and Blue Book id that the case files reference | — |
+| `npm run e2e` | Playwright: the app in a real browser (desktop and phone), run in CI on every push. A weekly job also checks every cited link and opens an issue if one breaks. | — |
 | `npm test` | Vitest: case-file integrity (coordinates, taxonomy, track times, plausible altitudes), the region resolver, sky, weather, airspace and launch helpers, sighting-checker scoring, story text, OSM building tiles and dataset schemas | — |
 
 **Adding a case:**
@@ -316,7 +361,8 @@ It then appears on the globe.
 - **Blue Book pins mark the town in the file name**, not the exact spot.
 - **GEIPAN pins mark the commune named in the file.** GEIPAN's classification is its own: a class D case is unexplained after investigation, not proven extraordinary.
 - **NUFORC reports are unverified.** They show where people report things.
-- **MUFON places are found automatically.** A violet pin is a town named in a journal report. That's usually where the sighting was, but sometimes it's a witness's hometown or where a report was filed. Every pin links to its page so you can check.
+- **MUFON and research-archive places are found automatically.** A violet or teal pin is a town named in a journal report. That's usually where the sighting was, but sometimes it's a witness's hometown or where a report was filed. Every pin links to its page so you can check.
+- **Night-side city lights are today's.** When a case lights the globe for its moment, the lights on the night side are NASA's 2016 Black Marble, not the lights of the case year.
 - **Times can be approximate.** 36 older cases record only the date or part of the day. They are marked *time approx.*, and the sky, weather and story say so.
 
 ## Deploy your own
@@ -357,6 +403,8 @@ Corrections and new cases are welcome, especially with sources.
   - Blue Book scans: Internet Archive / NARA.
   - GEIPAN files: [GEIPAN](https://www.cnes-geipan.fr/) / CNES. Case data from its published CSV files; each case links to its full file on cnes-geipan.fr.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
+  - Research archives: the *APRO Bulletin* (Aerial Phenomena Research Organization) and MUFON chapter newsletters as scanned by the [Archives for the Unexplained](https://archive.org/details/ufonewsletters); NICAP's *U.F.O. Investigator* from the Internet Archive's Serials in Microfilm; CUFOS's *International UFO Reporter* from the Internet Archive. Only places, page numbers, short quotes and a word index are stored; the pages are read from the Internet Archive.
+  - Night lights: NASA Earth Observatory Black Marble (VIIRS, 2016), served by NASA GIBS.
 - **Other data:**
   - Launches: [Launch Library 2](https://thespacedevs.com/llapi) by The Space Devs.
   - Weather: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0), ERA5 reanalysis by ECMWF / Copernicus.
