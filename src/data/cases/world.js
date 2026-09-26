@@ -259,7 +259,7 @@ export default [
       commons('RAF Woodbridge East Gate.jpg', 'RAF Woodbridge east gate'),
       commons('Rendelsham(reconstitution).png', 'Artist reconstruction'),
     ],
-    sources: [link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/ufos/', 'official')],
+    sources: [link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/ufos/', 'official')],
   },
   {
     id: 'belgian-wave-1990',
@@ -354,7 +354,7 @@ export default [
     tracks: [],
     wiki: 'Calvine UFO photograph',
     media: [],
-    sources: [link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/ufos/', 'official')],
+    sources: [link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/ufos/', 'official')],
   },
   {
     id: 'voronezh-1989',

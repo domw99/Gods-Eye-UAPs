@@ -7,3 +7,7 @@ dist
 .vite
 coverage
 .cache
+test-results/
+playwright-report/
+link-report.md
+media-report.txt

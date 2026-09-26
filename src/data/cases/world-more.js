@@ -1,7 +1,7 @@
 import { p, commons, link, MIN } from './helpers.js';
 
 const UK_LIST = 'https://en.wikipedia.org/wiki/UFO_sightings_in_the_United_Kingdom';
-const UK_ARCHIVE = link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/ufos/', 'official');
+const UK_ARCHIVE = link('The National Archives (UK) — MoD UFO files', 'https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/ufos/', 'official');
 
 /** More cases outside North America: RAF files, police chases, stadium crowds and military reports. */
 export default [

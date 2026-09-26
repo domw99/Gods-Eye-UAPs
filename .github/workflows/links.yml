@@ -1,0 +1,55 @@
+name: Link check
+
+# Weekly: check that every file, article and page the cases cite still
+# exists. Opens (or updates) an issue listing anything broken.
+on:
+  schedule:
+    - cron: '41 7 * * 3' # Wednesdays 07:41 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Media and article references (Commons, Wikipedia, DVIDS, Blue Book)
+        id: media
+        continue-on-error: true
+        run: npm run verify:media 2>&1 | tee media-report.txt
+      - name: Outside links in case sources and the files library
+        id: links
+        continue-on-error: true
+        run: node scripts/check-links.mjs
+      - name: Report
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Weekly link check, run ${{ github.run_id }}."
+            echo
+            cat link-report.md 2>/dev/null || true
+            echo
+            echo "### Media and article references"
+            echo '```'
+            tail -n 30 media-report.txt 2>/dev/null || true
+            echo '```'
+          } > body.md
+          cat body.md >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.media.outcome }}" = "failure" ] || [ "${{ steps.links.outcome }}" = "failure" ]; then
+            existing=$(gh issue list --state open --search "Broken links in:title" --json number --jq '.[0].number')
+            if [ -n "$existing" ]; then gh issue comment "$existing" --body-file body.md
+            else gh issue create --title "Broken links" --body-file body.md
+            fi
+            exit 1
+          fi

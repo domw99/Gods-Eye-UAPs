@@ -2,7 +2,7 @@
   "name": "gods-eye-uap",
   "private": true,
   "version": "0.1.0",
-  "description": "God's Eye // UAP \u2014 a 3D globe intelligence console for Unidentified Anomalous Phenomena: documented encounters, reconstructed flight paths, official government footage and files, and reference imagery.",
+  "description": "God's Eye // UAP — a 3D globe intelligence console for Unidentified Anomalous Phenomena: documented encounters, reconstructed flight paths, official government footage and files, and reference imagery.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -13,6 +13,7 @@
     "build": "vite build && node scripts/fix-cesium-base.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "e2e": "playwright test",
     "sync:official": "node scripts/sync-dvids.mjs",
     "build:bluebook": "node scripts/build-bluebook.mjs",
     "build:nuforc": "node scripts/build-nuforc.mjs",
@@ -32,6 +33,7 @@
     "satellite.js": "^6.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "vite": "^6.4.3",
     "vite-plugin-cesium": "^1.2.23",
     "vitest": "^5.0.1"
