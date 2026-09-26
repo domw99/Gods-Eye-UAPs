@@ -729,7 +729,7 @@ export default [
     category: 'photo-video',
     evidence: ['video', 'sensor-data', 'official-document'],
     status: 'explained',
-    explanation: 'Using longer-focal-length footage and commercial flight data, AARO assessed the object as likely a commercial aircraft and the "wake" as a video-compression artifact; final resolution was pending review.',
+    explanation: 'AARO resolved the case in February 2024 (“Atmospheric Wakes”): frame-by-frame analysis and flight data showed a commuter aircraft flying near the two MQ-9s, and the apparent wake was the heat signature from its engines.',
     shape: 'Object with apparent atmospheric wake',
     witnesses: 'MQ-9 sensor operators',
     duration: 'Seconds to ~2 minutes',
@@ -742,7 +742,7 @@ export default [
       commons('SouthAsia 1 UAP 20230115 Official Footage from the USG for Public Release.webm', 'Clip 1 — official release'),
       commons('SouthAsia 2 UAP 20230115 Official Footage from the USG for Public Release.webm', 'Clip 2 — official release'),
     ],
-    sources: [],
+    sources: [link('AARO case resolution: “Atmospheric Wakes” (Feb 2024)', 'https://www.aaro.mil/Portals/136/PDFs/case_resolution_reports/Case_Resolution_of_Atmospheric_Wakes_508-02262024.pdf', 'official')],
   },
   {
     id: 'western-us-range-2021',
@@ -768,7 +768,7 @@ export default [
     tracks: [],
     wiki: 'NASA Unidentified Anomalous Phenomena Independent Study Team',
     media: [commons('Western USA 2021 UAP Official Footage from the USG for Public Release.webm', 'Official AARO release')],
-    sources: [],
+    sources: [link('AARO case resolution: “Western United States UAP” (Feb 2024)', 'https://www.aaro.mil/Portals/136/PDFs/case_resolution_reports/Case_Resolution_of_Western_United_States_Uap_508-02262024.pdf', 'official')],
   },
   // ── Oceania ─────────────────────────────────────────────
   {

@@ -1193,7 +1193,7 @@ export default [
     evidence: ['video', 'sensor-data', 'radar', 'pilot-witness', 'military-witness', 'official-document'],
     status: 'disputed',
     explanation:
-      'Both videos were officially released and remain "unidentified" per DoD. Analysts such as Mick West argue GoFast shows a slow object (e.g. a balloon) at ~13,000 ft that only looks fast and low because of parallax, and that Gimbal’s rotation is a glare artifact of the ATFLIR pod.',
+      'Both videos were officially released and remain "unidentified" per DoD. Analysts such as Mick West argue GoFast shows a slow object (e.g. a balloon) at ~13,000 ft that only looks fast and low because of parallax, and that Gimbal’s rotation is a glare artifact of the ATFLIR pod. AARO later published a case resolution for GoFast worked out from the sensor’s geometry and the winds aloft.',
     shape: 'Rotating lozenge (Gimbal); small fast object (GoFast)',
     witnesses: 'VFA-11 aircrew; Lt. Ryan Graves’ squadron reported near-daily objects',
     duration: 'Seconds of video; months of sightings',
@@ -1219,6 +1219,7 @@ export default [
         'https://www.defense.gov/News/Releases/Release/Article/2165713/statement-by-the-department-of-defense-on-the-release-of-historical-navy-videos/',
         'official',
       ),
+      link('AARO case resolution: GoFast', 'https://www.aaro.mil/Portals/136/PDFs/case_resolution_reports/AARO_GoFast_Case_Resolution_Card_Methodology_Final.pdf', 'official'),
     ],
   },
   {
@@ -1315,7 +1316,7 @@ export default [
     evidence: ['video', 'sensor-data', 'official-document'],
     status: 'explained',
     explanation:
-      'AARO assesses with high confidence the objects showed no anomalous speed or behaviour: a reconstruction of the sensor’s look angle shows two objects travelling near each other in a straight line at wind speed, never entering the water. Some independent analysts still dispute this.',
+      'AARO assesses with high confidence the objects showed no anomalous speed or behaviour: a reconstruction of the sensor’s look angle shows two objects travelling near each other in a straight line at wind speed, never entering the water. Its case resolution assesses with moderate confidence that they were a pair of sky lanterns. Some independent analysts still dispute this.',
     shape: 'Small hot object; appears to enter and exit the sea',
     witnesses: 'U.S. Customs and Border Protection aircrew; tower controllers',
     duration: '~3 minutes of video',
@@ -1346,7 +1347,7 @@ export default [
       dvids(955936, 'AARO — 2013 Puerto Rico Object Reconstruction (2025)'),
       dvids(944204, 'Puerto Rico Objects — official footage'),
     ],
-    sources: [],
+    sources: [link('AARO case resolution: Puerto Rico UAP', 'https://www.aaro.mil/Portals/136/PDFs/case_resolution_reports/AARO_Puerto_Rico_UAP_Case_Resolution.pdf', 'official')],
   },
   {
     id: 'uss-omaha-russell-2019',
