@@ -434,7 +434,7 @@ export function renderCase(item, ctx) {
       tracks.length ? html`<span class="badge path">${tracks.length} TRACK${tracks.length > 1 ? 'S' : ''}</span>` : ''
     }${evidenceBadges(c.evidence)}</div>
 
-    <div class="btn-row" style="margin:10px 0 0"><button class="chip on" data-action="story">▶ STORY MODE</button><button class="chip" data-action="compare">⇄ COMPARE</button></div>
+    <div class="btn-row" style="margin:10px 0 0"><button class="chip on" data-action="story">▶ STORY MODE</button><button class="chip" data-action="compare">⇄ COMPARE</button><button class="chip" data-action="share-card" title="An image of this case to post or send">⇪ SHARE</button></div>
     ${section('ASSESSMENT', html`<div class="explain"><b>${STATUS[c.status]?.label}</b>${c.explanation || STATUS[c.status]?.long}</div>`)}
     ${section('SUMMARY', html`<div class="d-text"><p>${c.summary}</p></div>
       <dl class="d-kv" style="margin-top:10px">
@@ -483,7 +483,7 @@ export function renderCase(item, ctx) {
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
     ${section(
       'THE LOCATION',
-      html`<div class="btn-row" style="margin:0 0 8px"><button class="chip" data-action="ground">⤓ FLY TO GROUND VIEW</button><button class="chip" data-action="share">⧉ COPY LINK</button></div>
+      html`<div class="btn-row" style="margin:0 0 8px"><button class="chip" data-action="ground">⤓ FLY TO GROUND VIEW</button><button class="chip" data-action="share">⧉ COPY LINK</button><button class="chip" data-action="share-card">⇪ SHARE CARD</button></div>
         ${siteLinks(c.lat, c.lon)}`,
     )}
     ${section(
@@ -572,7 +572,7 @@ export function renderOfficial(item, ctx) {
       html`<ul class="source-list">
         <li><span class="badge official">DVIDS</span><a href="${safeUrl(o.page)}" target="_blank" rel="noopener">DVIDS asset ${o.dvidsId}</a></li>
         <li><span class="badge official">WAR.GOV</span><a href="https://www.war.gov/UFO/" target="_blank" rel="noopener">war.gov/UFO — PURSUE releases</a></li>
-      </ul><div class="btn-row"><button class="chip" data-action="share">⧉ COPY LINK</button></div>`,
+      </ul><div class="btn-row"><button class="chip" data-action="share">⧉ COPY LINK</button><button class="chip" data-action="share-card">⇪ SHARE CARD</button></div>`,
     )}`;
   mount(body(), content);
   return token;

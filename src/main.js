@@ -24,6 +24,7 @@ import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
+import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -32,7 +33,7 @@ import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/ex
 import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
-import { shapeClasses, STATUS, EVIDENCE } from './data/taxonomy.js';
+import { shapeClasses, evidenceScore, STATUS, EVIDENCE } from './data/taxonomy.js';
 import { classInfo as geipanClassInfo } from './services/geipan.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -1153,6 +1154,45 @@ bindDossierActions({
       render.request();
     }
   },
+  'share-card': async (btn) => {
+    const item = itemByKey(state.selected);
+    if (!item || btn.disabled) return;
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'MAKING CARD…';
+    try {
+      const ref = item.ref || {};
+      const url = `${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`;
+      const canvas = await drawCard(
+        {
+          title: item.title,
+          when: String(item.year),
+          place: item.place || '',
+          status: STATUS[item.status]?.label || item.status,
+          statusColor: STATUS[item.status]?.color || '#00d4ff',
+          score: item.kind === 'case' ? evidenceScore(ref.evidence || [], Boolean(ref.tracks?.length)) : null,
+          summary: ref.summary || ref.description || item.description || '',
+          url,
+          kind: item.kind === 'official' ? 'OFFICIAL U.S. RELEASE' : item.kind === 'user' ? 'MY SIGHTING' : 'CASE FILE',
+        },
+        await snapshotGlobe(viewer, (() => {
+          const at = itemLayer.positionOf(item.key);
+          return at ? Cesium.Cartesian3.fromDegrees(at.lon, at.lat) : null;
+        })()),
+      );
+      const how = await shareCard(canvas, { title: item.title, url, filename: `gods-eye-uap-${item.id}.png` });
+      if (how === 'downloaded') {
+        navigator.clipboard?.writeText(url).catch(() => {});
+        toast('Card saved as an image, and the link copied', 3500);
+      }
+    } catch (e) {
+      console.warn('[share card]', e);
+      toast('Could not make the card');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  },
   'journal-search': (btn) => openSearchJournals(btn.dataset.q || ''),
   'explain-here': () => nearPoint && openExplainNow({ lat: nearPoint.lat, lon: nearPoint.lon }),
   'near-nuforc': async () => {
@@ -1713,6 +1753,14 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     if (peak && pending === 0) finish();
   });
   setTimeout(finish, 6000); // never hold the page for slow tiles
+}
+
+// Installable app: cache the app shell and data for quick reopening and offline use.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  const registerSw = () => navigator.serviceWorker.register(`${BASE}sw.js`).catch((e) => console.warn('[sw]', e));
+  // The app gets here after the globe starts, usually after the page's load event.
+  if (document.readyState === 'complete') registerSw();
+  else window.addEventListener('load', registerSw, { once: true });
 }
 
 // Expose for debugging and automated screenshots.
