@@ -383,6 +383,8 @@ body.dossier-open .map-controls { right: calc(var(--right-w) + 26px); }
 .map-controls button { display: grid; place-items: center; gap: 2px; height: 36px; border: 0; border-radius: 9px; background: none; color: var(--text-secondary); cursor: pointer; }
 @media (hover: hover) { .map-controls button:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.07); } }
 .map-controls button:active { background: var(--accent-dim); color: var(--accent); }
+.map-controls button[aria-pressed='true'] { color: var(--accent); }
+.map-controls button[data-view='group'][aria-pressed='false'] svg { opacity: 0.55; }
 .map-controls svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 .map-controls svg .dot { fill: currentColor; stroke: none; }
 .map-controls .reset { height: 44px; margin-top: 3px; border-top: 1px solid var(--glass-border); border-radius: 0 0 9px 9px; color: var(--accent); }
@@ -703,3 +705,11 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .stats-table th, .stats-table td { text-align: right; padding: 3px 6px; border-bottom: 1px solid var(--glass-border); }
 .stats-table th:first-child, .stats-table td:first-child { text-align: left; }
 .stats-table { overflow-x: auto; }
+
+/* ── Active filters & resets ─────────────────────── */
+.active-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 8px; border: 1px solid rgba(0, 212, 255, 0.25); border-radius: 10px; background: rgba(0, 212, 255, 0.05); }
+.active-filters .af-label { font: 10px var(--font-mono); letter-spacing: 0.14em; color: var(--text-dim); margin-right: 2px; }
+.active-filters .af-reset { margin-left: auto; }
+.layers-label { display: flex; justify-content: space-between; align-items: center; }
+.link-btn { background: none; border: 0; padding: 0; font: 10px var(--font-mono); letter-spacing: 0.14em; color: var(--accent); cursor: pointer; }
+@media (hover: hover) { .link-btn:hover { text-decoration: underline; } }

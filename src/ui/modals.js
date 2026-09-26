@@ -12,26 +12,43 @@ import { tiles, yearMultiples, barList, makeTooltip, dataTable } from './stats.j
 /** Modal dialogs: government files library, sighting log, about, lightbox. */
 const root = () => document.getElementById('modal-root');
 let lastFocus = null;
+// Dialogs opened from another dialog (files → journal search) keep the one
+// beneath, whole, so Back returns to it as it was.
+const stack = [];
 
+/** Close every dialog. */
 export function closeModal() {
+  stack.length = 0;
   mount(root(), html``);
   lastFocus?.focus?.();
 }
 
+/** Back to the dialog this one was opened from, or close it. */
+export function backModal() {
+  const prev = stack.pop();
+  if (!prev) return closeModal();
+  root().replaceChildren(prev);
+  prev.querySelector('.modal button, .modal input, .modal a')?.focus();
+}
+
 function modal(title, content, { wide = true } = {}) {
-  lastFocus = document.activeElement;
+  const current = root().querySelector('.modal-backdrop');
+  // A dialog re-rendering itself replaces itself; a different one stacks.
+  if (current && current.dataset.title !== title) stack.push(current);
+  else if (!current) lastFocus = document.activeElement;
   mount(
     root(),
-    html`<div class="modal-backdrop" data-close>
+    html`<div class="modal-backdrop" data-close data-title="${title}">
       <div class="modal glass" role="dialog" aria-modal="true" aria-label="${title}" style="${wide ? '' : 'width:min(620px,100%)'}">
-        <div class="panel-head"><span class="panel-title">${title}</span><span class="muted"></span><button class="icon-btn" data-close aria-label="Close">✕</button></div>
+        <div class="panel-head">${stack.length ? html`<button class="icon-btn" data-back aria-label="Back to the previous dialog" title="Back (Esc)">‹</button>` : ''}<span class="panel-title">${title}</span><span class="muted"></span><button class="icon-btn" data-close aria-label="Close">✕</button></div>
         <div class="panel-body">${content}</div>
       </div>
     </div>`,
   );
   const backdrop = root().querySelector('.modal-backdrop');
   backdrop.addEventListener('click', (e) => {
-    if (e.target.hasAttribute('data-close') || e.target.closest('button[data-close]')) closeModal();
+    if (e.target.closest('button[data-back]')) backModal();
+    else if (e.target.hasAttribute('data-close') || e.target.closest('button[data-close]')) closeModal();
     // In-app links (#/case/…, #/mufon/…) open a record behind the dialog, so close it.
     else if (e.target.closest('a[href^="#/"]')) closeModal();
   });

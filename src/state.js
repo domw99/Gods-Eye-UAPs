@@ -7,6 +7,21 @@ const listeners = new Set();
 export const YEAR_MIN = 1900;
 export const YEAR_MAX = new Date().getUTCFullYear();
 
+export const DEFAULT_LAYERS = {
+  cases: true,
+  official: true,
+  bluebook: false,
+  geipan: false,
+  mufon: false,
+  journals: false,
+  nuforc: false,
+  satellites: false,
+  buildings: true,
+  launches: false,
+  airspace: false,
+  user: true,
+};
+
 export const state = {
   search: '',
   evidence: new Set(), // any-of
@@ -14,20 +29,7 @@ export const state = {
   shape: new Set(), // any-of
   yearRange: null, // [from, to] or null for all
   sort: 'date-desc',
-  layers: {
-    cases: true,
-    official: true,
-    bluebook: false,
-    geipan: false,
-    mufon: false,
-    journals: false,
-    nuforc: false,
-    satellites: false,
-    buildings: true,
-    launches: false,
-    airspace: false,
-    user: true,
-  },
+  layers: { ...DEFAULT_LAYERS },
   selected: null, // item key
 };
 
@@ -56,4 +58,13 @@ export function inYearRange(year) {
   const [a, b] = state.yearRange;
   const y = Math.max(YEAR_MIN, year);
   return y >= a && y <= b;
+}
+
+/** Any filter narrowing the records (search, year range, evidence, shape, status)? */
+export const filtersActive = () =>
+  Boolean(state.search || state.yearRange || state.evidence.size || state.shape.size || state.status.size);
+
+/** Clear every filter at once. */
+export function resetFilters() {
+  update({ search: '', yearRange: null, evidence: new Set(), shape: new Set(), status: new Set() }, 'reset');
 }

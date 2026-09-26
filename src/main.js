@@ -14,7 +14,7 @@ import { createLaunchLayer } from './layers/launches.js';
 import { createAirspaceLayer } from './layers/airspace.js';
 import { loadAirspace, areasAt, AIRSPACE_TYPES, formatFt } from './services/airspace.js';
 import { launchesAroundNow, RateLimitError } from './services/launches.js';
-import { renderLayers, renderFilters, renderList, bindList, markSelected } from './ui/list.js';
+import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList, markSelected } from './ui/list.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
@@ -24,7 +24,7 @@ import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
-import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal } from './ui/modals.js';
+import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
@@ -37,6 +37,7 @@ import { classInfo as geipanClassInfo } from './services/geipan.js';
 
 const BASE = import.meta.env.BASE_URL;
 const LOG_KEY = 'gods-eye-uap:log';
+const GROUP_KEY = 'gods-eye-uap:group';
 
 /* ── Boot ──────────────────────────────────────────────── */
 const loadingStep = (text, pct) => {
@@ -189,6 +190,7 @@ function refresh() {
   }
   layerCounts.user = userItems.length;
   renderLayersNow();
+  renderActiveFilters();
   markSelected(state.selected);
   render.request();
 }
@@ -200,8 +202,13 @@ function renderLayersNow(extra = {}) {
 
 subscribe((s, reason) => {
   if (reason === 'layers') applyLayers();
-  if (['search', 'evidence', 'status', 'shape', 'yearRange', 'sort', 'layers'].includes(reason)) {
-    if (reason === 'evidence' || reason === 'status' || reason === 'shape') renderFilters();
+  if (reason === 'reset') {
+    document.getElementById('search').value = '';
+    mount(document.getElementById('place-results'), html``);
+    timeline.draw();
+  }
+  if (['search', 'evidence', 'status', 'shape', 'yearRange', 'sort', 'layers', 'reset'].includes(reason)) {
+    if (reason === 'evidence' || reason === 'status' || reason === 'shape' || reason === 'reset') renderFilters();
     refresh();
   }
 });
@@ -575,7 +582,7 @@ function select(key, source = 'api') {
     setSceneMoment({ lat: item.ref.lat, lon: item.ref.lon, date: item.ref.date });
     flyToItem(item);
   }
-  setHash(`#/${item.kind}/${encodeURIComponent(item.id)}`);
+  setHash(`#/${item.kind}/${encodeURIComponent(item.id)}`, { replace: source === 'tour' || source === 'hash' });
   document.getElementById('hud-tgt').textContent = item.title.slice(0, 40).toUpperCase();
   return true;
 }
@@ -670,7 +677,7 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
   document.getElementById('hud-tgt').textContent = `${tag} ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase();
 }
 
-function deselect() {
+function deselect({ keepHash = false } = {}) {
   selectToken++;
   nearPoint = null;
   hideHover();
@@ -683,19 +690,34 @@ function deselect() {
   setSceneMoment(null);
   hidePlayback();
   itemLayer.showRegion(null);
-  setHash('');
+  if (!keepHash) setHash('');
   document.getElementById('hud-tgt').textContent = 'NONE';
 }
 
-let suppressHash = false;
-function setHash(h) {
-  suppressHash = true;
+/*
+ * Each record opened is a browser history entry, so Back and Forward (and
+ * the dossier's ‹ button) step through what the user looked at. Routing from
+ * history and the guided tour replace the entry instead of adding one.
+ */
+let routing = false; // true while following Back / Forward
+let navDepth = history.state?.depth || 0;
+function setHash(h, { replace = false } = {}) {
+  if (location.hash === h || (!h && !location.hash)) return;
   const url = `${location.pathname}${location.search}${h}`;
-  history.replaceState(null, '', url);
-  setTimeout(() => (suppressHash = false), 0);
+  if (replace || routing) history.replaceState({ ...history.state, depth: navDepth }, '', url);
+  else history.pushState({ depth: ++navDepth }, '', url);
+  updateBackButton();
+}
+function updateBackButton() {
+  document.getElementById('dossier-back')?.classList.toggle('hidden', navDepth <= 0);
 }
 
 function routeFromHash() {
+  const near = location.hash.match(/^#\/near\/(-?[\d.]+),(-?[\d.]+)(?:\/(.+))?$/);
+  if (near) {
+    showNearby(+near[1], +near[2], near[3] ? decodeURIComponent(near[3]) : `${(+near[1]).toFixed(2)}, ${(+near[2]).toFixed(2)}`);
+    return true;
+  }
   const mj = location.hash.match(/^#\/(mufon|journal)\/([^/]+)\/(\d+)$/);
   if (mj) {
     (mj[1] === 'mufon' ? selectMufonPage : selectJournalPage)(decodeURIComponent(mj[2]), +mj[3]);
@@ -713,9 +735,25 @@ function routeFromHash() {
   }
   return true;
 }
-window.addEventListener('hashchange', () => {
-  if (!suppressHash) routeFromHash();
+// Back / Forward, or a link to #/…: show that record (or close the dossier).
+window.addEventListener('popstate', (e) => {
+  navDepth = e.state?.depth || 0;
+  updateBackButton();
+  routing = true;
+  try {
+    if (!routeFromHash()) deselect();
+  } finally {
+    routing = false;
+  }
 });
+window.addEventListener('hashchange', () => {
+  // In-app links change the hash without a popstate in some browsers.
+  if (history.state?.depth == null) {
+    history.replaceState({ depth: ++navDepth }, '');
+    updateBackButton();
+  }
+});
+document.getElementById('dossier-back')?.addEventListener('click', () => history.back());
 
 /* ── Search inside the journals ────────────────────────── */
 async function runJournalSearch(q) {
@@ -796,7 +834,7 @@ let nearPoint = null; // { lat, lon } while the nearby dossier is open
 
 /** Everything reported near a point, filled in as each archive loads. */
 async function showNearby(lat, lon, label, { fly = true } = {}) {
-  deselect();
+  deselect({ keepHash: true });
   const token = selectToken;
   nearPoint = { lat, lon };
   if (fly)
@@ -828,6 +866,7 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
     renderNearby({ label, lat, lon, data });
   };
   draw();
+  setHash(`#/near/${lat.toFixed(4)},${lon.toFixed(4)}/${encodeURIComponent(label)}`);
   document.getElementById('hud-tgt').textContent = `NEAR ${label}`.slice(0, 40).toUpperCase();
   const fill = (key, promise, pick) =>
     promise.then(
@@ -1270,7 +1309,7 @@ function setMode(mode) {
   document.getElementById('hud-mode').textContent = MODE_LABELS[m];
   const url = new URL(location.href);
   m === 'normal' ? url.searchParams.delete('mode') : url.searchParams.set('mode', m);
-  history.replaceState(null, '', url);
+  history.replaceState(history.state, '', url);
 }
 document.querySelector('.modes').addEventListener('click', (e) => {
   const b = e.target.closest('[data-mode]');
@@ -1377,6 +1416,25 @@ function resetView() {
 
 let zoomTarget = null; // where a running zoom is heading, so quick clicks add up
 
+/* Grouping nearby markers into clusters: on by default, remembered per browser. */
+function setGrouping(on, { save = true } = {}) {
+  itemLayer.setGrouping(on);
+  const b = document.querySelector('#map-controls [data-view="group"]');
+  b?.setAttribute('aria-pressed', String(on));
+  if (b) b.title = on ? 'Grouping nearby markers: on (C)' : 'Grouping nearby markers: off, every marker shown (C)';
+  if (save)
+    try {
+      localStorage.setItem(GROUP_KEY, on ? '1' : '0');
+    } catch {}
+}
+{
+  let saved = null;
+  try {
+    saved = localStorage.getItem(GROUP_KEY);
+  } catch {}
+  setGrouping(saved !== '0', { save: false });
+}
+
 function zoomView(dir) {
   hideHover();
   const cam = viewer.camera;
@@ -1407,6 +1465,10 @@ document.getElementById('map-controls').addEventListener('click', (e) => {
   if (!b) return;
   if (b.dataset.view === 'home') resetView();
   else if (b.dataset.view === 'near') nearMe();
+  else if (b.dataset.view === 'group') {
+    setGrouping(!itemLayer.grouping);
+    toast(itemLayer.grouping ? 'Grouping nearby markers' : 'Showing every marker', 1800);
+  }
   else zoomView(b.dataset.view === 'in' ? 1 : -1);
 });
 
@@ -1471,7 +1533,7 @@ function neighbour(delta) {
 window.addEventListener('keydown', (e) => {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
   if (e.key === 'Escape') {
-    if (document.getElementById('modal-root').children.length) return closeModal();
+    if (document.getElementById('modal-root').children.length) return backModal();
     if (story.active) return story.stop();
     if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
@@ -1502,6 +1564,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'r') resetView();
   else if (e.key.toLowerCase() === 'n') nearMe();
   else if (e.key.toLowerCase() === 's') openStatsNow();
+  else if (e.key.toLowerCase() === 'c') setGrouping(!itemLayer.grouping);
   else if (e.key === '+' || e.key === '=') zoomView(1);
   else if (e.key === '-' || e.key === '_') zoomView(-1);
 });
@@ -1626,7 +1689,10 @@ if (params.get('mode')) setMode(params.get('mode'));
 if (params.get('layers'))
   for (const l of params.get('layers').split(',')) if (l in state.layers) setLayer(l, true);
 
+routing = true;
 const routed = routeFromHash();
+routing = false;
+updateBackButton();
 if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 // The loading screen follows the first imagery tiles, then gets out of the way.
 {
@@ -1650,4 +1716,4 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
 }
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, showNearby, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };
+window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)) };

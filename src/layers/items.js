@@ -174,6 +174,7 @@ export function createItemLayer(viewer) {
   let regionRing = null;
   let visibleKeys = null; // null = everything passes the filters
   let selectedKey = null;
+  let grouping = true; // the user can turn grouping of nearby markers off
   let clusters = []; // [{ members: [item], position }]
   const clusterBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
   const haloBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
@@ -289,7 +290,7 @@ export function createItemLayer(viewer) {
     const camera = viewer.camera;
     clusterBoards.removeAll();
     clusters = [];
-    const on = camera.positionCartographic.height > CLUSTER_BELOW_M;
+    const on = grouping && camera.positionCartographic.height > CLUSTER_BELOW_M;
     scene.requestRender(); // marker visibility changes show on the next frame
     const occluder = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, camera.positionWC);
     const pts = [];
@@ -466,6 +467,14 @@ export function createItemLayer(viewer) {
     positionOf,
     zoomToCluster,
     cluster: (index) => clusters[index] || null,
+    /** Group nearby markers into numbered clusters (default) or show every marker. */
+    setGrouping(on) {
+      grouping = Boolean(on);
+      recluster();
+    },
+    get grouping() {
+      return grouping;
+    },
     /** True while the selection ping animates. */
     get animating() {
       return Boolean(halo.ping) && performance.now() - halo.since < PING_MS;

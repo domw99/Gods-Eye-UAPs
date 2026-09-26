@@ -1,6 +1,6 @@
 import { html, mount } from '../util/dom.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
-import { state, update, toggleIn, setLayer } from '../state.js';
+import { state, update, toggleIn, setLayer, filtersActive, resetFilters, DEFAULT_LAYERS } from '../state.js';
 import { itemColor } from '../layers/items.js';
 
 /** Left rail: search, layer toggles, evidence/status filters and results. */
@@ -24,7 +24,10 @@ const EVIDENCE_FILTERS = [
   'pilot-witness', 'police-witness', 'multiple-witnesses', 'physical-trace', 'medical', 'audio', 'em-effects',
 ];
 
+const layersAreDefault = () => Object.entries(DEFAULT_LAYERS).every(([k, v]) => Boolean(state.layers[k]) === v);
+
 export function renderLayers(counts) {
+  document.getElementById('layers-reset')?.classList.toggle('hidden', layersAreDefault());
   mount(
     document.getElementById('layers'),
     html`${LAYER_DEFS.map(
@@ -35,6 +38,20 @@ export function renderLayers(counts) {
       </button>`,
     )}`,
   );
+}
+
+/** The filters in force, each removable, with one button to clear them all. */
+export function renderActiveFilters() {
+  const el = document.getElementById('active-filters');
+  if (!el) return;
+  const chips = [];
+  if (state.search) chips.push(html`<button class="chip small on" data-clear="search" title="Clear the search">“${state.search}” ✕</button>`);
+  if (state.yearRange) chips.push(html`<button class="chip small on" data-clear="years" title="All years">${state.yearRange[0]}–${state.yearRange[1]} ✕</button>`);
+  for (const e of state.evidence) chips.push(html`<button class="chip small on" data-clear-evidence="${e}">${EVIDENCE[e]?.label || e} ✕</button>`);
+  for (const k of state.shape) chips.push(html`<button class="chip small on" data-clear-shape="${k}">${SHAPES[k]?.label || k} ✕</button>`);
+  for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${STATUS[k]?.label || k} ✕</button>`);
+  el.classList.toggle('hidden', !chips.length);
+  mount(el, chips.length ? html`<span class="af-label">FILTERED BY</span>${chips}<button class="chip small af-reset" data-clear="all">RESET ALL</button>` : html``);
 }
 
 export function renderFilters() {
@@ -72,7 +89,10 @@ export function renderList(items) {
   const list = document.getElementById('case-list');
   document.getElementById('case-count').textContent = `${items.length} shown`;
   if (!sorted.length) {
-    mount(list, html`<li class="case-empty">No records match these filters.</li>`);
+    mount(
+      list,
+      html`<li class="case-empty">No records match these filters.${filtersActive() ? html`<br /><button class="chip small on" data-clear="all" style="margin-top:10px">RESET FILTERS</button>` : ''}</li>`,
+    );
     return;
   }
   mount(
@@ -125,8 +145,25 @@ export function bindList({ onSelect }) {
     const b = e.target.closest('[data-status]');
     if (b) toggleIn('status', b.dataset.status);
   });
+  // Removing filters: the chips above the results, and the reset in an empty list.
+  const clear = (e) => {
+    const b = e.target.closest('[data-clear], [data-clear-evidence], [data-clear-shape], [data-clear-status]');
+    if (!b) return false;
+    if (b.dataset.clear === 'all') resetFilters();
+    else if (b.dataset.clear === 'search') {
+      search.value = '';
+      update({ search: '' }, 'search');
+    } else if (b.dataset.clear === 'years') update({ yearRange: null }, 'yearRange');
+    else if (b.dataset.clearEvidence) toggleIn('evidence', b.dataset.clearEvidence);
+    else if (b.dataset.clearShape) toggleIn('shape', b.dataset.clearShape);
+    else if (b.dataset.clearStatus) toggleIn('status', b.dataset.clearStatus);
+    return true;
+  };
+  document.getElementById('active-filters')?.addEventListener('click', clear);
+  document.getElementById('layers-reset')?.addEventListener('click', () => update({ layers: { ...DEFAULT_LAYERS } }, 'layers'));
   const list = document.getElementById('case-list');
   list.addEventListener('click', (e) => {
+    if (clear(e)) return;
     const li = e.target.closest('[data-key]');
     if (li) onSelect(li.dataset.key, 'list');
   });

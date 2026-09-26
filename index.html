@@ -62,7 +62,7 @@
     </div>
     <div class="panel-body">
       <input id="search" type="search" placeholder="Search cases, places, evidence…  ( / )" autocomplete="off" />
-      <div class="section-label">LAYERS</div>
+      <div class="section-label layers-label"><span>LAYERS</span><button id="layers-reset" class="link-btn hidden" type="button" title="Back to the default layers">RESET</button></div>
       <div id="layers" class="layer-list"></div>
       <details class="filters" id="filters">
         <summary class="section-label"><span>FILTERS<span id="filter-count" class="active-count"></span></span></summary>
@@ -73,6 +73,7 @@
         <div class="section-label">STATUS</div>
         <div id="status-filters" class="chips"></div>
       </details>
+      <div id="active-filters" class="active-filters hidden" aria-label="Active filters"></div>
       <div class="section-label list-label">
         <span>RESULTS</span>
         <select id="sort" aria-label="Sort cases">
@@ -90,6 +91,7 @@
   <!-- ── Right rail: dossier ─────────────────────────────── -->
   <aside id="dossier" class="panel glass hidden" aria-label="Case dossier">
     <div class="panel-head">
+      <button id="dossier-back" class="icon-btn hidden" aria-label="Back to the previous record" title="Back">‹</button>
       <span class="panel-title">DOSSIER</span>
       <span id="dossier-id" class="muted mono"></span>
       <button id="dossier-peek" class="icon-btn mobile-only" aria-label="Shrink dossier to see the globe" title="Show globe">⌄</button>
@@ -120,6 +122,9 @@
     </button>
     <button type="button" data-view="out" title="Zoom out (−)" aria-label="Zoom out">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" /></svg>
+    </button>
+    <button type="button" data-view="group" aria-pressed="true" title="Grouping nearby markers: on (C)" aria-label="Group nearby markers">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="5" cy="6" r="2.4" /><circle cx="11" cy="5" r="2" /><circle cx="9" cy="11" r="2.6" /></svg>
     </button>
     <button type="button" data-view="near" title="Near me: what has been reported around you (N)" aria-label="Near me">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.5s-4.5-4.2-4.5-7.6a4.5 4.5 0 0 1 9 0c0 3.4-4.5 7.6-4.5 7.6z" /><circle cx="8" cy="6.8" r="1.6" /></svg>
