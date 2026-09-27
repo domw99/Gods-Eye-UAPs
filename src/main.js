@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken } from './app/viewer.js';
+import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken, loadStarSky } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop } from './app/quality.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
@@ -1067,14 +1067,19 @@ handler.setInputAction((click) => {
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-let hoverPending = false;
+// Hover: picking renders the scene again and reads it back from the GPU, so it
+// waits until the pointer pauses, and never runs mid-drag.
+let hoverTimer = 0;
+let pointerHeld = false;
+viewer.canvas.addEventListener('pointerdown', () => (pointerHeld = true));
+window.addEventListener('pointerup', () => (pointerHeld = false));
 handler.setInputAction((move) => {
-  if (hoverPending) return;
-  if (pointerIsTouch || cameraMoving) return hideHover();
-  hoverPending = true;
-  requestAnimationFrame(() => {
-    hoverPending = false;
-    const hit = describePick(viewer.scene.pick(move.endPosition));
+  clearTimeout(hoverTimer);
+  if (pointerIsTouch || cameraMoving || pointerHeld) return hideHover();
+  const at = Cesium.Cartesian2.clone(move.endPosition);
+  hoverTimer = setTimeout(() => {
+    if (cameraMoving || pointerHeld) return;
+    const hit = describePick(viewer.scene.pick(at));
     let lines = null; // [title, detail] — escaped below, data is external
     if (hit?.type === 'item') lines = [hit.item.title, `${hit.item.year} · ${hit.item.place}`];
     else if (hit?.type === 'cluster') {
@@ -1112,13 +1117,14 @@ handler.setInputAction((move) => {
     }
     if (lines) {
       hoverEl.innerHTML = `${esc(lines[0])}<br><span class="dim">${esc(lines[1])}</span>`;
-      hoverEl.style.left = `${move.endPosition.x}px`;
-      hoverEl.style.top = `${move.endPosition.y}px`;
+      hoverEl.style.left = `${at.x}px`;
+      hoverEl.style.top = `${at.y}px`;
       hoverEl.classList.remove('hidden');
       viewer.scene.canvas.style.cursor = 'pointer';
     } else hideHover();
-  });
+  }, 90);
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+viewer.scene.canvas.addEventListener('pointerleave', () => clearTimeout(hoverTimer));
 viewer.scene.canvas.addEventListener('pointerdown', () => stopTour());
 viewer.scene.canvas.addEventListener('pointerleave', hideHover);
 
@@ -1930,6 +1936,10 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     setTimeout(() => {
       loading.classList.add('done');
       maybeWelcome();
+      // Compile the picking shaders while idle, so the first hover doesn't stall.
+      const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
+      (window.requestIdleCallback || setTimeout)(warm, { timeout: 3000 });
+      (window.requestIdleCallback || setTimeout)(() => loadStarSky(viewer, BASE), { timeout: 4000 });
     }, 250);
     removeProgress();
   };
@@ -1954,4 +1964,5 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
   // Used by scripts/build-cards.mjs to render the case pages' preview images.
   zoomer: () => zoomer,
+  Cesium,
   cardFor: async (key, url) => (await makeCard(itemByKey(key), url)).toDataURL('image/jpeg', 0.84) };

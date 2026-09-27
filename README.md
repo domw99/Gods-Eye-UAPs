@@ -417,6 +417,8 @@ Corrections and new cases are welcome, especially with sources.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
   - Research archives: the *APRO Bulletin* (Aerial Phenomena Research Organization) and MUFON chapter newsletters as scanned by the [Archives for the Unexplained](https://archive.org/details/ufonewsletters); NICAP's *U.F.O. Investigator* from the Internet Archive's Serials in Microfilm; CUFOS's *International UFO Reporter* from the Internet Archive. Only places, page numbers, short quotes and a word index are stored; the pages are read from the Internet Archive.
   - Night lights: NASA Earth Observatory Black Marble (VIIRS, 2016), served by NASA GIBS.
+  - Stars behind the globe: [NASA Deep Star Maps 2020](https://svs.gsfc.nasa.gov/4851) (NASA/Goddard Scientific Visualization Studio; Hipparcos-2, Tycho-2 and Gaia DR2 stars), made into a sky box by `scripts/build-skybox.py`.
+  - Dark, Streets and Topographic maps and the place names overlay: Esri (keyless services, attribution shown in the app).
 - **Other data:**
   - Launches: [Launch Library 2](https://thespacedevs.com/llapi) by The Space Devs.
   - Weather: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0), ERA5 reanalysis by ECMWF / Copernicus.

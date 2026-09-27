@@ -6,13 +6,15 @@ import * as Cesium from 'cesium';
  * while something animates. A still globe then costs almost nothing, which
  * keeps the panels and scrolling smooth and saves battery.
  *
- * A still view is always drawn at the screen's full sharpness. Only while
- * the view moves (camera, playback, animations) does it render at a lower
- * pixel ratio, which drops further if frames get slow; a moment after the
- * motion stops the next frame is sharp again.
+ * The view is drawn at the screen's full sharpness. Only on a device where
+ * frames get slow while the view moves (camera, playback, animations) does
+ * the moving view drop to a lower pixel ratio, stepping back up when frames
+ * are fast again; a moment after the motion stops the view is sharp again.
+ * Changing the ratio resizes every GPU buffer, so a device that keeps up
+ * never switches at all.
  */
 const IDLE_MS = 500; // a slow heartbeat catches anything that changed without asking
-const SETTLE_MS = 180; // this long after the last moving frame, draw a sharp one
+const SETTLE_MS = 350; // this long after the last moving frame, draw a sharp one
 
 export function deviceProfile() {
   const coarse = globalThis.matchMedia?.('(pointer: coarse)').matches ?? false;
@@ -21,10 +23,11 @@ export function deviceProfile() {
   const low = coarse || memory <= 4;
   return {
     low,
-    // At rest: the screen's own pixel ratio (up to 2×), so text, markers and imagery are crisp.
-    pixelRatio: Math.min(dpr, 2),
-    // While moving: cheaper, especially on phones and tablets.
-    motionPixelRatio: low ? Math.min(dpr, 1.25) : Math.min(dpr, 1.5),
+    // The screen's own pixel ratio (up to 2×, 1.5× on phones and tablets), so
+    // text, markers and imagery are crisp.
+    pixelRatio: low ? Math.min(dpr, 1.5) : Math.min(dpr, 2),
+    // The lowest a moving view may drop to on a slow device.
+    motionPixelRatio: low ? Math.min(dpr, 0.9) : Math.min(dpr, 1),
     msaa: low ? 1 : dpr >= 1.5 ? 2 : 4,
     fxaa: low,
     // Imagery detail: lower is sharper (more tiles). High-DPI screens get finer tiles.
@@ -74,9 +77,9 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
   let last = 0;
   let slow = 0;
   let fast = 0;
-  let scale = Math.min(baseScale, sharpScale);
-  const minScale = scale * 0.55;
-  const maxScale = scale;
+  let scale = sharpScale; // what a moving view renders at; starts sharp
+  const minScale = Math.min(baseScale, sharpScale);
+  const maxScale = sharpScale;
   let settle = 0;
   const sharpen = () => {
     settle = 0;
@@ -105,10 +108,10 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
       fast++;
       slow = 0;
     }
-    if (slow > 30 && scale > minScale) {
+    if (slow > 15 && scale > minScale) {
       scale = Math.max(minScale, scale * 0.85);
       slow = 0;
-    } else if (fast > 90 && scale < maxScale) {
+    } else if (fast > 120 && scale < maxScale) {
       scale = Math.min(maxScale, scale / 0.85);
       fast = 0;
     }

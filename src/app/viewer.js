@@ -205,4 +205,24 @@ export async function createViewer(container) {
   return viewer;
 }
 
+/**
+ * The sky behind the globe: NASA's Deep Star Maps 2020 (Hipparcos-2, Tycho-2
+ * and Gaia DR2 stars; NASA/Goddard SVS), as six 2048-px cube faces made by
+ * scripts/build-skybox.py. Loaded after the globe is up and swapped in whole,
+ * so there is no gap; Cesium's own star field shows until then.
+ */
+export async function loadStarSky(viewer, base) {
+  const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
+  try {
+    const images = await Promise.all(Object.values(faces).map((f) => Cesium.Resource.fetchImage({ url: `${base}skybox/${f}.jpg` })));
+    const sources = Object.fromEntries(Object.keys(faces).map((k, i) => [k, images[i]]));
+    const old = viewer.scene.skyBox;
+    viewer.scene.skyBox = new Cesium.SkyBox({ sources });
+    if (old && !old.isDestroyed?.()) old.destroy();
+    viewer.scene.requestRender();
+  } catch (e) {
+    console.warn('[sky] keeping the default star field', e);
+  }
+}
+
 export { Cesium };
