@@ -114,10 +114,18 @@ export function createBasemap(viewer, { onChange = () => {} } = {}) {
     },
     setStyle(style) {
       if (!(style in BASEMAPS) || style === state.style) return busy;
+      const previous = state.style;
       state = { ...state, style };
       save();
       return run(async () => {
-        await applyStyle(style);
+        try {
+          await applyStyle(style);
+        } catch (e) {
+          // Couldn't reach the map service: keep the map that is showing.
+          state = { ...state, style: previous };
+          save();
+          throw e;
+        }
         await applyNames();
       });
     },

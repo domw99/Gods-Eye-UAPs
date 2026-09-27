@@ -751,7 +751,9 @@ body[data-mode='flir'] .thermal-scale, body[data-mode='ironbow'] .thermal-scale 
 body[data-mode='ironbow'] .thermal-scale i { background: linear-gradient(90deg, #000005, #29005c, #8c0073, #e6291f, #ff9400, #ffed66, #fff); }
 body.left-collapsed .thermal-scale { left: 80px; }
 body.clean .thermal-scale { left: 20px; }
-@media (max-width: 760px) { .thermal-scale { left: 14px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 760px) { .thermal-scale { left: 14px; bottom: auto; top: calc(186px + env(safe-area-inset-top, 0px)); } }
+.tips-touch { display: none; }
+@media (pointer: coarse) { .tips-mouse { display: none; } .tips-touch { display: inline; } }
 
 /* ── Starred cases ────────────────────────────────────── */
 .case-item .star { color: #ffcf5c; }

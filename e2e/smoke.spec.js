@@ -50,6 +50,35 @@ test.describe('God’s Eye // UAP', () => {
     expect(await page.evaluate(() => window.__uap.viewer.camera.positionCartographic.height)).toBeGreaterThan(8e6);
   });
 
+  test('lighting and starred cases are remembered', async ({ page }) => {
+    await openApp(page, '/#/case/socorro-zamora-1964');
+    await page.keyboard.press('m');
+    await expect(page.locator('#ms-style [data-style]')).toHaveCount(4);
+    await page.locator('#ms-light [data-light="night"]').click();
+    await expect(page.locator('#ms-light [data-light="night"]')).toHaveClass(/on/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#hud-map')).toContainText('· NIGHT');
+    await page.locator('#dossier-body [data-action="star"]').click();
+    await expect(page.locator('#dossier-body [data-action="star"]')).toHaveText('★ STARRED');
+    await page.reload();
+    await expect(page.locator('#case-list .case-item').first()).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#hud-map')).toContainText('· NIGHT', { timeout: 20_000 });
+    await page.locator('#filters summary').click();
+    await page.locator('[data-starred-only]').click();
+    await expect(page.locator('#case-list .case-item')).toHaveCount(1);
+    await expect(page.locator('#case-list .case-item')).toContainText('Socorro');
+  });
+
+  test('clean view hides the panels and a case brings them back', async ({ page }) => {
+    await openApp(page);
+    await page.keyboard.press('f');
+    await expect(page.locator('body')).toHaveClass(/clean/);
+    await expect(page.locator('#clean-exit')).toBeVisible();
+    await page.evaluate(() => window.__uap.select('case:socorro-zamora-1964', 'list'));
+    await expect(page.locator('body')).not.toHaveClass(/clean/);
+    await expect(page.locator('#dossier-body .d-title')).toHaveText(/Socorro/);
+  });
+
   test('filters narrow the list and reset clears them', async ({ page }) => {
     await openApp(page);
     const all = await caseCount(page);

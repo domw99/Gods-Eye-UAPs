@@ -671,6 +671,7 @@ function select(key, source = 'api') {
   const item = itemByKey(key);
   if (!item) return false;
   setOrbitDay(null);
+  focusRecord();
   if (!document.getElementById('welcome').hidden) closeWelcome(); // they found their way in
   selectToken++;
   hideHover();
@@ -704,6 +705,7 @@ function select(key, source = 'api') {
 }
 
 async function selectBlueBook(id) {
+  focusRecord();
   stopTour();
   story.stop(true);
   const token = ++selectToken;
@@ -731,6 +733,7 @@ async function selectBlueBook(id) {
 }
 
 async function selectGeipan(id) {
+  focusRecord();
   stopTour();
   story.stop(true);
   const token = ++selectToken;
@@ -763,6 +766,7 @@ const selectJournalPage = (issueId, leaf, recordIndex = null) => selectArchivePa
 
 /** Open a page of the MUFON Journal ('mufon') or of the research archives ('journals'). */
 async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
+  focusRecord();
   stopTour();
   story.stop(true);
   const token = ++selectToken;
@@ -951,6 +955,7 @@ let nearPoint = null; // { lat, lon } while the nearby dossier is open
 
 /** Everything reported near a point, filled in as each archive loads. */
 async function showNearby(lat, lon, label, { fly = true } = {}) {
+  focusRecord();
   deselect({ keepHash: true });
   const token = selectToken;
   nearPoint = { lat, lon };
@@ -1527,6 +1532,7 @@ function tourStep() {
   tourTimer = setTimeout(tourStep, 18000);
 }
 function startTour() {
+  if (flycam.orbiting) setOrbit(false);
   if (tourTimer) return stopTour();
   tourIndex = 0;
   tourTimer = true;
@@ -1556,6 +1562,7 @@ function flyHome(duration = 1.8) {
 }
 
 function resetView() {
+  if (flycam.orbiting) setOrbit(false);
   stopTour();
   if (story.active) story.stop(true);
   if (trackLayer.witnessOn) toggleWitnessView(false);
@@ -1679,6 +1686,12 @@ function setCleanView(on = !document.body.classList.contains('clean')) {
   render.request();
 }
 document.getElementById('clean-exit').addEventListener('click', () => setCleanView(false));
+
+/** Opening a record takes the camera: stop orbiting, and bring the panels back to show it. */
+function focusRecord() {
+  if (flycam.orbiting) setOrbit(false);
+  if (document.body.classList.contains('clean')) setCleanView(false);
+}
 viewer.camera.moveEnd.addEventListener(() => zoomer.levelIfHigh());
 
 function zoomView(dir) {
@@ -1755,7 +1768,10 @@ function openMapSettingsNow() {
     onLighting: (m) => setLighting(m),
     style: basemap.style,
     names: basemap.names,
-    onStyle: (s) => basemap.setStyle(s),
+    onStyle: async (s) => {
+      await basemap.setStyle(s);
+      if (basemap.style !== s) toast('That map could not be loaded right now', 3000);
+    },
     onNames: (on) => basemap.setNames(on),
     buildingsOn: state.layers.buildings,
     photoreal: { active: photoreal.active, source: photoreal.source },
