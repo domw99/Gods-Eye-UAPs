@@ -1,4 +1,4 @@
-import { p, commons, dvids, link, MIN, HR, bluebookPdf } from './helpers.js';
+import { p, commons, link, MIN, HR, bluebookPdf } from './helpers.js';
 
 /** Curated cases outside North America. */
 export default [

@@ -116,8 +116,8 @@ function lookup(text) {
   if (!text) return null;
   const hit = REGIONS.find((r) => r.match.test(text));
   if (!hit) return null;
-  const { match, ...rest } = hit;
-  return { ...rest };
+  const { match: _match, ...rest } = hit;
+  return rest;
 }
 
 // Phrases AARO uses to say where a platform was, e.g. "aboard a U.S. Coast

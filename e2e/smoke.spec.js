@@ -79,6 +79,23 @@ test.describe('God’s Eye // UAP', () => {
     await expect(page.locator('#dossier-body .d-title')).toHaveText(/Socorro/);
   });
 
+  test('a logged sighting opens, then can be deleted', async ({ page }) => {
+    const errors = await openApp(page);
+    await page.keyboard.press('l');
+    await page.locator('#log-form [name=title]').fill('Three silent orange lights');
+    await page.locator('#log-form [name=lat]').fill('51.5');
+    await page.locator('#log-form [name=lon]').fill('-0.12');
+    await page.locator('#log-form button[type=submit]').click();
+    await expect(page.locator('#dossier-body .d-title')).toHaveText('Three silent orange lights');
+    await expect(page).toHaveURL(/#\/user\//);
+    const del = page.locator('[data-action=delete-user]');
+    await del.click();
+    await expect(del).toHaveText(/again/);
+    await del.click();
+    await expect(page.locator('#dossier')).toHaveClass(/hidden/);
+    expect(errors).toEqual([]);
+  });
+
   test('filters narrow the list and reset clears them', async ({ page }) => {
     await openApp(page);
     const all = await caseCount(page);

@@ -148,6 +148,7 @@ body[data-mode='ironbow'] #scope { opacity: 1; }
 }
 @media (hover: hover) { .chip:hover { border-color: var(--glass-border-hover); background: rgba(255, 255, 255, 0.08); } }
 .chip[aria-pressed='true'], .chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.chip.danger { border-color: var(--danger); color: var(--danger); }
 .chip.small { font-size: 10px; padding: 4px 8px; }
 
 .icon-btn {

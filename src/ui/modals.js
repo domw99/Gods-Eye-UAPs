@@ -296,6 +296,8 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const f = new FormData(form);
+    const when = new Date(f.get('date'));
+    if (Number.isNaN(when.getTime())) return toast('Check the date and time');
     const entry = {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
       title: f.get('title').trim(),
@@ -508,7 +510,7 @@ export function openExplain(o) {
     if (Number.isNaN(when.getTime())) return toast('Check the date and time');
     const num = (k) => (f.get(k) === '' || f.get(k) == null ? null : Number(f.get(k)));
     const input = {
-      date: new Date(f.get('date')).toISOString(),
+      date: when.toISOString(),
       lat: Number(f.get('lat')),
       lon: Number(f.get('lon')),
       report: {

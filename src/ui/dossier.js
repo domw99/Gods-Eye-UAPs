@@ -863,9 +863,23 @@ export function renderUser(item, { onDelete }) {
   );
   autoFillLaunches();
   fillWeather(token, u.lat, u.lon, u.date, null);
-  body().querySelector('[data-action="delete-user"]').addEventListener('click', (e) => {
+  // Two presses to delete: the first asks, the second (within a few seconds) deletes.
+  const del = body().querySelector('[data-action="delete-user"]');
+  let armed = null;
+  del.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (confirm('Delete this sighting from this browser?')) onDelete(u.id);
+    if (armed) {
+      clearTimeout(armed);
+      onDelete(u.id);
+      return;
+    }
+    del.textContent = 'Press again to delete';
+    del.classList.add('danger');
+    armed = setTimeout(() => {
+      armed = null;
+      del.textContent = 'Delete this entry';
+      del.classList.remove('danger');
+    }, 4000);
   });
 }
 

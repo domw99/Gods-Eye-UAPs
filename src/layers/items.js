@@ -324,7 +324,6 @@ export function createItemLayer(viewer) {
   }
 
   function clusterPoints(pts) {
-    const scene = viewer.scene;
     if (pts.length < CLUSTER_MIN) return;
     // Bucket by screen cell, then grow each group from an unused seed.
     const grid = new Map();
