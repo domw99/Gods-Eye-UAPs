@@ -564,6 +564,33 @@ const LIGHT_NEAR = 1.5e6; // camera heights above the ground
 const LIGHT_FAR = 4e6;
 const EARTH_RADIUS = 6_371_000;
 
+/* NASA's true-colour picture of the Earth on a case's day: MODIS on the Terra
+   satellite, served keyless by NASA GIBS (250 m pixels, so it fades out close in). */
+let orbitDay = null; // { day, layer }
+function setOrbitDay(day) {
+  if (orbitDay) {
+    viewer.imageryLayers.remove(orbitDay.layer, true);
+    orbitDay = null;
+  }
+  if (day) {
+    const layer = viewer.imageryLayers.addImageryProvider(
+      new Cesium.UrlTemplateImageryProvider({
+        url: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${day}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
+        maximumLevel: 9,
+        credit: `The Earth on ${day}: NASA EOSDIS GIBS, MODIS Terra corrected reflectance`,
+      }),
+      1, // just above the base map, under city lights and place names
+    );
+    orbitDay = { day, layer };
+  }
+  render.request();
+}
+viewer.scene.preRender.addEventListener(() => {
+  if (!orbitDay) return;
+  const h = viewer.camera.positionCartographic.height;
+  orbitDay.layer.alpha = 0.95 * Math.min(1, Math.max(0, (h - 40e3) / (220e3 - 40e3)));
+});
+
 /** Recompute the sun at the site for the current clock time. */
 function updateNightDim() {
   if (!sceneMoment) return;
@@ -642,6 +669,7 @@ let selectToken = 0;
 function select(key, source = 'api') {
   const item = itemByKey(key);
   if (!item) return false;
+  setOrbitDay(null);
   if (!document.getElementById('welcome').hidden) closeWelcome(); // they found their way in
   selectToken++;
   hideHover();
@@ -766,6 +794,7 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
 
 function deselect({ keepHash = false } = {}) {
   selectToken++;
+  setOrbitDay(null);
   nearPoint = null;
   hideHover();
   story.stop(true);
@@ -1204,6 +1233,17 @@ document.getElementById('pb-close').addEventListener('click', () => {
 /* ── Dossier actions ───────────────────────────────────── */
 bindDossierActions({
   lightbox: (d) => openLightbox(d),
+  'orbit-day': (btn) => {
+    const on = orbitDay?.day !== btn.dataset.day;
+    setOrbitDay(on ? btn.dataset.day : null);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.classList.toggle('on', on);
+    btn.textContent = on ? '✓ THAT DAY FROM ORBIT' : '🛰 THAT DAY FROM ORBIT';
+    // Rise high enough to see the weather systems around the site.
+    const item = itemByKey(state.selected);
+    if (on && item && viewer.camera.positionCartographic.height < 900e3)
+      viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(item.lon, item.lat, 1_600_000), duration: 1.6 });
+  },
   play: () => {
     trackLayer.fit(1.2);
     trackLayer.restart();

@@ -85,9 +85,20 @@ function skyBlock(lat, lon, when, explanation = '', approx = false) {
   }
 }
 
+// NASA's Terra satellite has photographed the whole Earth every day since 24 Feb 2000.
+const ORBIT_FROM = '2000-02-24';
+
+/** The button that lays that day's satellite picture over the globe. */
+function orbitDayButton(when) {
+  const day = String(when).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < ORBIT_FROM) return '';
+  return html`<div class="btn-row" style="margin-top:10px"><button class="chip" data-action="orbit-day" data-day="${day}" aria-pressed="false" title="NASA's true-colour picture of the Earth on ${day} (Terra satellite)">🛰 THAT DAY FROM ORBIT</button></div>
+    <p class="caveat">The whole Earth as NASA's Terra satellite photographed it that day, clouds included. It passes about 10:30 in the morning local time, so the sky at a night sighting may have changed.</p>`;
+}
+
 function weatherBlock(when) {
   if (!weatherAvailable(when)) return '';
-  return section('WEATHER AT THE TIME', html`<div id="d-weather"><div class="loading-line">Loading historical weather…</div></div>`);
+  return section('WEATHER AT THE TIME', html`<div id="d-weather"><div class="loading-line">Loading historical weather…</div></div>${orbitDayButton(when)}`);
 }
 
 function windArrow(towardDeg) {
