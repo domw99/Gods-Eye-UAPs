@@ -50,7 +50,9 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - **Filters stay in view** as chips above the results, each removable, with **RESET ALL**. **Back and Forward** step through the records you opened, and every record has its own link.
 - **Group or ungroup** nearby markers (<kbd>C</kbd>). Labels that would overlap are hidden by priority, so the view stays readable.
 - **Share any view**: the address bar keeps the camera position.
-- **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. The **＋ / −** buttons zoom toward the centre of the screen, while wheel zoom heads for the pointer.
+- **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. Zooming in with the wheel heads for the pointer; zooming out (wheel, **−** button or key) stays centred and levels the view as it rises, so the globe ends up in the middle.
+- **Fly with the keyboard**: arrow keys move over the ground, <kbd>Shift</kbd>+arrows turn and tilt, <kbd>O</kbd> orbits slowly around the middle of the screen, and <kbd>F</kbd> hides every panel for a clean view of the globe.
+- **Star cases** (☆ in a case file) to keep your own list in this browser, then show only those under *Filters › Saved*. **⚄ Random** opens a case with something to see, and first-time visitors get a short "start here" card.
 
 ### ✈️ Replay the encounter, from the witness's seat
 
@@ -73,14 +75,31 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <sub><b>Betty and Barney Hill, 1961.</b> The car's route and the craft's reported path replayed over the White Mountains, cycling through Normal → NVG → FLIR → Ironbow.</sub>
 
-There are five sensor looks, rendered as real-time post-processing shaders (keys <kbd>1</kbd>–<kbd>5</kbd>):
+There are five sensor looks, rendered as real-time post-processing shaders (keys <kbd>1</kbd>–<kbd>5</kbd>). They keep the picture sharp at any zoom, so markers and labels stay readable; the look comes from tone, grain and scanlines, not blur:
 - **Normal**
 - **NVG**: image-intensifier gain, shot noise and raster lines.
-- **FLIR white-hot**: a low-resolution microbolometer look.
-- **FLIR Ironbow**
-- **CRT**
+- **FLIR white-hot** and **FLIR Ironbow**, with a cold-to-hot scale on screen.
+- **CRT**: scanlines, a shadow mask and a slightly curved glass.
 
 **3D buildings are free.** OpenStreetMap buildings (via OpenFreeMap) appear as you zoom into any town. If you want Google's photorealistic 3D tiles instead, paste your own key under **MAP**.
+
+### 🗺 Map styles, day and night, and a real sky
+
+<img src="docs/media/map-styles.jpg" alt="The same view of Arizona on the satellite map with place names, and on the dark, streets and topographic maps" width="100%" />
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/night-globe.jpg" alt="Night lighting: the Americas at night with city lights, the case markers and NASA's star map behind the globe" /></td>
+<td width="50%"><img src="docs/media/day-globe.jpg" alt="Day: the globe of cases against NASA's star map" /></td>
+</tr>
+<tr>
+<td><sub><b>Night</b> (<kbd>D</kbd> cycles the lighting): the side you look at turns to night, with NASA's Black Marble city lights.</sub></td>
+<td><sub><b>The stars are real</b>: NASA's Deep Star Maps 2020, 1.7 billion stars from Hipparcos, Tycho and Gaia, in their true positions behind the globe.</sub></td>
+</tr>
+</table>
+
+- **Map style** (**MAP** or <kbd>M</kbd>): Satellite, Dark, Streets or Topographic, all keyless. Over the satellite map you can add **place names and borders**, which fade out close in where 3D buildings take over.
+- **Lighting**: *Auto* lights an open case by the sun at the moment it happened, with city lights on the night side; *Day* and *Night* hold that look everywhere; *Off* keeps the globe evenly lit.
 
 ### 🔭 Check it yourself
 
@@ -95,6 +114,9 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
   Aircraft are listed as not checkable. Above, a bright, still light low in the WSW at dusk comes back as **Venus**.
 - **The sky at that moment**, for every case: Sun, Moon phase, planets and bright stars. Objects named in the official explanation are circled. For the Hills in 1961, Jupiter sits low in the SSW beside the Moon, just as the Air Force file says.
 - **Historical weather** since 1940 (ERA5): cloud layers, wind at 10 m and 100 m, and whether a slow object moved with the wind.
+- **That day from orbit**, for cases since 2000: NASA's true-colour picture of the whole Earth that day (MODIS on the Terra satellite) laid over the globe. Below, O'Hare on 7 November 2006 under the solid overcast the witnesses described.
+
+  <img src="docs/media/orbit-day.jpg" alt="The O'Hare case: NASA's satellite picture of 7 November 2006 over the globe shows Chicago under solid cloud; the dossier shows 100% overcast and the THAT DAY FROM ORBIT button" width="100%" />
 - **Military airspace**: which FAA restricted or warning areas a case falls in.
 
 <table>
@@ -238,13 +260,15 @@ Restrict browser keys to your domain, because anything built into the site is pu
 |---|---|---|---|
 | <kbd>1</kbd>–<kbd>5</kbd> | Sensor modes | <kbd>E</kbd> | What did I see? |
 | <kbd>/</kbd> | Search | <kbd>V</kbd> | Witness view (during playback) |
-| <kbd>[</kbd> <kbd>]</kbd> | Previous / next case | <kbd>M</kbd> | 3D map settings |
+| <kbd>[</kbd> <kbd>]</kbd> | Previous / next case | <kbd>M</kbd> | Map: style, place names, lighting, 3D |
 | <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Files library (government + MUFON) |
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
+| <kbd>D</kbd> | Lighting: auto → day → night → off | <kbd>F</kbd> | Clean view: hide every panel |
+| <kbd>O</kbd> | Orbit around the middle of the screen | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
 
 </details>
 
@@ -295,6 +319,7 @@ flowchart LR
 |---|---|
 | Globe, imagery, terrain, 3D tiles, key handling | `src/app/viewer.js` |
 | Rendering on demand, device quality, dynamic resolution | `src/app/quality.js` |
+| Map styles and place names; centred zoom-out; keyboard flying and orbit | `src/app/basemap.js`, `src/app/zoom.js`, `src/app/flycam.js` |
 | NVG / FLIR / Ironbow / CRT shaders | `src/app/effects.js` |
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
 | Label decluttering; Blue Book, GEIPAN, MUFON, research-archive & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
@@ -306,8 +331,9 @@ flowchart LR
 
 ```
 src/
-  app/        viewer.js (globe, imagery, terrain, 3D tiles) · effects.js (NVG/FLIR/CRT shaders)
+  app/        viewer.js (globe, imagery, terrain, 3D tiles, star sky) · effects.js (NVG/FLIR/CRT shaders)
               quality.js (render on demand, device quality) · horizon.js (markers hidden behind the Earth)
+              basemap.js (map styles, place names) · zoom.js (centred zoom-out) · flycam.js (keys, orbit)
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
   layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
               points.js (Blue Book / GEIPAN / MUFON / NUFORC) · satellites.js (live SGP4)
@@ -323,6 +349,7 @@ src/
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
               build-cards.mjs (case preview images) · indexnow.mjs (search engines)
+              build-skybox.py (NASA star map → sky box)
               verify-media.mjs · check-links.mjs · fix-cesium-base.mjs
               lib/ (GeoNames gazetteer · case-pages.mjs: a page per case + sitemap, made at build)
 public/cards/ the preview image for each case page

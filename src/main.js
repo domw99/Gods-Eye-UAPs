@@ -487,8 +487,9 @@ function showNightLights(on) {
     basemap.keepNamesOnTop();
     nightLights.dayAlpha = 0;
     nightLights.nightAlpha = 1;
-    nightLights.brightness = 1.9;
-    nightLights.contrast = 1.25;
+    nightLights.brightness = 2.2; // moonlit coastlines, cities that glow
+    nightLights.contrast = 1.3;
+    nightLights.gamma = 1.35;
   }
   if (nightLights) nightLights.show = on;
 }
