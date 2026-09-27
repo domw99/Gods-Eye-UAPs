@@ -1664,12 +1664,26 @@ function closeWelcome() {
     localStorage.setItem(WELCOME_KEY, '1');
   } catch {}
 }
+// Returning visitors hear once about what changed since they were here.
+const RELEASE = '1.1';
+const RELEASE_KEY = 'gods-eye-uap:release';
 function maybeWelcome() {
   let seen = false;
+  let release = null;
   try {
     seen = Boolean(localStorage.getItem(WELCOME_KEY));
+    release = localStorage.getItem(RELEASE_KEY);
+    localStorage.setItem(RELEASE_KEY, RELEASE);
   } catch {}
-  if (!seen && !location.hash && !state.selected && !navigator.webdriver) welcome.hidden = false;
+  if (navigator.webdriver) return;
+  if (!seen && !location.hash && !state.selected) welcome.hidden = false;
+  else if (seen && release !== RELEASE)
+    toast(
+      matchMedia('(pointer: coarse)').matches
+        ? 'New: NASA star sky · map styles and day/night lighting under MAP · that day from orbit in case files'
+        : 'New: NASA star sky · map styles & lighting (MAP, D) · clean view (F) · orbit (O) · that day from orbit',
+      7000,
+    );
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');

@@ -484,6 +484,10 @@ body.dossier-open .map-controls { right: calc(var(--right-w) + 26px); }
   left: 50%;
   top: calc(var(--top-h) + 22px);
   transform: translateX(-50%);
+  width: max-content;
+  max-width: min(640px, calc(100vw - 32px));
+  text-align: center;
+  line-height: 1.45;
   z-index: 60;
   font-family: var(--font-mono);
   font-size: 12px;
