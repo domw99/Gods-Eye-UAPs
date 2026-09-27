@@ -253,7 +253,7 @@ export function openAbout(meta) {
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
-    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
+    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Night-side city lights: NASA Black Marble (VIIRS, 2016 — today’s lights, not those of the case year). Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p>
@@ -344,8 +344,22 @@ export function openMapSettings(o) {
         ? 'OFF — this site has a key configured'
         : 'OFF — no key yet';
   const content = html`
-    <h2>3D map</h2>
-    <p class="lead">There are two ways to see cities in 3D. OpenStreetMap buildings are free and need nothing. Google's photorealistic 3D tiles need your own API key.</p>
+    <h2>Map</h2>
+    <p class="lead">Pick the map under the markers, add place names, and see cities in 3D: OpenStreetMap buildings are free; Google's photorealistic 3D tiles need your own API key.</p>
+
+    <div class="section-label">MAP STYLE</div>
+    <div class="btn-row" id="ms-style" role="radiogroup" aria-label="Map style">${o.styles.map(
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.style ? 'on' : ''}" data-style="${id}" aria-checked="${id === o.style ? 'true' : 'false'}">${label.toUpperCase()}</button>`,
+    )}</div>
+    <div class="btn-row">${o.style === 'satellite'
+      ? html`<button type="button" class="chip ${o.names ? 'on' : ''}" id="ms-names" aria-pressed="${o.names ? 'true' : 'false'}">${o.names ? '✓ PLACE NAMES & BORDERS' : 'PLACE NAMES & BORDERS OFF'}</button>`
+      : html`<span class="muted mono">Place names and borders are part of this map.</span>`}</div>
+
+    <div class="section-label">LIGHTING · D</div>
+    <div class="btn-row" id="ms-light" role="radiogroup" aria-label="Lighting">${o.lightModes.map(
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${label.toUpperCase()}</button>`,
+    )}</div>
+    <p class="muted" style="margin:6px 0 12px;font-size:12px">Auto lights an open case by the sun at the time it happened, with city lights on the night side. Day and Night hold that look everywhere; Off keeps the globe evenly lit.</p>
 
     <div class="section-label">FREE — OPENSTREETMAP 3D BUILDINGS</div>
     <div class="d-text"><p>Building footprints and heights from OpenStreetMap, served keyless by OpenFreeMap and raised on the terrain. They appear when you zoom into a town (below about 9 km altitude). Detail depends on how well the area is mapped. "Fly to ground view" turns them on.</p></div>
@@ -377,7 +391,7 @@ export function openMapSettings(o) {
       <li>Paste it above. Check Google's <a href="https://developers.google.com/maps/documentation/tile/usage-and-billing" target="_blank" rel="noopener">current pricing and free usage limits</a>.</li>
     </ol>
     <p class="caveat">Your key is stored only in this browser (localStorage) and sent only to Google's tile server (tile.googleapis.com). It is never uploaded anywhere else. Anyone who uses this browser profile could read it, so remove it on shared computers. If you host your own copy, you can set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> instead.</p>`;
-  const el = modal('3D MAP', content, { wide: false });
+  const el = modal('MAP', content, { wide: false });
   const status = el.querySelector('#ms-status');
   const busy = (msg) => {
     status.textContent = `STATUS: ${msg}`;
@@ -390,6 +404,23 @@ export function openMapSettings(o) {
     return 'Could not load Google 3D tiles with this key.';
   };
 
+  el.querySelector('#ms-style').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-style]');
+    if (!b || b.classList.contains('on')) return;
+    for (const x of el.querySelectorAll('#ms-style [data-style]')) x.disabled = true;
+    await o.onStyle(b.dataset.style);
+    o.reopen();
+  });
+  el.querySelector('#ms-light').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-light]');
+    if (!b || b.classList.contains('on')) return;
+    o.onLighting(b.dataset.light);
+    o.reopen();
+  });
+  el.querySelector('#ms-names')?.addEventListener('click', async () => {
+    await o.onNames(!o.names);
+    o.reopen();
+  });
   el.querySelector('#ms-osm').addEventListener('click', () => {
     o.onBuildings(!o.buildingsOn);
     o.reopen();

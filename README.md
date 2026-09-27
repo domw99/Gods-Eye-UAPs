@@ -80,7 +80,7 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 - **FLIR Ironbow**
 - **CRT**
 
-**3D buildings are free.** OpenStreetMap buildings (via OpenFreeMap) appear as you zoom into any town. If you want Google's photorealistic 3D tiles instead, paste your own key under **3D MAP**.
+**3D buildings are free.** OpenStreetMap buildings (via OpenFreeMap) appear as you zoom into any town. If you want Google's photorealistic 3D tiles instead, paste your own key under **MAP**.
 
 ### 🔭 Check it yourself
 
@@ -216,7 +216,7 @@ That's it. Nothing needs a key: the imagery, terrain, 3D buildings, weather, lau
 
 <br>
 
-In the app, click **3D MAP** (or press <kbd>M</kbd>) and paste a Google Maps Platform key with the **Map Tiles API** enabled. The key stays in that browser's localStorage and is sent only to `tile.googleapis.com`. You can remove it there at any time.
+In the app, click **MAP** (or press <kbd>M</kbd>) and paste a Google Maps Platform key with the **Map Tiles API** enabled. The key stays in that browser's localStorage and is sent only to `tile.googleapis.com`. You can remove it there at any time.
 
 If you host your own copy, you can build keys in instead: copy `.env.example` to `.env`.
 
@@ -400,7 +400,7 @@ Corrections and new cases are welcome, especially with sources.
 - **Code:** MIT (see [LICENSE](LICENSE)).
 - **Inspiration:**
   - The visual language follows [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) by Bilawal Sidhu (MIT).
-  - Its space-launch layer, cockpit view, in-app key panel and URL camera inspired the launch layer, witness view, 3D MAP panel and view links here.
+  - Its space-launch layer, cockpit view, in-app key panel and URL camera inspired the launch layer, witness view, MAP panel and view links here.
   - The shaders and code here are original.
 - **Globe:** [CesiumJS](https://cesium.com/platform/cesiumjs/) (Apache-2.0).
 - **Map data:**

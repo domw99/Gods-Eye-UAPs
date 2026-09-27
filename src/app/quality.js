@@ -123,6 +123,16 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
       wake();
       return () => keepAlive.delete(fn);
     },
+    /**
+     * Redraw every `ms` while `fn()` holds, for overlays that flicker on a
+     * still view (sensor grain). These frames don't count as motion, so they
+     * stay at full sharpness.
+     */
+    pulseWhile(fn, ms = 66) {
+      setInterval(() => {
+        if (!document.hidden && fn()) scene.requestRender();
+      }, ms);
+    },
     /** The resolution used while the view moves (a still view is always at full sharpness). */
     get resolutionScale() {
       return scale;

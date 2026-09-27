@@ -27,6 +27,8 @@ import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
 import { shareLink } from './app/links.js';
 import { createZoomOut } from './app/zoom.js';
+import { createFlycam } from './app/flycam.js';
+import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, closeModal, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -53,6 +55,7 @@ loadingStep('STARTING GLOBE…', 25);
 const officialPromise = loadOfficial(BASE).catch((e) => e);
 const viewer = await createViewer(document.getElementById('globe'));
 const render = createRenderLoop(viewer);
+const basemap = createBasemap(viewer, { onChange: () => render.request() }); // map style and place names
 const effects = createEffects(viewer);
 const itemLayer = createItemLayer(viewer);
 const trackLayer = createTrackLayer(viewer);
@@ -68,7 +71,7 @@ const launchLayer = createLaunchLayer(viewer);
 const airspaceLayer = createAirspaceLayer(viewer);
 const story = createStory({ viewer, trackLayer });
 // Things that animate without moving the camera keep frames coming while they run.
-render.keepAliveWhile(() => effects.mode !== 'normal'); // sensor noise and scanlines
+render.pulseWhile(() => effects.mode !== 'normal', 66); // sensor grain, ~15 fps, at full sharpness
 render.keepAliveWhile(() => story.active);
 render.keepAliveWhile(() => itemLayer.animating); // selection ping
 window.addEventListener('resize', () => render.request());
@@ -108,6 +111,7 @@ if (photoreal.configured)
 /* ── Filtering ─────────────────────────────────────────── */
 function passesNonYear(it) {
   if (!state.layers[{ case: 'cases', official: 'official', user: 'user' }[it.kind]]) return false;
+  if (state.starredOnly && !state.starred.has(it.key)) return false;
   if (state.search && !it.search.includes(state.search)) return false;
   if (state.evidence.size && !it.evidence.some((e) => state.evidence.has(e))) return false;
   if (state.shape.size && !it.shapes?.some((s) => state.shape.has(s))) return false;
@@ -120,6 +124,7 @@ function passesNonYear(it) {
 
 /** Blue Book files are official documents with no per-file assessment. */
 function bluebookPasses(r) {
+  if (state.starredOnly) return false; // only cases and releases can be starred
   if (state.evidence.size && !state.evidence.has('official-document')) return false;
   if (state.status.size && !state.status.has('unassessed')) return false;
   if (state.shape.size) return false; // file names carry no shape
@@ -129,6 +134,7 @@ function bluebookPasses(r) {
 
 /** MUFON journal mentions: civilian investigations with no per-report assessment or shape. */
 function mufonPasses(r) {
+  if (state.starredOnly) return false;
   if (state.evidence.size) return false;
   if (state.status.size && !state.status.has('unassessed')) return false;
   if (state.shape.size) return false;
@@ -138,6 +144,7 @@ function mufonPasses(r) {
 
 /** Research archive mentions: civilian investigations, like the MUFON files. */
 function journalsPasses(r) {
+  if (state.starredOnly) return false;
   if (state.evidence.size) return false;
   if (state.status.size && !state.status.has('unassessed')) return false;
   if (state.shape.size) return false;
@@ -148,6 +155,7 @@ function journalsPasses(r) {
 /** GEIPAN files: official French documents, filtered by GEIPAN's own classification. */
 let foldedSearch = ['', ''];
 function geipanPasses(r) {
+  if (state.starredOnly) return false;
   if (state.evidence.size && !state.evidence.has('official-document') && !(r.witnesses > 1 && state.evidence.has('multiple-witnesses'))) return false;
   if (state.status.size && !state.status.has(r.status)) return false;
   if (state.shape.size) return false; // the files carry no shape field
@@ -185,7 +193,7 @@ function refresh() {
     layerCounts.geipan = n.toLocaleString();
   }
   if (nuforc && state.layers.nuforc) {
-    const evOk = !state.evidence.size && (!state.status.size || state.status.has('unassessed'));
+    const evOk = !state.starredOnly && !state.evidence.size && (!state.status.size || state.status.has('unassessed'));
     nuforcShapeClasses ||= nuforc.shapes.map((s) => shapeClasses(s));
     const shapeOk = (i) => !state.shape.size || nuforcShapeClasses[nuforc.shape[i]].some((s) => state.shape.has(s));
     const n = nuforcLayer.filter((i) => evOk && shapeOk(i) && inYearRange(Math.floor(nuforc.date[i] / 10000)) && (!state.search || nuforc.places[nuforc.place[i]].toLowerCase().includes(state.search) || nuforc.shapes[nuforc.shape[i]] === state.search));
@@ -210,8 +218,8 @@ subscribe((s, reason) => {
     mount(document.getElementById('place-results'), html``);
     timeline.draw();
   }
-  if (['search', 'evidence', 'status', 'shape', 'yearRange', 'sort', 'layers', 'reset'].includes(reason)) {
-    if (reason === 'evidence' || reason === 'status' || reason === 'shape' || reason === 'reset') renderFilters();
+  if (['search', 'evidence', 'status', 'shape', 'yearRange', 'sort', 'layers', 'reset', 'starred', 'starredOnly'].includes(reason)) {
+    if (['evidence', 'status', 'shape', 'reset', 'starred', 'starredOnly'].includes(reason)) renderFilters();
     refresh();
   }
 });
@@ -476,6 +484,7 @@ function showNightLights(on) {
         credit: 'City lights: NASA Earth Observatory Black Marble (VIIRS 2016)',
       }),
     );
+    basemap.keepNamesOnTop();
     nightLights.dayAlpha = 0;
     nightLights.nightAlpha = 1;
     nightLights.brightness = 1.9;
@@ -485,30 +494,72 @@ function showNightLights(on) {
 }
 
 function setSceneMoment(rec) {
-  const globe = viewer.scene.globe;
-  const imagery = viewer.imageryLayers.get(0);
   if (!rec || rec.lat == null || !rec.date) {
     sceneMoment = null;
-    globe.enableLighting = false;
-    showNightLights(false);
-    if (imagery) imagery.brightness = 1;
     if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.now();
-    render.request();
-    return;
+  } else {
+    sceneMoment = { lat: rec.lat, lon: rec.lon, approx: Boolean(rec.approx), dim: 1 };
+    if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(rec.date));
   }
-  sceneMoment = { lat: rec.lat, lon: rec.lon, approx: Boolean(rec.approx), dim: 1 };
-  globe.enableLighting = true;
-  showNightLights(true);
-  // From high up, Cesium shades the night side (the terminator shows from
-  // 1,500 km). Closer in, the ground is dimmed gently instead, so a night
-  // case still reads; the two hand over between 1,500 and 4,000 km.
-  // Cesium measures these fade distances from the Earth's centre.
-  globe.lightingFadeOutDistance = EARTH_RADIUS + LIGHT_NEAR;
-  globe.lightingFadeInDistance = EARTH_RADIUS + LIGHT_FAR;
-  if (!trackLayer.current) viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(rec.date));
-  updateNightDim();
+  applyLighting();
+}
+
+/* Lighting, chosen in the Map panel (or D): AUTO lights an open case by the
+   sun at its moment and leaves the globe flat otherwise; DAY keeps the view
+   in daylight; NIGHT turns the side you look at to night, with city lights;
+   OFF never shades. */
+const LIGHT_MODES = { auto: 'Auto (case time)', day: 'Day', night: 'Night', off: 'Off' };
+const LIGHT_KEY = 'gods-eye-uap:lighting';
+let lightMode = (() => {
+  try {
+    const m = localStorage.getItem(LIGHT_KEY);
+    return m in LIGHT_MODES ? m : 'auto';
+  } catch {
+    return 'auto';
+  }
+})();
+const sunLight = viewer.scene.light;
+const viewLight = new Cesium.DirectionalLight({ direction: new Cesium.Cartesian3(1, 0, 0) });
+const NIGHT_DIM = 0.4; // how dark the ground gets close in, in night mode
+let lighting = null; // { mode, dim } while the globe is shaded
+
+function applyLighting() {
+  const globe = viewer.scene.globe;
+  const imagery = viewer.imageryLayers.get(0);
+  const mode = lightMode === 'auto' ? (sceneMoment ? 'moment' : 'off') : lightMode;
+  viewer.scene.light = mode === 'day' || mode === 'night' ? viewLight : sunLight;
+  globe.enableLighting = mode !== 'off';
+  showNightLights(mode === 'moment' || mode === 'night');
+  if (mode === 'off') {
+    lighting = null;
+    if (imagery) imagery.brightness = 1;
+  } else {
+    lighting = { mode, dim: mode === 'night' ? NIGHT_DIM : 1 };
+    // From high up, Cesium shades the night side (the terminator shows from
+    // 1,500 km). Closer in, the ground is dimmed gently instead, so a night
+    // view still reads; the two hand over between 1,500 and 4,000 km.
+    // Cesium measures these fade distances from the Earth's centre.
+    globe.lightingFadeOutDistance = EARTH_RADIUS + LIGHT_NEAR;
+    globe.lightingFadeInDistance = EARTH_RADIUS + LIGHT_FAR;
+    if (mode === 'moment') updateNightDim();
+  }
+  document.body.dataset.lighting = lightMode;
   render.request();
 }
+
+function setLighting(mode) {
+  if (!(mode in LIGHT_MODES)) return;
+  lightMode = mode;
+  try {
+    localStorage.setItem(LIGHT_KEY, mode);
+  } catch {}
+  applyLighting();
+}
+const nextLighting = () => {
+  const modes = Object.keys(LIGHT_MODES);
+  setLighting(modes[(modes.indexOf(lightMode) + 1) % modes.length]);
+  toast(`Lighting: ${LIGHT_MODES[lightMode]}`, 1600);
+};
 const LIGHT_NEAR = 1.5e6; // camera heights above the ground
 const LIGHT_FAR = 4e6;
 const EARTH_RADIUS = 6_371_000;
@@ -525,10 +576,16 @@ function updateNightDim() {
 }
 viewer.scene.preRender.addEventListener(() => {
   const imagery = viewer.imageryLayers.get(0);
-  if (!sceneMoment || !imagery) return;
+  if (!lighting || !imagery) return;
+  if (lighting.mode === 'day' || lighting.mode === 'night') {
+    // Day: the light shines the way the camera looks. Night: it comes from behind the Earth.
+    Cesium.Cartesian3.clone(viewer.camera.directionWC, viewLight.direction);
+    if (lighting.mode === 'night') Cesium.Cartesian3.negate(viewLight.direction, viewLight.direction);
+  }
+  const dim = lighting.mode === 'moment' ? sceneMoment?.dim ?? 1 : lighting.dim;
   const h = viewer.camera.positionCartographic.height;
   const t = Math.min(1, Math.max(0, (h - LIGHT_NEAR) / (LIGHT_FAR - LIGHT_NEAR)));
-  imagery.brightness = sceneMoment.dim + (1 - sceneMoment.dim) * t;
+  imagery.brightness = dim + (1 - dim) * t;
   // City lights belong to the view from space; close in they would cover the ground.
   if (nightLights) nightLights.alpha = t;
 });
@@ -538,6 +595,8 @@ trackLayer.onTick(() => {
   lastDim = performance.now();
   updateNightDim();
 });
+applyLighting(); // the lighting chosen last time
+
 
 /** The share card for an item: the globe as it is now, with the case's details and link. */
 async function makeCard(item, url) {
@@ -583,6 +642,7 @@ let selectToken = 0;
 function select(key, source = 'api') {
   const item = itemByKey(key);
   if (!item) return false;
+  if (!document.getElementById('welcome').hidden) closeWelcome(); // they found their way in
   selectToken++;
   hideHover();
   if (source !== 'tour') stopTour();
@@ -1505,7 +1565,73 @@ viewer.container.addEventListener(
   },
   { capture: true, passive: false },
 );
-viewer.container.addEventListener('pointerdown', () => zoomer.cancel(), { capture: true });
+viewer.container.addEventListener(
+  'pointerdown',
+  () => {
+    zoomer.cancel();
+    if (flycam.orbiting) setOrbit(false);
+  },
+  { capture: true },
+);
+
+// Arrow keys fly the camera, O orbits the middle of the screen (see app/flycam.js).
+const flycam = createFlycam(viewer, {
+  blocked: () => Boolean(viewer.trackedEntity) || story.active || trackLayer.witnessOn,
+  onMove: () => {
+    hideHover();
+    render.request();
+  },
+});
+render.keepAliveWhile(() => flycam.orbiting || flycam.moving);
+function setOrbit(on) {
+  const now = on ? flycam.toggleOrbit() || flycam.orbiting : (flycam.stopOrbit(), false);
+  document.body.classList.toggle('orbiting', Boolean(now));
+  if (on && !now) toast('Nothing to orbit here', 1500);
+  else if (on) toast('Orbiting — press O or touch the globe to stop', 2200);
+}
+window.addEventListener('keyup', (e) => flycam.key(e, false));
+window.addEventListener('blur', () => flycam.release());
+
+/* A random case with something to see: a flight path or strong evidence. */
+function surpriseMe() {
+  const pool = CASE_ITEMS.filter((i) => i.hasTrack || evidenceScore(i.evidence, i.hasTrack) >= 6);
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  if (pick) select(pick.key, 'list');
+}
+document.getElementById('btn-random').addEventListener('click', surpriseMe);
+
+/* First visit: a small card with places to start. Shown once per browser. */
+const WELCOME_KEY = 'gods-eye-uap:welcomed';
+const welcome = document.getElementById('welcome');
+function closeWelcome() {
+  if (welcome.hidden) return;
+  welcome.hidden = true;
+  try {
+    localStorage.setItem(WELCOME_KEY, '1');
+  } catch {}
+}
+function maybeWelcome() {
+  let seen = false;
+  try {
+    seen = Boolean(localStorage.getItem(WELCOME_KEY));
+  } catch {}
+  if (!seen && !location.hash && !state.selected && !navigator.webdriver) welcome.hidden = false;
+}
+welcome.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-welcome]');
+  if (!b) return;
+  closeWelcome();
+  const go = { tour: startTour, nimitz: () => select('case:nimitz-tic-tac-2004', 'list'), random: surpriseMe, explain: () => openExplainNow() }[b.dataset.welcome];
+  go?.();
+});
+
+/* Clean view: every panel out of the way, only the globe (F). */
+function setCleanView(on = !document.body.classList.contains('clean')) {
+  document.body.classList.toggle('clean', on);
+  document.getElementById('clean-exit').hidden = !on;
+  render.request();
+}
+document.getElementById('clean-exit').addEventListener('click', () => setCleanView(false));
 viewer.camera.moveEnd.addEventListener(() => zoomer.levelIfHigh());
 
 function zoomView(dir) {
@@ -1576,6 +1702,14 @@ document.getElementById('btn-about').addEventListener('click', openAboutModal);
 /* ── Map settings: OSM buildings and the user's own Google key ── */
 function openMapSettingsNow() {
   openMapSettings({
+    styles: Object.entries(BASEMAPS).map(([id, m]) => [id, m.label]),
+    lightModes: Object.entries(LIGHT_MODES),
+    lighting: lightMode,
+    onLighting: (m) => setLighting(m),
+    style: basemap.style,
+    names: basemap.names,
+    onStyle: (s) => basemap.setStyle(s),
+    onNames: (on) => basemap.setNames(on),
     buildingsOn: state.layers.buildings,
     photoreal: { active: photoreal.active, source: photoreal.source },
     hasStoredKey: Boolean(storedGoogleKey()),
@@ -1614,10 +1748,20 @@ window.addEventListener('keydown', (e) => {
     if (story.active) return story.stop();
     if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
+    if (!welcome.hidden) return closeWelcome();
+    if (flycam.orbiting) return setOrbit(false);
+    if (document.body.classList.contains('clean')) return setCleanView(false);
     return deselect();
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (document.getElementById('modal-root').children.length) return; // a dialog is open
+  // Arrow keys fly the camera unless a list or control has the focus.
+  const onGlobe = e.target === document.body || e.target.closest?.('#globe');
+  if (onGlobe && flycam.key(e, true)) {
+    e.preventDefault();
+    return;
+  }
+  if (e.key === 'Shift') return flycam.key(e, true);
   if (e.key === ' ' && e.target.closest?.('button, a, summary, [role="option"], [tabindex]:not(body)')) return;
   const modes = ['normal', 'nvg', 'flir', 'ironbow', 'crt'];
   if (/^[1-5]$/.test(e.key)) setMode(modes[Number(e.key) - 1]);
@@ -1642,6 +1786,9 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'n') nearMe();
   else if (e.key.toLowerCase() === 's') openStatsNow();
   else if (e.key.toLowerCase() === 'c') setGrouping(!itemLayer.grouping);
+  else if (e.key.toLowerCase() === 'o') setOrbit(!flycam.orbiting);
+  else if (e.key.toLowerCase() === 'd') nextLighting();
+  else if (e.key.toLowerCase() === 'f') setCleanView();
   else if (e.key === '+' || e.key === '=') zoomView(1);
   else if (e.key === '-' || e.key === '_') zoomView(-1);
 });
@@ -1664,7 +1811,7 @@ setInterval(() => {
   const c = viewer.camera.positionCartographic;
   hud.cam.textContent = formatDMS(Cesium.Math.toDegrees(c.latitude), Cesium.Math.toDegrees(c.longitude));
   hud.alt.textContent = c.height > 1e4 ? `${(c.height / 1000).toFixed(0)} KM` : `${Math.round(c.height)} M`;
-  hud.map.textContent = viewer.__mapName || '';
+  hud.map.textContent = `${viewer.__mapName || ''}${lightMode !== 'auto' ? ` · ${lightMode.toUpperCase()}` : ''}`;
 }, 250);
 
 /* ── Start ─────────────────────────────────────────────── */
@@ -1780,7 +1927,10 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     if (done) return;
     done = true;
     loadingStep('READY', 100);
-    setTimeout(() => loading.classList.add('done'), 250);
+    setTimeout(() => {
+      loading.classList.add('done');
+      maybeWelcome();
+    }, 250);
     removeProgress();
   };
   loadingStep('ACQUIRING IMAGERY…', 60);

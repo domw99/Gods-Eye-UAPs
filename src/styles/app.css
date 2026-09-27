@@ -723,3 +723,36 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 #loading .made-by { position: absolute; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; letter-spacing: 0.2em; }
 .modal .made-by { margin: 6px 0 0; }
 .stats-by { margin-top: 20px !important; text-align: right; }
+
+/* ── Clean view (F): only the globe ───────────────────── */
+body.clean .topbar, body.clean #left, body.clean #dossier, body.clean #timeline, body.clean #playback,
+body.clean .map-controls, body.clean #active-filters { opacity: 0; pointer-events: none; transition: opacity 200ms; }
+body.clean .hud-br, body.clean .hud-tl { opacity: 0.7; }
+.clean-exit { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 40; font-size: 10px; opacity: 0.75; }
+.clean-exit:hover { opacity: 1; }
+
+/* ── Welcome card (first visit) ───────────────────────── */
+.welcome { position: fixed; z-index: 30; left: calc(var(--left-w) + 34px); right: 80px; bottom: 150px; max-width: 520px; padding: 18px 20px 14px; border-radius: 14px; }
+.welcome h2 { margin: 6px 0 6px; font-size: 19px; line-height: 1.25; text-wrap: balance; }
+.welcome p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+.welcome .btn-row { gap: 6px; margin-bottom: 10px; }
+.welcome-kicker { font-size: 10px; letter-spacing: 0.26em; color: var(--accent); }
+.welcome-tips { font-size: 10px !important; letter-spacing: 0.06em; color: var(--text-dim) !important; margin: 0 !important; }
+.welcome-tips kbd { font: inherit; border: 1px solid var(--border, rgba(255,255,255,.2)); border-radius: 3px; padding: 0 4px; }
+.welcome-close { position: absolute; top: 10px; right: 10px; }
+@media (max-width: 760px) {
+  .welcome { left: 10px; right: 10px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); max-width: none; }
+}
+
+/* ── Thermal scale (FLIR modes) ───────────────────────── */
+.thermal-scale { display: none; position: fixed; z-index: 12; left: calc(var(--left-w) + 34px); bottom: 150px; align-items: center; gap: 8px; font-size: 9.5px; letter-spacing: 0.16em; color: #e8eaed; text-shadow: 0 1px 2px #000; pointer-events: none; }
+.thermal-scale i { width: 150px; height: 8px; border-radius: 2px; border: 1px solid rgba(255,255,255,.35); background: linear-gradient(90deg, #000, #fff); }
+body[data-mode='flir'] .thermal-scale, body[data-mode='ironbow'] .thermal-scale { display: flex; }
+body[data-mode='ironbow'] .thermal-scale i { background: linear-gradient(90deg, #000005, #29005c, #8c0073, #e6291f, #ff9400, #ffed66, #fff); }
+body.left-collapsed .thermal-scale { left: 80px; }
+body.clean .thermal-scale { left: 20px; }
+@media (max-width: 760px) { .thermal-scale { left: 14px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); } }
+
+/* ── Starred cases ────────────────────────────────────── */
+.case-item .star { color: #ffcf5c; }
+.chip.star-btn.on { color: #ffcf5c; border-color: rgba(255, 207, 92, 0.6); background: rgba(255, 207, 92, 0.08); }

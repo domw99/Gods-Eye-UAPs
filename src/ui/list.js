@@ -50,12 +50,18 @@ export function renderActiveFilters() {
   for (const e of state.evidence) chips.push(html`<button class="chip small on" data-clear-evidence="${e}">${EVIDENCE[e]?.label || e} ✕</button>`);
   for (const k of state.shape) chips.push(html`<button class="chip small on" data-clear-shape="${k}">${SHAPES[k]?.label || k} ✕</button>`);
   for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${STATUS[k]?.label || k} ✕</button>`);
+  if (state.starredOnly) chips.push(html`<button class="chip small on" data-clear="starred">★ STARRED ✕</button>`);
   el.classList.toggle('hidden', !chips.length);
   mount(el, chips.length ? html`<span class="af-label">FILTERED BY</span>${chips}<button class="chip small af-reset" data-clear="all">RESET ALL</button>` : html``);
 }
 
 export function renderFilters() {
-  const n = state.evidence.size + state.status.size + state.shape.size;
+  const n = state.evidence.size + state.status.size + state.shape.size + (state.starredOnly ? 1 : 0);
+  const stars = state.starred.size;
+  mount(
+    document.getElementById('starred-filter'),
+    html`<button class="chip small ${state.starredOnly ? 'on' : ''}" data-starred-only aria-pressed="${state.starredOnly ? 'true' : 'false'}" ${stars || state.starredOnly ? '' : 'disabled'} title="${stars ? 'Show only the cases you starred' : 'Star a case (☆ in its file) to save it here'}">★ STARRED ONLY · ${stars}</button>`,
+  );
   document.getElementById('filter-count').textContent = n ? `· ${n} ACTIVE` : '';
   mount(
     document.getElementById('evidence-filters'),
@@ -108,7 +114,7 @@ export function renderList(items) {
       if (it.lat == null) badges.push(html`<span class="badge">NO LOCATION</span>`);
       return html`<li class="case-item" role="option" tabindex="0" data-key="${it.key}" aria-selected="${state.selected === it.key ? 'true' : 'false'}">
         <span class="dot" style="background:${itemColor(it)};box-shadow:0 0 8px ${itemColor(it)}"></span>
-        <div><div class="t">${it.title}</div><div class="m">${y} · ${it.place}</div><div class="b">${badges}</div></div>
+        <div><div class="t">${state.starred.has(it.key) ? html`<span class="star" title="Starred">★</span> ` : ''}${it.title}</div><div class="m">${y} · ${it.place}</div><div class="b">${badges}</div></div>
       </li>`;
     })}`,
   );
@@ -145,6 +151,9 @@ export function bindList({ onSelect }) {
     const b = e.target.closest('[data-status]');
     if (b) toggleIn('status', b.dataset.status);
   });
+  document.getElementById('starred-filter').addEventListener('click', (e) => {
+    if (e.target.closest('[data-starred-only]')) update({ starredOnly: !state.starredOnly }, 'starredOnly');
+  });
   // Removing filters: the chips above the results, and the reset in an empty list.
   const clear = (e) => {
     const b = e.target.closest('[data-clear], [data-clear-evidence], [data-clear-shape], [data-clear-status]');
@@ -154,6 +163,7 @@ export function bindList({ onSelect }) {
       search.value = '';
       update({ search: '' }, 'search');
     } else if (b.dataset.clear === 'years') update({ yearRange: null }, 'yearRange');
+    else if (b.dataset.clear === 'starred') update({ starredOnly: false }, 'starredOnly');
     else if (b.dataset.clearEvidence) toggleIn('evidence', b.dataset.clearEvidence);
     else if (b.dataset.clearShape) toggleIn('shape', b.dataset.clearShape);
     else if (b.dataset.clearStatus) toggleIn('status', b.dataset.clearStatus);

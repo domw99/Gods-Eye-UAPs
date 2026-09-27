@@ -22,6 +22,16 @@ export const DEFAULT_LAYERS = {
   user: true,
 };
 
+// Cases the viewer starred, kept in this browser.
+const STAR_KEY = 'gods-eye-uap:starred';
+function loadStars() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(STAR_KEY) || '[]'));
+  } catch {
+    return new Set();
+  }
+}
+
 export const state = {
   search: '',
   evidence: new Set(), // any-of
@@ -31,6 +41,8 @@ export const state = {
   sort: 'date-desc',
   layers: { ...DEFAULT_LAYERS },
   selected: null, // item key
+  starred: loadStars(), // item keys
+  starredOnly: false,
 };
 
 export function subscribe(fn) {
@@ -60,11 +72,21 @@ export function inYearRange(year) {
   return y >= a && y <= b;
 }
 
-/** Any filter narrowing the records (search, year range, evidence, shape, status)? */
+/** Any filter narrowing the records (search, year range, evidence, shape, status, starred)? */
 export const filtersActive = () =>
-  Boolean(state.search || state.yearRange || state.evidence.size || state.shape.size || state.status.size);
+  Boolean(state.search || state.yearRange || state.evidence.size || state.shape.size || state.status.size || state.starredOnly);
 
 /** Clear every filter at once. */
 export function resetFilters() {
-  update({ search: '', yearRange: null, evidence: new Set(), shape: new Set(), status: new Set() }, 'reset');
+  update({ search: '', yearRange: null, evidence: new Set(), shape: new Set(), status: new Set(), starredOnly: false }, 'reset');
+}
+
+/** Star or unstar a record (remembered in this browser). */
+export function toggleStar(key) {
+  const starred = new Set(state.starred);
+  starred.has(key) ? starred.delete(key) : starred.add(key);
+  try {
+    localStorage.setItem(STAR_KEY, JSON.stringify([...starred]));
+  } catch {}
+  update({ starred }, 'starred');
 }

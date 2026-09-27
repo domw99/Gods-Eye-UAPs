@@ -3,6 +3,9 @@ import * as Cesium from 'cesium';
 /**
  * Sensor looks rendered as Cesium post-process stages — the same idea as
  * God's Eye View's "reskin reality" styles, rewritten compactly for this app.
+ * They keep the image sharp (a light unsharp mask, no downsampling), so
+ * detail, markers and labels stay readable at any zoom; the look comes from
+ * tone, grain and scanlines rather than blur.
  */
 const COMMON = /* glsl */ `
   uniform sampler2D colorTexture;
@@ -25,19 +28,23 @@ const COMMON = /* glsl */ `
     s += texture(colorTexture, uv - vec2(0.0, px.y)).rgb * 0.16;
     return s;
   }
+  // The pixel, sharpened a little against its neighbours.
+  vec3 crisp(vec2 uv, float amount) {
+    vec3 c = texture(colorTexture, uv).rgb;
+    return max(c + (c - blur5(uv, 1.0)) * amount, 0.0);
+  }
 `;
 
 const NVG = /* glsl */ `${COMMON}
   void main() {
     vec2 uv = v_textureCoordinates;
-    vec3 src = blur5(uv, 0.8);
-    float l = luma(src);
+    float l = luma(crisp(uv, 0.55));
     float x = l * 3.0;                                   // image-intensifier gain with a soft
     l = x * (1.0 + x / 9.0) / (1.0 + x);                // shoulder, so bright scenes keep detail
     float grain = hash(uv * colorTextureDimensions + fract(time * 13.0) * 97.0);
-    l += (grain - 0.5) * 0.16;                          // photon shot noise
-    l *= 0.93 + 0.07 * sin(uv.y * colorTextureDimensions.y * 1.2); // raster
-    l *= 0.97 + 0.03 * sin(time * 30.0);                // tube flicker
+    l += (grain - 0.5) * 0.07;                          // photon shot noise
+    l *= 0.965 + 0.035 * sin(uv.y * colorTextureDimensions.y * 1.2); // raster
+    l *= 0.985 + 0.015 * sin(time * 30.0);              // tube flicker
     vec2 d = uv - 0.5;
     d.x *= colorTextureDimensions.x / colorTextureDimensions.y;
     float vig = 1.0 - smoothstep(0.35, 0.78, length(d));
@@ -66,16 +73,12 @@ const THERMAL = (ironbow) => /* glsl */ `${COMMON}
   }
   void main() {
     vec2 uv = v_textureCoordinates;
-    // Low-resolution microbolometer: snap to a coarse sensor grid, then blur.
-    vec2 grid = colorTextureDimensions / 1.6;
-    vec2 suv = (floor(uv * grid) + 0.5) / grid;
-    vec3 src = mix(texture(colorTexture, suv).rgb, blur5(suv, 1.6), 0.6);
-    float t = luma(src);
+    float t = luma(crisp(uv, 0.45));
     // Sky reads cold, sunlit ground and lights read hot.
     t = smoothstep(0.04, 0.85, t);
     t = pow(t, 0.9);
     float grain = hash(uv * colorTextureDimensions + floor(time * 24.0));
-    t += (grain - 0.5) * 0.05;
+    t += (grain - 0.5) * 0.03;
     vec3 col = ${ironbow ? 'ironbowRamp(t)' : 'vec3(t)'};
     vec2 d = uv - 0.5;
     d.x *= colorTextureDimensions.x / colorTextureDimensions.y;
@@ -87,7 +90,7 @@ const THERMAL = (ironbow) => /* glsl */ `${COMMON}
 const CRT = /* glsl */ `${COMMON}
   vec2 barrel(vec2 uv) {
     vec2 c = uv * 2.0 - 1.0;
-    c *= 1.0 + 0.045 * dot(c, c);
+    c *= 1.0 + 0.03 * dot(c, c);
     return c * 0.5 + 0.5;
   }
   void main() {
@@ -96,13 +99,13 @@ const CRT = /* glsl */ `${COMMON}
       out_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
       return;
     }
-    float ab = 1.2 / colorTextureDimensions.x;
+    float ab = 0.7 / colorTextureDimensions.x;
     vec3 col;
     col.r = texture(colorTexture, uv + vec2(ab, 0.0)).r;
     col.g = texture(colorTexture, uv).g;
     col.b = texture(colorTexture, uv - vec2(ab, 0.0)).b;
-    float line = 0.78 + 0.22 * sin(uv.y * colorTextureDimensions.y * 1.5708);
-    float mask = 0.9 + 0.1 * sin(uv.x * colorTextureDimensions.x * 2.0944);
+    float line = 0.86 + 0.14 * sin(uv.y * colorTextureDimensions.y * 1.5708);
+    float mask = 0.94 + 0.06 * sin(uv.x * colorTextureDimensions.x * 2.0944);
     col *= line * mask;
     col = pow(col, vec3(0.9)) * 1.18;
     col += (hash(uv * colorTextureDimensions + time) - 0.5) * 0.035;

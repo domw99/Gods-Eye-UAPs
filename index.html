@@ -55,7 +55,7 @@
       <button id="btn-stats" class="chip" title="Statistics: what the archives hold (S)">STATS</button>
       <button id="btn-explain" class="chip" title="Check a sighting against planets, satellites, launches and wind (E)">WHAT DID I SEE?</button>
       <button id="btn-log" class="chip" title="Log your own sighting (L)">+ LOG SIGHTING</button>
-      <button id="btn-map" class="chip" title="Map settings: 3D buildings, your Google Maps key (M)">3D MAP</button>
+      <button id="btn-map" class="chip" title="Map: style, place names, 3D buildings, your Google Maps key (M)">MAP</button>
       <button id="btn-about" class="chip" title="About the data (?)">?</button>
     </div>
   </header>
@@ -79,10 +79,13 @@
         <div id="shape-filters" class="chips"></div>
         <div class="section-label">STATUS</div>
         <div id="status-filters" class="chips"></div>
+        <div class="section-label">SAVED</div>
+        <div id="starred-filter" class="chips"></div>
       </details>
       <div id="active-filters" class="active-filters hidden" aria-label="Active filters"></div>
       <div class="section-label list-label">
         <span>RESULTS</span>
+        <button id="btn-random" class="link-btn" type="button" title="Open a random case">⚄ RANDOM</button>
         <select id="sort" aria-label="Sort cases">
           <option value="date-desc">Newest first</option>
           <option value="date-asc">Oldest first</option>
@@ -181,6 +184,25 @@
     <button id="pb-pov" class="chip" aria-pressed="false" title="See it from the witness's position (V)">WITNESS VIEW</button>
     <button id="pb-close" class="icon-btn" aria-label="Stop playback">✕</button>
   </div>
+
+  <div id="thermal-scale" class="thermal-scale mono" aria-hidden="true"><span>COLD</span><i></i><span>HOT</span></div>
+
+  <!-- ── First visit: where to start ───────────────────── -->
+  <section id="welcome" class="welcome glass" hidden aria-labelledby="welcome-title">
+    <button type="button" class="icon-btn welcome-close" data-welcome="close" aria-label="Close">✕</button>
+    <div class="welcome-kicker mono">GOD'S EYE // UAP</div>
+    <h2 id="welcome-title">Every documented UFO case on a 3D globe</h2>
+    <p>Each case has its flight path, the evidence, and the official or best explanation. Pick one from the list, or start here:</p>
+    <div class="btn-row">
+      <button type="button" class="chip on" data-welcome="tour">▶ TAKE THE TOUR</button>
+      <button type="button" class="chip" data-welcome="nimitz">USS NIMITZ "TIC TAC"</button>
+      <button type="button" class="chip" data-welcome="random">⚄ SURPRISE ME</button>
+      <button type="button" class="chip" data-welcome="explain">WHAT DID I SEE?</button>
+    </div>
+    <p class="welcome-tips mono">Drag to spin · scroll to zoom · <kbd>?</kbd> for all shortcuts</p>
+  </section>
+
+  <button id="clean-exit" class="chip clean-exit" type="button" hidden title="Show the panels again (F or Esc)">SHOW PANELS · F</button>
 
   <div id="modal-root"></div>
   <div id="toast" role="status" aria-live="polite"></div>
