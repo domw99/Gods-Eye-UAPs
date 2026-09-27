@@ -211,10 +211,12 @@ export async function createViewer(container) {
  * scripts/build-skybox.py. Loaded after the globe is up and swapped in whole,
  * so there is no gap; Cesium's own star field shows until then.
  */
-export async function loadStarSky(viewer, base) {
+export async function loadStarSky(viewer, base, { small = false } = {}) {
   const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
+  // Six 2048-pixel faces take about 100 MB of video memory; phones get 1024-pixel ones.
+  const dir = small ? 'skybox/1k/' : 'skybox/';
   try {
-    const images = await Promise.all(Object.values(faces).map((f) => Cesium.Resource.fetchImage({ url: `${base}skybox/${f}.jpg` })));
+    const images = await Promise.all(Object.values(faces).map((f) => Cesium.Resource.fetchImage({ url: `${base}${dir}${f}.jpg` })));
     const sources = Object.fromEntries(Object.keys(faces).map((k, i) => [k, images[i]]));
     const old = viewer.scene.skyBox;
     viewer.scene.skyBox = new Cesium.SkyBox({ sources });

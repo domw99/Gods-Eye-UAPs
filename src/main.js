@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken, loadStarSky } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
-import { createRenderLoop } from './app/quality.js';
+import { createRenderLoop, deviceProfile } from './app/quality.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -2018,7 +2018,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
       // Compile the picking shaders while idle, so the first hover doesn't stall.
       const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
       (window.requestIdleCallback || setTimeout)(warm, { timeout: 3000 });
-      (window.requestIdleCallback || setTimeout)(() => loadStarSky(viewer, BASE), { timeout: 4000 });
+      (window.requestIdleCallback || setTimeout)(() => loadStarSky(viewer, BASE, { small: deviceProfile().low }), { timeout: 4000 });
     }, 250);
     removeProgress();
   };

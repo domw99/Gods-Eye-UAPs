@@ -14,6 +14,7 @@ plate carrée, centred on 0h with RA increasing to the left). Cesium samples
 the cube in the same inertial frame with standard GL cube-map directions and
 uploads faces flipped vertically, which the face directions below account
 for. A dark tone curve keeps the Milky Way subtle behind the markers.
+Writes 2048-pixel faces, and 1024-pixel ones in 1k/ for phones.
 """
 import sys
 from pathlib import Path
@@ -56,11 +57,14 @@ def sample(img, x, y, z):
 
 def main(src, out):
     img = OpenEXR.File(src).channels()['RGB'].pixels.astype(np.float32)
-    Path(out).mkdir(parents=True, exist_ok=True)
+    Path(f'{out}/1k').mkdir(parents=True, exist_ok=True)
     for face in ['px', 'mx', 'py', 'my', 'pz', 'mz']:
         v = sample(img, *face_dirs(face, SIZE))
         v = np.clip((v - BLACK) * GAIN, 0, 1) ** (1 / 2.2)
-        Image.fromarray((v * 255 + 0.5).astype(np.uint8)).save(f'{out}/{face}.jpg', quality=QUALITY, optimize=True, progressive=True)
+        im = Image.fromarray((v * 255 + 0.5).astype(np.uint8))
+        im.save(f'{out}/{face}.jpg', quality=QUALITY, optimize=True, progressive=True)
+        # A quarter of the memory for phones and small devices.
+        im.resize((SIZE // 2, SIZE // 2), Image.LANCZOS).save(f'{out}/1k/{face}.jpg', quality=82, optimize=True, progressive=True)
         print(face)
 
 
