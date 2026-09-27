@@ -1692,7 +1692,15 @@ function focusRecord() {
   if (flycam.orbiting) setOrbit(false);
   if (document.body.classList.contains('clean')) setCleanView(false);
 }
-viewer.camera.moveEnd.addEventListener(() => zoomer.levelIfHigh());
+// Level the view after a zoom-out gesture Cesium handles itself (a pinch, a
+// right-button drag), but leave a deliberate tilt from high up alone.
+let zoomGestureAt = -1e9;
+const markZoomGesture = () => (zoomGestureAt = performance.now());
+viewer.container.addEventListener('touchmove', (e) => e.touches.length >= 2 && markZoomGesture(), { capture: true, passive: true });
+viewer.container.addEventListener('pointerup', (e) => e.button === 2 && markZoomGesture(), { capture: true });
+viewer.camera.moveEnd.addEventListener(() => {
+  if (performance.now() - zoomGestureAt < 2500) zoomer.levelIfHigh();
+});
 
 function zoomView(dir) {
   hideHover();
