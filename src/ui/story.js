@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { skyAt, compass } from '../services/sky.js';
 import { STATUS } from '../data/taxonomy.js';
+import { lessMotion } from '../app/quality.js';
 
 /**
  * Story mode: a narrated fly-through of one case. Captions step through the
@@ -106,6 +107,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
 
   function orbit(c) {
     stopOrbit();
+    if (lessMotion()) return; // hold the view still
     const center = Cesium.Cartesian3.fromDegrees(c.lon, c.lat, 0);
     const range = RANGE[c.precision] || 40000;
     let heading = 0;

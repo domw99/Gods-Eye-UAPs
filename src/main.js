@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken, loadStarSky } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
-import { createRenderLoop, deviceProfile } from './app/quality.js';
+import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -55,6 +55,12 @@ loadingStep('STARTING GLOBE…', 25);
 const officialPromise = loadOfficial(BASE).catch((e) => e);
 const viewer = await createViewer(document.getElementById('globe'));
 const render = createRenderLoop(viewer);
+// For visitors who ask for less motion, camera flights become cuts
+// (flyToBoundingSphere goes through flyTo too).
+{
+  const flyTo = viewer.camera.flyTo.bind(viewer.camera);
+  viewer.camera.flyTo = (options) => flyTo(lessMotion() ? { ...options, duration: 0 } : options);
+}
 const basemap = createBasemap(viewer, { onChange: () => render.request() }); // map style and place names
 const effects = createEffects(viewer);
 const itemLayer = createItemLayer(viewer);
@@ -71,7 +77,7 @@ const launchLayer = createLaunchLayer(viewer);
 const airspaceLayer = createAirspaceLayer(viewer);
 const story = createStory({ viewer, trackLayer });
 // Things that animate without moving the camera keep frames coming while they run.
-render.pulseWhile(() => effects.mode !== 'normal', 66); // sensor grain, ~15 fps, at full sharpness
+render.pulseWhile(() => effects.mode !== 'normal' && !lessMotion(), 66); // sensor grain, ~15 fps, at full sharpness
 render.keepAliveWhile(() => story.active);
 render.keepAliveWhile(() => itemLayer.animating); // selection ping
 window.addEventListener('resize', () => render.request());

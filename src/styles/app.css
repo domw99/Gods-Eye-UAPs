@@ -763,3 +763,8 @@ body.clean .thermal-scale { left: 20px; }
 /* ── Starred cases ────────────────────────────────────── */
 .case-item .star { color: #ffcf5c; }
 .chip.star-btn.on { color: #ffcf5c; border-color: rgba(255, 207, 92, 0.6); background: rgba(255, 207, 92, 0.08); }
+
+/* ── Less motion, when the visitor's system asks for it ─ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

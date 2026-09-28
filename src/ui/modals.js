@@ -552,7 +552,7 @@ export function openExplain(o) {
         <div class="btn-row"><button type="button" class="chip on" id="ex-log">+ LOG THIS SIGHTING</button></div>`,
     );
     results.querySelector('#ex-log').addEventListener('click', () => o.onLog(input, top[0]));
-    results.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    results.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
 }
 

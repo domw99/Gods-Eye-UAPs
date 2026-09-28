@@ -13,6 +13,9 @@ import * as Cesium from 'cesium';
  * Changing the ratio resizes every GPU buffer, so a device that keeps up
  * never switches at all.
  */
+/** True when the visitor asked their system for less motion. */
+export const lessMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
 const IDLE_MS = 500; // a slow heartbeat catches anything that changed without asking
 const SETTLE_MS = 350; // this long after the last moving frame, draw a sharp one
 
