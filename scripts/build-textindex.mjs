@@ -16,6 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOT, CACHE } from './lib/geonames.mjs';
 import { words, shardOf, encodePostings } from '../src/services/textsearch.js';
+import { joinBrokenWords } from '../src/services/mufon.js';
 
 const OUT = path.join(ROOT, 'public/data/textindex');
 const MAX_PAGES = 1200; // words on more pages than this are too common to help
@@ -51,7 +52,7 @@ async function main() {
       } catch {}
       if (!pages) missing++;
       for (let leaf = 0; leaf < is.pages; leaf++, pageId++)
-        for (const w of words(pages?.[leaf] || '')) {
+        for (const w of words(joinBrokenWords(pages?.[leaf]))) {
           let list = postings.get(w);
           if (!list) postings.set(w, (list = []));
           list.push(pageId);
