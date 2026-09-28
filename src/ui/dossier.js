@@ -863,23 +863,31 @@ export function renderUser(item, { onDelete }) {
   );
   autoFillLaunches();
   fillWeather(token, u.lat, u.lon, u.date, null);
-  // Two presses to delete: the first asks, the second (within a few seconds) deletes.
+  // Two presses to delete: the first asks, the second deletes. Pressing anywhere
+  // else, or waiting a few seconds, takes the question back.
   const del = body().querySelector('[data-action="delete-user"]');
   let armed = null;
+  const disarm = () => {
+    clearTimeout(armed);
+    armed = null;
+    document.removeEventListener('pointerdown', elsewhere, true);
+    del.textContent = 'Delete this entry';
+    del.classList.remove('danger');
+  };
+  const elsewhere = (e) => {
+    if (!del.contains(e.target)) disarm();
+  };
   del.addEventListener('click', (e) => {
     e.stopPropagation();
     if (armed) {
-      clearTimeout(armed);
+      disarm();
       onDelete(u.id);
       return;
     }
     del.textContent = 'Press again to delete';
     del.classList.add('danger');
-    armed = setTimeout(() => {
-      armed = null;
-      del.textContent = 'Delete this entry';
-      del.classList.remove('danger');
-    }, 4000);
+    armed = setTimeout(disarm, 8000);
+    document.addEventListener('pointerdown', elsewhere, true);
   });
 }
 

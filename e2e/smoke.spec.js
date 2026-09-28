@@ -88,10 +88,15 @@ test.describe('God’s Eye // UAP', () => {
     await page.locator('#log-form button[type=submit]').click();
     await expect(page.locator('#dossier-body .d-title')).toHaveText('Three silent orange lights');
     await expect(page).toHaveURL(/#\/user\//);
-    const del = page.locator('[data-action=delete-user]');
-    await del.click();
-    await expect(del).toHaveText(/again/);
-    await del.click();
+    // Two presses in a row (in the page, so a slow machine can't let the question time out between them).
+    const asked = await page.evaluate(() => {
+      const del = document.querySelector('[data-action=delete-user]');
+      del.click();
+      const text = del.textContent;
+      del.click();
+      return text;
+    });
+    expect(asked).toMatch(/again/);
     await expect(page.locator('#dossier')).toHaveClass(/hidden/);
     expect(errors).toEqual([]);
   });
