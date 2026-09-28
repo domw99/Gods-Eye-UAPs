@@ -2049,5 +2049,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
   // Used by scripts/build-cards.mjs to render the case pages' preview images.
   zoomer: () => zoomer,
+  // Used by the demo and README capture scripts.
+  basemap, setLighting, setOrbitDay, setCleanView,
   Cesium,
   cardFor: async (key, url) => (await makeCard(itemByKey(key), url)).toDataURL('image/jpeg', 0.84) };

@@ -11,6 +11,8 @@
  * Rebuild afterwards so the case pages point at the new cards.
  * Without a GPU Chromium draws the globe with SwiftShader: slow but fine.
  * PW_CHROMIUM points at a preinstalled Chromium; PW_ARGS adds launch flags.
+ * CARD_LIGHTING=off (or day, night) overrides the lighting, for a case whose
+ * moment is at night when its card should show the ground.
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -40,6 +42,7 @@ async function main() {
   await page.route(/open-meteo|thespacedevs|wikipedia\.org|wikimedia\.org|archive\.org|celestrak|dvidshub|photon\.komoot/, (r) => r.abort());
   await page.goto(app);
   await page.waitForFunction(() => window.__uap && document.getElementById('loading')?.classList.contains('done'), null, { timeout: 120_000 });
+  if (process.env.CARD_LIGHTING) await page.evaluate((m) => window.__uap.setLighting(m), process.env.CARD_LIGHTING);
   console.log(`Rendering ${cases.length} cards from ${app}`);
   let done = 0;
   for (const c of cases) {

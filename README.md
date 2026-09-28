@@ -122,7 +122,7 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 <table>
 <tr>
 <td width="50%"><img src="docs/media/airspace.jpg" alt="FAA restricted and warning areas over the south-western U.S. as 3D volumes with case markers" /></td>
-<td width="50%"><img src="docs/media/launches.jpg" alt="Rocket launch layer with Cape Canaveral's recent and upcoming launches" /></td>
+<td width="50%"><img src="docs/media/launches.jpg" alt="Rocket launch sites around the Americas, with the Guiana Space Centre's recent and upcoming launches open in the dossier" /></td>
 </tr>
 <tr>
 <td><sub><b>Military airspace</b>: all 1,542 U.S. restricted, warning, MOA, alert and prohibited areas from the FAA, drawn as 3D volumes. Nimitz sits in warning area W-291.</sub></td>
@@ -212,7 +212,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
 
-Add it to your home screen from the browser menu. It reopens quickly and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery.
+Add it to your home screen from the browser menu. It reopens quickly and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
 
 **Also included:**
 - Reference photos, films and audio for each case.
