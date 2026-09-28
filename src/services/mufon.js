@@ -40,17 +40,29 @@ export const embedUrl = (is, leaf = 0) => `https://archive.org/embed/${bookPath(
 export const pdfUrl = (is) => download(is, '.pdf');
 export const itemUrl = (is = null) => `https://archive.org/details/${encodeURIComponent(is ? itemOf(is) : MUFON_ITEM)}`;
 
+/**
+ * The Internet Archive's OCR marks a word broken across two lines with "¬"
+ * ("Switzer¬ land"); join the halves again.
+ */
+export const joinBrokenWords = (text) => (text || '').replace(/(\S)¬\s+(?=\S)/g, '$1').replace(/¬/g, '');
+
+/** Case hits in either archive: { caseId: { term, total, hits: [[issue, leaf, quote]] } }. */
+export function cleanCaseHits(cases = {}) {
+  for (const found of Object.values(cases)) for (const hit of found.hits || []) hit[2] = joinBrokenWords(hit[2]);
+  return cases;
+}
+
 /** Unpack the compact JSON written by the build script. */
 export function decodeMufon(data) {
   const issues = data.issues.map(([id, year, month, monthTo, number, title, pages, cover], index) => ({
     id, year, month, monthTo, number, title, pages, cover: !!cover, index,
   }));
   const records = data.places.map(([lat, lon, issue, leaf, place, quote], index) => ({
-    lat, lon, issue, leaf, place: data.placeNames[place], quote, index,
+    lat, lon, issue, leaf, place: data.placeNames[place], quote: joinBrokenWords(quote), index,
     year: issues[issue].year, month: issues[issue].month,
   }));
   const byIssueId = new Map(issues.map((is) => [is.id, is]));
-  return { meta: data, issues, records, byIssueId, cases: data.cases || {}, chapters: data.chapters || [] };
+  return { meta: data, issues, records, byIssueId, cases: cleanCaseHits(data.cases), chapters: data.chapters || [] };
 }
 
 export async function loadMufon(base) {
@@ -86,9 +98,9 @@ export async function pageText(is, leaf) {
     );
   }
   const { cps, index, pages } = await textCache.get(is.id);
-  if (pages) return pages[leaf] || '';
+  if (pages) return joinBrokenWords(pages[leaf]);
   const span = index[leaf];
-  return span ? cps.slice(span[0], span[1]).join('').trim() : '';
+  return span ? joinBrokenWords(cps.slice(span[0], span[1]).join('').trim()) : '';
 }
 
 /** Page texts from a djvu.xml: one OBJECT per page, WORDs grouped in LINEs. */

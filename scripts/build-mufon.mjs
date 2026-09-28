@@ -24,6 +24,7 @@ import { gunzipSync } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOT, UA, cached, norm, loadGazetteer, resolveRegionToken, inRegion } from './lib/geonames.mjs';
+import { joinBrokenWords } from '../src/services/mufon.js';
 
 export const ITEM = 'MUFON_UFO_Journal_-_Skylook';
 const OUT = path.join(ROOT, 'public/data/mufon.json');
@@ -134,7 +135,7 @@ export function quote(text, index, length, pad = 110) {
   let b = Math.min(text.length, index + length + pad);
   if (a > 0) a = text.indexOf(' ', a) + 1 || a;
   if (b < text.length) b = text.lastIndexOf(' ', b) > index + length ? text.lastIndexOf(' ', b) : b;
-  return `${a > 0 ? '…' : ''}${text.slice(a, b).trim()}${b < text.length ? '…' : ''}`;
+  return joinBrokenWords(`${a > 0 ? '…' : ''}${text.slice(a, b).trim()}${b < text.length ? '…' : ''}`);
 }
 
 const clean = (s) => s.replace(/\s+/g, ' ').trim();

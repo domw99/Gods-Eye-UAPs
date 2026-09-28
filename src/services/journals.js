@@ -6,6 +6,8 @@
  * Issues share the MUFON journal's shape, so the page links and page text
  * in services/mufon.js work for both.
  */
+import { joinBrokenWords, cleanCaseHits } from './mufon.js';
+
 export const JOURNALS_COLOR = '#3fd4b0';
 
 /** Short labels for badges and hover text. */
@@ -25,11 +27,11 @@ export function decodeJournals(data) {
     id, series, item, file, sub: !!sub, text, year, month, monthTo, number, title, pages, cover: false, index,
   }));
   const records = data.places.map(([lat, lon, issue, leaf, place, quote], index) => ({
-    lat, lon, issue, leaf, place: data.placeNames[place], quote, index,
+    lat, lon, issue, leaf, place: data.placeNames[place], quote: joinBrokenWords(quote), index,
     year: issues[issue].year, month: issues[issue].month, series: issues[issue].series,
   }));
   const byIssueId = new Map(issues.map((is) => [is.id, is]));
-  return { meta: data, series: data.series, issues, records, byIssueId, cases: data.cases || {} };
+  return { meta: data, series: data.series, issues, records, byIssueId, cases: cleanCaseHits(data.cases) };
 }
 
 export async function loadJournals(base) {

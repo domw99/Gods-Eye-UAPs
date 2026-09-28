@@ -65,6 +65,11 @@ describe.runIf(existsSync(DATA))('research archive dataset', () => {
     j = decodeJournals(JSON.parse(readFileSync(DATA, 'utf8')));
   });
 
+  it('shows quotes without the OCR line-break marks', () => {
+    for (const r of j.records) expect(r.quote, r.quote).not.toContain('¬');
+    for (const found of Object.values(j.cases)) for (const [, , q] of found.hits) expect(q, q).not.toContain('¬');
+  });
+
   it('covers the four series with dated issues', () => {
     const bySeries = {};
     for (const is of j.issues) bySeries[is.series] = (bySeries[is.series] || 0) + 1;

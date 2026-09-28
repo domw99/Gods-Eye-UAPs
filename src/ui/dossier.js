@@ -12,7 +12,7 @@ import { correctionUrl, REPO_URL } from '../config.js';
 import { shareLink } from '../app/links.js';
 import { state, toggleStar } from '../state.js';
 import { relativeTime } from '../layers/launches.js';
-import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, MUFON_LICENSE } from '../services/mufon.js';
+import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, joinBrokenWords, MUFON_LICENSE } from '../services/mufon.js';
 import { SERIES_SHORT, SERIES_LINKS } from '../services/journals.js';
 import { classInfo, geipanDate, caseUrl, translateUrl, bodiesNamed, GEIPAN_SITE, GEIPAN_SEARCH, CLASS_COLORS } from '../services/geipan.js';
 
@@ -625,7 +625,7 @@ export async function showOcr(id) {
   try {
     const res = await fetch(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`);
     if (!res.ok) throw new Error(res.status);
-    const text = (await res.text()).replace(/\n{3,}/g, '\n\n').slice(0, 6000);
+    const text = joinBrokenWords(await res.text()).replace(/\n{3,}/g, '\n\n').slice(0, 6000);
     mount(el, html`<pre class="mono" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">OCR text unavailable for this file.</div>`);

@@ -357,11 +357,11 @@ export function openMapSettings(o) {
       ? html`<button type="button" class="chip ${o.names ? 'on' : ''}" id="ms-names" aria-pressed="${o.names ? 'true' : 'false'}">${o.names ? '✓ PLACE NAMES & BORDERS' : 'PLACE NAMES & BORDERS OFF'}</button>`
       : html`<span class="muted mono">Place names and borders are part of this map.</span>`}</div>
 
-    <div class="section-label">LIGHTING · D</div>
+    <div class="section-label">LIGHTING<span class="tips-mouse"> · D</span></div>
     <div class="btn-row" id="ms-light" role="radiogroup" aria-label="Lighting">${o.lightModes.map(
       ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${label.toUpperCase()}</button>`,
     )}</div>
-    <p class="muted" style="margin:6px 0 12px;font-size:12px">Auto lights an open case by the sun at the time it happened, with city lights on the night side. Day and Night hold that look everywhere; Off keeps the globe evenly lit.</p>
+    <p class="muted" style="margin:6px 0 12px;font-size:12px;line-height:1.5">Auto lights an open case by the sun at the time it happened, with city lights on the night side. Day and Night hold that look everywhere; Off keeps the globe evenly lit.</p>
 
     <div class="section-label">FREE — OPENSTREETMAP 3D BUILDINGS</div>
     <div class="d-text"><p>Building footprints and heights from OpenStreetMap, served keyless by OpenFreeMap and raised on the terrain. They appear when you zoom into a town (below about 9 km altitude). Detail depends on how well the area is mapped. "Fly to ground view" turns them on.</p></div>

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parseIssueName, findPlaces, sightingContext, quote, caseTerms } from '../scripts/build-mufon.mjs';
 import { CASES } from '../src/data/cases/index.js';
-import { decodeMufon, issueDate, issueLabel, pageNumber, embedUrl, readerUrl } from '../src/services/mufon.js';
+import { decodeMufon, issueDate, issueLabel, pageNumber, embedUrl, readerUrl, joinBrokenWords } from '../src/services/mufon.js';
 
 // A tiny gazetteer standing in for GeoNames.
 const REGIONS = {
@@ -142,5 +142,15 @@ describe('MUFON dataset', () => {
       expect(v.hits.length).toBeGreaterThan(0);
       for (const [issue] of v.hits) expect(data.issues[issue]).toBeDefined();
     }
+  });
+});
+
+describe('OCR clean-up', () => {
+  it('joins words the scan broke across lines', () => {
+    expect(joinBrokenWords('over Basel, Switzer¬ land in 1566')).toBe('over Basel, Switzerland in 1566');
+    expect(joinBrokenWords("'Fly¬\ning Saucers'")).toBe("'Flying Saucers'");
+    expect(joinBrokenWords('Mrs. Carl Hahn, James¬…')).toBe('Mrs. Carl Hahn, James…');
+    expect(joinBrokenWords('no marks here')).toBe('no marks here');
+    expect(joinBrokenWords(undefined)).toBe('');
   });
 });
