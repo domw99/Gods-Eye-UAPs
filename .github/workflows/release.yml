@@ -29,5 +29,5 @@ jobs:
           notes=".github/release-notes/${TAG}.md"
           test -f "$notes" || { echo "Missing $notes"; exit 1; }
           assets=()
-          for f in docs/media/demo.mp4 docs/media/share-card.jpg; do [ -f "$f" ] && assets+=("$f"); done
+          for f in docs/media/demo.mp4 "docs/media/whats-new-${TAG#v}.mp4" docs/media/share-card.jpg; do [ -f "$f" ] && assets+=("$f"); done
           gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" --notes-file "$notes" --latest "${assets[@]}"

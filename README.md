@@ -85,6 +85,10 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 
 ### 🗺 Map styles, day and night, and a real sky
 
+<a href="docs/media/whats-new-1.1.mp4"><img src="docs/media/whats-new-1.1.webp" alt="What's new in 1.1: the night globe with NASA's city lights against NASA's star map, the lighting switching to day, the four map styles, and NASA's satellite picture of 7 November 2006 fading in over Chicago" width="100%" /></a>
+
+<sub><b>New in 1.1:</b> a real star sky and city lights, day and night lighting, four map styles, and NASA's picture of a case's day from orbit. <a href="docs/media/whats-new-1.1.mp4">▶ Watch the 21-second video (MP4)</a></sub>
+
 <img src="docs/media/map-styles.jpg" alt="The same view of Arizona on the satellite map with place names, and on the dark, streets and topographic maps" width="100%" />
 
 <table>
