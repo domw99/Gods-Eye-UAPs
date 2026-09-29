@@ -7,6 +7,12 @@ import { spiralOffset } from '../util/geo.js';
 /**
  * Globe markers for curated cases, official releases and the user's log.
  * Glyphs are drawn once to canvases and reused as billboard images.
+ *
+ * Every image carries a fixed id. Cesium keeps billboard images in a texture
+ * atlas keyed by id, and a bare canvas gets a new random id each time it is
+ * assigned: the picture is uploaded again and the marker is missing until
+ * that finishes, which made markers blink whenever they were regrouped.
+ * With a fixed id an image that is already in the atlas draws at once.
  */
 const glyphCache = new Map();
 const PX = 2; // canvases are drawn at twice their size so markers stay sharp on high-DPI screens
@@ -80,7 +86,8 @@ function glyph(kind, color, emphasis = false) {
   g.beginPath();
   g.arc(m, m, 1.4, 0, Math.PI * 2);
   g.fill();
-  const out = { image: c, size: s };
+  // Entity billboards take the glyph as a URL, which Cesium also uses as its atlas id.
+  const out = { image: c.toDataURL(), size: s };
   glyphCache.set(key, out);
   return out;
 }
@@ -107,12 +114,78 @@ function haloImage(color) {
 export const KIND_COLORS = { official: '#ff5ce1', user: '#c6ff5c' };
 
 /* ── Clustering ──────────────────────────────────────────── */
-// Markers closer than CLUSTER_PX on screen merge into a numbered cluster
-// once there are at least CLUSTER_MIN of them. Below CLUSTER_BELOW_M the
-// camera is close enough that markers separate on their own.
+// Markers that would sit within about CLUSTER_PX of each other on screen merge
+// into a numbered cluster once there are at least CLUSTER_MIN of them. Below
+// CLUSTER_BELOW_M the camera is close enough that markers separate on their own.
+//
+// The groups are made from distances on the ground, for fixed zoom steps
+// (each LEVEL_STEP times higher than the last), so turning or panning the globe
+// never regroups: like single markers, clusters stay put. Zooming regroups only
+// when the camera passes into another step, with some slack so it doesn't
+// flip back and forth at the boundary.
 const CLUSTER_PX = 38;
 const CLUSTER_MIN = 3;
 const CLUSTER_BELOW_M = 150_000;
+const LEVEL_STEP = 1.4;
+const LEVEL_SLACK = 0.65; // in steps: past half a step, plus a margin
+
+/** The zoom step for a camera height, keeping `current` until the height is clearly past it. */
+export function clusterLevel(height, current = null) {
+  const x = Math.log(height) / Math.log(LEVEL_STEP);
+  return current != null && Math.abs(x - current) <= LEVEL_SLACK ? current : Math.round(x);
+}
+
+/**
+ * Group points by distance: `points` are { x, y, z } in metres, `radius` the
+ * merging distance. Returns lists of indices with at least CLUSTER_MIN each.
+ * The result depends only on the points and the radius, never on the view.
+ */
+export function groupByDistance(points, radius) {
+  const cell = (v) => Math.floor(v / radius);
+  const grid = new Map();
+  points.forEach((p, i) => {
+    const k = `${cell(p.x)},${cell(p.y)},${cell(p.z)}`;
+    if (!grid.has(k)) grid.set(k, []);
+    grid.get(k).push(i);
+  });
+  const r2 = radius * radius;
+  const d2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
+  const used = new Uint8Array(points.length);
+  const groups = [];
+  for (let i = 0; i < points.length; i++) {
+    if (used[i]) continue;
+    const p = points[i];
+    const group = [i];
+    for (let dx = -1; dx <= 1; dx++)
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dz = -1; dz <= 1; dz++)
+          for (const j of grid.get(`${cell(p.x) + dx},${cell(p.y) + dy},${cell(p.z) + dz}`) || []) {
+            if (j !== i && !used[j] && d2(p, points[j]) <= r2) group.push(j);
+          }
+    if (group.length < CLUSTER_MIN) continue;
+    for (const j of group) used[j] = 1;
+    groups.push(group);
+  }
+  // Neighbouring groups can still overlap: merge those whose centres are close.
+  const centre = (g) => {
+    const c = { x: 0, y: 0, z: 0 };
+    for (const j of g) (c.x += points[j].x), (c.y += points[j].y), (c.z += points[j].z);
+    return { x: c.x / g.length, y: c.y / g.length, z: c.z / g.length };
+  };
+  const near2 = (radius * 0.9) ** 2;
+  for (let merged = true; merged; ) {
+    merged = false;
+    outer: for (let a = 0; a < groups.length; a++)
+      for (let b = a + 1; b < groups.length; b++)
+        if (d2(centre(groups[a]), centre(groups[b])) < near2) {
+          groups[a] = groups[a].concat(groups[b]);
+          groups.splice(b, 1);
+          merged = true;
+          break outer;
+        }
+  }
+  return groups;
+}
 const clusterImages = new Map();
 
 /** A dark disc with a count, ringed in case (cyan) and official (magenta) shares. */
@@ -155,7 +228,7 @@ function clusterImage(count, caseShare) {
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText(String(count), m, m + 0.5);
-  const out = { image: c, size: s };
+  const out = { id: `uap-cluster-${count}-${bucket}`, image: c, size: s };
   clusterImages.set(key, out);
   return out;
 }
@@ -175,8 +248,10 @@ export function createItemLayer(viewer) {
   let visibleKeys = null; // null = everything passes the filters
   let selectedKey = null;
   let grouping = true; // the user can turn grouping of nearby markers off
-  let clusters = []; // [{ members: [item], position }]
+  let clusters = []; // [{ members: [item], position, positions }]
   const clusterBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
+  const clusterPool = []; // billboards reused from one grouping to the next
+  let version = 0; // bumped when the markers or the filters change
   const haloBoards = viewer.scene.primitives.add(new Cesium.BillboardCollection());
   const halo = { ping: null, ring: null, since: 0 };
   const PING_MS = 2400;
@@ -245,11 +320,13 @@ export function createItemLayer(viewer) {
       add(item, index);
     }
     source.entities.resumeEvents();
+    version++;
     recluster();
   }
 
   function setVisible(keys) {
     visibleKeys = keys;
+    version++;
     recluster();
   }
 
@@ -259,10 +336,11 @@ export function createItemLayer(viewer) {
     halo.ping = halo.ring = null;
     const e = key && entities.get(key);
     if (e) {
-      const image = haloImage(itemColor(e.__item));
-      const common = { position: e.__pos, image, width: 64, height: 64, disableDepthTestDistance: horizon.distance };
-      halo.ring = haloBoards.add({ ...common, scale: 0.8 });
-      halo.ping = haloBoards.add({ ...common, scale: 0.8 });
+      const color = itemColor(e.__item);
+      const common = { position: e.__pos, width: 64, height: 64, disableDepthTestDistance: horizon.distance, scale: 0.8 };
+      halo.ring = haloBoards.add(common);
+      halo.ping = haloBoards.add(common);
+      for (const b of [halo.ring, halo.ping]) b.setImage(`uap-halo-${color}`, haloImage(color));
       halo.since = performance.now();
     }
     recluster();
@@ -279,122 +357,161 @@ export function createItemLayer(viewer) {
     halo.ring.disableDepthTestDistance = halo.ping.disableDepthTestDistance = horizon.distance;
   });
 
-  /**
-   * Group markers that overlap on screen. Only markers on the side of the
-   * Earth facing the camera take part (the globe hides the rest), and the
-   * selected marker always stays on its own.
-   */
-  const scratch = new Cesium.Cartesian2();
-  function recluster() {
-    const scene = viewer.scene;
-    const camera = viewer.camera;
-    clusterBoards.removeAll();
-    clusters = [];
-    const on = grouping && camera.positionCartographic.height > CLUSTER_BELOW_M;
-    scene.requestRender(); // marker visibility changes show on the next frame
-    const occluder = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, camera.positionWC);
-    const pts = [];
-    const front = []; // markers on the camera's side of the Earth, for labels
-    for (const [key, e] of entities) {
-      const visible = !visibleKeys || visibleKeys.has(key);
-      e.show = visible;
-      if (!visible || !occluder.isPointVisible(e.__pos)) continue;
-      front.push(e);
-      if (!on || key === selectedKey) continue;
-      const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, e.__pos, scratch);
-      if (w) pts.push({ e, x: w.x, y: w.y });
-    }
-    clusterPoints(pts);
-    // Labels: the selected case first, then cases with flight paths and stronger evidence.
-    declutter(
-      scene,
-      front
-        .filter((e) => e.show)
-        .map((e) => ({
-          entity: e,
-          position: e.__pos,
-          text: e.__label,
-          priority: (e.id === selectedKey ? 1000 : 0) + (e.__item.hasTrack ? 40 : 0) + (e.__item.kind === 'case' ? 20 : 0) + evidenceScore(e.__item.evidence || [], e.__item.hasTrack),
-          dx: e.__item.hasTrack ? 22 : 18,
-          dy: 0,
-          charPx: 6.6,
-          maxDistance: e.__item.kind === 'case' ? 3.5e6 : 9e5,
-        })),
-    );
+  /** Metres on the ground per screen pixel at `height`, looking straight down. */
+  function metersPerPixel(height) {
+    const fovy = viewer.camera.frustum.fovy ?? Cesium.Math.toRadians(60);
+    return (2 * height * Math.tan(fovy / 2)) / Math.max(1, viewer.canvas.clientHeight);
   }
 
-  function clusterPoints(pts) {
-    if (pts.length < CLUSTER_MIN) return;
-    // Bucket by screen cell, then grow each group from an unused seed.
-    const grid = new Map();
-    const cellOf = (p) => `${Math.floor(p.x / CLUSTER_PX)},${Math.floor(p.y / CLUSTER_PX)}`;
-    pts.forEach((p, i) => {
-      const k = cellOf(p);
-      if (!grid.has(k)) grid.set(k, []);
-      grid.get(k).push(i);
-    });
-    const used = new Uint8Array(pts.length);
-    const r2 = CLUSTER_PX * CLUSTER_PX;
-    const groups = [];
-    for (let i = 0; i < pts.length; i++) {
-      if (used[i]) continue;
-      const p = pts[i];
-      const cx = Math.floor(p.x / CLUSTER_PX);
-      const cy = Math.floor(p.y / CLUSTER_PX);
-      const group = [i];
-      for (let dx = -1; dx <= 1; dx++)
-        for (let dy = -1; dy <= 1; dy++)
-          for (const j of grid.get(`${cx + dx},${cy + dy}`) || []) {
-            if (j === i || used[j]) continue;
-            const q = pts[j];
-            if ((q.x - p.x) ** 2 + (q.y - p.y) ** 2 <= r2) group.push(j);
-          }
-      if (group.length < CLUSTER_MIN) continue;
-      for (const j of group) used[j] = 1;
-      groups.push(group);
+  /**
+   * Group markers that would overlap on screen at the current zoom step. The
+   * selected marker always stays on its own. Returns true when anything changed.
+   */
+  let level = null; // the zoom step the groups were made for
+  let groupedFor = null;
+  let pending = null; // a new grouping waiting for its cluster images to load
+  // Every marker is drawn on its own for the first frames (under the loading
+  // screen), so each glyph is loaded before a cluster ever splits into markers.
+  const WARM_FRAMES = 8;
+  const WARM_MS = 600;
+  let warm = false;
+  let warmFrames = 0;
+  const warmSince = performance.now();
+  let frames = 0; // frames drawn so far
+  viewer.scene.postRender.addEventListener(() => {
+    frames++;
+    if (warm) return;
+    if (++warmFrames >= WARM_FRAMES && performance.now() - warmSince >= WARM_MS) {
+      warm = true;
+      recluster();
+    } else setTimeout(() => viewer.scene.requestRender(), 50);
+  });
+
+  // Cluster images are loaded ahead on hidden billboards. A new grouping is put
+  // on screen only once every image it needs is ready, so no cluster is ever
+  // missing for a frame while its markers are already hidden.
+  const staged = new Map(); // image id -> hidden billboard holding it
+  function imageReady(ci) {
+    let b = staged.get(ci.id);
+    if (!b) {
+      b = clusterBoards.add({ show: false });
+      b.setImage(ci.id, ci.image);
+      staged.set(ci.id, b);
     }
-    // Neighbouring groups can still overlap on screen: merge them.
-    const centre = (g) => [g.reduce((a, j) => a + pts[j].x, 0) / g.length, g.reduce((a, j) => a + pts[j].y, 0) / g.length];
-    const near2 = (CLUSTER_PX * 0.9) ** 2;
-    for (let merged = true; merged; ) {
-      merged = false;
-      outer: for (let a = 0; a < groups.length; a++)
-        for (let b = a + 1; b < groups.length; b++) {
-          const [ax, ay] = centre(groups[a]);
-          const [bx, by] = centre(groups[b]);
-          if ((ax - bx) ** 2 + (ay - by) ** 2 < near2) {
-            groups[a] = groups[a].concat(groups[b]);
-            groups.splice(b, 1);
-            merged = true;
-            break outer;
-          }
-        }
-    }
-    viewer.scene.requestRender();
-    for (const group of groups) {
+    return b.ready;
+  }
+
+  function regroup() {
+    const height = viewer.camera.positionCartographic.height;
+    const on = grouping && warm && height > CLUSTER_BELOW_M;
+    level = on ? clusterLevel(height, level) : null;
+    const key = on ? `${level}|${version}|${selectedKey}|${viewer.canvas.clientHeight}` : `off|${version}`;
+    if (key === groupedFor) return false;
+    groupedFor = key;
+    const candidates = [];
+    if (on) for (const [k, e] of entities) if ((!visibleKeys || visibleKeys.has(k)) && k !== selectedKey) candidates.push(e);
+    const groups = on ? groupByDistance(candidates.map((e) => e.__pos), CLUSTER_PX * metersPerPixel(LEVEL_STEP ** level)) : [];
+    const grouped = new Set();
+    const next = groups.map((group) => {
       const sum = new Cesium.Cartesian3();
       let cases = 0;
       for (const j of group) {
-        pts[j].e.show = false;
-        Cesium.Cartesian3.add(sum, pts[j].e.__pos, sum);
-        if (pts[j].e.__item.kind !== 'official') cases++;
+        const e = candidates[j];
+        grouped.add(e);
+        Cesium.Cartesian3.add(sum, e.__pos, sum);
+        if (e.__item.kind !== 'official') cases++;
       }
       const position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(Cesium.Cartesian3.divideByScalar(sum, group.length, sum), new Cesium.Cartesian3());
-      const members = group.map((j) => pts[j].e.__item);
-      clusters.push({ members, position, positions: group.map((j) => pts[j].e.__pos) });
-      clusterBoards.add({
+      return {
+        members: group.map((j) => candidates[j].__item),
         position,
-        ...(() => {
-          const ci = clusterImage(group.length, cases / group.length);
-          return { image: ci.image, width: ci.size, height: ci.size };
-        })(),
-        id: { layer: 'cluster', index: clusters.length - 1 },
-        disableDepthTestDistance: horizon.distance,
-      });
+        positions: group.map((j) => candidates[j].__pos),
+        image: clusterImage(group.length, cases / group.length),
+      };
+    });
+    if (next.every((c) => imageReady(c.image))) {
+      pending = null;
+      apply(next, grouped);
+      return true;
     }
+    pending = { next, grouped, frame: frames };
+    waitForImages();
+    return false;
   }
 
-  // Re-group as the camera moves (at most a few times a second) and once it stops.
+  /** Keep frames coming (the atlas loads images on rendered frames) until the pending grouping can be shown. */
+  let waiting = false;
+  function waitForImages() {
+    if (waiting) return;
+    waiting = true;
+    requestAnimationFrame(() => {
+      waiting = false;
+      if (!pending) return;
+      // Images load in a frame or two; after ten drawn frames show it anyway rather than never.
+      if (pending.next.every((c) => imageReady(c.image)) || frames - pending.frame > 10) {
+        const { next, grouped } = pending;
+        pending = null;
+        apply(next, grouped);
+        relabel();
+        viewer.dataSourceDisplay?.update(viewer.clock.currentTime);
+      } else waitForImages();
+      viewer.scene.requestRender();
+    });
+  }
+
+  /** Put a grouping on screen: hide the grouped markers and draw the clusters. */
+  function apply(next, grouped) {
+    clusters = next;
+    for (const [k, e] of entities) {
+      const show = (!visibleKeys || visibleKeys.has(k)) && !grouped.has(e);
+      if (e.show !== show) e.show = show;
+    }
+    // Reuse the cluster billboards rather than rebuilding them.
+    clusters.forEach((c, i) => {
+      let b = clusterPool[i];
+      if (!b) {
+        b = clusterBoards.add({ position: c.position, id: { layer: 'cluster', index: i }, disableDepthTestDistance: horizon.distance });
+        clusterPool.push(b);
+      }
+      b.position = c.position;
+      b.setImage(c.image.id, c.image.image);
+      b.width = b.height = c.image.size;
+      b.show = true;
+    });
+    for (let i = clusters.length; i < clusterPool.length; i++) clusterPool[i].show = false;
+  }
+
+  /** Labels on the side of the Earth facing the camera: the selected case first, then cases with flight paths and stronger evidence. */
+  function relabel() {
+    const occluder = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.positionWC);
+    const front = [];
+    for (const e of entities.values()) if (e.show && occluder.isPointVisible(e.__pos)) front.push(e);
+    return declutter(
+      viewer.scene,
+      front.map((e) => ({
+        entity: e,
+        position: e.__pos,
+        text: e.__label,
+        priority: (e.id === selectedKey ? 1000 : 0) + (e.__item.hasTrack ? 40 : 0) + (e.__item.kind === 'case' ? 20 : 0) + evidenceScore(e.__item.evidence || [], e.__item.hasTrack),
+        dx: e.__item.hasTrack ? 22 : 18,
+        dy: 0,
+        charPx: 6.6,
+        maxDistance: e.__item.kind === 'case' ? 3.5e6 : 9e5,
+      })),
+    );
+  }
+
+  function recluster() {
+    const grouped = regroup();
+    const labelled = relabel();
+    if (!grouped && !labelled) return;
+    // Markers and labels are entities, which normally reach the screen a frame
+    // after the cluster billboards: update them now so both change together.
+    viewer.dataSourceDisplay?.update(viewer.clock.currentTime);
+    viewer.scene.requestRender();
+  }
+
+  // Regroup and re-place labels as the camera moves (at most a few times a second) and once it stops.
   let lastCluster = 0;
   let queued = false;
   const lastPos = new Cesium.Cartesian3();
@@ -409,7 +526,7 @@ export function createItemLayer(viewer) {
     Cesium.Cartesian3.clone(cam.directionWC, lastDir);
     const now = performance.now();
     if (now - lastCluster < 120) {
-      if (!queued) setTimeout(() => viewer.scene.requestRender(), 130); // regroup after the camera stops
+      if (!queued) setTimeout(() => viewer.scene.requestRender(), 130); // once more after the camera stops
       queued = true;
       return;
     }

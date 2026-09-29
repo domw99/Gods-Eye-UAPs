@@ -5,7 +5,7 @@ import * as Cesium from 'cesium';
  * priority order; a label that would cover one already placed is hidden.
  * Each candidate: { entity, position, text, priority, dx, dy, charPx, maxDistance }.
  * Label boxes are estimated from the text length, which is close enough
- * for Inter and JetBrains Mono at 11–12 px.
+ * for Inter and JetBrains Mono at 11–12 px. Returns true when a label changed.
  */
 const scratch = new Cesium.Cartesian2();
 
@@ -33,6 +33,7 @@ export function declutter(scene, candidates) {
     }
   }
   if (changed) scene.requestRender();
+  return changed;
 }
 
 /** Run `fn` when the camera moves, at most every `ms` and once more after it stops. */
