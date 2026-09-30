@@ -49,6 +49,12 @@
       <button data-mode="ironbow" role="radio" aria-checked="false" title="FLIR ironbow (4)">IRONBOW</button>
       <button data-mode="crt" role="radio" aria-checked="false" title="CRT (5)">CRT</button>
     </nav>
+    <div id="light-switch" class="lighting" role="radiogroup" aria-label="Lighting">
+      <button type="button" role="radio" data-light="auto" aria-checked="true" title="Lighting: automatic, the sun at the moment of the case (D)" aria-label="Automatic lighting"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" /><path d="M8 2.8a5.2 5.2 0 0 1 0 10.4z" class="fill" /></svg></button>
+      <button type="button" role="radio" data-light="day" aria-checked="false" title="Lighting: day everywhere (D)" aria-label="Day"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.7" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" /></svg></button>
+      <button type="button" role="radio" data-light="night" aria-checked="false" title="Lighting: night everywhere (D)" aria-label="Night"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.6 9.8A5.3 5.3 0 0 1 6.2 3.4a5.3 5.3 0 1 0 6.4 6.4z" /></svg></button>
+      <button type="button" role="radio" data-light="off" aria-checked="false" title="Lighting off: the globe evenly lit (D)" aria-label="Lighting off"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" /><path d="M4.5 11.5l7-7" /></svg></button>
+    </div>
     <div class="top-actions">
       <button id="btn-tour" class="chip" title="Guided tour of landmark cases (T)">▶ TOUR</button>
       <button id="btn-files" class="chip" title="Government UAP files and the MUFON files (G)">FILES</button>
@@ -151,10 +157,11 @@
   <footer id="timeline" class="glass" aria-label="Timeline">
     <button id="tl-play" class="icon-btn" title="Sweep through history (Space)" aria-label="Play history">▶</button>
     <div class="tl-main">
-      <div class="tl-labels mono"><span id="tl-range">ALL YEARS</span><span id="tl-hint" class="muted">drag on the histogram to filter by year · double-click to reset</span></div>
+      <div class="tl-labels mono"><span id="tl-range">ALL YEARS</span><span id="tl-hint" class="muted">drag on the histogram to filter by year · double-click to reset</span><button id="tl-hide" class="link-btn" type="button" title="Hide the years bar (Y)" aria-label="Hide the years bar">HIDE ⌄</button></div>
       <canvas id="tl-canvas" height="54"></canvas>
     </div>
   </footer>
+  <button id="tl-show" class="chip tl-show" type="button" title="Show the years bar (Y)">▲ YEARS</button>
 
   <!-- ── Playback bar (shown while a flight path is loaded) ─ -->
   <div id="story" class="glass hidden" role="region" aria-label="Story mode" aria-live="polite">

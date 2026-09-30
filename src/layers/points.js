@@ -1,25 +1,27 @@
 import * as Cesium from 'cesium';
 import { horizonOf } from '../app/horizon.js';
+import { glyphUrl } from './glyphs.js';
 
 /**
- * Large point layers (Project Blue Book ~10k files, NUFORC ~80k reports)
- * drawn with a PointPrimitiveCollection so they stay fast. Each point's `id`
- * carries { layer, index } for picking.
+ * Large point layers (Project Blue Book ~10k files, NUFORC ~80k reports),
+ * drawn as one billboard collection so they stay fast. Each layer has its own
+ * symbol (layers/glyphs.js), tinted per point. Each point's `id` carries
+ * { layer, index } for picking.
  */
-export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0.85, near = 1.3, far = 0.45 }) {
-  const collection = viewer.scene.primitives.add(
-    new Cesium.PointPrimitiveCollection({ blendOption: Cesium.BlendOption.TRANSLUCENT }),
-  );
+export function createPointLayer(viewer, { name, color, size = 18, alpha = 0.85, near = 1.3, far = 0.45, underneath = false }) {
+  const collection = viewer.scene.primitives.add(new Cesium.BillboardCollection({ blendOption: Cesium.BlendOption.TRANSLUCENT }));
   collection.show = false;
+  if (underneath) viewer.scene.primitives.lowerToBottom(collection); // a dense wash: keep it under the other markers
+  const image = glyphUrl(name); // a URL is the texture's id, so every marker shares one picture
   const base = Cesium.Color.fromCssColorString(color).withAlpha(alpha);
   const points = [];
   let years = [];
   let rowIndex = [];
 
-  // Points skip the depth test only up to the horizon, so the globe hides the
-  // far side (see app/horizon.js). Rewriting tens of thousands of points is
+  // Markers skip the depth test only up to the horizon, so the globe hides the
+  // far side (see app/horizon.js). Rewriting tens of thousands of markers is
   // costly, so the applied distance keeps a 15% margin inside the horizon and
-  // only changes when the horizon moves inside it (far-side points would
+  // only changes when the horizon moves inside it (far-side markers would
   // show) or grows well beyond it.
   const horizon = horizonOf(viewer);
   let applied = horizon.distance * 0.85;
@@ -50,10 +52,10 @@ export function createPointLayer(viewer, { name, color, pixelSize = 5, alpha = 0
       if (jitter) [la, lo] = jitter(row, index, la, lo);
       const p = collection.add({
         position: Cesium.Cartesian3.fromDegrees(lo, la, 0),
-        pixelSize,
+        image,
+        width: size,
+        height: size,
         color: color ? colorFor(color(row, index)) : base,
-        outlineColor: Cesium.Color.BLACK.withAlpha(0.5),
-        outlineWidth: pixelSize > 3 ? 1 : 0,
         scaleByDistance: new Cesium.NearFarScalar(1e5, near, 1.5e7, far),
         disableDepthTestDistance: applied,
         id: { layer: name, index },

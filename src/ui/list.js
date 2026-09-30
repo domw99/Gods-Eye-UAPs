@@ -1,4 +1,5 @@
-import { html, mount } from '../util/dom.js';
+import { html, mount, raw } from '../util/dom.js';
+import { glyphSvg } from '../layers/glyphs.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer, filtersActive, resetFilters, DEFAULT_LAYERS } from '../state.js';
 import { itemColor } from '../layers/items.js';
@@ -32,7 +33,7 @@ export function renderLayers(counts) {
     document.getElementById('layers'),
     html`${LAYER_DEFS.map(
       (l) => html`<button class="layer" data-layer="${l.id}" aria-pressed="${state.layers[l.id] ? 'true' : 'false'}" style="color:${l.color}">
-        <span class="swatch"></span>
+        ${glyphSvg(l.id) ? raw(glyphSvg(l.id)) : html`<span class="swatch"></span>`}
         <span style="color:var(--text-primary)"><span class="name">${l.name}</span><span class="sub">${l.sub}</span></span>
         <span class="state">${counts[l.id] ?? ''}</span>
       </button>`,

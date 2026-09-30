@@ -69,6 +69,72 @@ test.describe('God’s Eye // UAP', () => {
     await expect(page.locator('#case-list .case-item')).toContainText('Socorro');
   });
 
+  test('lighting is one click away in the top bar', async ({ page }) => {
+    await openApp(page);
+    await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'true');
+    await page.locator('#light-switch [data-light="night"]').click();
+    await expect(page.locator('#light-switch [data-light="night"]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'false');
+    await expect(page.locator('#hud-map')).toContainText('· NIGHT');
+    await page.locator('#light-switch [data-light="off"]').click();
+    await expect(page.locator('#hud-map')).toContainText('· OFF');
+    await page.keyboard.press('d'); // the key cycles on from the current choice and the bar follows
+    await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('3D buildings start off, and the layer list shows each layer with its own symbol', async ({ page }) => {
+    await openApp(page);
+    expect(await page.evaluate(() => window.__uap.state.layers.buildings)).toBe(false);
+    await expect(page.locator('#layers [data-layer="buildings"]')).toHaveAttribute('aria-pressed', 'false');
+    const symbols = await page.locator('#layers svg.swatch path.body').evaluateAll((els) => els.map((e) => e.getAttribute('d')));
+    expect(symbols.length).toBeGreaterThanOrEqual(8);
+    expect(new Set(symbols).size).toBe(symbols.length); // no two layers share a symbol
+  });
+
+  test('the map controls return to the edge when the dossier closes, at any width', async ({ page }) => {
+    await openApp(page);
+    const rightGap = () => page.locator('#map-controls').evaluate((el) => Math.round(innerWidth - el.getBoundingClientRect().right));
+    const closedGap = await rightGap();
+    for (const width of [1280, 900]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.evaluate(() => window.__uap.select('case:socorro-zamora-1964', 'list'));
+      await expect.poll(rightGap).toBeGreaterThan(300); // clear of the open dossier
+      await page.locator('#dossier-close').click();
+      await expect.poll(rightGap).toBeLessThan(closedGap + 6);
+      await page.evaluate(() => window.__uap.select('case:socorro-zamora-1964', 'list'));
+      await expect.poll(rightGap).toBeGreaterThan(300);
+      await page.keyboard.press('Escape');
+      await expect.poll(rightGap).toBeLessThan(closedGap + 6);
+    }
+  });
+
+  test('the top bar is back to its height after the window is resized narrow and wide again', async ({ page }) => {
+    await openApp(page);
+    const barHeight = () => page.locator('.topbar').evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    const wide = await barHeight();
+    await page.setViewportSize({ width: 560, height: 800 });
+    await expect.poll(barHeight).toBeGreaterThan(wide + 20);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect.poll(barHeight).toBeLessThan(wide + 4);
+  });
+
+  test('the years bar can be hidden, brought back, and is remembered', async ({ page }) => {
+    await openApp(page);
+    await expect(page.locator('#timeline')).toBeVisible();
+    const panelBottom = () => page.locator('#left').evaluate((el) => Math.round(el.getBoundingClientRect().bottom));
+    const withBar = await panelBottom();
+    await page.locator('#tl-hide').click();
+    await expect(page.locator('#timeline')).toBeHidden();
+    await expect(page.locator('#tl-show')).toBeVisible();
+    await expect.poll(panelBottom).toBeGreaterThan(withBar + 20); // the panels grow into the space
+    await page.reload();
+    await expect(page.locator('#case-list .case-item').first()).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#timeline')).toBeHidden();
+    await page.keyboard.press('y');
+    await expect(page.locator('#timeline')).toBeVisible();
+    await expect.poll(panelBottom).toBeLessThan(withBar + 4);
+  });
+
   test('clean view hides the panels and a case brings them back', async ({ page }) => {
     await openApp(page);
     await page.keyboard.press('f');

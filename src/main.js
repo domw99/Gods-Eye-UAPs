@@ -65,11 +65,11 @@ const basemap = createBasemap(viewer, { onChange: () => render.request() }); // 
 const effects = createEffects(viewer);
 const itemLayer = createItemLayer(viewer);
 const trackLayer = createTrackLayer(viewer);
-const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', pixelSize: 5 });
-const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', pixelSize: 4.5 });
-const journalsLayer = createPointLayer(viewer, { name: 'journals', color: JOURNALS_COLOR, pixelSize: 4.5 });
-const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, pixelSize: 5, alpha: 0.9 });
-const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', pixelSize: 2.5, alpha: 0.55, near: 1.6, far: 0.7 });
+const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb547', size: 18 });
+const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', size: 17 });
+const journalsLayer = createPointLayer(viewer, { name: 'journals', color: JOURNALS_COLOR, size: 18 });
+const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, size: 18, alpha: 0.95 });
+const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', size: 8, alpha: 0.5, near: 1.4, far: 0.8, underneath: true });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
 const photoreal = createPhotoreal(viewer, { onChange: ({ active }) => buildingLayer.suspend(active) });
@@ -173,6 +173,21 @@ function geipanPasses(r) {
 }
 
 const timeline = createTimeline({ onPlayToggle: toggleHistorySweep });
+
+/* The years bar can be hidden (Y, or HIDE on the bar); a small tab brings it back. The choice is remembered. */
+const TIMELINE_KEY = 'gods-eye-uap:timeline-hidden';
+function setTimelineHidden(on) {
+  document.body.classList.toggle('tl-hidden', on);
+  try {
+    localStorage.setItem(TIMELINE_KEY, on ? '1' : '0');
+  } catch {}
+  render.request();
+}
+try {
+  if (localStorage.getItem(TIMELINE_KEY) === '1') document.body.classList.add('tl-hidden');
+} catch {}
+document.getElementById('tl-hide').addEventListener('click', () => setTimelineHidden(true));
+document.getElementById('tl-show').addEventListener('click', () => setTimelineHidden(false));
 
 let nuforcShapeClasses = null;
 function refresh() {
@@ -551,6 +566,7 @@ function applyLighting() {
     if (mode === 'moment') updateNightDim();
   }
   document.body.dataset.lighting = lightMode;
+  for (const b of document.querySelectorAll('#light-switch [data-light]')) b.setAttribute('aria-checked', String(b.dataset.light === lightMode));
   render.request();
 }
 
@@ -562,6 +578,10 @@ function setLighting(mode) {
   } catch {}
   applyLighting();
 }
+document.getElementById('light-switch').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-light]');
+  if (b) setLighting(b.dataset.light);
+});
 const nextLighting = () => {
   const modes = Object.keys(LIGHT_MODES);
   setLighting(modes[(modes.indexOf(lightMode) + 1) % modes.length]);
@@ -1344,6 +1364,16 @@ document.getElementById('dossier-peek').addEventListener('click', () => {
   document.body.classList.toggle('dossier-peek', d.classList.contains('peek'));
 });
 
+// The body class that moves the map controls and HUD clear of the dossier follows the
+// panel's real visibility, so it can't be left behind by whichever path showed or hid it.
+{
+  const dossier = document.getElementById('dossier');
+  new MutationObserver(() => document.body.classList.toggle('dossier-open', !dossier.classList.contains('hidden'))).observe(dossier, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+}
+
 // The top bar wraps on small screens; keep panels and HUD clear of it.
 new ResizeObserver(([entry]) => {
   document.documentElement.style.setProperty('--top-h', `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
@@ -1486,6 +1516,7 @@ document.querySelector('.modes').addEventListener('click', (e) => {
 /* ── History sweep (timeline ▶) ────────────────────────── */
 let sweepTimer = null;
 function toggleHistorySweep() {
+  if (document.body.classList.contains('tl-hidden')) setTimelineHidden(false); // the sweep shows on the bar
   if (sweepTimer) {
     clearInterval(sweepTimer);
     sweepTimer = null;
@@ -1880,6 +1911,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'o') setOrbit(!flycam.orbiting);
   else if (e.key.toLowerCase() === 'd') nextLighting();
   else if (e.key.toLowerCase() === 'f') setCleanView();
+  else if (e.key.toLowerCase() === 'y') setTimelineHidden(!document.body.classList.contains('tl-hidden'));
   else if (e.key === '+' || e.key === '=') zoomView(1);
   else if (e.key === '-' || e.key === '_') zoomView(-1);
 });

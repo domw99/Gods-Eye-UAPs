@@ -81,7 +81,7 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 - **FLIR white-hot** and **FLIR Ironbow**, with a cold-to-hot scale on screen.
 - **CRT**: scanlines, a shadow mask and a slightly curved glass.
 
-**3D buildings are free.** OpenStreetMap buildings (via OpenFreeMap) appear as you zoom into any town. If you want Google's photorealistic 3D tiles instead, paste your own key under **MAP**.
+**3D buildings are free, and off until you want them.** Turn on OpenStreetMap buildings (via OpenFreeMap) under **MAP** or in the layer list, and they appear as you zoom into any town; **Fly to ground view** on a case turns them on for you. If you want Google's photorealistic 3D tiles instead, paste your own key under **MAP**.
 
 ### 🗺 Map styles, day and night, and a real sky
 
