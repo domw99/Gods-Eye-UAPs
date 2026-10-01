@@ -18,6 +18,7 @@ export const DEFAULT_LAYERS = {
   satellites: false,
   buildings: false, // OSM 3D buildings: off until asked for (MAP, the layer list, or ground view)
   launches: false,
+  quakes: false,
   airspace: false,
   user: true,
 };

@@ -12,7 +12,7 @@ import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
 import { createBuildingLayer } from './layers/buildings.js';
-import { createLaunchLayer } from './layers/launches.js';
+import { createLaunchLayer, relativeTime } from './layers/launches.js';
 import { createAirspaceLayer } from './layers/airspace.js';
 import { loadAirspace, areasAt, AIRSPACE_TYPES, formatFt } from './services/airspace.js';
 import { launchesAroundNow, RateLimitError } from './services/launches.js';
@@ -20,9 +20,10 @@ import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList,
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
+  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
+import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
@@ -72,6 +73,7 @@ const bluebookLayer = createPointLayer(viewer, { name: 'bluebook', color: '#ffb5
 const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', size: 17 });
 const journalsLayer = createPointLayer(viewer, { name: 'journals', color: JOURNALS_COLOR, size: 18 });
 const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, size: 18, alpha: 0.95 });
+const quakeLayer = createPointLayer(viewer, { name: 'quakes', color: '#e6c37a', size: 16, alpha: 0.92, near: 1.35, far: 0.7 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', size: 8, alpha: 0.5, near: 1.4, far: 0.8, underneath: true });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
@@ -94,7 +96,7 @@ let nuforc = null;
 let mufon = null; // { issues, records, byIssueId, cases, chapters }
 let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', journals: 'APRO+', nuforc: '80k', satellites: 'live', launches: 'LL2', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', journals: 'APRO+', nuforc: '80k', satellites: 'live', launches: 'LL2', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 loadingStep('LOADING CASE FILES…', 45);
 try {
@@ -258,6 +260,8 @@ async function applyLayers() {
   satLayer.show = L.satellites;
   buildingLayer.show = L.buildings;
   launchLayer.show = L.launches;
+  quakeLayer.show = L.quakes;
+  if (L.quakes) ensureQuakes();
   if (L.launches) ensureLaunches();
   airspaceLayer.show = L.airspace;
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
@@ -297,6 +301,23 @@ async function airspaceFor(c) {
       for (const a of areasAt(areas, lon, lat, altM / 0.3048))
         if (!hits.has(a.index)) hits.set(a.index, { area: a, why: t.label });
   return [...hits.values()];
+}
+
+let quakeRows = [];
+let quakesLoaded = 0;
+async function ensureQuakes() {
+  if (quakeRows.length && Date.now() - quakesLoaded < 10 * 60e3) return;
+  renderLayersNow({ quakes: 'loading…' });
+  try {
+    quakeRows = await loadQuakes();
+    quakesLoaded = Date.now();
+    quakeLayer.setData(quakeRows, { lat: (q) => q.lat, lon: (q) => q.lon, year: () => YEAR_MAX, size: (q) => quakeSize(q.mag), color: (q) => quakeColor(q.mag) });
+    renderLayersNow({ quakes: quakeRows.length.toLocaleString() });
+  } catch (error) {
+    console.warn(error);
+    renderLayersNow({ quakes: 'offline' });
+    toast('Earthquake feed unavailable');
+  }
 }
 
 let launchesLoaded = 0;
@@ -1128,6 +1149,12 @@ handler.setInputAction((click) => {
       deselect();
       renderLaunchPad(pad);
     }
+  } else if (hit.type === 'quakes') {
+    const q = quakeRows[hit.index];
+    if (q) {
+      deselect();
+      renderQuake(q);
+    }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
@@ -1174,6 +1201,9 @@ handler.setInputAction((move) => {
     else if (hit?.type === 'airspace') {
       const a = airspaceLayer.info(hit.index);
       if (a) lines = [a.name, `${AIRSPACE_TYPES[a.type]?.label || a.type} · ${formatFt(a.lowerFt)} to ${formatFt(a.upperFt)}`];
+    } else if (hit?.type === 'quakes') {
+      const q = quakeRows[hit.index];
+      if (q) lines = [`${q.mag != null ? `M ${q.mag.toFixed(1)}` : 'Quake'} · ${q.place}`, relativeTime(new Date(q.time).toISOString())];
     } else if (hit?.type === 'launch') {
       const p = launchLayer.info(hit.index);
       const l = p?.next || p?.last;

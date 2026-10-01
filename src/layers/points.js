@@ -39,8 +39,8 @@ export function createPointLayer(viewer, { name, color, size = 18, alpha = 0.85,
     return colors.get(css);
   };
 
-  /** `color(row, index)` optionally gives each point its own CSS colour. */
-  function setData(rows, { lat, lon, year, jitter = null, color = null }) {
+  /** `color(row, index)` optionally gives each point its own CSS colour, `size(row, index)` its own size in pixels. */
+  function setData(rows, { lat, lon, year, jitter = null, color = null, size: sizeOf = null }) {
     collection.removeAll();
     points.length = 0;
     years = [];
@@ -53,8 +53,8 @@ export function createPointLayer(viewer, { name, color, size = 18, alpha = 0.85,
       const p = collection.add({
         position: Cesium.Cartesian3.fromDegrees(lo, la, 0),
         image,
-        width: size,
-        height: size,
+        width: sizeOf ? sizeOf(row, index) : size,
+        height: sizeOf ? sizeOf(row, index) : size,
         color: color ? colorFor(color(row, index)) : base,
         scaleByDistance: new Cesium.NearFarScalar(1e5, near, 1.5e7, far),
         disableDepthTestDistance: applied,

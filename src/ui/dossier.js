@@ -281,6 +281,31 @@ export function renderLaunchPad(p) {
   );
 }
 
+export function renderQuake(q) {
+  open('EARTHQUAKE');
+  const when = new Date(q.time);
+  mount(
+    body(),
+    html`<div class="d-title">${q.mag != null ? `M ${q.mag.toFixed(1)}` : t('Earthquake')} · ${q.place}</div>
+    <div class="d-sub">${fmtDate(when, { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC · ${relativeTime(when.toISOString())}<br />${formatDMS(q.lat, q.lon)}</div>
+    ${section(
+      'DETAILS',
+      html`<dl class="d-kv">
+        <dt>MAGNITUDE</dt><dd>${q.mag != null ? q.mag.toFixed(1) : '—'}</dd>
+        <dt>DEPTH</dt><dd>${q.depthKm != null ? t('{n} km', { n: Math.round(q.depthKm) }) : '—'}</dd>
+        ${q.felt ? html`<dt>FELT BY</dt><dd>${t('{n} people reported it', { n: q.felt.toLocaleString(locale()) })}</dd>` : ''}
+      </dl>`,
+    )}
+    ${section(
+      'WHY IT MATTERS',
+      html`<div class="d-text"><p>${t('A strong earthquake is sometimes reported as a boom, a shaking ground or odd lights in the sky; rare “earthquake lights” have been documented around large quakes. Compare its time and place with a sighting made the same day.')}</p></div>
+        <p class="caveat">${t('Data: USGS, earthquakes of the last 24 hours (updated every few minutes).')}</p>
+        ${q.url ? html`<div class="btn-row"><a class="chip" target="_blank" rel="noopener" href="${safeUrl(q.url)}">${t('USGS EVENT PAGE')} ↗</a></div>` : ''}`,
+    )}
+    ${section('THE LOCATION', siteLinks(q.lat, q.lon))}`,
+  );
+}
+
 function strengthMeter(score) {
   const cells = Array.from({ length: 10 }, (_, i) => `<i class="${i < score ? 'on' : ''}"></i>`).join('');
   return html`<span class="meter" title="${t('Documentation score {n}/10: instrument data, imagery, official papers and trained observers count most. It measures evidence, not strangeness.', { n: score })}">${raw(cells)}<b>${score}/10</b></span>`;

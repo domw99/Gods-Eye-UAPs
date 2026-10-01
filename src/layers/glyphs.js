@@ -9,6 +9,7 @@
  *   MUFON files      a hexagon
  *   Research archives  an open book
  *   Civilian reports a four-point spark
+ *   Earthquakes      a pentagon with a seismograph trace
  *
  * The outlines are SVG paths in a 16 × 16 box, so the same shapes draw on the
  * map (canvas) and in the layer list (inline SVG).
@@ -18,6 +19,7 @@ export const GLYPHS = {
   geipan: { path: 'M8 1.6l5.2 1.9v4.6c0 3-2.2 5.1-5.2 6.4-3-1.3-5.2-3.4-5.2-6.4V3.5z', detail: null, dot: [8, 7.7] },
   mufon: { path: 'M8 1.7l5.4 3.15v6.3L8 14.3l-5.4-3.15v-6.3z', detail: null, dot: [8, 8] },
   journals: { path: 'M1.8 4c2-.8 4.2-.8 6.2.7 2-1.5 4.2-1.5 6.2-.7v8.1c-2-.8-4.2-.8-6.2.7-2-1.5-4.2-1.5-6.2-.7z', detail: 'M8 4.7v8.1', dot: null },
+  quakes: { path: 'M8 1.7l5.8 4.2-2.2 6.8H4.4L2.2 5.9z', detail: 'M4.7 8.7h1.4l1-2.6 1.7 4 1-1.4h1.6', dot: null },
   nuforc: { path: 'M8 1.4L9.7 6.3 14.6 8 9.7 9.7 8 14.6 6.3 9.7 1.4 8 6.3 6.3z', detail: null, dot: [8, 8] },
 };
 

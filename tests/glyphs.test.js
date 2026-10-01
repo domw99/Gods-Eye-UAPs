@@ -3,8 +3,8 @@ import { GLYPHS, glyphSvg } from '../src/layers/glyphs.js';
 import { LAYER_DEFS } from '../src/ui/list.js';
 
 describe('layer symbols', () => {
-  it('gives every archive layer a shape of its own', () => {
-    const archives = ['bluebook', 'geipan', 'mufon', 'journals', 'nuforc'];
+  it('gives every map-point layer a shape of its own', () => {
+    const archives = ['bluebook', 'geipan', 'mufon', 'journals', 'nuforc', 'quakes'];
     expect(Object.keys(GLYPHS).sort()).toEqual([...archives].sort());
     const paths = Object.values(GLYPHS).map((g) => g.path);
     expect(new Set(paths).size).toBe(paths.length);
@@ -20,7 +20,7 @@ describe('layer symbols', () => {
 
   it('draws the same symbols in the layer list, and none is shared between layers', () => {
     const shown = LAYER_DEFS.map((l) => glyphSvg(l.id)).filter(Boolean);
-    expect(shown.length).toBeGreaterThanOrEqual(8); // cases, official, user and the five archives
+    expect(shown.length).toBeGreaterThanOrEqual(8); // cases, official, user, the five archives and earthquakes
     expect(new Set(shown).size).toBe(shown.length);
     expect(glyphSvg('bluebook')).toContain('class="swatch"');
     expect(glyphSvg('satellites')).toBeNull();
