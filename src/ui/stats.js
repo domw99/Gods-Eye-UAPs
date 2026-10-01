@@ -1,4 +1,5 @@
 import { html, raw, mount, esc } from '../util/dom.js';
+import { t } from '../i18n/index.js';
 
 /**
  * The statistics view: what the archives hold, charted. Every chart is one
@@ -10,7 +11,7 @@ const W = 640; // SVG user units; the SVG scales to its box
 /** Row of stat tiles. */
 export const tiles = (items) =>
   html`<div class="stat-row stats-tiles">${items.map(
-    (t) => html`<div class="stat"><div class="v">${t.value}</div><div class="k">${t.label}</div></div>`,
+    (tile) => html`<div class="stat"><div class="v">${tile.value}</div><div class="k">${tile.label}</div></div>`,
   )}</div>`;
 
 const compact = (n) => (n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}K` : n.toLocaleString());
@@ -92,7 +93,7 @@ export function barList(items, { color, emphasis = false, unit = '' } = {}) {
     const pct = (i.value / max) * 100;
     const share = total ? Math.round((i.value / total) * 100) : 0;
     const fill = emphasis && !i.strong ? 'rgba(232,234,237,0.22)' : color;
-    return html`<div class="bar-row" role="listitem" title="${i.hint || i.label}: ${i.value.toLocaleString()}${unit} (${share}%)">
+    return html`<div class="bar-row" role="listitem" title="${t(i.hint || i.label)}: ${i.value.toLocaleString()}${unit} (${share}%)">
       <span class="bar-label">${i.label}</span>
       <span class="bar-track"><i style="width:${pct.toFixed(1)}%;background:${fill}"></i></span>
       <span class="bar-value">${i.value.toLocaleString()}${emphasis ? html` <span class="dim">${share}%</span>` : ''}</span>

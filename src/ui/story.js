@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 import { skyAt, compass } from '../services/sky.js';
 import { STATUS } from '../data/taxonomy.js';
 import { lessMotion } from '../app/quality.js';
+import { locale } from '../i18n/index.js';
 
 /**
  * Story mode: a narrated fly-through of one case. Captions step through the
@@ -50,7 +51,7 @@ function skySentence(c) {
 
 export function buildStory(c) {
   const date = new Date(c.date);
-  const when = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const when = date.toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   const steps = [
     { kicker: 'CASE FILE', text: `${c.title}. ${c.place}, ${when}.`, camera: 'space' },
     ...sentences(c.summary).reduce((acc, s, i) => {

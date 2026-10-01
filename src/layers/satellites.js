@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import * as satellite from 'satellite.js';
 import * as Astro from 'astronomy-engine';
+import { t } from '../i18n/index.js';
 
 /**
  * Live "sky check" layer: propagates CelesTrak element sets with satellite.js
@@ -73,7 +74,7 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     const seen = new Set();
     for (const g of GROUPS) {
       try {
-        onStatus(`Loading ${g.label}…`);
+        onStatus(t('Loading {name}…', { name: t(g.label) }));
         const text = await fetchTle(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g.id}&FORMAT=tle`);
         for (const s of parseTle(text)) {
           if (seen.has(s.norad)) continue;

@@ -1,4 +1,5 @@
 import { html, mount, raw } from '../util/dom.js';
+import { t } from '../i18n/index.js';
 import { glyphSvg } from '../layers/glyphs.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer, filtersActive, resetFilters, DEFAULT_LAYERS } from '../state.js';
@@ -94,7 +95,7 @@ const SORTERS = {
 export function renderList(items) {
   const sorted = [...items].sort(SORTERS[state.sort] || SORTERS['date-desc']);
   const list = document.getElementById('case-list');
-  document.getElementById('case-count').textContent = `${items.length} shown`;
+  document.getElementById('case-count').textContent = t('{n} shown', { n: items.length });
   if (!sorted.length) {
     mount(
       list,
@@ -130,10 +131,10 @@ export function markSelected(key) {
 
 export function bindList({ onSelect }) {
   const search = document.getElementById('search');
-  let t;
+  let searchTimer;
   search.addEventListener('input', () => {
-    clearTimeout(t);
-    t = setTimeout(() => update({ search: search.value.trim().toLowerCase() }, 'search'), 120);
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => update({ search: search.value.trim().toLowerCase() }, 'search'), 120);
   });
   document.getElementById('sort').addEventListener('change', (e) => update({ sort: e.target.value }, 'sort'));
   document.getElementById('layers').addEventListener('click', (e) => {

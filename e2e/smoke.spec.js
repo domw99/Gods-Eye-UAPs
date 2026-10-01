@@ -216,6 +216,38 @@ test.describe('God’s Eye // UAP', () => {
     await expect(page.locator('.stats-body .bar-row').first()).toBeVisible();
   });
 
+  test('the interface can be switched to another language, and is remembered', async ({ page }) => {
+    const errors = await openApp(page);
+    await expect(page.locator('#btn-files')).toHaveText('FILES');
+    await page.locator('#lang').selectOption('de');
+    await expect(page.locator('#btn-files')).toHaveText('AKTEN');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+    // Panels drawn later are translated too, while the case file itself stays as published.
+    await page.evaluate(() => window.__uap.select('case:socorro-zamora-1964', 'list'));
+    await expect(page.locator('#dossier-body')).toContainText('ZUSAMMENFASSUNG');
+    await expect(page.locator('#dossier-body .d-title')).toHaveText(/Socorro landing/);
+    await page.reload();
+    await expect(page.locator('#case-list .case-item').first()).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#btn-files')).toHaveText('AKTEN');
+    await page.locator('#lang').selectOption('ar');
+    await expect(page.locator('html')).toHaveAttribute('data-text-dir', 'rtl');
+    await page.locator('#lang').selectOption('en');
+    await expect(page.locator('#btn-files')).toHaveText('FILES');
+    await expect(page.locator('html')).toHaveAttribute('data-text-dir', 'ltr');
+    expect(errors).toEqual([]);
+  });
+
+  test('the sensor looks include Noir and Snow, on keys 6 and 7', async ({ page }) => {
+    await openApp(page);
+    await page.keyboard.press('6');
+    await expect(page.locator('.modes [data-mode="noir"]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('#hud-mode')).toContainText('NOIR');
+    await page.keyboard.press('7');
+    await expect(page.locator('#hud-mode')).toContainText('SNOW');
+    await page.keyboard.press('1');
+    await expect(page.locator('#hud-mode')).toContainText('NORMAL');
+  });
+
   test('grouping can be switched off and is remembered', async ({ page }) => {
     await openApp(page);
     const group = page.locator('#map-controls [data-view="group"]');

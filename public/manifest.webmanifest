@@ -2,6 +2,8 @@
   "name": "God's Eye // UAP",
   "short_name": "God's Eye UAP",
   "description": "Every well-documented UFO/UAP encounter on a 3D globe, with replayable flight paths, official files from the U.S. and France, the MUFON and research archives, and tools to check each sighting yourself.",
+  "id": "./",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

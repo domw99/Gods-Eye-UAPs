@@ -1,3 +1,5 @@
+import { t, fill, translateDom } from '../i18n/index.js';
+
 /** Tiny DOM helpers — no framework needed for a panel-driven console. */
 
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -29,14 +31,21 @@ export function html(strings, ...values) {
 
 export function mount(el, fragment) {
   el.innerHTML = fragment[RAW] ?? String(fragment);
+  translateDom(el);
   return el;
+}
+
+/** Translated markup: the key may hold tags (<b>…</b>); the {placeholders} are filled with escaped values. */
+export function th(key, vars = {}) {
+  const safe = Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, v && v[RAW] !== undefined ? v[RAW] : esc(v)]));
+  return raw(fill(t(key), safe));
 }
 
 let toastTimer;
 export function toast(message, ms = 2600) {
   const el = document.getElementById('toast');
   if (!el) return;
-  el.textContent = message;
+  el.textContent = t(message);
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), ms);

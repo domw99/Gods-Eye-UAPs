@@ -2,6 +2,8 @@ import * as Cesium from 'cesium';
 import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGoogleKey, hasIonToken, loadStarSky } from './app/viewer.js';
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
+import { createInstall, installSteps } from './app/install.js';
+import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, locale } from './i18n/index.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -29,7 +31,7 @@ import { shareLink } from './app/links.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
-import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, backModal } from './ui/modals.js';
+import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
@@ -45,8 +47,9 @@ const LOG_KEY = 'gods-eye-uap:log';
 const GROUP_KEY = 'gods-eye-uap:group';
 
 /* ── Boot ──────────────────────────────────────────────── */
+await initLanguage(); // the saved language, else the browser's, before anything is drawn
 const loadingStep = (text, pct) => {
-  document.getElementById('loading-step').textContent = text;
+  document.getElementById('loading-step').textContent = t(text);
   document.getElementById('loading-fill').style.width = `${pct}%`;
   document.getElementById('loading').setAttribute('aria-valuenow', String(pct));
 };
@@ -585,7 +588,7 @@ document.getElementById('light-switch').addEventListener('click', (e) => {
 const nextLighting = () => {
   const modes = Object.keys(LIGHT_MODES);
   setLighting(modes[(modes.indexOf(lightMode) + 1) % modes.length]);
-  toast(`Lighting: ${LIGHT_MODES[lightMode]}`, 1600);
+  toast(t('Lighting: {mode}', { mode: t(LIGHT_MODES[lightMode]) }), 1600);
 };
 const LIGHT_NEAR = 1.5e6; // camera heights above the ground
 const LIGHT_FAR = 4e6;
@@ -838,7 +841,7 @@ function deselect({ keepHash = false } = {}) {
   hidePlayback();
   itemLayer.showRegion(null);
   if (!keepHash) setHash('');
-  document.getElementById('hud-tgt').textContent = 'NONE';
+  document.getElementById('hud-tgt').textContent = t('NONE');
 }
 
 /*
@@ -877,7 +880,7 @@ function routeFromHash() {
   if (kind === 'bluebook') selectBlueBook(id);
   else if (kind === 'geipan') selectGeipan(id);
   else if (!select(`${kind}:${id}`, 'hash')) {
-    toast(kind === 'user' ? 'That sighting is not in this browser’s log' : `Nothing found for “${id}”`);
+    toast(kind === 'user' ? 'That sighting is not in this browser’s log' : t('Nothing found for “{id}”', { id }));
     return false;
   }
   return true;
@@ -1015,7 +1018,7 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
   };
   draw();
   setHash(`#/near/${lat.toFixed(4)},${lon.toFixed(4)}/${encodeURIComponent(label)}`);
-  document.getElementById('hud-tgt').textContent = `NEAR ${label}`.slice(0, 40).toUpperCase();
+  document.getElementById('hud-tgt').textContent = t('NEAR {place}', { place: label }).slice(0, 40).toUpperCase();
   const fill = (key, promise, pick) =>
     promise.then(
       (d) => ((data[key] = pick(d)), draw()),
@@ -1248,7 +1251,7 @@ function toggleWitnessView(force) {
   if (on && who) {
     pb.follow.setAttribute('aria-pressed', 'false');
     document.body.classList.add('pov');
-    toast(`Witness view: ${who}. Press V or Esc to leave.`, 3500);
+    toast(t('Witness view: {who}. Press V or Esc to leave.', { who }), 3500);
     if (!trackLayer.playing) trackLayer.play();
   } else {
     document.body.classList.remove('pov');
@@ -1346,7 +1349,7 @@ bindDossierActions({
     if (!nearPoint) return;
     const at = nearPoint;
     await ensureNuforc();
-    if (nearPoint === at) toast(`${countNuforc(at.lat, at.lon).toLocaleString()} civilian reports within 50 km`, 4000);
+    if (nearPoint === at) toast(t('{n} civilian reports within 50 km', { n: countNuforc(at.lat, at.lon).toLocaleString(locale()) }), 4000);
     if (nearPoint === at) {
       const label = document.querySelector('#dossier-body .d-title')?.textContent.replace(/^Reported near /, '') || 'here';
       showNearby(at.lat, at.lon, label, { fly: false });
@@ -1468,11 +1471,11 @@ async function explainSighting({ date, lat, lon, report }) {
       : Promise.resolve(null),
     weatherAt(lat, lon, when).catch(() => null),
   ]);
-  if (satellites) checked.push(`${satellites.length.toLocaleString()} satellites above the horizon`);
-  else if (!recent) notes.push('Satellites were skipped: current orbital data only covers the last three weeks.');
-  if (launches) checked.push('rocket launches ±12 h');
-  if (weather) checked.push('wind and cloud');
-  checked.push('aircraft: not checkable');
+  if (satellites) checked.push(t('{n} satellites above the horizon', { n: satellites.length.toLocaleString(locale()) }));
+  else if (!recent) notes.push(t('Satellites were skipped: current orbital data only covers the last three weeks.'));
+  if (launches) checked.push(t('rocket launches ±12 h'));
+  if (weather) checked.push(t('wind and cloud'));
+  checked.push(t('aircraft: not checkable'));
   return { candidates: rankCandidates({ report, sky, satellites, launches, weather }), checked, notes };
 }
 
@@ -1560,7 +1563,7 @@ function tourStep() {
   tourPlayTimer = setTimeout(() => {
     if (tourTimer && trackLayer.current) trackLayer.play();
   }, 2600);
-  toast(`TOUR ${tourIndex + 1}/${TOUR.length} — ${CASES.find((c) => c.id === id).title}`, 3500);
+  toast(t('TOUR {i}/{n} — {title}', { i: tourIndex + 1, n: TOUR.length, title: CASES.find((c) => c.id === id).title }), 3500);
   tourIndex++;
   if (tourIndex >= TOUR.length) {
     tourTimer = setTimeout(stopTour, 18000);
@@ -1621,7 +1624,7 @@ function setGrouping(on, { save = true } = {}) {
   itemLayer.setGrouping(on);
   const b = document.querySelector('#map-controls [data-view="group"]');
   b?.setAttribute('aria-pressed', String(on));
-  if (b) b.title = on ? 'Grouping nearby markers: on (C)' : 'Grouping nearby markers: off, every marker shown (C)';
+  if (b) b.title = on ? t('Grouping nearby markers: on (C)') : t('Grouping nearby markers: off, every marker shown (C)');
   if (save)
     try {
       localStorage.setItem(GROUP_KEY, on ? '1' : '0');
@@ -1725,8 +1728,8 @@ function maybeWelcome() {
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
   if (!b) return;
-  closeWelcome();
-  const go = { tour: startTour, nimitz: () => select('case:nimitz-tic-tac-2004', 'list'), random: surpriseMe, explain: () => openExplainNow() }[b.dataset.welcome];
+  if (b.dataset.welcome !== 'install') closeWelcome();
+  const go = { install: () => document.getElementById('btn-install').click(), tour: startTour, nimitz: () => select('case:nimitz-tic-tac-2004', 'list'), random: surpriseMe, explain: () => openExplainNow() }[b.dataset.welcome];
   go?.();
 });
 
@@ -1855,6 +1858,29 @@ function openMapSettingsNow() {
 }
 document.getElementById('btn-map').addEventListener('click', openMapSettingsNow);
 
+/* Language: the picker in the top bar; what the pages translate on their own stays, what was built in code is redrawn. */
+{
+  const pick = document.getElementById('lang');
+  pick.replaceChildren(...LANGUAGES.map((l) => Object.assign(document.createElement('option'), { value: l.code, textContent: l.name, lang: l.code })));
+  pick.value = language();
+  pick.addEventListener('change', () => setLanguage(pick.value));
+  onLanguageChange((code) => {
+    pick.value = code;
+    renderLayersNow();
+    renderFilters();
+    renderActiveFilters();
+    refresh();
+    setGrouping(itemLayer.grouping, { save: false });
+  });
+}
+
+/* Save to the home screen: one tap where the browser allows it, otherwise the steps. */
+const install = createInstall({
+  button: document.getElementById('btn-install'),
+  onHelp: (platform) => openInstallHelp(installSteps(platform)),
+  onInstalled: () => toast('Installed. Open God’s Eye from your home screen.', 4500),
+});
+
 function neighbour(delta) {
   const keys = [...document.querySelectorAll('#case-list [data-key]')].map((li) => li.dataset.key);
   if (!keys.length) return;
@@ -1885,8 +1911,8 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Shift') return flycam.key(e, true);
   if (e.key === ' ' && e.target.closest?.('button, a, summary, [role="option"], [tabindex]:not(body)')) return;
-  const modes = ['normal', 'nvg', 'flir', 'ironbow', 'crt'];
-  if (/^[1-5]$/.test(e.key)) setMode(modes[Number(e.key) - 1]);
+  const modes = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
+  if (/^[1-7]$/.test(e.key)) setMode(modes[Number(e.key) - 1]);
   else if (e.key === '/') {
     e.preventDefault();
     document.getElementById('search').focus();
@@ -1911,6 +1937,10 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'o') setOrbit(!flycam.orbiting);
   else if (e.key.toLowerCase() === 'd') nextLighting();
   else if (e.key.toLowerCase() === 'f') setCleanView();
+  else if (e.key === '`') {
+    viewer.scene.debugShowFramesPerSecond = !viewer.scene.debugShowFramesPerSecond;
+    render.request();
+  }
   else if (e.key.toLowerCase() === 'y') setTimelineHidden(!document.body.classList.contains('tl-hidden'));
   else if (e.key === '+' || e.key === '=') zoomView(1);
   else if (e.key === '-' || e.key === '_') zoomView(-1);
@@ -2049,7 +2079,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
   const finish = () => {
     if (done) return;
     done = true;
-    loadingStep('READY', 100);
+    loadingStep(t('READY'), 100);
     setTimeout(() => {
       loading.classList.add('done');
       maybeWelcome();

@@ -1,4 +1,5 @@
-import { html, raw, mount, esc, safeUrl, toast } from '../util/dom.js';
+import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
+import { t, plural, locale } from '../i18n/index.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
@@ -36,11 +37,11 @@ async function settle(token, ms = 350) {
 }
 
 const fmtDate = (d, opts = {}) =>
-  d.toLocaleString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', ...opts });
+  d.toLocaleString(locale(), { year: 'numeric', month: 'short', day: 'numeric', ...opts });
 
 /** "13 Mar 1997, 19:55 local (UTC−07:00) · 02:55 UTC" from an ISO string with offset. */
 function localAndUtc(iso, approx = false) {
-  if (approx) return `${localAndUtc(iso).replace(/(\d{2}:\d{2}) local/, '~$1 local').replace(/ · \d{2}:\d{2} UTC$/, '')} · time of day approximate`;
+  if (approx) return `${localAndUtc(iso).replace(/(\d{2}:\d{2})/, '~$1').replace(/ · \d{2}:\d{2} UTC$/, '')} · ${t('time of day approximate')}`;
   const d = new Date(iso);
   const m = iso.match(/T(\d{2}):(\d{2}).*([+-]\d{2}):?(\d{2})$/);
   const utc = `${d.toISOString().slice(11, 16)} UTC`;
@@ -49,7 +50,7 @@ function localAndUtc(iso, approx = false) {
   const local = new Date(d.getTime() + offMin * 60000);
   const day = fmtDate(local, { timeZone: 'UTC' });
   const off = `UTC${offMin < 0 ? '−' : '+'}${m[3].replace(/^[+-]/, '')}:${m[4]}`;
-  return `${day}, ${m[1]}:${m[2]} local (${off}) · ${utc}`;
+  return t('{day}, {time} local ({off}) · {utc}', { day, time: `${m[1]}:${m[2]}`, off, utc });
 }
 
 function statusBadge(status) {
@@ -75,8 +76,8 @@ function skyBlock(lat, lon, when, explanation = '', approx = false) {
     const sky = skyAt(lat, lon, when);
     const year = new Date(when).getUTCFullYear();
     const notes = [];
-    if (approx) notes.push('— but the sources give no exact time of day for this case, so treat the chart as indicative');
-    if (year < 1583) notes.push('(dates before 1583 are read as Gregorian, so allow for the calendar change)');
+    if (approx) notes.push(t('— but the sources give no exact time of day for this case, so treat the chart as indicative'));
+    if (year < 1583) notes.push(t('(dates before 1583 are read as Gregorian, so allow for the calendar change)'));
     const note = notes.join(' ');
     return skySection(sky, bodiesNamedIn(explanation), { note });
   } catch (error) {
@@ -92,7 +93,7 @@ const ORBIT_FROM = '2000-02-24';
 function orbitDayButton(when) {
   const day = String(when).slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < ORBIT_FROM) return '';
-  return html`<div class="btn-row" style="margin-top:10px"><button class="chip" data-action="orbit-day" data-day="${day}" aria-pressed="false" title="NASA's true-colour picture of the Earth on ${day} (Terra satellite)">🛰 THAT DAY FROM ORBIT</button></div>
+  return html`<div class="btn-row" style="margin-top:10px"><button class="chip" data-action="orbit-day" data-day="${day}" aria-pressed="false" title="${t("NASA's true-colour picture of the Earth on {day} (Terra satellite)", { day })}">🛰 THAT DAY FROM ORBIT</button></div>
     <p class="caveat">The whole Earth as NASA's Terra satellite photographed it that day, clouds included. It passes about 10:30 in the morning local time, so the sky at a night sighting may have changed.</p>`;
 }
 
@@ -109,7 +110,7 @@ function windArrow(towardDeg) {
 const windLine = (speed, from) =>
   speed == null || from == null
     ? '—'
-    : `${Math.round(speed)} km/h from the ${compass(from)} (blowing toward the ${compass(driftToward(from))})`;
+    : t('{speed} km/h from the {from} (blowing toward the {to})', { speed: Math.round(speed), from: compass(from), to: compass(driftToward(from)) });
 
 async function fillWeather(token, lat, lon, when, uapTrack, approx = false) {
   const el = document.getElementById('d-weather');
@@ -128,24 +129,24 @@ async function fillWeather(token, lat, lon, when, uapTrack, approx = false) {
   const cmp = trackVsWind(uapTrack, wx);
   const from = wx.wind_direction_100m ?? wx.wind_direction_10m;
   const verdict = {
-    'with-wind': `The reconstructed path runs with the wind (heading ${compass(cmp?.heading ?? 0)} at about ${Math.round(cmp?.speed ?? 0)} km/h). That fits something drifting, like a balloon or lantern, though the path is itself a reconstruction.`,
-    'against-wind': `The reconstructed path runs against the wind (heading ${compass(cmp?.heading ?? 0)}), so simple drifting doesn't explain it.`,
-    'across-wind': `The reconstructed path (heading ${compass(cmp?.heading ?? 0)}) doesn't follow the wind.`,
-    fast: `The reconstructed path is far faster than the wind (about ${Math.round(cmp?.speed ?? 0).toLocaleString()} km/h), so wind drift doesn't apply.`,
+    'with-wind': t('The reconstructed path runs with the wind (heading {dir} at about {speed} km/h). That fits something drifting, like a balloon or lantern, though the path is itself a reconstruction.', { dir: compass(cmp?.heading ?? 0), speed: Math.round(cmp?.speed ?? 0) }),
+    'against-wind': t("The reconstructed path runs against the wind (heading {dir}), so simple drifting doesn't explain it.", { dir: compass(cmp?.heading ?? 0) }),
+    'across-wind': t("The reconstructed path (heading {dir}) doesn't follow the wind.", { dir: compass(cmp?.heading ?? 0) }),
+    fast: t("The reconstructed path is far faster than the wind (about {speed} km/h), so wind drift doesn't apply.", { speed: Math.round(cmp?.speed ?? 0).toLocaleString(locale()) }),
   }[cmp?.verdict];
   mount(
     el,
     html`<div class="wx-wrap">
         ${from != null ? windArrow(driftToward(from)) : ''}
         <dl class="d-kv">
-          <dt>SKY</dt><dd>${describeWeatherCode(wx.weather_code)}${wx.cloud_cover != null ? html` · cloud ${wx.cloud_cover}% <span class="dim">(low ${wx.cloud_cover_low ?? '—'} · mid ${wx.cloud_cover_mid ?? '—'} · high ${wx.cloud_cover_high ?? '—'})</span>` : ''}</dd>
-          <dt>WIND 10 M</dt><dd>${windLine(wx.wind_speed_10m, wx.wind_direction_10m)}${wx.wind_gusts_10m ? html` <span class="dim">· gusts ${Math.round(wx.wind_gusts_10m)}</span>` : ''}</dd>
+          <dt>SKY</dt><dd>${t(describeWeatherCode(wx.weather_code))}${wx.cloud_cover != null ? html` · ${t('cloud {n}%', { n: wx.cloud_cover })} <span class="dim">(${t('low {l} · mid {m} · high {h}', { l: wx.cloud_cover_low ?? '—', m: wx.cloud_cover_mid ?? '—', h: wx.cloud_cover_high ?? '—' })})</span>` : ''}</dd>
+          <dt>WIND 10 M</dt><dd>${windLine(wx.wind_speed_10m, wx.wind_direction_10m)}${wx.wind_gusts_10m ? html` <span class="dim">· ${t('gusts {n}', { n: Math.round(wx.wind_gusts_10m) })}</span>` : ''}</dd>
           <dt>WIND 100 M</dt><dd>${windLine(wx.wind_speed_100m, wx.wind_direction_100m)}</dd>
-          <dt>TEMP</dt><dd>${wx.temperature_2m != null ? `${Math.round(wx.temperature_2m)} °C` : '—'}${wx.precipitation ? ` · ${wx.precipitation} mm precipitation` : ''}</dd>
+          <dt>TEMP</dt><dd>${wx.temperature_2m != null ? `${Math.round(wx.temperature_2m)} °C` : '—'}${wx.precipitation ? ` · ${t('{n} mm precipitation', { n: wx.precipitation })}` : ''}</dd>
         </dl>
       </div>
       ${verdict ? html`<p class="d-text wx-verdict">${verdict}</p>` : ''}
-      <p class="caveat">${wx.source}, hour of ${wx.hour.slice(0, 13).replace('T', ' ')}:00 UTC, on a ~25 km grid.${approx ? ' The time of day for this case is approximate, so conditions at the real moment may differ.' : ''} Local conditions can differ, and winds aloft are often stronger and from a different direction.</p>`,
+      <p class="caveat">${t('{source}, hour of {hour}:00 UTC, on a ~25 km grid.', { source: t(wx.source), hour: wx.hour.slice(0, 13).replace('T', ' ') })}${approx ? ' ' + t('The time of day for this case is approximate, so conditions at the real moment may differ.') : ''} ${t('Local conditions can differ, and winds aloft are often stronger and from a different direction.')}</p>`,
   );
 }
 
@@ -161,8 +162,8 @@ function launchBlock(lat, lon, when) {
 
 const fmtGap = (ms) => {
   const m = Math.round(Math.abs(ms) / 60000);
-  const s = m < 90 ? `${m} min` : `${(m / 60).toFixed(1)} h`;
-  return ms < 0 ? `${s} before` : `${s} after`;
+  const s = m < 90 ? t('{n} min', { n: m }) : t('{n} h', { n: (m / 60).toFixed(1) });
+  return ms < 0 ? t('{gap} before', { gap: s }) : t('{gap} after', { gap: s });
 };
 
 async function fillLaunches(el) {
@@ -176,7 +177,7 @@ async function fillLaunches(el) {
   } catch (error) {
     mount(
       el,
-      html`<p class="caveat">${error instanceof RateLimitError ? 'Launch Library allows about 15 look-ups an hour without a key. Try again later.' : 'Launch Library could not be reached.'}</p>
+      html`<p class="caveat">${error instanceof RateLimitError ? t('Launch Library allows about 15 look-ups an hour without a key. Try again later.') : t('Launch Library could not be reached.')}</p>
         <div class="btn-row"><button class="chip" data-action="launch-check">TRY AGAIN</button></div>`,
     );
     return;
@@ -185,18 +186,18 @@ async function fillLaunches(el) {
 }
 
 function showLaunches(el, list, when, lat, lon) {
-  const t = Date.parse(when);
+  const at = Date.parse(when);
   const rows = list
-    .map((l) => ({ ...l, gap: Date.parse(l.net) - t, km: l.lat != null ? haversineKm(lat, lon, l.lat, l.lon) : null }))
+    .map((l) => ({ ...l, gap: Date.parse(l.net) - at, km: l.lat != null ? haversineKm(lat, lon, l.lat, l.lon) : null }))
     .sort((a, b) => Math.abs(a.gap) - Math.abs(b.gap));
   mount(
     el,
     rows.length
       ? html`<ul class="source-list launch-list">${rows.map(
           (l) => html`<li class="${l.km != null && l.km < 2000 ? 'near' : ''}"><span class="badge ${l.km != null && l.km < 2000 ? 'official' : ''}">${fmtGap(l.gap)}</span>
-            <span><b>${l.name}</b><br /><span class="dim">${l.location || l.pad}${l.km != null ? ` · ${Math.round(l.km).toLocaleString()} km away` : ''} · ${l.statusName || l.status}</span></span></li>`,
+            <span><b>${l.name}</b><br /><span class="dim">${l.location || l.pad}${l.km != null ? ` · ${t('{n} km away', { n: Math.round(l.km).toLocaleString(locale()) })}` : ''} · ${l.statusName || l.status}</span></span></li>`,
         )}</ul>
-        <p class="caveat">Launches within 12 hours, nearest in time first; highlighted ones were under 2,000 km away. Source: Launch Library 2 (orbital and many suborbital launches; not military missile tests).</p>`
+        <p class="caveat">${t('Launches within 12 hours, nearest in time first; highlighted ones were under 2,000 km away. Source: Launch Library 2 (orbital and many suborbital launches; not military missile tests).')}</p>`
       : html`<p class="d-text">No launches are logged within 12 hours of this moment.</p><p class="caveat">Launch Library 2 covers orbital and many suborbital launches, not military missile tests.</p>`,
   );
 }
@@ -282,7 +283,7 @@ export function renderLaunchPad(p) {
 
 function strengthMeter(score) {
   const cells = Array.from({ length: 10 }, (_, i) => `<i class="${i < score ? 'on' : ''}"></i>`).join('');
-  return html`<span class="meter" title="Documentation score ${score}/10: instrument data, imagery, official papers and trained observers count most. It measures evidence, not strangeness.">${raw(cells)}<b>${score}/10</b></span>`;
+  return html`<span class="meter" title="${t('Documentation score {n}/10: instrument data, imagery, official papers and trained observers count most. It measures evidence, not strangeness.', { n: score })}">${raw(cells)}<b>${score}/10</b></span>`;
 }
 
 function section(title, content, id = '') {
@@ -292,7 +293,7 @@ function section(title, content, id = '') {
 function open(idLabel) {
   panel().classList.remove('hidden');
   document.body.classList.add('dossier-open');
-  document.getElementById('dossier-id').textContent = idLabel;
+  document.getElementById('dossier-id').textContent = t(idLabel);
   body().scrollTop = 0;
   return ++renderToken;
 }
@@ -410,7 +411,7 @@ async function fillWiki(token, container, title) {
 function bluebookList(records) {
   if (!records.length) return html`<div class="loading-line">No matching Blue Book files.</div>`;
   return html`<ul class="source-list">${records.map(
-    (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''}${r.distKm != null ? ` · ${Math.round(r.distKm)} km away` : ''}
+    (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''}${r.distKm != null ? ` · ${t('{n} km away', { n: Math.round(r.distKm) })}` : ''}
       <a class="dim" href="https://archive.org/details/${encodeURIComponent(r.id)}" target="_blank" rel="noopener">archive ↗</a></span></li>`,
   )}</ul>`;
 }
@@ -427,7 +428,7 @@ function geipanList(records) {
   if (!records.length) return html`<div class="loading-line">No GEIPAN file matches this case.</div>`;
   return html`<ul class="source-list">${records.map(
     (r) => html`<li>${classBadge(r.cls)}<span><a href="#/geipan/${encodeURIComponent(r.id)}">${r.place}</a> · ${geipanDate(r)}${
-      r.distKm != null ? ` · ${Math.round(r.distKm)} km away` : ''
+      r.distKm != null ? ` · ${t('{n} km away', { n: Math.round(r.distKm) })}` : ''
     }<span class="mufon-quote" lang="fr">${r.short}</span></span></li>`,
   )}</ul>`;
 }
@@ -450,7 +451,7 @@ export function renderCase(item, ctx) {
     <div class="d-sub">${localAndUtc(c.date, c.timeApprox)}<br />${c.place}<br />
       ${formatDMS(c.lat, c.lon)} · <span title="${PRECISION[c.precision]}">${(c.precision || '').toUpperCase()}</span></div>
     <div class="d-badges">${statusBadge(c.status)}<span class="badge">${CATEGORY[c.category] || c.category}</span>${
-      tracks.length ? html`<span class="badge path">${tracks.length} TRACK${tracks.length > 1 ? 'S' : ''}</span>` : ''
+      tracks.length ? html`<span class="badge path">${tracks.length > 1 ? t('{n} TRACKS', { n: tracks.length }) : t('{n} TRACK', { n: tracks.length })}</span>` : ''
     }${evidenceBadges(c.evidence)}</div>
 
     <div class="btn-row" style="margin:10px 0 0"><button class="chip on" data-action="story">▶ STORY MODE</button><button class="chip" data-action="compare">⇄ COMPARE</button><button class="chip" data-action="share-card" title="An image of this case to post or send">⇪ SHARE</button>${starButton(item.key)}</div>
@@ -467,14 +468,14 @@ export function renderCase(item, ctx) {
     ${tracks.length
       ? section(
           'FLIGHT PATH',
-          html`<div class="track-list">${tracks.map((t) => {
-            const st = trackStats(t);
-            const kind = TRACK_KINDS[t.kind] || TRACK_KINDS.uap;
-            return html`<div class="track"><span class="sw" style="background:${t.color || kind.color};box-shadow:0 0 8px ${t.color || kind.color}"></span>
-              <span>${t.label}<br /><span class="dim" style="font-size:11px">${st.length.toFixed(st.length < 10 ? 1 : 0)} km · ${formatDuration(st.duration)} · max ${Math.round(st.maxAlt * 3.281).toLocaleString()} ft${
-                st.avgSpeedKmh ? ` · avg ${Math.round(st.avgSpeedKmh).toLocaleString()} km/h` : ''
+          html`<div class="track-list">${tracks.map((tr) => {
+            const st = trackStats(tr);
+            const kind = TRACK_KINDS[tr.kind] || TRACK_KINDS.uap;
+            return html`<div class="track"><span class="sw" style="background:${tr.color || kind.color};box-shadow:0 0 8px ${tr.color || kind.color}"></span>
+              <span>${tr.label}<br /><span class="dim" style="font-size:11px">${st.length.toFixed(st.length < 10 ? 1 : 0)} km · ${formatDuration(st.duration)} · ${t('max {n} ft', { n: Math.round(st.maxAlt * 3.281).toLocaleString(locale()) })}${
+                st.avgSpeedKmh ? ` · ${t('avg {n} km/h', { n: Math.round(st.avgSpeedKmh).toLocaleString(locale()) })}` : ''
               }</span></span>
-              <span class="basis">${(TRACK_BASIS[t.basis] || t.basis || '').toUpperCase()}</span></div>`;
+              <span class="basis">${t((TRACK_BASIS[tr.basis] || tr.basis || '').toUpperCase())}</span></div>`;
           })}</div>
           <div class="btn-row"><button class="chip on" data-action="play">▶ PLAY PATH</button><button class="chip" data-action="chase">CHASE CAM</button><button class="chip" data-action="fit">FIT VIEW</button></div>
           <p class="caveat">Paths are reconstructed from the cited reports and are approximate; each track states its basis. Average speeds are simple distance ÷ time between reported points.</p>`,
@@ -695,14 +696,14 @@ function mufonHitList(hits) {
   return html`<ul class="source-list mufon-hits">${hits.map(
     (h) => html`<li>${pageBadge(h.is)}<span><a href="${pageHref(h.is, h.leaf)}">${h.is.series === 'chapters' ? `${h.is.title} · ` : h.is.series && h.is.number ? `${h.is.number} · ` : ''}${issueDate(h.is)} · p. ${pageNumber(h.is, h.leaf)}</a>${
       h.place ? html` · ${h.place}` : ''
-    }${h.distKm != null ? html` · ${Math.round(h.distKm)} km away` : ''}<span class="mufon-quote">${h.quote}</span></span></li>`,
+    }${h.distKm != null ? html` · ${t('{n} km away', { n: Math.round(h.distKm) })}` : ''}<span class="mufon-quote">${h.quote}</span></span></li>`,
   )}</ul>`;
 }
 
 function mufonCaseBlock(m) {
   if (!m.hits.length && !m.near.length)
     return html`<div class="loading-line">No pages in the journal archive matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of Skylook and the MUFON UFO Journal (1967–2008) for “${m.term || 'the case name'}”.</p>`;
-  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">Pages that mention <b>${m.term}</b>${m.total > m.hits.length ? ` (first ${m.hits.length} of ${m.total})` : ''}:</p>${mufonHitList(m.hits)}` : ''}
+  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">${th('Pages that mention <b>{term}</b>', { term: m.term })}${m.total > m.hits.length ? ` ${t('(first {a} of {b})', { a: m.hits.length, b: m.total })}` : ''}:</p>${mufonHitList(m.hits)}` : ''}
     ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in the journal:</p>${mufonHitList(m.near)}` : ''}
     <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>
     ${m.term ? html`<div class="btn-row"><button class="chip" data-action="journal-search" data-q="${m.term}">⌕ SEARCH ALL JOURNALS FOR “${m.term}”</button></div>` : ''}`;
@@ -711,7 +712,7 @@ function mufonCaseBlock(m) {
 function journalCaseBlock(m) {
   if (!m.hits.length && !m.near.length)
     return html`<div class="loading-line">No pages in these archives matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of the APRO Bulletin, NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON chapter newsletters for “${m.term || 'the case name'}”.</p>`;
-  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">Pages that mention <b>${m.term}</b>${m.total > m.hits.length ? ` (first ${m.hits.length} of ${m.total})` : ''}:</p>${mufonHitList(m.hits)}` : ''}
+  return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">${th('Pages that mention <b>{term}</b>', { term: m.term })}${m.total > m.hits.length ? ` ${t('(first {a} of {b})', { a: m.hits.length, b: m.total })}` : ''}:</p>${mufonHitList(m.hits)}` : ''}
     ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in these journals:</p>${mufonHitList(m.near)}` : ''}
     <p class="caveat">Found automatically in the OCR text of the scans on the Internet Archive. Open a page to read it in context.</p>`;
 }
@@ -806,8 +807,8 @@ export function renderNearby({ label, lat, lon, data }) {
   const total = ['cases', 'bluebook', 'geipan', 'mufon', 'journals'].reduce((n, k) => n + (d[k]?.length || 0), 0);
   mount(
     body(),
-    html`<div class="d-title">Reported near ${label}</div>
-    <div class="d-sub">${formatDMS(lat, lon)}${d.done ? html`<br />${total.toLocaleString()} records within range${d.nuforc != null ? ` · ${d.nuforc.toLocaleString()} civilian reports within 50 km` : ''}` : ''}</div>
+    html`<div class="d-title">${t('Reported near {place}', { place: label })}</div>
+    <div class="d-sub">${formatDMS(lat, lon)}${d.done ? html`<br />${t('{n} records within range', { n: total.toLocaleString(locale()) })}${d.nuforc != null ? ` · ${t('{n} civilian reports within 50 km', { n: d.nuforc.toLocaleString(locale()) })}` : ''}` : ''}</div>
     ${section('CASE FILES WITHIN 250 KM', block(d.cases, (c) => html`<li>${statusBadge(c.status)}<span><a href="#/${c.kind}/${encodeURIComponent(c.id)}">${c.title}</a> · ${c.year} · ${km(c.distKm)} km</span></li>`))}
     ${section('PROJECT BLUE BOOK WITHIN 100 KM', block(d.bluebook, (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · ${km(r.distKm)} km</span></li>`, 'Air Force case files placed at the town in their file name.'))}
     ${d.geipan !== undefined ? section('GEIPAN (FRANCE) WITHIN 50 KM', block(d.geipan, (r) => html`<li>${classBadge(r.cls)}<span><a href="#/geipan/${encodeURIComponent(r.id)}">${r.place}</a> · ${geipanDate(r)} · ${km(r.distKm)} km<span class="mufon-quote" lang="fr">${r.short}</span></span></li>`)) : ''}
@@ -817,7 +818,7 @@ export function renderNearby({ label, lat, lon, data }) {
       'CIVILIAN REPORTS (NUFORC)',
       d.nuforc == null
         ? html`<div class="btn-row"><button class="chip" data-action="near-nuforc">COUNT REPORTS WITHIN 50 KM</button></div><p class="caveat">Loads the ~80,000-report layer.</p>`
-        : html`<p class="d-text"><b>${d.nuforc.toLocaleString()}</b> unverified reports within 50 km (1906–2014). Turn on <b>Civilian reports</b> to see them.</p>`,
+        : html`<p class="d-text">${th('<b>{n}</b> unverified reports within 50 km (1906–2014). Turn on <b>Civilian reports</b> to see them.', { n: d.nuforc.toLocaleString(locale()) })}</p>`,
     )}
     ${section('WHAT’S OVERHEAD NOW', html`<div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button><button class="chip on" data-action="explain-here">WHAT DID I SEE?</button></div><div id="d-sky"></div>`)}
     ${section('THE LOCATION', siteLinks(lat, lon))}`,

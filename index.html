@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>God's Eye // UAP</title>
   <meta name="description" content="A 3D globe console for Unidentified Anomalous Phenomena: documented encounters, reconstructed flight paths, official U.S. government footage and files, and reference imagery." />
   <meta name="author" content="domw99" />
@@ -22,6 +22,7 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="God's Eye UAP" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,6 +49,8 @@
       <button data-mode="flir" role="radio" aria-checked="false" title="FLIR white-hot (3)">FLIR</button>
       <button data-mode="ironbow" role="radio" aria-checked="false" title="FLIR ironbow (4)">IRONBOW</button>
       <button data-mode="crt" role="radio" aria-checked="false" title="CRT (5)">CRT</button>
+      <button data-mode="noir" role="radio" aria-checked="false" title="Noir film (6)">NOIR</button>
+      <button data-mode="snow" role="radio" aria-checked="false" title="Snow and frost (7)">SNOW</button>
     </nav>
     <div id="light-switch" class="lighting" role="radiogroup" aria-label="Lighting">
       <button type="button" role="radio" data-light="auto" aria-checked="true" title="Lighting: automatic, the sun at the moment of the case (D)" aria-label="Automatic lighting"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" /><path d="M8 2.8a5.2 5.2 0 0 1 0 10.4z" class="fill" /></svg></button>
@@ -62,6 +65,8 @@
       <button id="btn-explain" class="chip" title="Check a sighting against planets, satellites, launches and wind (E)">WHAT DID I SEE?</button>
       <button id="btn-log" class="chip" title="Log your own sighting (L)">+ LOG SIGHTING</button>
       <button id="btn-map" class="chip" title="Map: style, place names, 3D buildings, your Google Maps key (M)">MAP</button>
+      <select id="lang" class="chip lang" aria-label="Language" title="Language"></select>
+      <button id="btn-install" class="chip on" type="button" hidden title="Save it to your home screen and open it like an app">⤓ INSTALL APP</button>
       <button id="btn-about" class="chip" title="About the data (?)">?</button>
     </div>
   </header>
@@ -205,6 +210,7 @@
       <button type="button" class="chip" data-welcome="nimitz">USS NIMITZ "TIC TAC"</button>
       <button type="button" class="chip" data-welcome="random">⚄ SURPRISE ME</button>
       <button type="button" class="chip" data-welcome="explain">WHAT DID I SEE?</button>
+      <button type="button" class="chip install-chip" data-welcome="install">⤓ ADD TO HOME SCREEN</button>
     </div>
     <p class="welcome-tips mono"><span class="tips-mouse">Drag to spin · scroll to zoom · <kbd>?</kbd> for all shortcuts</span><span class="tips-touch">Drag to spin · pinch to zoom · tap a marker to open it</span></p>
   </section>

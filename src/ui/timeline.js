@@ -1,4 +1,5 @@
 import { state, update, YEAR_MIN, YEAR_MAX } from '../state.js';
+import { t } from '../i18n/index.js';
 
 /**
  * Year histogram with brush selection. Bars: curated + official + user items
@@ -115,7 +116,7 @@ export function createTimeline({ onPlayToggle }) {
       g.fillStyle = '#e8eaed';
       g.fillText(text, tx + 5, pad.t + 11);
     }
-    label.textContent = state.yearRange ? `${state.yearRange[0]} – ${state.yearRange[1]}` : 'ALL YEARS';
+    label.textContent = state.yearRange ? `${state.yearRange[0]} – ${state.yearRange[1]}` : t('ALL YEARS');
   }
 
   function inRange(year) {

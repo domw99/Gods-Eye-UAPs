@@ -117,11 +117,57 @@ const CRT = /* glsl */ `${COMMON}
   }
 `;
 
+const NOIR = /* glsl */ `${COMMON}
+  void main() {
+    vec2 uv = v_textureCoordinates;
+    float l = luma(crisp(uv, 0.6));
+    l = smoothstep(0.06, 0.94, l);                       // crushed blacks, bright highlights
+    l = pow(l, 1.18);
+    float grain = hash(uv * colorTextureDimensions + fract(time * 9.0) * 61.0);
+    l += (grain - 0.5) * 0.085;                          // film grain
+    l *= 0.992 + 0.008 * sin(time * 24.0);               // projector flicker
+    vec2 d = uv - 0.5;
+    d.x *= colorTextureDimensions.x / colorTextureDimensions.y;
+    l *= 1.0 - smoothstep(0.32, 0.8, length(d)) * 0.75;
+    out_FragColor = vec4(vec3(l) * vec3(1.0, 0.985, 0.95), 1.0);
+  }
+`;
+
+const SNOW = /* glsl */ `${COMMON}
+  void main() {
+    vec2 uv = v_textureCoordinates;
+    vec3 c = crisp(uv, 0.4);
+    float l = luma(c);
+    vec3 col = mix(c, vec3(l), 0.6) * vec3(0.86, 0.95, 1.08) + 0.1;   // cold, washed out
+    col = mix(col, vec3(0.9, 0.95, 1.0), 0.16);
+    float aspect = colorTextureDimensions.x / colorTextureDimensions.y;
+    float flakes = 0.0;
+    for (int i = 0; i < 3; i++) {
+      float fi = float(i);
+      vec2 p = uv * vec2(aspect, 1.0) * (26.0 + fi * 20.0);
+      p.y += time * (0.55 + 0.35 * fi);
+      p.x += sin(time * 0.6 + fi * 2.0) * 0.4;
+      vec2 id = floor(p);
+      vec2 f = fract(p) - 0.5;
+      float h = hash(id + fi * 17.0);
+      vec2 o = vec2(h - 0.5, fract(h * 7.3) - 0.5) * 0.5;
+      flakes += smoothstep(0.13 - fi * 0.025, 0.0, length(f - o)) * step(0.62, h) * (0.95 - fi * 0.22);
+    }
+    col = mix(col, vec3(1.0), clamp(flakes, 0.0, 0.85));
+    vec2 d = uv - 0.5;
+    d.x *= aspect;
+    col = mix(col, vec3(0.78, 0.86, 0.95), smoothstep(0.45, 0.9, length(d)) * 0.35);  // frosted edges
+    out_FragColor = vec4(col, 1.0);
+  }
+`;
+
 const SHADERS = {
   nvg: NVG,
   flir: THERMAL(false),
   ironbow: THERMAL(true),
   crt: CRT,
+  noir: NOIR,
+  snow: SNOW,
 };
 
 export const MODE_LABELS = {
@@ -130,6 +176,8 @@ export const MODE_LABELS = {
   flir: 'FLIR / WHITE-HOT',
   ironbow: 'FLIR / IRONBOW',
   crt: 'CRT / ANALOG',
+  noir: 'NOIR / FILM',
+  snow: 'SNOW / FROST',
 };
 
 export function createEffects(viewer) {

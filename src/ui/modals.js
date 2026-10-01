@@ -1,4 +1,5 @@
-import { html, mount, safeUrl, toast } from '../util/dom.js';
+import { html, mount, safeUrl, toast, th } from '../util/dom.js';
+import { t, plural, locale } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { commonsPage } from '../services/wiki.js';
 import { STATUS, CATEGORY, EVIDENCE, SHAPES, evidenceScore, shapeClasses } from '../data/taxonomy.js';
@@ -88,7 +89,7 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null, 
       )}</div>${group === 'The MUFON files' ? html`<div id="mufon-browse" class="mufon-browse"><div class="loading-line">Loading the journal index…</div></div>` : ''}`,
     )}
     ${officialUnplaced.length
-      ? html`<div class="section-label" style="margin-top:18px">OFFICIAL RECORDS WITHOUT A LOCATION (${officialUnplaced.length})</div>
+      ? html`<div class="section-label" style="margin-top:18px">${t('OFFICIAL RECORDS WITHOUT A LOCATION ({n})', { n: officialUnplaced.length })}</div>
         <ul class="source-list">${officialUnplaced.map(
           (o) => html`<li><span class="badge official">${o.type === 'video' ? 'VIDEO' : 'IMAGE'}</span><a href="#/official/${o.dvidsId}">${o.title}</a></li>`,
         )}</ul>`
@@ -112,14 +113,14 @@ async function fillMufonBrowse(promise) {
     const first = (is) => (is.cover ? 1 : 0);
     mount(
       el,
-      html`<div class="section-label" style="margin-top:12px">MUFON UFO JOURNAL — EVERY ISSUE (${m.issues.length})</div>
+      html`<div class="section-label" style="margin-top:12px">${t('MUFON UFO JOURNAL — EVERY ISSUE ({n})', { n: m.issues.length })}</div>
       <div class="mufon-years">${years.map(
         (y) => html`<details><summary>${y}</summary><div class="links">${m.issues
           .filter((is) => is.year === y)
           .map((is) => html`<a class="chip small" href="#/mufon/${encodeURIComponent(is.id)}/${first(is)}">${issueDate(is).replace(` ${y}`, '')}${is.number ? ` · No. ${is.number}` : ''}</a>`)}</div></details>`,
       )}</div>
       ${m.chapters.length
-        ? html`<div class="section-label" style="margin-top:12px">CHAPTER NEWSLETTERS (${m.chapters.reduce((n, c) => n + c.items.length, 0)})</div>
+        ? html`<div class="section-label" style="margin-top:12px">${t('CHAPTER NEWSLETTERS ({n})', { n: m.chapters.reduce((n, c) => n + c.items.length, 0) })}</div>
           <div class="mufon-years">${m.chapters.map(
             (c) => html`<details><summary>${c.name} <span class="dim">· ${c.items.length}</span></summary><div class="links">${c.items.map(
               ([id, title, date]) => html`<a class="chip small" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">${date ? date.slice(0, 7) : title} ↗</a>`,
@@ -164,7 +165,7 @@ export function openJournalSearch({ query = '', run }) {
       const q1 = r.terms[0] || '';
       mount(
         out,
-        html`<p class="d-text js-summary"><b>${r.hits.length.toLocaleString()}</b> page${r.hits.length === 1 ? '' : 's'}${r.terms.length ? html` mention <b>${r.terms.join(' + ')}</b>` : ''}${r.hits.length > shown.length ? ` · first ${shown.length} shown` : ''}</p>
+        html`<p class="d-text js-summary"><b>${r.hits.length.toLocaleString(locale())}</b> ${plural(r.hits.length, 'page', 'pages', { n: '' }).trim()}${r.terms.length ? html` ${t('mention')} <b>${r.terms.join(' + ')}</b>` : ''}${r.hits.length > shown.length ? ` · ${t('first {n} shown', { n: shown.length })}` : ''}</p>
         ${notes.map((n) => html`<p class="caveat">${n}</p>`)}
         <ul class="source-list js-hits">${shown.map(
           ({ is, leaf }) => html`<li><span class="badge ${is.series ? 'journal' : 'mufon'}">${is.series ? SERIES_SHORT[is.series] : 'MUFON'}</span><span><a href="${is.series ? `#/journal/${encodeURIComponent(is.id)}/${leaf}` : `#/mufon/${encodeURIComponent(is.id)}/${leaf}`}">${issueLabel(is)} · p. ${pageNumber(is, leaf)}</a>
@@ -226,7 +227,7 @@ export function openStats({ load }) {
     years.bind(body, tip);
     body.querySelector('[data-stats-nuforc]')?.addEventListener('click', (e) => {
       e.target.disabled = true;
-      e.target.textContent = 'LOADING…';
+      e.target.textContent = t('LOADING…');
       draw(true);
     });
   };
@@ -253,7 +254,7 @@ export function openAbout(meta) {
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
-    <dl class="d-kv"><dt>1 – 5</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>Y</dt><dd>Hide or show the years bar</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
+    <dl class="d-kv"><dt>1 – 7</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT, Noir, Snow</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>Y</dt><dd>Hide or show the years bar</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>&#96;</dt><dd>Show the frame rate</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Night-side city lights: NASA Black Marble (VIIRS, 2016 — today’s lights, not those of the case year). Stars: NASA Deep Star Maps 2020 (NASA/Goddard SVS; Hipparcos-2, Tycho-2, Gaia DR2). Map styles and place names: Esri. Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p>
@@ -316,6 +317,17 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
   });
 }
 
+/** How to save the app on this device, for browsers that can't do it with one tap. */
+export function openInstallHelp(steps) {
+  modal(
+    'SAVE AS AN APP',
+    html`<h2>Keep it on your home screen</h2>
+      <p class="lead">God’s Eye runs in the browser, and can also sit on your phone’s home screen and open full screen like any app. It needs no account and nothing from an app store, and it reopens quickly and keeps working offline for what you have already looked at.</p>
+      <ol class="install-steps">${steps.map((step) => html`<li>${t(step)}</li>`)}</ol>`,
+    { wide: false },
+  );
+}
+
 export function openLightbox({ lightbox, caption, credit, href }) {
   lastFocus = document.activeElement;
   mount(
@@ -339,33 +351,33 @@ export function openLightbox({ lightbox, caption, credit, href }) {
  */
 export function openMapSettings(o) {
   const google = o.photoreal.active
-    ? `ON — ${o.photoreal.source}`
+    ? t('ON — {source}', { source: o.photoreal.source })
     : o.hasStoredKey
-      ? 'OFF — your key is saved in this browser'
+      ? t('OFF — your key is saved in this browser')
       : o.envKey || o.ionToken
-        ? 'OFF — this site has a key configured'
-        : 'OFF — no key yet';
+        ? t('OFF — this site has a key configured')
+        : t('OFF — no key yet');
   const content = html`
     <h2>Map</h2>
     <p class="lead">Pick the map under the markers, add place names, and see cities in 3D: OpenStreetMap buildings are free; Google's photorealistic 3D tiles need your own API key.</p>
 
     <div class="section-label">MAP STYLE</div>
     <div class="btn-row" id="ms-style" role="radiogroup" aria-label="Map style">${o.styles.map(
-      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.style ? 'on' : ''}" data-style="${id}" aria-checked="${id === o.style ? 'true' : 'false'}">${label.toUpperCase()}</button>`,
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.style ? 'on' : ''}" data-style="${id}" aria-checked="${id === o.style ? 'true' : 'false'}">${t(label).toUpperCase()}</button>`,
     )}</div>
     <div class="btn-row">${o.style === 'satellite'
-      ? html`<button type="button" class="chip ${o.names ? 'on' : ''}" id="ms-names" aria-pressed="${o.names ? 'true' : 'false'}">${o.names ? '✓ PLACE NAMES & BORDERS' : 'PLACE NAMES & BORDERS OFF'}</button>`
+      ? html`<button type="button" class="chip ${o.names ? 'on' : ''}" id="ms-names" aria-pressed="${o.names ? 'true' : 'false'}">${o.names ? t('✓ PLACE NAMES & BORDERS') : t('PLACE NAMES & BORDERS OFF')}</button>`
       : html`<span class="muted mono">Place names and borders are part of this map.</span>`}</div>
 
     <div class="section-label">LIGHTING<span class="tips-mouse"> · D</span></div>
     <div class="btn-row" id="ms-light" role="radiogroup" aria-label="Lighting">${o.lightModes.map(
-      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${label.toUpperCase()}</button>`,
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${t(label).toUpperCase()}</button>`,
     )}</div>
     <p class="muted" style="margin:6px 0 12px;font-size:12px;line-height:1.5">Auto lights an open case by the sun at the time it happened, with city lights on the night side. Day and Night hold that look everywhere; Off keeps the globe evenly lit.</p>
 
     <div class="section-label">FREE — OPENSTREETMAP 3D BUILDINGS</div>
     <div class="d-text"><p>Building footprints and heights from OpenStreetMap, served keyless by OpenFreeMap and raised on the terrain. They appear when you zoom into a town (below about 9 km altitude). Detail depends on how well the area is mapped. "Fly to ground view" turns them on.</p></div>
-    <div class="btn-row"><button type="button" class="chip ${o.buildingsOn ? 'on' : ''}" id="ms-osm" aria-pressed="${o.buildingsOn ? 'true' : 'false'}">${o.buildingsOn ? '✓ OSM BUILDINGS ON' : 'OSM BUILDINGS OFF'}</button></div>
+    <div class="btn-row"><button type="button" class="chip ${o.buildingsOn ? 'on' : ''}" id="ms-osm" aria-pressed="${o.buildingsOn ? 'true' : 'false'}">${o.buildingsOn ? t('✓ OSM BUILDINGS ON') : t('OSM BUILDINGS OFF')}</button></div>
 
     <div class="section-label">GOOGLE PHOTOREALISTIC 3D — YOUR OWN KEY</div>
     <div class="d-text"><p>Paste a Google Maps Platform API key with the <b>Map Tiles API</b> enabled, and the globe switches to Google's photorealistic 3D cities and terrain. OSM buildings are hidden while it is on.</p></div>
@@ -382,7 +394,7 @@ export function openMapSettings(o) {
             : ''}
         ${o.hasStoredKey ? html`<button type="button" class="chip" id="ms-remove">REMOVE MY KEY</button>` : ''}
       </div>
-      <div class="full muted" id="ms-status" role="status">STATUS: ${google}</div>
+      <div class="full muted" id="ms-status" role="status">${t('STATUS: {status}', { status: google })}</div>
     </form>
 
     <div class="section-label">GETTING A KEY</div>
@@ -396,7 +408,7 @@ export function openMapSettings(o) {
   const el = modal('MAP', content, { wide: false });
   const status = el.querySelector('#ms-status');
   const busy = (msg) => {
-    status.textContent = `STATUS: ${msg}`;
+    status.textContent = t('STATUS: {status}', { status: t(msg) });
     for (const b of el.querySelectorAll('#ms-form button')) b.disabled = true;
   };
   const failMessage = (error) => {
@@ -534,7 +546,7 @@ export function openExplain(o) {
     } catch (error) {
       if (id !== runId) return;
       console.warn('[explain]', error);
-      mount(results, html`<p class="caveat">The check failed: ${String(error?.message || error)}. Please try again.</p>`);
+      mount(results, html`<p class="caveat">${t('The check failed: {error}. Please try again.', { error: String(error?.message || error) })}</p>`);
       return;
     }
     if (id !== runId) return;
@@ -548,7 +560,7 @@ export function openExplain(o) {
             <div class="ex-bar"><i style="width:${Math.round(c.score * 100)}%"></i></div>
             <p>${c.reason}</p></li>`,
         )}</ol>
-        <p class="caveat">Checked: ${r.checked.join(' · ')}.${r.notes.length ? ` ${r.notes.join(' ')}` : ''} A match means an ordinary object was in the right place at the right time; it doesn't prove that's what you saw.</p>
+        <p class="caveat">${t('Checked: {list}.', { list: r.checked.join(' · ') })}${r.notes.length ? ` ${r.notes.join(' ')}` : ''} ${t("A match means an ordinary object was in the right place at the right time; it doesn't prove that's what you saw.")}</p>
         <div class="btn-row"><button type="button" class="chip on" id="ex-log">+ LOG THIS SIGHTING</button></div>`,
     );
     results.querySelector('#ex-log').addEventListener('click', () => o.onLog(input, top[0]));
@@ -558,7 +570,7 @@ export function openExplain(o) {
 
 /* ── Compare two cases ───────────────────────────────────── */
 function caseFacts(c) {
-  const uap = (c.tracks || []).find((t) => t.kind === 'uap');
+  const uap = (c.tracks || []).find((tr) => tr.kind === 'uap');
   const st = uap ? trackStats(uap) : null;
   let light = '—';
   try {
