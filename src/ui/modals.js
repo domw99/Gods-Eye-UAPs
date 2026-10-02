@@ -250,6 +250,7 @@ export function openAbout(meta) {
       <p><b style="color:#ff7a45">Civilian reports</b> — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.</p>
       <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
       <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>
+      <p><b style="color:#e6c37a">Earthquakes</b> — the last 24 hours from the USGS, sized by magnitude. Strong quakes are sometimes reported as booms or odd lights.</p>
     </div>
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>

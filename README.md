@@ -33,7 +33,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **126** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **138** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
 | **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **872** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
@@ -42,7 +42,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <img src="docs/media/globe.jpg" alt="The globe with curated case files (cyan and amber) and official U.S. releases (magenta)" width="100%" />
 
-- **126 curated case files** from 1561 to 2024. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones.
+- **138 curated case files** from 1561 to 2024. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 73 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
@@ -69,17 +69,18 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 ### 🎛 See it through a sensor
 
-<img src="docs/media/sensor-modes.jpg" alt="The same view of downtown Montreal in Normal, NVG, FLIR white-hot, FLIR Ironbow and CRT modes" width="100%" />
+<img src="docs/media/sensor-modes.jpg" alt="The same view of downtown Montreal in Normal, NVG, FLIR white-hot, FLIR Ironbow, CRT, Noir and Snow modes" width="100%" />
 
 <img src="docs/media/playback.webp" alt="Replaying the Betty and Barney Hill encounter in 3D over the White Mountains while switching between Normal, NVG, FLIR and Ironbow sensor modes" width="100%" />
 
 <sub><b>Betty and Barney Hill, 1961.</b> The car's route and the craft's reported path replayed over the White Mountains, cycling through Normal → NVG → FLIR → Ironbow.</sub>
 
-There are five sensor looks, rendered as real-time post-processing shaders (keys <kbd>1</kbd>–<kbd>5</kbd>). They keep the picture sharp at any zoom, so markers and labels stay readable; the look comes from tone, grain and scanlines, not blur:
+There are seven sensor looks, rendered as real-time post-processing shaders (keys <kbd>1</kbd>–<kbd>7</kbd>). They keep the picture sharp at any zoom, so markers and labels stay readable; the look comes from tone, grain and scanlines, not blur:
 - **Normal**
 - **NVG**: image-intensifier gain, shot noise and raster lines.
 - **FLIR white-hot** and **FLIR Ironbow**, with a cold-to-hot scale on screen.
 - **CRT**: scanlines, a shadow mask and a slightly curved glass.
+- **Noir** and **Snow** (new in 1.2, an idea from the original God's Eye View): high-contrast film grain with a vignette, and a cold, frosted look with falling flakes.
 
 **3D buildings are free, and off until you want them.** Turn on OpenStreetMap buildings (via OpenFreeMap) under **MAP** or in the layer list, and they appear as you zoom into any town; **Fly to ground view** on a case turns them on for you. If you want Google's photorealistic 3D tiles instead, paste your own key under **MAP**.
 
@@ -103,7 +104,12 @@ There are five sensor looks, rendered as real-time post-processing shaders (keys
 </table>
 
 - **Map style** (**MAP** or <kbd>M</kbd>): Satellite, Dark, Streets or Topographic, all keyless. Over the satellite map you can add **place names and borders**, which fade out close in where 3D buildings take over.
-- **Lighting**: *Auto* lights an open case by the sun at the moment it happened, with city lights on the night side; *Day* and *Night* hold that look everywhere; *Off* keeps the globe evenly lit.
+- **Lighting**: *Auto* lights an open case by the sun at the moment it happened, with city lights on the night side; *Day* and *Night* hold that look everywhere; *Off* keeps the globe evenly lit. The four-button switch in the top bar (☀ auto, day, night, off) changes it in one click, without opening any settings.
+- **Hide the years bar** (**HIDE** on the bar, or <kbd>Y</kbd>) for more room; the panels grow into the space, the choice is remembered, and **▲ YEARS** brings it back.
+- **Earthquakes** (new in 1.2): the last 24 hours from the USGS, sized and coloured by magnitude. Strong quakes are sometimes reported as booms or odd lights, so it helps check a same-day sighting.
+<img src="docs/media/earthquakes.jpg" alt="The Earthquakes layer over Japan and the western Pacific: pentagon markers sized and coloured by magnitude, listed in the layers panel with their own symbol" width="100%" />
+
+- **A symbol for every layer**: rings for cases, diamonds for official releases, triangles for your own sightings, and a file, shield, hexagon, open book, spark and seismograph for Blue Book, GEIPAN, MUFON, the research archives, civilian reports and earthquakes, so you can tell the dots apart at a glance.
 
 ### 🔭 Check it yourself
 
@@ -167,7 +173,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 - **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
 - **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
-- **Case dossiers list the journal pages that discuss them.** 71 of the 126 cases have coverage, for example:
+- **Case dossiers list the journal pages that discuss them.** 71 of the 138 cases have coverage, for example:
   - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
   - 60 on Travis Walton;
   - 39 on the 2008 Stephenville lights.
@@ -212,11 +218,15 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 </table>
 
-### 📱 Works on a phone, and installs like an app
+### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
 
-Add it to your home screen from the browser menu. It reopens quickly and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
+**Save it as an app**: on a phone, **⤓ INSTALL APP** in the top bar installs it in one tap where the browser allows it, and otherwise shows the exact steps for your browser (Share → Add to Home Screen on iPhone, the ⋮ menu on Android). It opens full screen, respects the notch and the home bar, reopens quickly, and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
+
+<img src="docs/media/languages.jpg" alt="The same case file in German, Japanese, Arabic (right to left) and Russian" width="100%" />
+
+**Your language.** The picker in the top bar switches the whole interface between English, Español, Français, Deutsch, Português, Italiano, Nederlands, Polski, Türkçe, Русский, العربية (right to left), हिन्दी, Bahasa Indonesia, 日本語, 한국어 and 中文. It starts in your browser's language and remembers your choice. Buttons, labels, filters, the sky, weather and launch lines, and the messages are translated; the case texts, archive descriptions and quotations stay as published, so the evidence is never paraphrased. To add or improve a language, edit one file in `src/i18n/locales/` (keys are the English texts); a test checks that every language covers every text the code asks for.
 
 **Also included:**
 - Reference photos, films and audio for each case.
@@ -262,7 +272,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 
 | Key | Action | Key | Action |
 |---|---|---|---|
-| <kbd>1</kbd>–<kbd>5</kbd> | Sensor modes | <kbd>E</kbd> | What did I see? |
+| <kbd>1</kbd>–<kbd>7</kbd> | Sensor modes (…, Noir, Snow) | <kbd>E</kbd> | What did I see? |
 | <kbd>/</kbd> | Search | <kbd>V</kbd> | Witness view (during playback) |
 | <kbd>[</kbd> <kbd>]</kbd> | Previous / next case | <kbd>M</kbd> | Map: style, place names, lighting, 3D |
 | <kbd>Space</kbd> | Play / pause the flight path | <kbd>G</kbd> | Files library (government + MUFON) |
@@ -271,6 +281,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
+| <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
 | <kbd>D</kbd> | Lighting: auto → day → night → off | <kbd>F</kbd> | Clean view: hide every panel |
 | <kbd>O</kbd> | Orbit around the middle of the screen | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
 
@@ -314,9 +325,9 @@ flowchart LR
     S5 & S7 --> S8["build-textindex.mjs"]
   end
   S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 --> DATA[("public/data/*.json")]
-  CASES["src/data/cases/*.js<br/>126 curated cases"] --> APP
+  CASES["src/data/cases/*.js<br/>138 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
-  LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
+  LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
 ```
 
 | Layer | Code |
@@ -324,9 +335,11 @@ flowchart LR
 | Globe, imagery, terrain, 3D tiles, key handling | `src/app/viewer.js` |
 | Rendering on demand, device quality, dynamic resolution | `src/app/quality.js` |
 | Map styles and place names; centred zoom-out; keyboard flying and orbit | `src/app/basemap.js`, `src/app/zoom.js`, `src/app/flycam.js` |
-| NVG / FLIR / Ironbow / CRT shaders | `src/app/effects.js` |
+| NVG / FLIR / Ironbow / CRT / Noir / Snow shaders | `src/app/effects.js` |
+| Interface languages (`t()`, dictionaries loaded on demand, right-to-left) | `src/i18n/index.js`, `src/i18n/locales/*.js` |
+| Save to the home screen (one-tap install, steps per browser) | `src/app/install.js` |
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
-| Label decluttering; Blue Book, GEIPAN, MUFON, research-archive & NUFORC points, satellites, launches, airspace, buildings | `src/layers/*.js` |
+| Label decluttering; Blue Book, GEIPAN, MUFON, research-archive, NUFORC & earthquake points, satellites, launches, airspace, buildings | `src/layers/*.js` |
 | Sky, weather, launches, airspace, GEIPAN classes, journal pages and full-text search, sighting-checker scoring | `src/services/*.js` |
 | Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards | `src/ui/*.js` |
 
@@ -429,15 +442,18 @@ Corrections and new cases are welcome, especially with sources.
 
 - **Made by** [domw99](https://github.com/domw99).
 - **Code:** MIT (see [LICENSE](LICENSE)).
+- **Translations:** written for this project (Spanish, French, German, Portuguese, Italian, Dutch, Polish, Turkish, Russian, Arabic, Hindi, Indonesian, Japanese, Korean, Chinese); corrections from native speakers are welcome as pull requests to `src/i18n/locales/`.
 - **Inspiration:**
   - The visual language follows [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) by Bilawal Sidhu (MIT).
   - Its space-launch layer, cockpit view, in-app key panel and URL camera inspired the launch layer, witness view, MAP panel and view links here.
+  - Its Noir and Snow sensor styles, frame-rate readout and sharable scene links inspired the same-named looks, the <kbd>`</kbd> key and the share links here.
   - The shaders and code here are original.
 - **Globe:** [CesiumJS](https://cesium.com/platform/cesiumjs/) (Apache-2.0).
 - **Map data:**
   - Imagery: Esri World Imagery ("Powered by Esri").
   - Terrain: Re:Earth / Mapterhorn (CC BY 4.0).
   - OSM fallback: © OpenStreetMap contributors.
+  - Earthquakes: USGS Earthquake Hazards Program (public domain).
   - 3D buildings: © OpenMapTiles © OpenStreetMap contributors, served by OpenFreeMap.
 - **Media & sources:**
   - Official footage: DVIDS / U.S. Department of War (public domain).

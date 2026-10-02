@@ -820,3 +820,5 @@ html[data-text-dir='rtl'] #toast, html[data-text-dir='rtl'] .topbar .chip, html[
 html[data-text-dir='rtl'] .case-item, html[data-text-dir='rtl'] .layer { text-align: right; }
 html[data-text-dir='rtl'] .d-kv dd, html[data-text-dir='rtl'] .d-text { text-align: right; }
 html[data-text-dir='rtl'] .mono, html[data-text-dir='rtl'] .sky-chart, html[data-text-dir='rtl'] #tl-canvas { direction: ltr; }
+/* Case texts and archive quotes stay English: each paragraph takes its own direction from its first letter, so they read left to right inside an Arabic panel. */
+html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .mufon-quote, .lead, .d-kv dd, .case-item .t, .case-item .m, .ex-list p, .story-text, .d-text :is(p, li, div), .explain :is(p, div)) { unicode-bidi: plaintext; text-align: start; }
