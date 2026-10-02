@@ -4,10 +4,13 @@ import { SPACE } from './space.js';
  * Places on the Moon for the interactive Moon map: the named seas, craters and
  * mountains people look for, and the sites where spacecraft have landed.
  * Positions are selenographic latitude and longitude in degrees (east
- * positive) of the feature's centre, from the IAU Gazetteer of Planetary
- * Nomenclature and NASA's Lunar Reconnaissance Orbiter team, rounded to a
- * tenth of a degree (landing sites to the nearest hundredth). They place a
- * label on a map of a body 3,475 km across, so a tenth of a degree is 3 km.
+ * positive) of the feature's centre. The six Apollo sites match NASA's
+ * NSSDC table. A spot check of the rest against Wikipedia's lunar coordinates
+ * (themselves from the IAU Gazetteer of Planetary Nomenclature) found 81
+ * places within 0.6 degrees and 9 more within about 1.6 degrees; 18 could not
+ * be checked that way (ten Surveyor, Luna, Chang'e and IM-1 sites, and eight
+ * ranges, valleys and rilles). 1.6 degrees is under 50 km on a body 3,475 km
+ * across: close enough to put a name on a map, not a survey.
  *
  *   kind  'sea' (a mare, lake or bay), 'basin', 'crater', 'range' (mountains,
  *         valleys, rilles and other long features), 'site' (a landing or
