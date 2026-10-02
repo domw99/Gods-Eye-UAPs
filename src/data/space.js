@@ -230,7 +230,7 @@ export const SPACE = [
     summary:
       'In July 1969 Neil Armstrong, from lunar orbit, reported that an area near Aristarchus was “considerably more illuminated than the surrounding area”, with “a slight amount of fluorescence”. In December 1972 Harrison Schmitt saw a bright flash north of Grimaldi, and Ronald Evans noted a light flash east of Mare Orientale. They are rare cases in which trained observers saw such an event close up. An Apollo 16 science debriefing also mentions an unreported “flash”.',
     explanation: 'There is no agreed explanation for any of these.',
-    official: [1010319],
+    official: [1010319, 1010336],
     moon: [
       { lat: 23.7, lon: -47.4, label: 'Aristarchus (Apollo 11)' },
       { lat: -2.5, lon: -68.5, label: 'Grimaldi, to the north (Apollo 17)' },

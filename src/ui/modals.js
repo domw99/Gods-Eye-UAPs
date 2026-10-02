@@ -1,4 +1,4 @@
-import { html, mount, safeUrl, toast, th } from '../util/dom.js';
+import { html, mount, safeUrl, toast } from '../util/dom.js';
 import { t, plural, locale } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { commonsPage } from '../services/wiki.js';
@@ -301,6 +301,8 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
     </form>`;
   const el = modal('LOG SIGHTING', content, { wide: false });
   const form = el.querySelector('#log-form');
+  // Start typing at once, instead of on the close button. Later than the keypress that opened this, or the L would land in the field.
+  setTimeout(() => form.elements.title?.focus(), 0);
   el.querySelector('#log-geo').addEventListener('click', () => {
     if (!navigator.geolocation) return toast('Geolocation unavailable');
     navigator.geolocation.getCurrentPosition(
@@ -330,6 +332,7 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
       description: f.get('description').trim(),
       media: f.get('media').trim(),
     };
+    if (!entry.title) return toast('Give the sighting a title'); // the field is required, but spaces alone pass that
     if (!Number.isFinite(entry.lat) || !Number.isFinite(entry.lon)) return toast('Check the coordinates');
     closeModal();
     onSave(entry);

@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "이 주제에 대한 NASA 자체의 검토는 다음에 있습니다:",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "위의 NASA 파일은 2026년 PURSUE 공개 자료에서 나온 것이며, 다른 공식 기록처럼 앱에서 재생됩니다.",
   "SIMILAR CASES": "비슷한 사례",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "연도별 기록. 드래그하여 연도 범위를 선택하고, 더블 클릭하여 해제합니다.",
+  "Give the sighting a title": "목격에 제목을 붙여 주세요",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "목격을 추가했지만 이 브라우저가 저장하지 못했습니다. 페이지를 닫으면 사라집니다",
+  "Could not update the saved log in this browser": "이 브라우저에 저장된 기록을 업데이트하지 못했습니다",
   "page|pages": {"other": "페이지"},
 };

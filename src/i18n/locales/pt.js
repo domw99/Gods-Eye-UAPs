@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "A análise da própria NASA sobre o assunto está em",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Os arquivos da NASA acima são os divulgados nas liberações PURSUE de 2026; eles tocam no aplicativo como os demais registros oficiais.",
   "SIMILAR CASES": "CASOS SEMELHANTES",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Registros por ano. Arraste para escolher um intervalo de anos; clique duas vezes para limpar.",
+  "Give the sighting a title": "Dê um título ao avistamento",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "Avistamento adicionado, mas este navegador não conseguiu guardá-lo: ele sumirá quando você fechar a página",
+  "Could not update the saved log in this browser": "Não foi possível atualizar o registro salvo neste navegador",
   "page|pages": {"one": "página", "other": "páginas"},
 };

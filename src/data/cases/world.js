@@ -152,7 +152,7 @@ export default [
   {
     id: 'valensole-1965',
     title: 'Valensole landing',
-    date: '1965-07-01T05:45:00+02:00',
+    date: '1965-07-01T05:45:00+01:00',
     place: 'Lavender field, Valensole, Alpes-de-Haute-Provence',
     country: 'France',
     cc: 'FR',
@@ -359,7 +359,7 @@ export default [
   {
     id: 'voronezh-1989',
     title: 'Voronezh park landing',
-    date: '1989-09-27T18:30:00+04:00',
+    date: '1989-09-27T18:30:00+03:00',
     place: 'Voronezh, RSFSR (Russia)',
     country: 'Russia',
     cc: 'RU',

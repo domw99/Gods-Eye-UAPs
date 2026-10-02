@@ -5,6 +5,7 @@
  * official explanations (Aguadilla, many 1940s–50s cases) rest on it.
  */
 import { bearingDeg, angleDiff, trackLengthKm } from '../util/geo.js';
+import { setCached } from '../util/storage.js';
 
 const ARCHIVE = 'https://archive-api.open-meteo.com/v1/archive';
 const FORECAST = 'https://api.open-meteo.com/v1/forecast';
@@ -105,12 +106,7 @@ export async function weatherAt(lat, lon, when) {
   const wx = pickHour(await res.json(), when);
   if (wx) {
     wx.source = recent ? 'Open-Meteo forecast model' : 'ERA5 reanalysis via Open-Meteo';
-    if (!recent)
-      try {
-        localStorage.setItem(key, JSON.stringify(wx));
-      } catch {
-        /* storage full: fine */
-      }
+    if (!recent) setCached(key, JSON.stringify(wx)); // fine if it can't be kept
   }
   return wx;
 }

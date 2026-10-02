@@ -59,12 +59,25 @@ test.describe('Keyboard and screen readers', () => {
   test('opening a case from the list with Enter moves focus into it, and Escape brings it back', async ({ page }) => {
     await openApp(page);
     await page.locator('#search').fill('nimitz');
+    await expect.poll(() => page.locator('#case-list .case-item').count()).toBeLessThan(15); // the search has narrowed the list
     const row = page.locator('#case-list .case-item', { hasText: 'Nimitz' }).first();
     await row.focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#dossier')).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(page.locator('#case-list .case-item:focus')).toHaveCount(1);
+  });
+
+  test('L opens the sighting form with the cursor in an empty title, and a blank title is refused', async ({ page }) => {
+    await openApp(page);
+    await page.keyboard.press('l');
+    const title = page.locator('#log-form [name="title"]');
+    await expect(title).toBeFocused();
+    await expect(title).toHaveValue(''); // the L that opened the form is not typed into it
+    await page.keyboard.type('   ');
+    await page.locator('#log-form').evaluate((f) => f.requestSubmit());
+    await expect(page.locator('#log-form')).toBeVisible();
+    await expect(page.locator('#toast')).toContainText('title');
   });
 
   test('has no detectable accessibility violations on the start screen, a case file or the dialogs', async ({ page }) => {

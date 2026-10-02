@@ -33,6 +33,7 @@ import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
+import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -1428,23 +1429,30 @@ function loadUserLog() {
 function saveUserLog(list) {
   try {
     localStorage.setItem(LOG_KEY, JSON.stringify(list));
+    return true;
   } catch {
-    toast('Could not save — browser storage is unavailable');
+    dropCaches(); // cached weather and launch look-ups can be fetched again; the log cannot
+    try {
+      localStorage.setItem(LOG_KEY, JSON.stringify(list));
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 function addUser(entry) {
   const list = [...userItems.map((u) => u.ref), entry];
-  saveUserLog(list);
+  const stored = saveUserLog(list);
   userItems = list.map(userToItem);
   itemLayer.setItems(allItems());
   if (!state.layers.user) setLayer('user', true);
   refresh();
   select(`user:${entry.id}`);
-  toast('Sighting saved in this browser');
+  toast(stored ? 'Sighting saved in this browser' : 'Sighting added, but this browser could not store it: it will be gone when you close the page', stored ? 2600 : 7000);
 }
 function deleteUser(id) {
   const list = userItems.map((u) => u.ref).filter((u) => u.id !== id);
-  saveUserLog(list);
+  if (!saveUserLog(list)) toast('Could not update the saved log in this browser');
   userItems = list.map(userToItem);
   itemLayer.setItems(allItems());
   deselect();
@@ -1839,7 +1847,7 @@ const openFiles = () =>
     {
       cases: CASE_ITEMS.length,
       official: officialItems.length,
-      bluebook: bluebook ? bluebook.records.length.toLocaleString() : '10,763',
+      bluebook: bluebook ? bluebook.records.length.toLocaleString() : '10,515',
       geipan: geipan ? geipan.records.length.toLocaleString() : '2,768',
       mufon: mufon ? mufon.issues.length : 485,
       nuforc: nuforc ? nuforc.count.toLocaleString() : '80,332',
@@ -1924,7 +1932,7 @@ document.getElementById('btn-map').addEventListener('click', openMapSettingsNow)
 }
 
 /* Save to the home screen: one tap where the browser allows it, otherwise the steps. */
-const install = createInstall({
+createInstall({
   button: document.getElementById('btn-install'),
   onHelp: (platform) => openInstallHelp(installSteps(platform)),
   onInstalled: () => toast('Installed. Open God’s Eye from your home screen.', 4500),

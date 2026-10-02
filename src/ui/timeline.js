@@ -104,7 +104,7 @@ export function createTimeline({ onPlayToggle }) {
       const x = xOf(hoverYear, w);
       g.fillStyle = 'rgba(255,255,255,0.8)';
       g.fillRect(x + bw / 2, pad.t, 1, plotH);
-      const parts = [`${hoverYear}: ${bars[i]} records`];
+      const parts = [`${hoverYear === YEAR_MIN ? '≤ 1900' : hoverYear}: ${bars[i]} records`]; // the first bar holds everything up to 1900
       for (const { key, label } of LINES) if (lines[key]) parts.push(`${lines[key][i]} ${label}`);
       if (nuforc) parts.push(`${nuforc[i]} NUFORC`);
       const text = parts.join(' · ');

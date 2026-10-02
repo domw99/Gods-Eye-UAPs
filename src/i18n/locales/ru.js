@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "Собственный взгляд NASA на тему — на",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Приведённые выше файлы NASA опубликованы в рамках релизов PURSUE 2026 года; они воспроизводятся в приложении, как и другие официальные записи.",
   "SIMILAR CASES": "ПОХОЖИЕ СЛУЧАИ",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Записи по годам. Проведите, чтобы выбрать период; двойной щелчок — сбросить.",
+  "Give the sighting a title": "Дайте наблюдению название",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "Наблюдение добавлено, но браузер не смог его сохранить: оно исчезнет при закрытии страницы",
+  "Could not update the saved log in this browser": "Не удалось обновить сохранённый журнал в этом браузере",
   "page|pages": {"one": "страница", "few": "страницы", "many": "страниц", "other": "страницы"},
 };

@@ -16,7 +16,7 @@
  * public/data/journals.json. Only places, page numbers and short quotes are
  * stored, with links back to the scans.
  *
- *   node scripts/build-journals.mjs
+ *   node scripts/build-journals.mjs [--offline]
  */
 import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
 import { gunzipSync, gzipSync } from 'node:zlib';
@@ -234,10 +234,22 @@ async function listChapters() {
 
 /* ── Build ─────────────────────────────────────────────────────────── */
 
+/** The issues already in journals.json, for a rebuild that needs no network (see --offline). */
+async function listExisting() {
+  const { issueFields, issues } = JSON.parse(await readFile(OUT, 'utf8'));
+  return issues.map((row) => {
+    const o = Object.fromEntries(issueFields.map((f, i) => [f, row[i]]));
+    return { id: o.id, series: o.series, item: o.item, file: o.file, sub: Boolean(o.sub), text: o.text, title: o.title, year: o.year, month: o.month, monthTo: o.monthTo, number: o.number };
+  });
+}
+
 async function main() {
-  const lists = await Promise.all([listApro(), listNicap(), listIur(), listChapters()]);
+  // --offline: reuse the issue list already in journals.json and the cached OCR, with no look-ups on
+  // archive.org. Use it to refresh which cases the journals discuss after cases have been added.
+  const offline = process.argv.includes('--offline');
+  const lists = offline ? [await listExisting()] : await Promise.all([listApro(), listNicap(), listIur(), listChapters()]);
   const all = lists.flat();
-  console.log(Object.fromEntries(Object.keys(SERIES).map((k, i) => [k, lists[i].length])));
+  console.log(offline ? { offline: all.length } : Object.fromEntries(Object.keys(SERIES).map((k, i) => [k, lists[i].length])));
 
   const loaded = await mapLimit(all, 4, async (is, i) => {
     try {

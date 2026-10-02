@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "Tinjauan NASA sendiri atas topik ini ada di",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Berkas NASA di atas adalah yang dirilis dalam rilis PURSUE 2026; berkas itu diputar di aplikasi seperti catatan resmi lainnya.",
   "SIMILAR CASES": "KASUS SERUPA",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Catatan per tahun. Seret untuk memilih rentang tahun; klik dua kali untuk menghapus.",
+  "Give the sighting a title": "Beri judul pada penampakan",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "Penampakan ditambahkan, tetapi peramban ini tidak dapat menyimpannya: akan hilang saat halaman ditutup",
+  "Could not update the saved log in this browser": "Log tersimpan di peramban ini tidak dapat diperbarui",
   "page|pages": {"other": "halaman"},
 };

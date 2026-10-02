@@ -7,6 +7,8 @@
  * Anonymous access allows about 15 requests an hour, so every answer is
  * cached in localStorage.
  */
+import { setCached } from '../util/storage.js';
+
 const API = 'https://ll.thespacedevs.com/2.3.0/launches/';
 const HOUR = 3600e3;
 
@@ -22,11 +24,7 @@ function readCache(key, ttl) {
   return null;
 }
 function writeCache(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify({ t: Date.now(), data }));
-  } catch {
-    /* storage full or blocked: fine */
-  }
+  setCached(key, JSON.stringify({ t: Date.now(), data })); // fine if it can't be kept
 }
 
 export function slimLaunch(r) {

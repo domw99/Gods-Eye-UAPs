@@ -9,8 +9,8 @@ export default [
   {
     id: 'battle-of-los-angeles-1942',
     title: 'Battle of Los Angeles',
-    date: '1942-02-25T03:15:00-08:00',
-    end: '1942-02-25T04:14:00-08:00',
+    date: '1942-02-25T03:15:00-07:00',
+    end: '1942-02-25T04:14:00-07:00',
     place: 'Los Angeles, California',
     country: 'United States',
     cc: 'US',
@@ -117,7 +117,7 @@ export default [
   {
     id: 'roswell-1947',
     title: 'Roswell debris recovery',
-    date: '1947-07-08T12:00:00-06:00',
+    date: '1947-07-08T12:00:00-07:00',
     timeApprox: true,
     place: 'Foster homestead near Corona, New Mexico',
     country: 'United States',

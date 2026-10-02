@@ -33,8 +33,8 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **138** curated case files<br><sub>1561 → 2024, every continent</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
-| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **872** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
+| **148** curated case files<br><sub>1561 → 2024, 33 countries</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **873** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
 
@@ -42,9 +42,9 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <img src="docs/media/globe.jpg" alt="The globe with curated case files (cyan and amber) and official U.S. releases (magenta)" width="100%" />
 
-- **138 curated case files** from 1561 to 2024. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
+- **148 curated case files** from 1561 to 2024, in 33 countries. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
-- **The evidence itself, where it survives.** 73 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
+- **The evidence itself, where it survives.** 74 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
 - **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports.
 - **Filters stay in view** as chips above the results, each removable, with **RESET ALL**. **Back and Forward** step through the records you opened, and every record has its own link.
@@ -173,7 +173,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 - **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
 - **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
-- **Case dossiers list the journal pages that discuss them.** 71 of the 138 cases have coverage, for example:
+- **Case dossiers list the journal pages that discuss them.** 87 of the 148 cases have coverage, for example:
   - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
   - 60 on Travis Walton;
   - 39 on the 2008 Stephenville lights.
@@ -218,6 +218,19 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 </table>
 
+### 🌙 Space & Moon
+
+<img src="docs/media/space-moon.jpg" alt="The Space & Moon section: the near side of the Moon with numbered pins for lunar transient phenomena beside the reports they mark, with the status and explanation of each" width="100%" />
+
+**Space & Moon** (**SPACE & MOON** in the top bar, or <kbd>K</kbd>) collects reports from beyond the atmosphere, 18 in all, each with what was reported, what is documented and the best explanation, and with its sources.
+
+- **In orbit (8):** the Mercury "fireflies", Gemini 4's cylinder over Hawaii, Gemini 7's "bogey", the object Apollo 11 saw on the way to the Moon, Apollo 17's drifting particles, the Apollo "light flashes" (cosmic rays crossing the eye), the STS-48 video and the STS-75 tether incident. Where the position is known, **SHOW ON THE GLOBE** flies there.
+- **The Moon (6):** transient lunar phenomena on a photograph of the near side with numbered pins: Gervase of Canterbury in 1178, Herschel's "volcanoes" in 1787, Kozyrev's spectrum at Alphonsus in 1958, Greenacre and Barr at Aristarchus in 1963, the Apollo crews' flashes, and NASA's brightest recorded impact flash (2013), which was solved. Reports at the same place fan out above a dot so none is hidden.
+- **Deep space (4):** the "Face on Mars", the "Wow!" signal, 'Oumuamua and 3I/ATLAS.
+- **NASA's own files are linked.** The NASA documents and recordings in the 2026 PURSUE releases (the Mercury flights, the Apollo 12, 14, 16 and 17 debriefings, Cooper's 1962 interview) are listed with the reports they bear on, and open in the app like the other official records.
+
+The pins are placed by a mapping fitted to known craters on the photograph (Gregory H. Revera, CC BY-SA 3.0), so they are accurate to about a degree.
+
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
 <a href="docs/media/whats-new-1.2.mp4"><img src="docs/media/whats-new-1.2.webp" alt="What's new in 1.2: the Noir and Snow sensor looks, the day, night and off lighting switch in the top bar, the years bar hiding, a case file switching between Japanese and Russian, live earthquakes along the US west coast, and one of the 12 new cases" width="100%" /></a>
@@ -230,9 +243,11 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 <img src="docs/media/languages.jpg" alt="The same case file in German, Japanese, Arabic (right to left) and Russian" width="100%" />
 
-**Your language.** The picker in the top bar switches the whole interface between English, Español, Français, Deutsch, Português, Italiano, Nederlands, Polski, Türkçe, Русский, العربية (right to left), हिन्दी, Bahasa Indonesia, 日本語, 한국어 and 中文. It starts in your browser's language and remembers your choice. Buttons, labels, filters, the sky, weather and launch lines, and the messages are translated; the case texts, archive descriptions and quotations stay as published, so the evidence is never paraphrased. To add or improve a language, edit one file in `src/i18n/locales/` (keys are the English texts); a test checks that every language covers every text the code asks for.
+**Your language.** A link can open in a chosen language by adding `?lang=` and a code, for example `?lang=es`. The picker in the top bar switches the whole interface between English, Español, Français, Deutsch, Português, Italiano, Nederlands, Polski, Türkçe, Русский, العربية (right to left), हिन्दी, Bahasa Indonesia, 日本語, 한국어 and 中文. It starts in your browser's language and remembers your choice. Buttons, labels, filters, the sky, weather and launch lines, and the messages are translated; the case texts, archive descriptions and quotations stay as published, so the evidence is never paraphrased. To add or improve a language, edit one file in `src/i18n/locales/` (keys are the English texts); a test checks that every language covers every text the code asks for.
 
 **Also included:**
+- **Similar cases** at the end of each case file: the cases most like it by kind of encounter, evidence, shape, country and era.
+- **Keyboard and screen readers:** a skip link, labelled regions, dialogs that keep the keyboard inside them and make the page behind inert, and focus that moves into a case file and back to its row in the list. The browser tests run an automated accessibility check (axe) on the start screen, a case file and the dialogs.
 - Reference photos, films and audio for each case.
 - One-click Google satellite, Street View and Google Earth 3D links.
 - A ground-view fly-in.
@@ -283,6 +298,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
+| <kbd>K</kbd> | Space & Moon | | |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
@@ -329,7 +345,7 @@ flowchart LR
     S5 & S7 --> S8["build-textindex.mjs"]
   end
   S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 --> DATA[("public/data/*.json")]
-  CASES["src/data/cases/*.js<br/>138 curated cases"] --> APP
+  CASES["src/data/cases/*.js<br/>148 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
 ```
@@ -345,7 +361,8 @@ flowchart LR
 | Case markers, flight paths & playback, witness view | `src/layers/items.js`, `src/layers/tracks.js` |
 | Label decluttering; Blue Book, GEIPAN, MUFON, research-archive, NUFORC & earthquake points, satellites, launches, airspace, buildings | `src/layers/*.js` |
 | Sky, weather, launches, airspace, GEIPAN classes, journal pages and full-text search, sighting-checker scoring | `src/services/*.js` |
-| Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards | `src/ui/*.js` |
+| Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards, Space & Moon | `src/ui/*.js` |
+| Space & Moon entries and the Moon picture; "similar cases" ranking | `src/data/space.js`, `public/space/`, `src/data/similar.js` |
 
 <details>
 <summary><b>Project structure</b></summary>
@@ -467,6 +484,7 @@ Corrections and new cases are welcome, especially with sources.
   - GEIPAN files: [GEIPAN](https://www.cnes-geipan.fr/) / CNES. Case data from its published CSV files; each case links to its full file on cnes-geipan.fr.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
   - Research archives: the *APRO Bulletin* (Aerial Phenomena Research Organization) and MUFON chapter newsletters as scanned by the [Archives for the Unexplained](https://archive.org/details/ufonewsletters); NICAP's *U.F.O. Investigator* from the Internet Archive's Serials in Microfilm; CUFOS's *International UFO Reporter* from the Internet Archive. Only places, page numbers, short quotes and a word index are stored; the pages are read from the Internet Archive.
+  - Space & Moon: NASA's UAP-related documents from the 2026 PURSUE releases (DVIDS, public domain), the NASA Apollo Lunar Surface Journal and technical debriefings, NASA Science and the Scientific Visualization Studio, ESA, and the sources named in each entry. The Moon photograph is by Gregory H. Revera ([CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg)), cropped and resized.
   - Night lights: NASA Earth Observatory Black Marble (VIIRS, 2016), served by NASA GIBS.
   - Stars behind the globe: [NASA Deep Star Maps 2020](https://svs.gsfc.nasa.gov/4851) (NASA/Goddard Scientific Visualization Studio; Hipparcos-2, Tycho-2 and Gaia DR2 stars), made into a sky box by `scripts/build-skybox.py`.
   - Dark, Streets and Topographic maps and the place names overlay: Esri (keyless services, attribution shown in the app).

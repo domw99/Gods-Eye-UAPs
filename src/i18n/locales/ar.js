@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "تناول ناسا نفسها للموضوع موجود على",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "ملفات ناسا أعلاه هي التي نُشرت ضمن إصدارات PURSUE لعام 2026؛ وتُعرض داخل التطبيق مثل بقية السجلات الرسمية.",
   "SIMILAR CASES": "حالات مشابهة",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "السجلات حسب السنة. اسحب لاختيار نطاق من السنوات؛ انقر مرتين للمسح.",
+  "Give the sighting a title": "أضف عنواناً للمشاهدة",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "أُضيفت المشاهدة لكن هذا المتصفح لم يستطع حفظها: ستختفي عند إغلاق الصفحة",
+  "Could not update the saved log in this browser": "تعذّر تحديث السجل المحفوظ في هذا المتصفح",
   "page|pages": {"zero": "صفحة", "one": "صفحة", "two": "صفحتان", "few": "صفحات", "many": "صفحة", "other": "صفحة"},
 };

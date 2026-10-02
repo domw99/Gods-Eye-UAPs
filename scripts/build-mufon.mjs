@@ -19,7 +19,7 @@
  *
  *   node scripts/build-mufon.mjs
  */
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -410,6 +410,11 @@ async function main() {
     chapters = await loadChapters();
   } catch (e) {
     console.warn('Chapter newsletters unavailable:', e.message);
+    // Keep the list from the last good build rather than shipping none.
+    try {
+      chapters = JSON.parse(await readFile(OUT, 'utf8')).chapters || [];
+      console.warn(`Kept the ${chapters.length} chapters already in ${path.basename(OUT)}`);
+    } catch {}
   }
 
   const payload = {

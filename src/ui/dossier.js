@@ -1,5 +1,5 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
-import { t, plural, locale } from '../i18n/index.js';
+import { t, locale } from '../i18n/index.js';
 import { CASES } from '../data/cases/index.js';
 import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';

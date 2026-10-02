@@ -681,5 +681,9 @@ export default {
   "NASA’s own look at the subject is at": "NASA 自己对这一主题的研究见",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "上述 NASA 文件来自 2026 年的 PURSUE 公开资料，可像其他官方记录一样在应用内播放。",
   "SIMILAR CASES": "相似案例",
+  "Records by year. Drag across it to choose a range of years; double-click to clear.": "按年份统计的记录。拖动以选择年份范围；双击清除。",
+  "Give the sighting a title": "请为这次目击起个标题",
+  "Sighting added, but this browser could not store it: it will be gone when you close the page": "目击已添加，但此浏览器无法保存：关闭页面后将消失",
+  "Could not update the saved log in this browser": "无法更新此浏览器中保存的记录",
   "page|pages": {"other": "页"},
 };

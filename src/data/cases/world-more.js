@@ -580,7 +580,7 @@ export default [
   {
     id: 'canary-islands-1976',
     title: 'Canary Islands sphere',
-    date: '1976-06-22T21:27:00+01:00',
+    date: '1976-06-22T21:27:00+00:00',
     place: 'Canary Islands (Gran Canaria, Tenerife, Fuerteventura)',
     country: 'Spain',
     cc: 'ES',
@@ -837,7 +837,7 @@ export default [
   {
     id: 'buenos-aires-meteors-1965',
     title: 'Buenos Aires — Meteors scrambled',
-    date: '1965-07-16T18:00:00-03:00',
+    date: '1965-07-16T18:00:00-04:00',
     timeApprox: true,
     place: 'Buenos Aires',
     country: 'Argentina',
@@ -905,7 +905,7 @@ export default [
   {
     id: 'villa-urquiza-1988',
     title: 'Villa Urquiza Christmas sighting',
-    date: '1988-12-25T19:00:00-03:00',
+    date: '1988-12-25T19:00:00-02:00',
     timeApprox: true,
     place: 'Villa Urquiza, Buenos Aires',
     country: 'Argentina',

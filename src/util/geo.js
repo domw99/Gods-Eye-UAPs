@@ -57,11 +57,12 @@ export function trackLengthKm(points) {
 
 export function formatDMS(lat, lon) {
   const f = (v, pos, neg) => {
-    const a = Math.abs(v);
-    const d = Math.floor(a);
-    const m = Math.floor((a - d) * 60);
-    const s = ((a - d) * 60 - m) * 60;
-    return `${d}°${String(m).padStart(2, '0')}′${s.toFixed(0).padStart(2, '0')}″${v >= 0 ? pos : neg}`;
+    // Round to whole arcseconds first, so 59.6″ carries into the minute instead of printing 60″.
+    const total = Math.round(Math.abs(v) * 3600);
+    const d = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    return `${d}°${String(m).padStart(2, '0')}′${String(s).padStart(2, '0')}″${v >= 0 ? pos : neg}`;
   };
   return `${f(lat, 'N', 'S')} ${f(lon, 'E', 'W')}`;
 }

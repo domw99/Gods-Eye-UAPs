@@ -50,8 +50,10 @@ function skySentence(c) {
 }
 
 export function buildStory(c) {
-  const date = new Date(c.date);
-  const when = date.toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  // The calendar day where it happened (the date as written, with its own UTC offset), not the UTC day,
+  // which for an evening case in the Americas is already the next one.
+  const [y, mo, d] = c.date.slice(0, 10).split('-').map(Number);
+  const when = new Date(Date.UTC(y, mo - 1, d)).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   const steps = [
     { kicker: 'CASE FILE', text: `${c.title}. ${c.place}, ${when}.`, camera: 'space' },
     ...sentences(c.summary).reduce((acc, s, i) => {

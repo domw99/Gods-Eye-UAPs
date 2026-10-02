@@ -70,6 +70,8 @@ export async function drawCard(c, snap) {
   canvas.width = W;
   canvas.height = H;
   const g = canvas.getContext('2d');
+  // Older browsers (Safari before 16, Firefox before 112) have no roundRect: square corners will do.
+  if (!g.roundRect) g.roundRect = function (x, y, w, h) { this.rect(x, y, w, h); };
   g.fillStyle = '#05070c';
   g.fillRect(0, 0, W, H);
 
