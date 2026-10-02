@@ -692,7 +692,9 @@ export default [
     ],
     observers: [{ label: 'Istrana radar', lat: 45.6875, lon: 12.0828 }],
     media: [commons('UFO photographed by Italian pilot Giancarlo Cecconi, 1979.jpg', "One of Cecconi's photographs")],
-    sources: [],
+    sources: [
+      link('The Black Vault — The UFO case of Maresciallo Cecconi, 18 June 1979', 'https://www.theblackvault.com/casefiles/the-ufo-case-of-maresciallo-cecconi-june-18-1979/', 'analysis'),
+    ],
   },
   {
     id: 'torpo-1986',

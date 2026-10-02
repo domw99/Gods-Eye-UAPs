@@ -67,11 +67,16 @@ export function glyphUrl(layer) {
   return url;
 }
 
-// The markers drawn in layers/items.js, for the layer list.
+// Symbols used only in the layer list: the markers drawn in layers/items.js, and the live layers.
 const LIST_ONLY = {
   cases: { path: 'M8 2.4a5.6 5.6 0 1 1 0 11.2A5.6 5.6 0 0 1 8 2.4z', detail: null, dot: [8, 8] },
   official: { path: 'M8 1.8l6.2 6.2L8 14.2 1.8 8z', detail: null, dot: [8, 8] },
   user: { path: 'M8 2l6 11H2z', detail: null, dot: [8, 9.6] },
+  // The live layers: a satellite with its solar panels, a rocket, an airspace volume (a cylinder) and a tower.
+  satellites: { path: 'M6 6.2h4v3.6H6z', detail: 'M1.4 6.4h3.2v3.2H1.4zM11.4 6.4h3.2v3.2h-3.2zM4.6 8H6M10 8h1.4M8 6.2V3.4', dot: [8, 8] },
+  launches: { path: 'M8 1.5c2 2 2.6 4.6 2.2 7.6H5.8C5.4 6.1 6 3.5 8 1.5z', detail: 'M5.8 9.1L4 12.4l2.4-1M10.2 9.1l1.8 3.3-2.4-1M8 12v2.6', dot: [8, 5.4] },
+  airspace: { path: 'M2.6 5.2c0-1.2 2.4-2.1 5.4-2.1s5.4.9 5.4 2.1v5.6c0 1.2-2.4 2.1-5.4 2.1s-5.4-.9-5.4-2.1z', detail: 'M2.6 5.2c0 1.2 2.4 2.1 5.4 2.1s5.4-.9 5.4-2.1', dot: null },
+  buildings: { path: 'M7 14.2V2.2h5.6v12z', detail: 'M3.2 14.2V7.2H7M1.8 14.2h12.4M9 5h1.6M9 7.4h1.6M9 9.8h1.6', dot: null },
 };
 
 /** The symbol for a layer as an inline SVG string (outline in the current colour), for the layer list; null when it has none. */

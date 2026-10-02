@@ -34,6 +34,7 @@
     "satellite.js": "^6.0.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "1.56.1",
     "vite": "^6.4.3",
     "vite-plugin-cesium": "^1.2.23",

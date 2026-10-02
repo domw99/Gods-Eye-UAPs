@@ -528,7 +528,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
 }
 #toast.show { opacity: 1; }
 #loading { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg-dark); z-index: 100; font-size: 11px; letter-spacing: 0.25em; color: var(--accent); transition: opacity 600ms; }
-#loading.done { opacity: 0; pointer-events: none; }
+#loading.done { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 600ms, visibility 0s 600ms; } /* hidden once faded, so a screen reader doesn't find it */
 .loading-bar { width: 180px; height: 2px; background: rgba(0, 212, 255, 0.15); border-radius: 2px; overflow: hidden; }
 .loading-bar i { display: block; height: 100%; width: 8%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 300ms ease-out; }
 .loading-ring { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(0, 212, 255, 0.2); border-top-color: var(--accent); animation: spin 1s linear infinite; }
@@ -756,7 +756,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .made-by a:hover { color: var(--accent); }
 #left .made-by { margin: 14px 0 2px; text-align: center; }
 .hud-br .made-by { margin-top: 4px; }
-#loading .made-by { position: absolute; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; letter-spacing: 0.2em; }
+#loading .made-by { color: var(--text-secondary); opacity: 1; position: absolute; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; letter-spacing: 0.2em; }
 .modal .made-by { margin: 6px 0 0; }
 .stats-by { margin-top: 20px !important; text-align: right; }
 
@@ -822,3 +822,42 @@ html[data-text-dir='rtl'] .d-kv dd, html[data-text-dir='rtl'] .d-text { text-ali
 html[data-text-dir='rtl'] .mono, html[data-text-dir='rtl'] .sky-chart, html[data-text-dir='rtl'] #tl-canvas { direction: ltr; }
 /* Case texts and archive quotes stay English: each paragraph takes its own direction from its first letter, so they read left to right inside an Arabic panel. */
 html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .mufon-quote, .lead, .d-kv dd, .case-item .t, .case-item .m, .ex-list p, .story-text, .d-text :is(p, li, div), .explain :is(p, div)) { unicode-bidi: plaintext; text-align: start; }
+
+/* Keyboard users: a link, hidden until focused, that jumps past the toolbar to search and the case list. */
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; transform: translateY(-250%); padding: 8px 14px; border-radius: 8px; background: var(--accent); color: #001018; font: 600 12px var(--font-mono); letter-spacing: 0.06em; text-decoration: none; }
+.skip-link:focus { transform: none; }
+
+/* ── Space & Moon ─────────────────────────────────────────
+   Three tabs of reports, the Moon's near side with numbered pins, and a card for each report. */
+.space-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+.space-panel[hidden] { display: none; }
+.space-list { list-style: none; display: grid; gap: 12px; }
+.space-card { padding: 14px 16px; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255, 255, 255, 0.025); scroll-margin: 14px; }
+.space-card.flash { animation: space-flash 1.6s ease-out; }
+@keyframes space-flash { 0% { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim), 0 0 22px var(--accent-glow); } 100% { border-color: var(--glass-border); box-shadow: none; } }
+.sc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sc-when { margin-left: auto; font-size: 10.5px; letter-spacing: 0.06em; color: var(--text-secondary); text-transform: uppercase; }
+.sc-num { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #001018; font: 700 11px var(--font-mono); flex: none; }
+.space-card h3 { font-size: 15px; font-weight: 600; line-height: 1.3; letter-spacing: 0.01em; text-wrap: balance; }
+.sc-where { margin: 2px 0 8px; font-size: 11.5px; color: var(--text-secondary); }
+.space-card p { font-size: 13px; line-height: 1.6; color: rgba(232, 234, 237, 0.88); }
+.space-card p + p { margin-top: 8px; }
+.sc-expl b, .sc-files b { display: block; margin-bottom: 2px; font: 600 10px var(--font-mono); letter-spacing: 0.1em; color: var(--accent); }
+.sc-files { margin-top: 10px; }
+.sc-files ul, .sc-sources { list-style: none; display: grid; gap: 4px; }
+.sc-files li a { color: var(--official); text-decoration: none; font-size: 12.5px; line-height: 1.4; }
+.sc-files li a:hover { text-decoration: underline; }
+.sc-sources { margin-top: 10px; }
+.sc-sources li { display: flex; align-items: baseline; gap: 8px; font-size: 12px; line-height: 1.4; }
+.sc-sources a { color: var(--accent); text-decoration: none; }
+.sc-sources a:hover { text-decoration: underline; }
+.sc-actions { margin-top: 12px; }
+.moon-map { margin: 0 0 14px; }
+.moon-frame { position: relative; width: min(100%, 460px); aspect-ratio: 1; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--glass-border); }
+.moon-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.moon-pin { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid #fff; background: rgba(0, 212, 255, 0.9); color: #001018; font: 700 11px var(--font-mono); cursor: pointer; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 12px var(--accent-glow); }
+.moon-pin:hover { background: #fff; }
+.moon-dot { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 8px var(--accent-glow); pointer-events: none; }
+.moon-map figcaption { margin: 6px auto 0; max-width: 460px; font-size: 10.5px; line-height: 1.45; color: var(--text-dim); text-align: center; }
+html[data-text-dir='rtl'] .space-card :is(p, h3, .sc-where, .sc-files li, .sc-sources li) { unicode-bidi: plaintext; text-align: start; }
+@media (prefers-reduced-motion: reduce) { .space-card.flash { animation: none; border-color: var(--accent); } }

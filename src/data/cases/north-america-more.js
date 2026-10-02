@@ -106,7 +106,10 @@ export default [
       bluebookPdf('1951-02-7006481-49-50N50-03W-Atlantic-', 'Blue Book record card, 10 February 1951'),
     ],
     bluebook: ['1951-02-7006481-49-50N50-03W-Atlantic-'],
-    sources: [],
+    sources: [
+      link('NICAP — Navy R5D, Newfoundland (case index)', 'http://www.nicap.org/casework/2014indexes/jan-mar/510210newfoundland_dir.htm', 'analysis'),
+      link('UFOs at close sight — Bethune\'s Flight 124 near-miss, 1951', 'http://ufologie.patrickgross.org/htm/bethune51.htm', 'analysis'),
+    ],
   },
   {
     id: 'fort-monmouth-1951',
@@ -163,7 +166,9 @@ export default [
       bluebookPdf('1951-09-7010207-Monmouth-NewJersey', 'Blue Book record card: ground radar and visual, 10–11 September 1951'),
     ],
     bluebook: ['1951-09-7010207-Monmouth-NewJersey'],
-    sources: [],
+    sources: [
+      link('NICAP — The Fort Monmouth incident, 10 September 1951', 'http://www.nicap.org/reports/monmouth.htm', 'analysis'),
+    ],
   },
   {
     id: 'flatwoods-1952',
@@ -400,7 +405,9 @@ export default [
       bluebookPdf('1957-11-7228923-WhiteSands-NewMexico', 'Blue Book record card, 3 November 1957'),
     ],
     bluebook: ['1957-11-7228923-WhiteSands-NewMexico'],
-    sources: [],
+    sources: [
+      link('NICAP — White Sands, 3 November 1957 (case index)', 'http://www.nicap.org/571103whitesands_dir.htm', 'analysis'),
+    ],
   },
   {
     id: 'red-bluff-1960',
@@ -431,7 +438,10 @@ export default [
     tracks: [],
     media: [commons('Carson(reconstitution).png', 'Reconstruction of the object the officers described')],
     bluebook: ['1960-08-7821479-RedBluffArea-California'],
-    sources: [],
+    sources: [
+      link('NICAP — Red Bluff, 13 August 1960', 'https://www.nicap.org/600813.htm', 'analysis'),
+      link('UFOs at close sight — the Red Bluff case, August 1960', 'https://ufologie.patrickgross.org/htm/clarb60.htm', 'analysis'),
+    ],
   },
   {
     id: 'hill-abduction-1961',
@@ -572,7 +582,10 @@ export default [
       bluebookPdf('1965-08-6978001-SantaAna-California-9654-', 'One of Rex Heflin’s Polaroids through the truck window, from the Blue Book photo file', 6),
     ],
     bluebook: ['1965-08-6978001-SantaAna-California-9654-', '1965-08-7461487-SantaAna-California'],
-    sources: [],
+    sources: [
+      link('Condon Report, case 52 — Santa Ana, California, photographs', 'https://files.ncas.org/condon/text/case52.htm', 'analysis'),
+      link('UFOs at close sight — the Rex Heflin photographs, 1965', 'https://ufologie.patrickgross.org/htm/heflin65.htm', 'analysis'),
+    ],
   },
   {
     id: 'michigan-swamp-gas-1966',
@@ -671,7 +684,10 @@ export default [
       bluebookPdf('1968-10-7170577-MinotAFB-NorthDakota', 'Blue Book record card and case file'),
     ],
     bluebook: ['1968-10-7170577-MinotAFB-NorthDakota', '1968-10-6981875-MinotAFB-NorthDakota-12548-'],
-    sources: [],
+    sources: [
+      link('A Narrative of UFO Events at Minot Air Force Base', 'https://minotb52ufo.sohp.us/narrative.php', 'analysis'),
+      link('Shough report on the Minot events (abstract)', 'https://minotb52ufo.com/shough/ms_sec1.php', 'analysis'),
+    ],
   },
   {
     id: 'langenburg-1974',
@@ -885,7 +901,10 @@ export default [
     ],
     tracks: [],
     media: [],
-    sources: [],
+    sources: [
+      link('Chicago Magazine — Do You Believe? (2007)', 'https://www.chicagomag.com/chicago-magazine/march-2007/do-you-believe/', 'reference'),
+      link('Patch — UFO researchers touch down in Tinley Park', 'https://patch.com/illinois/tinleypark/ufo-researchers-touch-down-in-tinley-park', 'reference'),
+    ],
   },
   {
     id: 'morristown-hoax-2009',

@@ -1019,7 +1019,10 @@ export default [
     tracks: [],
     wiki: null,
     media: [commons('Sept 1971 - Lake Cote UAP - Full Size RGB Drum Scan cropped levels.jpg', 'IGN survey frame (drum scan, cropped)')],
-    sources: [],
+    sources: [
+      link('NICAP — Costa Rica, 4 September 1971 (case index)', 'http://www.nicap.org/710904costarica_dir.htm', 'analysis'),
+      link('UFOs at close sight — the Lago de Cote photograph, 1971', 'https://ufologie.patrickgross.org/htm/decote.htm', 'analysis'),
+    ],
   },
   {
     id: 'colares-1977',

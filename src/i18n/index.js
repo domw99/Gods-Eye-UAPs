@@ -172,8 +172,13 @@ export async function setLanguage(code, { save = true } = {}) {
   return code;
 }
 
-/** Start in the saved language, else the browser's. */
+/** Start in the language named by ?lang=xx in the address (so a link can open in a chosen language), else the saved one, else the browser's. */
 export async function initLanguage() {
+  let asked = null;
+  try {
+    asked = new URLSearchParams(globalThis.location?.search || '').get('lang');
+  } catch {}
+  if (asked && LANGUAGES.some((l) => l.code === asked.toLowerCase())) return setLanguage(asked.toLowerCase());
   let saved = null;
   try {
     saved = localStorage.getItem(KEY);

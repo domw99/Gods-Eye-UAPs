@@ -32,6 +32,7 @@ import { shareLink } from './app/links.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
+import { openSpace } from './ui/space.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
@@ -96,7 +97,7 @@ let nuforc = null;
 let mufon = null; // { issues, records, byIssueId, cases, chapters }
 let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '485 issues', journals: 'APRO+', nuforc: '80k', satellites: 'live', launches: 'LL2', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 loadingStep('LOADING CASE FILES…', 45);
 try {
@@ -848,6 +849,9 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
 }
 
 function deselect({ keepHash = false } = {}) {
+  // Closing a case file from inside it hands the focus back to its row in the list.
+  const closed = state.selected;
+  const hadFocus = document.getElementById('dossier').contains(document.activeElement);
   selectToken++;
   setOrbitDay(null);
   nearPoint = null;
@@ -857,6 +861,7 @@ function deselect({ keepHash = false } = {}) {
   markSelected(null);
   itemLayer.setSelected(null);
   closeDossier();
+  if (hadFocus && closed) document.querySelector(`#case-list [data-key="${CSS.escape(closed)}"]`)?.focus({ preventScroll: true });
   trackLayer.clear();
   setSceneMoment(null);
   hidePlayback();
@@ -1845,6 +1850,20 @@ const openFiles = () =>
   );
 document.getElementById('btn-files').addEventListener('click', openFiles);
 document.getElementById('btn-stats').addEventListener('click', () => openStatsNow());
+/** Space & Moon: reports from orbit, from the Moon and from deep space. */
+function openSpaceNow(zone) {
+  hideHover();
+  openSpace({
+    base: BASE,
+    officialById,
+    zone,
+    onFly: ({ lat, lon }) => {
+      deselect();
+      viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 });
+    },
+  });
+}
+document.getElementById('btn-space').addEventListener('click', () => openSpaceNow());
 document.getElementById('btn-log').addEventListener('click', openLog);
 document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
 const openAboutModal = () =>
@@ -1963,6 +1982,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'r') resetView();
   else if (e.key.toLowerCase() === 'n') nearMe();
   else if (e.key.toLowerCase() === 's') openStatsNow();
+  else if (e.key.toLowerCase() === 'k') openSpaceNow();
   else if (e.key.toLowerCase() === 'c') setGrouping(!itemLayer.grouping);
   else if (e.key.toLowerCase() === 'o') setOrbit(!flycam.orbiting);
   else if (e.key.toLowerCase() === 'd') nextLighting();

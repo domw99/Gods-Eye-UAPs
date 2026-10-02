@@ -186,10 +186,19 @@ export function bindList({ onSelect }) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onSelect(li.dataset.key, 'list');
+      // From the keyboard, carry on in the case file instead of leaving the focus in the list.
+      const d = document.getElementById('dossier');
+      if (d && !d.classList.contains('hidden')) d.focus({ preventScroll: true });
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
       (e.key === 'ArrowDown' ? li.nextElementSibling : li.previousElementSibling)?.focus();
     }
+  });
+  document.getElementById('skip-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('left').classList.remove('collapsed');
+    document.body.classList.remove('left-collapsed');
+    search.focus();
   });
   document.getElementById('left-collapse').addEventListener('click', () => {
     const left = document.getElementById('left');

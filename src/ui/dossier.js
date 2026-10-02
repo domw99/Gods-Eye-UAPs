@@ -1,5 +1,7 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
 import { t, plural, locale } from '../i18n/index.js';
+import { CASES } from '../data/cases/index.js';
+import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
@@ -466,6 +468,16 @@ function starButton(key) {
   return html`<button class="chip star-btn ${on ? 'on' : ''}" data-action="star" data-key="${key}" aria-pressed="${on ? 'true' : 'false'}" title="${on ? 'Starred: click to remove it from your saved cases' : 'Save it to your starred cases (kept in this browser)'}">${on ? '★ STARRED' : '☆ STAR'}</button>`;
 }
 
+/** Up to four case files like this one (same kind of encounter, evidence, shape, country and era). */
+function similarBlock(c) {
+  const list = similarCases(c, CASES);
+  if (!list.length) return '';
+  return section(
+    'SIMILAR CASES',
+    html`<ul class="source-list">${list.map((d) => html`<li>${statusBadge(d.status)}<span><a href="#/case/${encodeURIComponent(d.id)}">${d.title}</a> · ${new Date(d.date).getUTCFullYear()} · ${d.place}</span></li>`)}</ul>`,
+  );
+}
+
 export function renderCase(item, ctx) {
   const c = item.ref;
   const token = open(c.id);
@@ -526,6 +538,7 @@ export function renderCase(item, ctx) {
     ${date.getUTCFullYear() <= 2011 ? section('RESEARCH ARCHIVES — APRO, NICAP, CUFOS', html`<div id="d-journals"><div class="loading-line">Searching the APRO, NICAP and CUFOS journals…</div></div>`) : ''}
     ${FRENCH.has(c.cc) ? section('FRENCH GOVERNMENT FILES — GEIPAN', html`<div id="d-geipan"><div class="loading-line">Searching GEIPAN’s case files…</div></div>`) : ''}
     ${c.wiki ? section('REFERENCE', html`<div id="d-wiki"><div class="loading-line">Loading Wikipedia…</div></div>`) : ''}
+    ${similarBlock(c)}
     ${section(
       'THE LOCATION',
       html`<div class="btn-row" style="margin:0 0 8px"><button class="chip" data-action="ground">⤓ FLY TO GROUND VIEW</button><button class="chip" data-action="share">⧉ COPY LINK</button><button class="chip" data-action="share-card">⇪ SHARE CARD</button></div>

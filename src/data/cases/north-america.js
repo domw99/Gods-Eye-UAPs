@@ -473,7 +473,10 @@ export default [
     wiki: null,
     media: [dvids(1023402, 'DOW-UAP-PR159 — digitised 16 mm Tremonton film (official release)')],
     bluebook: ['1952-07-7273984-Tremonton-Utah-1377-'],
-    sources: [],
+    sources: [
+      link('Condon Report, case 49 — Tremonton, Utah, movie film', 'https://files.ncas.org/condon/text/case49.htm', 'analysis'),
+      link('UFOs at close sight — the Tremonton colour film of 2 July 1952', 'https://ufologie.patrickgross.org/htm/tremonton.htm', 'analysis'),
+    ],
   },
   {
     id: 'washington-dc-1952',
@@ -1506,7 +1509,10 @@ export default [
       dvids(1023414, 'LLE-UAP-PR003 — officer’s video (official)'),
       dvids(1023416, 'LLE-UAP-PR004 — officer’s video (official)'),
     ],
-    sources: [],
+    sources: [
+      link('DVIDS — LLE-UAP-PR002, Unresolved UAP report, Colorado, October 2023', 'https://www.dvidshub.net/video/1023412/lle-uap-pr002-unresolved-uap-report-colorado-october-2023', 'official'),
+      link('Denver7 — New government UFO files include Colorado Springs sightings', 'https://www.denver7.com/news/local-news/new-government-ufo-files-include-colorado-springs-sightings', 'reference'),
+    ],
   },
   {
     id: 'tyndall-tic-tac-2024',
@@ -1533,7 +1539,9 @@ export default [
     tracks: [],
     wiki: null,
     media: [dvids(1007777, 'DOW-UAP-PR065 (official)'), dvids(1007778, 'DOW-UAP-PR066 (official)')],
-    sources: [],
+    sources: [
+      link('DVIDS — DOW-UAP-PR066, USCG C-144 Tyndall UAP 1, 24 April 2024', 'https://www.dvidshub.net/video/1007778/dow-uap-pr066-uscg-c-144-tyndall-uap-1-tic-tac-ir-hot-24-april-2024', 'official'),
+    ],
   },
   {
     id: 'shag-harbour-1967',

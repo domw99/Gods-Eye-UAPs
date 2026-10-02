@@ -237,6 +237,23 @@ test.describe('God’s Eye // UAP', () => {
     expect(errors).toEqual([]);
   });
 
+  test('?lang= opens the app in that language, and it is kept', async ({ page }) => {
+    await openApp(page, '/?lang=es');
+    await expect(page.locator('#btn-files')).toHaveText('ARCHIVOS');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+    await page.goto('/');
+    await expect(page.locator('#case-list .case-item').first()).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#btn-files')).toHaveText('ARCHIVOS');
+  });
+
+  test('a case file lists similar cases', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() => window.__uap.select('case:rendlesham-1980', 'list'));
+    const similar = page.locator('#dossier-body .d-section', { hasText: 'SIMILAR CASES' });
+    await expect(similar).toBeVisible();
+    expect(await similar.locator('li').count()).toBeGreaterThan(0);
+  });
+
   test('the sensor looks include Noir and Snow, on keys 6 and 7', async ({ page }) => {
     await openApp(page);
     await page.keyboard.press('6');

@@ -18,10 +18,22 @@ let lastFocus = null;
 // beneath, whole, so Back returns to it as it was.
 const stack = [];
 
+/**
+ * While a dialog is open the page behind it can be neither tabbed into nor read
+ * by a screen reader. The toast stays live so messages are still announced.
+ */
+function setBackgroundInert(on) {
+  for (const el of document.body.children) {
+    if (el.id === 'modal-root' || el.id === 'toast' || el.tagName === 'SCRIPT') continue;
+    el.toggleAttribute('inert', on);
+  }
+}
+
 /** Close every dialog. */
 export function closeModal() {
   stack.length = 0;
   mount(root(), html``);
+  setBackgroundInert(false);
   lastFocus?.focus?.();
 }
 
@@ -31,6 +43,10 @@ export function backModal() {
   if (!prev) return closeModal();
   root().replaceChildren(prev);
   prev.querySelector('.modal button, .modal input, .modal a')?.focus();
+}
+
+export function openModal(title, content, opts) {
+  return modal(title, content, opts);
 }
 
 function modal(title, content, { wide = true } = {}) {
@@ -54,6 +70,7 @@ function modal(title, content, { wide = true } = {}) {
     // In-app links (#/case/…, #/mufon/…) open a record behind the dialog, so close it.
     else if (e.target.closest('a[href^="#/"]')) closeModal();
   });
+  setBackgroundInert(true);
   backdrop.querySelector('.modal button, .modal input, .modal a')?.focus();
   return backdrop;
 }
@@ -251,11 +268,12 @@ export function openAbout(meta) {
       <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
       <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>
       <p><b style="color:#e6c37a">Earthquakes</b> — the last 24 hours from the USGS, sized by magnitude. Strong quakes are sometimes reported as booms or odd lights.</p>
+      <p><b style="color:#8fd3ff">Space &amp; Moon</b> — reports from beyond the atmosphere: what astronauts saw from orbit, what astronomers have seen on the Moon, and a few distant objects, each with its explanation and sources. The NASA files that were part of the 2026 PURSUE releases are linked from it. Press <b>K</b>.</p>
     </div>
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
-    <dl class="d-kv"><dt>1 – 7</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT, Noir, Snow</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>Y</dt><dd>Hide or show the years bar</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>&#96;</dt><dd>Show the frame rate</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
+    <dl class="d-kv"><dt>1 – 7</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT, Noir, Snow</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>K</dt><dd>Space and Moon: reports from orbit, the Moon and deep space</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>Y</dt><dd>Hide or show the years bar</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>&#96;</dt><dd>Show the frame rate</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Night-side city lights: NASA Black Marble (VIIRS, 2016 — today’s lights, not those of the case year). Stars: NASA Deep Star Maps 2020 (NASA/Goddard SVS; Hipparcos-2, Tycho-2, Gaia DR2). Map styles and place names: Esri. Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p>
@@ -343,6 +361,7 @@ export function openLightbox({ lightbox, caption, credit, href }) {
   lb.addEventListener('click', (e) => {
     if (e.target === lb || e.target.closest('button[data-close]')) closeModal();
   });
+  setBackgroundInert(true);
   lb.querySelector('button').focus();
 }
 
