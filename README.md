@@ -476,7 +476,7 @@ It then appears on the globe.
 
 `ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
-The build writes a page per case (`case/<id>/`) and a `sitemap.xml`. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build. For IndexNow, replace `public/<key>.txt` with your own key.
+The build writes a page per case (`case/<id>/`) and a `sitemap.xml`. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 
 ## Contributing
 

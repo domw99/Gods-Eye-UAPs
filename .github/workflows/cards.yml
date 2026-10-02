@@ -1,0 +1,57 @@
+name: Share cards
+
+# Draw case share cards (public/cards/<id>.jpg) in a browser with full network
+# access, so the satellite imagery behind each card loads, and commit them to
+# the branch this runs on. Name case ids to redraw those cards; leave the list
+# empty to draw only the cases that have no card yet. Run it from the Actions
+# tab after adding cases.
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: Case ids separated by spaces (empty = only cases without a card)
+        required: false
+        default: ''
+      lighting:
+        description: Lighting for the cards (off shows the ground for night cases too)
+        required: false
+        default: 'off'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cards-${{ github.ref }}
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Draw the cards
+        env:
+          IDS: ${{ inputs.ids }}
+          CARD_LIGHTING: ${{ inputs.lighting }}
+        run: |
+          [[ "$IDS" =~ ^[a-z0-9\ -]*$ ]] || { echo "Case ids are lower-case letters, digits and hyphens"; exit 1; }
+          npx vite preview --port 4173 --strictPort &
+          for i in $(seq 60); do curl -sf http://localhost:4173/ > /dev/null && break; sleep 1; done
+          node scripts/build-cards.mjs http://localhost:4173/ $IDS
+      - name: Commit the cards
+        env:
+          IDS: ${{ inputs.ids }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/cards
+          if git diff --cached --quiet; then echo "No cards changed."; exit 0; fi
+          git commit -q -m "Share cards with map imagery${IDS:+: $IDS}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
