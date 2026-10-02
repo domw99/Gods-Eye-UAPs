@@ -13,6 +13,7 @@ import { link } from './cases/helpers.js';
  *   when   the date as it is shown
  *   moon   [{ lat, lon, label }] selenographic positions (east longitudes
  *          positive), drawn on the near-side map
+ *   moonFar  the same, for places past the limb: only the Moon map shows them
  *   earth  { lat, lon, note } where the spacecraft was, for a fly-to on the globe
  *   official  DVIDS ids of the NASA files in the 2026 PURSUE releases; they open
  *          in the app like any other official record
@@ -163,6 +164,7 @@ export const SPACE = [
     explanation:
       'More recent studies reject that: an impact that made a 22-km crater would have caused a week-long meteor storm on Earth, and no record of one exists. Some scholars suspect the monks saw a meteor exploding in the atmosphere, by chance in line with the Moon.',
     moon: [],
+    moonFar: [{ lat: 35.9, lon: 102.8, label: 'Giordano Bruno (proposed)' }],
     sources: [
       link('Wikipedia — Transient lunar phenomenon', 'https://en.wikipedia.org/wiki/Transient_lunar_phenomenon'),
       link('Wikipedia — Giordano Bruno (crater)', 'https://en.wikipedia.org/wiki/Giordano_Bruno_(crater)'),

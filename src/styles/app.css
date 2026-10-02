@@ -851,7 +851,7 @@ html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .muf
 .sc-sources li { display: flex; align-items: baseline; gap: 8px; font-size: 12px; line-height: 1.4; }
 .sc-sources a { color: var(--accent); text-decoration: none; }
 .sc-sources a:hover { text-decoration: underline; }
-.sc-actions { margin-top: 12px; }
+.sc-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .sc-actions .chip { white-space: normal; text-align: start; line-height: 1.4; }
 .modal .chip { white-space: normal; }
 .moon-map { margin: 0 0 14px; }
@@ -863,3 +863,63 @@ html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .muf
 .moon-map figcaption { margin: 6px auto 0; max-width: 460px; font-size: 10.5px; line-height: 1.45; color: var(--text-dim); text-align: center; }
 html[data-text-dir='rtl'] .space-card :is(p, h3, .sc-where, .sc-files li, .sc-sources li) { unicode-bidi: plaintext; text-align: start; }
 @media (prefers-reduced-motion: reduce) { .space-card.flash { animation: none; border-color: var(--accent); } }
+
+/* ── Moon map: a full-screen globe of the Moon ── */
+.moon-launch { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 12px; }
+.moon-launch .dim { font-size: 11.5px; line-height: 1.45; flex: 1 1 220px; }
+.moon-view { position: fixed; inset: 0; z-index: 35; background: #020306; color: var(--text-primary); }
+.moon-globe { position: absolute; top: 0; bottom: 0; right: 0; left: calc(var(--sal) + 360px); overflow: hidden; }
+.moon-globe:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.moon-globe .cesium-viewer, .moon-globe .cesium-viewer-cesiumWidgetContainer, .moon-globe .cesium-widget { position: absolute; inset: 0; width: 100%; height: 100%; }
+.moon-globe .cesium-widget canvas { width: 100%; height: 100%; outline: none; }
+.moon-top { position: absolute; z-index: 3; top: calc(10px + var(--sat)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); display: flex; align-items: center; gap: 10px 14px; padding: 8px 12px; border-radius: var(--panel-radius); }
+.moon-heading { display: grid; line-height: 1.25; min-width: 0; }
+.moon-heading b { font: 600 12px var(--font-mono); letter-spacing: 0.22em; color: var(--accent); }
+.moon-heading span { font-size: 10px; letter-spacing: 0.14em; }
+.moon-tools { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.moon-styles { display: flex; gap: 4px; }
+.moon-panel { position: absolute; z-index: 2; left: calc(10px + var(--sal)); top: calc(var(--sat) + 72px); bottom: calc(10px + var(--sab)); width: min(340px, calc(100% - 20px)); display: flex; flex-direction: column; border-radius: var(--panel-radius); overflow: hidden; }
+.moon-panel .panel-body { overflow-y: auto; padding: 10px 12px 14px; min-height: 0; flex: 1; }
+.moon-fold { display: none; }
+.moon-search { width: 100%; padding: 8px 10px; margin-bottom: 4px; }
+.moon-search[hidden], #moon-list[hidden], #moon-detail[hidden] { display: none; }
+.moon-group h3 { margin: 14px 0 5px; font: 600 10px var(--font-mono); letter-spacing: 0.14em; color: var(--accent); }
+.moon-group ul { list-style: none; display: grid; gap: 1px; }
+.moon-item { display: flex; align-items: flex-start; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 8px; text-align: start; }
+.moon-item:hover, .moon-item:focus-visible { background: var(--accent-dim); }
+.moon-item .sc-num { margin-top: 1px; }
+.mi-text { display: grid; min-width: 0; flex: 1; }
+.mi-name { font-size: 12.5px; font-weight: 500; line-height: 1.35; }
+.mi-note { font-size: 11px; line-height: 1.35; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.moon-none { margin-top: 14px; line-height: 1.5; }
+.moon-detail { display: grid; gap: 8px; min-width: 0; }
+.moon-detail h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.moon-detail p { font-size: 13px; line-height: 1.55; color: rgba(232, 234, 237, 0.88); }
+.moon-detail .space-list { list-style: none; display: grid; gap: 10px; }
+.moon-detail .space-card { padding: 0; border: 0; background: none; }
+.moon-detail .chip.small { justify-self: start; }
+.moon-hud { position: absolute; z-index: 2; right: calc(16px + var(--sar)); bottom: calc(50px + var(--sab)); display: flex; gap: 0; font-size: 10.5px; letter-spacing: 0.06em; color: var(--text-primary); text-shadow: 0 1px 2px #000; pointer-events: none; }
+.moon-zoom { position: absolute; z-index: 2; right: calc(16px + var(--sar)); top: 50%; transform: translateY(-50%); display: grid; width: 46px; padding: 3px; border-radius: 12px; }
+.moon-zoom .icon-btn { width: 40px; height: 40px; font-size: 20px; }
+.moon-credit { position: absolute; z-index: 2; right: calc(14px + var(--sar)); bottom: calc(6px + var(--sab)); max-width: calc(100% - 400px); display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-size: 10px; line-height: 1.4; text-align: end; color: var(--text-secondary); text-shadow: 0 1px 2px #000; }
+.moon-credit .cesium-widget-credits { position: static; display: block; padding: 0; }
+.moon-credit .cesium-credit-textContainer, .moon-credit .cesium-credit-logoContainer { display: inline; }
+.moon-credit a { color: var(--text-secondary); }
+.moon-credit img { vertical-align: middle; max-height: 14px; }
+body.moon-open { overflow: hidden; }
+@media (max-width: 720px) {
+  .moon-top { flex-wrap: wrap; padding: 8px 10px; }
+  .moon-tools { margin-left: 0; width: 100%; }
+  .moon-panel { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); top: auto; bottom: calc(8px + var(--sab)); width: auto; max-height: 46vh; }
+  .moon-globe { left: 0; top: 92px; bottom: 46vh; }
+  .moon-view.folded .moon-globe { bottom: 52px; }
+  .moon-panel.collapsed { max-height: none; }
+  .moon-panel.collapsed .panel-body { display: none; }
+  .moon-fold { display: grid; }
+  .moon-hud { display: none; }
+  .moon-zoom { top: 150px; transform: none; }
+  .moon-credit { bottom: calc(46vh + 6px + var(--sab)); max-width: calc(100% - 24px); }
+  .moon-view.folded .moon-credit { bottom: calc(56px + var(--sab)); }
+}
+html[data-text-dir='rtl'] :is(.moon-item .mi-name, .moon-item .mi-note, .moon-detail :is(p, h3, .sc-where)) { unicode-bidi: plaintext; text-align: start; }
+#moon-credit-text { unicode-bidi: plaintext; }

@@ -229,7 +229,24 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 - **Deep space (4):** the "Face on Mars", the "Wow!" signal, 'Oumuamua and 3I/ATLAS.
 - **NASA's own files are linked.** The NASA documents and recordings in the 2026 PURSUE releases (the Mercury flights, the Apollo 12, 14, 16 and 17 debriefings, Cooper's 1962 interview) are listed with the reports they bear on, and open in the app like the other official records.
 
-The pins are placed by a mapping fitted to known craters on the photograph (Gregory H. Revera, CC BY-SA 3.0), so they are accurate to about a degree.
+The pins are placed by a mapping fitted to known craters on the photograph (Gregory H. Revera, CC BY-SA 3.0), so they are accurate to about a degree. Every report has its own link (`#/space/<id>`), and **⧉ COPY LINK** on a card copies it.
+
+#### The Moon map: a globe of the Moon, like the Earth one
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/moon-map.jpg" alt="The Moon map: the whole Moon on a globe with the seas and craters named, the landing sites as green diamonds and the lunar reports as numbered pins, beside a searchable list of places" width="100%" /></td>
+<td width="50%"><img src="docs/media/moon-map-close.jpg" alt="The Moon map zoomed to the Taurus-Littrow valley, 120 km up, with the Apollo 17 landing site marked" width="100%" /></td>
+</tr>
+</table>
+
+Open it from the **MOON MAP** button in the top bar, with <kbd>U</kbd>, from the Moon tab of Space & Moon, or with a link: `#/moon`, or `#/moon/<place or report>` such as `#/moon/apollo-17` or `#/moon/tycho`.
+
+- **A real globe.** Drag to turn it, scroll or pinch to zoom, from the whole Moon down to about a kilometre above the surface. It is drawn on the Moon's own ellipsoid (radius 1,737.4 km) with the **Lunar Reconnaissance Orbiter Camera** global mosaic from NASA Moon Trek, 100 metres to the pixel. **RELIEF** lays the laser altimeter's colour-coded heights over it. If NASA's tiles can't be reached, a 2,048-pixel copy of the mosaic that ships with the app keeps the Moon turning.
+- **Names and landing sites.** 89 named seas, basins, craters, mountains and valleys, labelled as you zoom in (**NAMES** or <kbd>N</kbd> hides them), and 25 landing and impact sites from Luna 2 (1959) through Apollo 11 to 17, Chang'e 3 to 6, Chandrayaan-3, SLIM and IM-1, each with its date and what it did.
+- **The lunar reports as pins.** The same six reports as in Space & Moon, numbered the same way, including the far-side one the photograph can't show (Giordano Bruno, for Gervase of Canterbury). Click a pin, or a row in the list, to fly there and read the report, its explanation, its NASA files and its sources.
+- **Search** the list by name, English name ("Sea of Tranquility"), mission or year. Arrow keys turn the Moon, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> resets, <kbd>Esc</kbd> returns to the Earth. On a phone the list is a sheet at the bottom that folds away.
+- It opens over the Earth, which stops drawing meanwhile, and its video memory goes back when you close it. **← EARTH**, Esc and Back all return.
 
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
@@ -298,7 +315,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
-| <kbd>K</kbd> | Space & Moon | | |
+| <kbd>K</kbd> | Space & Moon | <kbd>U</kbd> | The Moon map (in it: arrows turn, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> reset, <kbd>N</kbd> names) |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
@@ -363,6 +380,7 @@ flowchart LR
 | Sky, weather, launches, airspace, GEIPAN classes, journal pages and full-text search, sighting-checker scoring | `src/services/*.js` |
 | Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards, Space & Moon | `src/ui/*.js` |
 | Space & Moon entries and the Moon picture; "similar cases" ranking | `src/data/space.js`, `public/space/`, `src/data/similar.js` |
+| The Moon map: places and landing sites, the globe on the Moon's ellipsoid, the panel | `src/data/moon.js`, `src/app/moonglobe.js`, `src/ui/moonview.js`, `public/space/moon-wac-2k.jpg` |
 
 <details>
 <summary><b>Project structure</b></summary>
@@ -485,6 +503,7 @@ Corrections and new cases are welcome, especially with sources.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
   - Research archives: the *APRO Bulletin* (Aerial Phenomena Research Organization) and MUFON chapter newsletters as scanned by the [Archives for the Unexplained](https://archive.org/details/ufonewsletters); NICAP's *U.F.O. Investigator* from the Internet Archive's Serials in Microfilm; CUFOS's *International UFO Reporter* from the Internet Archive. Only places, page numbers, short quotes and a word index are stored; the pages are read from the Internet Archive.
   - Space & Moon: NASA's UAP-related documents from the 2026 PURSUE releases (DVIDS, public domain), the NASA Apollo Lunar Surface Journal and technical debriefings, NASA Science and the Scientific Visualization Studio, ESA, and the sources named in each entry. The Moon photograph is by Gregory H. Revera ([CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg)), cropped and resized.
+  - The Moon map: imagery from the Lunar Reconnaissance Orbiter Camera (NASA/GSFC/Arizona State University) and the Lunar Orbiter Laser Altimeter (NASA/GSFC/MIT), served as tiles by [NASA Moon Trek](https://trek.nasa.gov/moon/); the copy that ships with the app is the same mosaic at zoom level 2. Feature positions follow the IAU Gazetteer of Planetary Nomenclature, and landing sites NASA's LRO team and the missions' own pages.
   - Night lights: NASA Earth Observatory Black Marble (VIIRS, 2016), served by NASA GIBS.
   - Stars behind the globe: [NASA Deep Star Maps 2020](https://svs.gsfc.nasa.gov/4851) (NASA/Goddard Scientific Visualization Studio; Hipparcos-2, Tycho-2 and Gaia DR2 stars), made into a sky box by `scripts/build-skybox.py`.
   - Dark, Streets and Topographic maps and the place names overlay: Esri (keyless services, attribution shown in the app).

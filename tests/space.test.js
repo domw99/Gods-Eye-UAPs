@@ -41,7 +41,15 @@ describe('Space & Moon entries', () => {
           expect(m.label).toBeTruthy();
           expect(moonXY(m.lat, m.lon), `${m.label} is on the near side`).not.toBeNull();
         }
-        if (e.zone !== 'moon') expect(e.moon).toBeUndefined();
+        for (const m of e.moonFar || []) {
+          expect(Math.abs(m.lat)).toBeLessThanOrEqual(90);
+          expect(m.label).toBeTruthy();
+          expect(moonXY(m.lat, m.lon), `${m.label} is past the limb`).toBeNull();
+        }
+        if (e.zone !== 'moon') {
+          expect(e.moon).toBeUndefined();
+          expect(e.moonFar).toBeUndefined();
+        }
       });
     });
   }

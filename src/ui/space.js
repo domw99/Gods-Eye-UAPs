@@ -1,7 +1,8 @@
-import { html, safeUrl } from '../util/dom.js';
+import { html, safeUrl, toast } from '../util/dom.js';
 import { t } from '../i18n/index.js';
 import { STATUS } from '../data/taxonomy.js';
 import { SPACE, SPACE_ZONES, NASA_UAP_URL } from '../data/space.js';
+import { moonReports } from '../data/moon.js';
 import { openModal, closeModal } from './modals.js';
 
 /**
@@ -33,9 +34,13 @@ export function moonXY(lat, lon) {
   return { x: 0.5 + MOON_RADIUS * w[0], y: 0.5 - MOON_RADIUS * w[1] };
 }
 
+/** The link to one report: the app opens Space & Moon on it. */
+export const spaceLink = (id) => `${location.origin}${location.pathname}#/space/${id}`;
+
 const statusBadge = (s) => html`<span class="badge status-${s}">${t(STATUS[s]?.label || s)}</span>`;
 
-function card(e, { officialById, number }) {
+/** One report as a card: what was reported, what is known, the NASA files and the sources. */
+export function spaceCard(e, { officialById, number }) {
   const files = (e.official || []).map((id) => officialById.get(String(id))).filter(Boolean); // the releases key their records by DVIDS id as text
   return html`<li class="space-card" id="sp-${e.id}" data-id="${e.id}">
     <div class="sc-head">${number ? html`<span class="sc-num" aria-hidden="true">${number}</span>` : ''}${statusBadge(e.status)}<span class="sc-when mono">${e.when}</span></div>
@@ -47,21 +52,18 @@ function card(e, { officialById, number }) {
       ? html`<div class="sc-files"><b>${t('NASA FILES IN THE OFFICIAL RELEASES')}</b><ul>${files.map((f) => html`<li><a href="#/official/${f.dvidsId}">${f.title}</a></li>`)}</ul></div>`
       : ''}
     <ul class="sc-sources">${e.sources.map((s) => html`<li><span class="badge">${(s.kind || 'ref').toUpperCase()}</span><a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${s.label}</a></li>`)}</ul>
-    ${e.earth ? html`<div class="sc-actions"><button type="button" class="chip" data-fly="${e.id}">${t('SHOW ON THE GLOBE')} · ${e.earth.note}</button></div>` : ''}
+    <div class="sc-actions">${e.earth ? html`<button type="button" class="chip" data-fly="${e.id}">${t('SHOW ON THE GLOBE')} · ${e.earth.note}</button>` : ''}<button type="button" class="chip" data-copy="${e.id}">${t('⧉ COPY LINK')}</button></div>
   </li>`;
 }
 
-function moonMap(entries, base) {
-  let n = 0;
+function moonMap(base) {
   const pins = [];
   const numbers = new Map();
-  for (const e of entries) {
-    if (!e.moon?.length) continue;
-    n += 1;
-    numbers.set(e.id, n);
-    for (const site of e.moon) {
+  for (const { n, entry, sites } of moonReports()) {
+    numbers.set(entry.id, n);
+    for (const site of sites) {
       const at = moonXY(site.lat, site.lon);
-      if (at) pins.push({ ...at, n, id: e.id, label: site.label, title: e.title });
+      if (at) pins.push({ ...at, n, id: entry.id, label: site.label, title: entry.title });
     }
   }
   // Reports at the same place (Aristarchus has three) would hide each other, so
@@ -76,13 +78,14 @@ function moonMap(entries, base) {
     g.map((p, i) => ({ ...p, dx: g.length > 1 ? Math.round((i - (g.length - 1) / 2) * 25) : 0, dy: g.length > 1 ? -22 : 0, grouped: g.length > 1 })),
   );
   const pct = (v) => `${(v * 100).toFixed(2)}%`;
+  const hidden = moonReports().some((r) => !pins.some((p) => p.id === r.entry.id));
   const map = html`<figure class="moon-map">
     <div class="moon-frame">
       <img src="${base}space/moon-near-side.jpg" alt="${t('The near side of the Moon, with the sites of these reports marked')}" width="880" height="880" />
       ${groups.filter((g) => g.length > 1).map((g) => html`<span class="moon-dot" style="left:${pct(g[0].x)};top:${pct(g[0].y)}" aria-hidden="true"></span>`)}
       ${placed.map((p) => html`<button type="button" class="moon-pin" data-pin="${p.id}" style="left:${pct(p.x)};top:${pct(p.y)};transform:translate(${p.dx}px,${p.dy}px)" aria-label="${p.n}. ${p.title} — ${p.label}" title="${p.label}">${p.n}</button>`)}
     </div>
-    <figcaption>${t('Near side, north up, east to the right. Positions are approximate (within about a degree). Photograph: Gregory H. Revera, CC BY-SA 3.0, via Wikimedia Commons.')}</figcaption>
+    <figcaption>${t('Near side, north up, east to the right. Positions are approximate (within about a degree). Photograph: Gregory H. Revera, CC BY-SA 3.0, via Wikimedia Commons.')}${hidden ? html`<br />${t('A report with a number but no pin here took place on the far side; the Moon map shows it.')}` : ''}</figcaption>
   </figure>`;
   return { map, numbers };
 }
@@ -92,12 +95,14 @@ function moonMap(entries, base) {
  * @param {string} o.base         the app's base URL, for the Moon picture
  * @param {Map}    o.officialById official releases by DVIDS id
  * @param {(earth: {lat: number, lon: number}) => void} o.onFly  fly the globe to a place
- * @param {string} [o.zone]       the tab to open on
+ * @param {() => void} [o.onMoonGlobe]  open the interactive Moon map (adds a button to the Moon tab)
+ * @param {string} [o.focus]      a tab ('orbit', 'moon', 'deep') or the id of one report, which is
+ *                                opened on its tab, scrolled to and highlighted
  */
-export function openSpace({ base, officialById, onFly, zone = 'orbit' }) {
-  const tab = SPACE_ZONES.includes(zone) ? zone : 'orbit';
-  const moonEntries = SPACE.filter((e) => e.zone === 'moon').sort((a, b) => a.year - b.year);
-  const { map, numbers } = moonMap(moonEntries, base);
+export function openSpace({ base, officialById, onFly, onMoonGlobe, focus }) {
+  const entry = SPACE.find((e) => e.id === focus);
+  const tab = entry ? entry.zone : SPACE_ZONES.includes(focus) ? focus : 'orbit';
+  const { map, numbers } = moonMap(base);
   const lists = Object.fromEntries(
     SPACE_ZONES.map((z) => [z, SPACE.filter((e) => e.zone === z).sort((a, b) => a.year - b.year)]),
   );
@@ -111,8 +116,11 @@ export function openSpace({ base, officialById, onFly, zone = 'orbit' }) {
     </div>
     ${SPACE_ZONES.map(
       (z) => html`<section class="space-panel" id="space-panel-${z}" role="tabpanel" aria-labelledby="space-tab-${z}" ${z === tab ? '' : 'hidden'}>
+        ${z === 'moon' && onMoonGlobe
+          ? html`<div class="moon-launch"><button type="button" class="chip on" data-moon-globe>⌖ ${t('OPEN THE INTERACTIVE MOON MAP')}</button><span class="muted">${t('Turn the Moon, zoom in to the craters and landing sites, and tap the pins.')}</span></div>`
+          : ''}
         ${z === 'moon' ? map : ''}
-        <ol class="space-list">${lists[z].map((e) => card(e, { officialById, number: numbers.get(e.id) }))}</ol>
+        <ol class="space-list">${lists[z].map((e) => spaceCard(e, { officialById, number: numbers.get(e.id) }))}</ol>
       </section>`,
     )}
     <p class="caveat">${t('NASA’s own look at the subject is at')} <a href="${NASA_UAP_URL}" target="_blank" rel="noopener">science.nasa.gov/uap</a>. ${t('The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.')}</p>`;
@@ -128,16 +136,32 @@ export function openSpace({ base, officialById, onFly, zone = 'orbit' }) {
     }
     for (const p of el.querySelectorAll('.space-panel')) p.hidden = p.id !== `space-panel-${z}`;
   };
+  const reveal = (id) => {
+    const target = el.querySelector(`#sp-${CSS.escape(id)}`);
+    target?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    target?.classList.remove('flash');
+    void target?.offsetWidth;
+    target?.classList.add('flash');
+  };
   el.addEventListener('click', (e) => {
     const tabBtn = e.target.closest('[role="tab"]');
     if (tabBtn) return show(tabBtn.dataset.zone);
     const pin = e.target.closest('[data-pin]');
-    if (pin) {
-      const target = el.querySelector(`#sp-${CSS.escape(pin.dataset.pin)}`);
-      target?.scrollIntoView({ block: 'center', behavior: 'auto' });
-      target?.classList.remove('flash');
-      void target?.offsetWidth;
-      target?.classList.add('flash');
+    if (pin) return reveal(pin.dataset.pin);
+    if (e.target.closest('[data-moon-globe]')) {
+      closeModal();
+      onMoonGlobe?.();
+      return;
+    }
+    const copy = e.target.closest('[data-copy]');
+    if (copy) {
+      // Clipboard access needs a secure context; fall back to showing the link.
+      const url = spaceLink(copy.dataset.copy);
+      if (!navigator.clipboard?.writeText) return toast(url, 6000);
+      navigator.clipboard.writeText(url).then(
+        () => toast('Link copied'),
+        () => toast(url, 6000),
+      );
       return;
     }
     const fly = e.target.closest('[data-fly]');
@@ -149,6 +173,7 @@ export function openSpace({ base, officialById, onFly, zone = 'orbit' }) {
       }
     }
   });
+  if (entry) reveal(entry.id);
   el.addEventListener('keydown', (e) => {
     const tabBtn = e.target.closest?.('[role="tab"]');
     if (!tabBtn || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;

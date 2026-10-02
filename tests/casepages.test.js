@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { casePage, sitemap, caseDate, clip, esc } from '../scripts/lib/case-pages.mjs';
-import { shareableUrl } from '../src/app/links.js';
+import { shareableUrl, decodeHashPart } from '../src/app/links.js';
 import { CASES } from '../src/data/cases/index.js';
 
 const SITE = 'https://example.github.io/app/';
@@ -55,5 +55,18 @@ describe('share links', () => {
     for (const href of ['https://x.github.io/app/#/bluebook/123', 'https://x.github.io/app/#/case/nimitz-2004/cam/1,2', 'https://x.github.io/app/'])
       expect(shareableUrl(href, '/app/')).toBe(href);
     expect(shareableUrl('http://localhost:5173/#/case/a', null)).toBe('http://localhost:5173/#/case/a');
+  });
+});
+
+describe('reading a #/… link', () => {
+  it('decodes escaped characters', () => {
+    expect(decodeHashPart('roswell-1947')).toBe('roswell-1947');
+    expect(decodeHashPart('Ca%C3%B1ada%20test')).toBe('Cañada test');
+  });
+
+  it('keeps a part it cannot decode instead of throwing', () => {
+    expect(decodeHashPart('%')).toBe('%');
+    expect(decodeHashPart('%E0%A4%A')).toBe('%E0%A4%A');
+    expect(decodeHashPart('100%')).toBe('100%');
   });
 });

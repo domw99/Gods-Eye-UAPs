@@ -14,3 +14,12 @@ export function shareableUrl(href, base) {
 
 /** The share link for the running app. */
 export const shareLink = (href = location.href) => shareableUrl(href, import.meta.env.DEV ? null : import.meta.env.BASE_URL);
+
+/** Decode one part of a #/… link. A stray % in a typed or cut-off link would otherwise throw. */
+export function decodeHashPart(part) {
+  try {
+    return decodeURIComponent(part);
+  } catch {
+    return part;
+  }
+}

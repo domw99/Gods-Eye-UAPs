@@ -28,11 +28,12 @@ import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } f
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
-import { shareLink } from './app/links.js';
+import { shareLink, decodeHashPart } from './app/links.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
+import { openMoon, closeMoon, isMoonOpen, moonGlobe } from './ui/moonview.js';
 import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
@@ -892,18 +893,18 @@ function updateBackButton() {
 function routeFromHash() {
   const near = location.hash.match(/^#\/near\/(-?[\d.]+),(-?[\d.]+)(?:\/(.+))?$/);
   if (near) {
-    showNearby(+near[1], +near[2], near[3] ? decodeURIComponent(near[3]) : `${(+near[1]).toFixed(2)}, ${(+near[2]).toFixed(2)}`);
+    showNearby(+near[1], +near[2], near[3] ? decodeHashPart(near[3]) : `${(+near[1]).toFixed(2)}, ${(+near[2]).toFixed(2)}`);
     return true;
   }
   const mj = location.hash.match(/^#\/(mufon|journal)\/([^/]+)\/(\d+)$/);
   if (mj) {
-    (mj[1] === 'mufon' ? selectMufonPage : selectJournalPage)(decodeURIComponent(mj[2]), +mj[3]);
+    (mj[1] === 'mufon' ? selectMufonPage : selectJournalPage)(decodeHashPart(mj[2]), +mj[3]);
     return true;
   }
   const m = location.hash.match(/^#\/(case|official|user|bluebook|geipan)\/(.+)$/);
   if (!m) return false;
   const [, kind, raw] = m;
-  const id = decodeURIComponent(raw);
+  const id = decodeHashPart(raw);
   if (kind === 'bluebook') selectBlueBook(id);
   else if (kind === 'geipan') selectGeipan(id);
   else if (!select(`${kind}:${id}`, 'hash')) {
@@ -912,13 +913,31 @@ function routeFromHash() {
   }
   return true;
 }
+// #/space and #/space/<report or tab>: the Space & Moon dialog, which isn't a record on the globe.
+const SPACE_ROUTE = /^#\/space(?:\/([\w-]+))?$/;
+function routeToSpace() {
+  const m = SPACE_ROUTE.exec(location.hash);
+  if (m) openSpaceNow(m[1]);
+  return Boolean(m);
+}
+// #/moon and #/moon/<place or report>: the Moon map.
+const MOON_ROUTE = /^#\/moon(?:\/([^/]+))?$/;
+function routeToMoon() {
+  const m = MOON_ROUTE.exec(location.hash);
+  if (m) openMoonNow(m[1] && decodeHashPart(m[1]));
+  return Boolean(m);
+}
 // Back / Forward, or a link to #/…: show that record (or close the dossier).
 window.addEventListener('popstate', (e) => {
   navDepth = e.state?.depth || 0;
   updateBackButton();
   routing = true;
   try {
-    if (!routeFromHash()) deselect();
+    if (isMoonOpen() && !MOON_ROUTE.test(location.hash)) closeMoon({ silent: true });
+    if (!routeFromHash()) {
+      deselect({ keepHash: SPACE_ROUTE.test(location.hash) || MOON_ROUTE.test(location.hash) });
+      if (!routeToMoon()) routeToSpace();
+    }
   } finally {
     routing = false;
   }
@@ -1421,7 +1440,7 @@ new ResizeObserver(([entry]) => {
 /* ── User sighting log ─────────────────────────────────── */
 function loadUserLog() {
   try {
-    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]').filter((u) => Number.isFinite(u.lat) && Number.isFinite(u.lon));
+    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]').filter((u) => u && Number.isFinite(u.lat) && Number.isFinite(u.lon));
   } catch {
     return [];
   }
@@ -1748,7 +1767,7 @@ function closeWelcome() {
   } catch {}
 }
 // Returning visitors hear once about what changed since they were here.
-const RELEASE = '1.1';
+const RELEASE = '1.4';
 const RELEASE_KEY = 'gods-eye-uap:release';
 function maybeWelcome() {
   let seen = false;
@@ -1763,8 +1782,8 @@ function maybeWelcome() {
   else if (seen && release !== RELEASE)
     toast(
       matchMedia('(pointer: coarse)').matches
-        ? 'New: NASA star sky · map styles and day/night lighting under MAP · that day from orbit in case files'
-        : 'New: NASA star sky · map styles & lighting (MAP, D) · clean view (F) · orbit (O) · that day from orbit',
+        ? 'New: Moon map and Space & Moon in the top bar · 16 languages · 10 more cases · save it to your home screen'
+        : 'New: the Moon map (U) · Space & Moon (K) · 16 languages (top bar) · 10 more cases',
       7000,
     );
 }
@@ -1859,18 +1878,55 @@ const openFiles = () =>
 document.getElementById('btn-files').addEventListener('click', openFiles);
 document.getElementById('btn-stats').addEventListener('click', () => openStatsNow());
 /** Space & Moon: reports from orbit, from the Moon and from deep space. */
-function openSpaceNow(zone) {
+function openSpaceNow(focus) {
   hideHover();
   openSpace({
     base: BASE,
     officialById,
-    zone,
+    focus,
+    onMoonGlobe: () => openMoonNow(),
     onFly: ({ lat, lon }) => {
       deselect();
       viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 });
     },
   });
 }
+
+/**
+ * The Moon map: a full-screen globe of the Moon. The Earth globe stops
+ * drawing while it is open, and the address follows it (#/moon, #/moon/<id>)
+ * so Back closes it and a link opens it.
+ */
+let moonPushed = false; // this visit added a history entry for the map
+function openMoonNow(focus) {
+  if (isMoonOpen()) return void openMoon({ focus });
+  hideHover();
+  deselect({ keepHash: true });
+  viewer.useDefaultRenderLoop = false;
+  if (!MOON_ROUTE.test(location.hash)) {
+    setHash(`#/moon${focus ? `/${encodeURIComponent(focus)}` : ''}`);
+    moonPushed = true;
+  }
+  openMoon({
+    base: BASE,
+    officialById,
+    focus,
+    profile: deviceProfile(),
+    onRoute: (id) => history.replaceState(history.state, '', `${location.pathname}${location.search}#/moon${id ? `/${encodeURIComponent(id)}` : ''}`),
+    onFly: ({ lat, lon }) => viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 }),
+    onClose: () => {
+      viewer.useDefaultRenderLoop = true;
+      render.request();
+      // Leave the address as it was: step back over the entry the map added, or clear it.
+      if (MOON_ROUTE.test(location.hash)) {
+        if (moonPushed) history.back();
+        else history.replaceState(history.state, '', `${location.pathname}${location.search}`);
+      }
+      moonPushed = false;
+    },
+  });
+}
+document.getElementById('btn-moon').addEventListener('click', () => openMoonNow());
 document.getElementById('btn-space').addEventListener('click', () => openSpaceNow());
 document.getElementById('btn-log').addEventListener('click', openLog);
 document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
@@ -1947,6 +2003,7 @@ function neighbour(delta) {
 }
 
 window.addEventListener('keydown', (e) => {
+  if (isMoonOpen()) return; // the Moon map has its own keys
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return backModal();
@@ -1991,6 +2048,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'n') nearMe();
   else if (e.key.toLowerCase() === 's') openStatsNow();
   else if (e.key.toLowerCase() === 'k') openSpaceNow();
+  else if (e.key.toLowerCase() === 'u') openMoonNow();
   else if (e.key.toLowerCase() === 'c') setGrouping(!itemLayer.grouping);
   else if (e.key.toLowerCase() === 'o') setOrbit(!flycam.orbiting);
   else if (e.key.toLowerCase() === 'd') nextLighting();
@@ -2140,6 +2198,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     loadingStep(t('READY'), 100);
     setTimeout(() => {
       loading.classList.add('done');
+      if (!routeToMoon()) routeToSpace();
       maybeWelcome();
       // Compile the picking shaders while idle, so the first hover doesn't stall.
       const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
@@ -2166,7 +2225,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
+window.__uap = { viewer, moonGlobe, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
   // Used by scripts/build-cards.mjs to render the case pages' preview images.
   zoomer: () => zoomer,
   // Used by the demo and README capture scripts.
