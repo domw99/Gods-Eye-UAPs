@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Хребты, долины, борозды, разлом и завиток",
   "Relief": "Рельеф",
   "Heights from the laser altimeter, in colour": "Высоты по данным лазерного высотомера, в цвете",
+  "Switch between the Earth and the Moon": "Переключение между Землёй и Луной",
   "page|pages": {"one": "страница", "few": "страницы", "many": "страниц", "other": "страницы"},
 };

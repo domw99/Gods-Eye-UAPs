@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Ketens, dalen, groeven, een breuk en een werveling",
   "Relief": "Reliëf",
   "Heights from the laser altimeter, in colour": "Hoogtes van de laserhoogtemeter, in kleur",
+  "Switch between the Earth and the Moon": "Wisselen tussen de aarde en de Maan",
   "page|pages": {"one": "pagina", "other": "pagina’s"},
 };

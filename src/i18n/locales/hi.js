@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "पर्वतमालाएँ, घाटियाँ, खाँचे, एक भ्रंश और एक भँवर",
   "Relief": "उच्चावच",
   "Heights from the laser altimeter, in colour": "लेज़र ऊँचाईमापी से ऊँचाइयाँ, रंगों में",
+  "Switch between the Earth and the Moon": "पृथ्वी और चंद्रमा के बीच बदलें",
   "page|pages": {"one": "पृष्ठ", "other": "पृष्ठ"},
 };

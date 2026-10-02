@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "산맥, 계곡, 열구, 단층과 소용돌이",
   "Relief": "지형",
   "Heights from the laser altimeter, in colour": "레이저 고도계의 높이를 색으로 표시",
+  "Switch between the Earth and the Moon": "지구와 달 사이 전환",
   "page|pages": {"other": "페이지"},
 };

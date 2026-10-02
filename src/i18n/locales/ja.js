@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "山脈・谷・谷溝・断層・渦模様",
   "Relief": "起伏",
   "Heights from the laser altimeter, in colour": "レーザー高度計による高さを色で表示",
+  "Switch between the Earth and the Moon": "地球と月を切り替える",
   "page|pages": {"other": "ページ"},
 };

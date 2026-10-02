@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Pasma, doliny, bruzdy, uskok i wir",
   "Relief": "Rzeźba terenu",
   "Heights from the laser altimeter, in colour": "Wysokości z wysokościomierza laserowego, w kolorach",
+  "Switch between the Earth and the Moon": "Przełączaj między Ziemią a Księżycem",
   "page|pages": {"one": "strona", "few": "strony", "many": "stron", "other": "stron"},
 };

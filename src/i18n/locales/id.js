@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Pegunungan, lembah, alur, sesar, dan pusaran",
   "Relief": "Relief",
   "Heights from the laser altimeter, in colour": "Ketinggian dari altimeter laser, berwarna",
+  "Switch between the Earth and the Moon": "Beralih antara Bumi dan Bulan",
   "page|pages": {"other": "halaman"},
 };

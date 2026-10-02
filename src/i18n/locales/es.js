@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Cordilleras, valles, surcos, una falla y un remolino",
   "Relief": "Relieve",
   "Heights from the laser altimeter, in colour": "Alturas del altímetro láser, en color",
+  "Switch between the Earth and the Moon": "Cambiar entre la Tierra y la Luna",
   "page|pages": {"one": "página", "other": "páginas"},
 };

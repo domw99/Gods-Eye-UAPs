@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Sıradağlar, vadiler, oluklar, bir fay ve bir girdap",
   "Relief": "Yükseklik",
   "Heights from the laser altimeter, in colour": "Lazer altimetresinden yükseklikler, renkli",
+  "Switch between the Earth and the Moon": "Dünya ile Ay arasında geçiş yap",
   "page|pages": {"other": "sayfa"},
 };

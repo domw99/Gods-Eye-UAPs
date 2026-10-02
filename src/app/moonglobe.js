@@ -148,6 +148,10 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   // Cesium turns the shading off close to the ground (for the Earth's sake); on the Moon it stays at every height.
   scene.globe.lightingFadeOutDistance = 0;
   scene.globe.lightingFadeInDistance = 1;
+  // No air to scatter the light: the lit side is bright almost to the terminator, and the night side
+  // shows only by earthshine.
+  scene.globe.lambertDiffuseMultiplier = 2.6;
+  scene.globe.vertexShadowDarkness = 0.1;
   scene.globe.baseColor = Cesium.Color.fromCssColorString('#101114');
   scene.backgroundColor = Cesium.Color.fromCssColorString('#020306');
   scene.fog.enabled = false;

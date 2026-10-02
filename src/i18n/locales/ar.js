@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "سلاسل ووديان وأخاديد وصدع ودوامة",
   "Relief": "التضاريس",
   "Heights from the laser altimeter, in colour": "ارتفاعات من مقياس الارتفاع الليزري، بالألوان",
+  "Switch between the Earth and the Moon": "التبديل بين الأرض والقمر",
   "page|pages": {"zero": "صفحة", "one": "صفحة", "two": "صفحتان", "few": "صفحات", "many": "صفحة", "other": "صفحة"},
 };

@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "Gebirge, Täler, Rillen, eine Verwerfung und ein Wirbel",
   "Relief": "Relief",
   "Heights from the laser altimeter, in colour": "Höhen aus dem Laser-Höhenmesser, in Farbe",
+  "Switch between the Earth and the Moon": "Zwischen Erde und Mond wechseln",
   "page|pages": {"one": "Seite", "other": "Seiten"},
 };

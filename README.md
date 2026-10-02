@@ -21,7 +21,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 ---
 
-**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. and French files, search 22,000 pages of the MUFON, APRO, NICAP and CUFOS journals, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
+**God's Eye // UAP** puts every well-documented UFO/UAP encounter on a 3D globe. You can replay each one along a reconstructed flight path, read the official U.S. and French files, search 22,000 pages of the MUFON, APRO, NICAP and CUFOS journals, and watch the footage. You can also check the ordinary explanations yourself: what was in the sky, the weather, military airspace and rocket launches. Beside the Earth is the Moon (**EARTH | MOON** in the top bar), a globe of it in the same layout with its landing sites and the lunar reports. It is a UAP-only edition of Bilawal Sidhu's [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view).
 
 <div align="center">
 
@@ -220,7 +220,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 ### 🌙 Space & Moon
 
-<img src="docs/media/space-moon.jpg" alt="The Space & Moon section: the near side of the Moon with numbered pins for lunar transient phenomena beside the reports they mark, with the status and explanation of each" width="100%" />
+<img src="docs/media/space-moon.jpg" alt="The Space & Moon dialog on its Moon tab: the near side of the Moon with numbered pins for the lunar reports, the button that opens the Moon itself, and the first report with its status" width="100%" />
 
 **Space & Moon** (**SPACE & MOON** in the top bar, or <kbd>K</kbd>) collects reports from beyond the atmosphere, 18 in all, each with what was reported, what is documented and the best explanation, and with its sources.
 
@@ -231,22 +231,30 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 The pins are placed by a mapping fitted to known craters on the photograph (Gregory H. Revera, CC BY-SA 3.0), so they are accurate to about a degree. Every report has its own link (`#/space/<id>`), and **⧉ COPY LINK** on a card copies it.
 
-#### The Moon map: a globe of the Moon, like the Earth one
+#### The Moon, beside the Earth
+
+<a href="docs/media/whats-new-1.4.mp4"><img src="docs/media/whats-new-1.4.webp" alt="What's new in 1.3 and 1.4: EARTH | MOON in the top bar switches to a globe of the Moon laid out like the Earth, which dives to the Apollo 17 landing site, is lit by the Sun of that landing, takes the night-vision and thermal looks, shows the relief layer and turns to a report on the far side; then the Space & Moon dialog and one of the new cases" width="100%" /></a>
+
+<sub><b>New in 1.3 and 1.4:</b> the Moon beside the Earth, Space & Moon, and 10 more cases. <a href="docs/media/whats-new-1.4.mp4">▶ Watch the 34-second video (MP4)</a></sub>
+
+<img src="docs/media/moon-map.jpg" alt="The Moon in the app: the whole Moon on a globe with the seas and craters named, the landing sites as green diamonds and the lunar reports as numbered pins, with the list of places and its layers on the left, the HUD and the map controls, under the same top bar as the Earth with EARTH | MOON switched to MOON" width="100%" />
 
 <table>
 <tr>
-<td width="50%"><img src="docs/media/moon-map.jpg" alt="The Moon map: the whole Moon on a globe with the seas and craters named, the landing sites as green diamonds and the lunar reports as numbered pins, beside a searchable list of places" width="100%" /></td>
-<td width="50%"><img src="docs/media/moon-map-close.jpg" alt="The Moon map zoomed to the Taurus-Littrow valley, 120 km up, with the Apollo 17 landing site marked" width="100%" /></td>
+<td width="50%"><img src="docs/media/moon-map-close.jpg" alt="The Taurus-Littrow valley, 120 km up, with the Apollo 17 landing site marked and its dossier open on the right: landed 11 December 1972, the Sun 13° above the horizon" width="100%" /></td>
+<td width="50%"><img src="docs/media/moon-light.jpg" alt="The whole Moon lit as the Sun stood at the Apollo 11 landing: the terminator runs just west of Tranquility Base and the western half is in the dark" width="100%" /></td>
 </tr>
 </table>
 
-Open it from the **MOON MAP** button in the top bar, with <kbd>U</kbd>, from the Moon tab of Space & Moon, or with a link: `#/moon`, or `#/moon/<place or report>` such as `#/moon/apollo-17` or `#/moon/tycho`.
+**EARTH | MOON** at the left of the top bar (or <kbd>U</kbd>) switches between the two worlds, and the Moon is laid out like the Earth: the same top bar, the list of places on the left with search, layers and sorting, a dossier on the right, the HUD, the zoom and reset controls, and the same sensor looks and lighting. It also opens from the Moon tab of Space & Moon, or with a link: `#/moon`, or `#/moon/<place or report>` such as `#/moon/apollo-17` or `#/moon/tycho`.
 
-- **A real globe.** Drag to turn it, scroll or pinch to zoom, from the whole Moon down to about a kilometre above the surface. It is drawn on the Moon's own ellipsoid (radius 1,737.4 km) with the **Lunar Reconnaissance Orbiter Camera** global mosaic from NASA Moon Trek, 100 metres to the pixel. **RELIEF** lays the laser altimeter's colour-coded heights over it. If NASA's tiles can't be reached, a 2,048-pixel copy of the mosaic that ships with the app keeps the Moon turning.
-- **Names and landing sites.** 89 named seas, basins, craters, mountains and valleys, labelled as you zoom in (**NAMES** or <kbd>N</kbd> hides them), and 25 landing and impact sites from Luna 2 (1959) through Apollo 11 to 17, Chang'e 3 to 6, Chandrayaan-3, SLIM and IM-1, each with its date and what it did.
-- **The lunar reports as pins.** The same six reports as in Space & Moon, numbered the same way, including the far-side one the photograph can't show (Giordano Bruno, for Gervase of Canterbury). Click a pin, or a row in the list, to fly there and read the report, its explanation, its NASA files and its sources.
-- **Search** the list by name, English name ("Sea of Tranquility"), mission or year. Arrow keys turn the Moon, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> resets, <kbd>Esc</kbd> returns to the Earth. On a phone the list is a sheet at the bottom that folds away.
-- It opens over the Earth, which stops drawing meanwhile, and its video memory goes back when you close it. **← EARTH**, Esc and Back all return.
+- **A real globe.** Drag to turn it, scroll or pinch to zoom, from the whole Moon down to about a kilometre above the surface. It is drawn on the Moon's own ellipsoid (radius 1,737.4 km) with the **Lunar Reconnaissance Orbiter Camera** global mosaic from NASA Moon Trek, 100 metres to the pixel. If NASA's tiles can't be reached, a 2,048-pixel copy of the mosaic that ships with the app keeps the Moon turning.
+- **Layers, as on the Earth.** Lunar reports, landing sites, seas and basins, craters, and mountains and valleys each turn on and off, on the globe and in the list. **Relief** lays the laser altimeter's colour-coded heights over the photographs. 89 named places are labelled as you zoom in (the names button in the map controls, or <kbd>N</kbd>, hides them), and the 25 landing and impact sites run from Luna 2 (1959) through Apollo 11 to 17 and Chang'e 3 to 6 to Chandrayaan-3, SLIM and IM-1.
+- **A dossier for every place and report.** Click a pin, or a row in the list, to fly there and open it on the right: what the place is and where, when a mission landed and how high the Sun stood, or for a lunar report its assessment, summary, NASA files and sources. The six reports are numbered as in Space & Moon, including the far-side one the photograph can't show (Giordano Bruno, for Gervase of Canterbury).
+- **Lit by the Sun of the moment.** With the lighting on **AUTO**, a landing site is lit as the Sun stood at the landing (Apollo 11 touched down with the Sun 10.7° up, and the map shows the terminator just west of Tranquility Base), and a report with a known night is lit for that night. **DAY** lights the Moon from where you look, **NIGHT** shows it by earthshine, and **OFF** lights it evenly. The Sun's position comes from the IAU model of the Moon's rotation; the Apollo landings come out within half a degree of their documented Sun angles.
+- **The sensor looks** (<kbd>1</kbd>–<kbd>7</kbd>: NVG, FLIR, Ironbow, CRT, Noir, Snow) work on the Moon too.
+- **Search** by name, English name ("Sea of Tranquility"), mission or year, and sort by kind, date or name. Arrow keys turn the Moon, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> or <kbd>R</kbd> resets, <kbd>[</kbd> <kbd>]</kbd> step through the list, and <kbd>Esc</kbd> closes the dossier, then returns to the Earth. On a phone the list is a sheet at the bottom that folds away, as on the Earth.
+- The Earth stops drawing while the Moon is showing, and the Moon's video memory is released when you switch back. A case opened from a dialog while on the Moon takes you back to the Earth.
 
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
@@ -315,7 +323,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
-| <kbd>K</kbd> | Space & Moon | <kbd>U</kbd> | The Moon map (in it: arrows turn, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> reset, <kbd>N</kbd> names) |
+| <kbd>K</kbd> | Space & Moon | <kbd>U</kbd> | Switch between the Earth and the Moon (on the Moon: arrows turn, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> reset, <kbd>N</kbd> names) |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
@@ -380,7 +388,7 @@ flowchart LR
 | Sky, weather, launches, airspace, GEIPAN classes, journal pages and full-text search, sighting-checker scoring | `src/services/*.js` |
 | Dossier, list, timeline, modals, sky chart, story mode, statistics, share cards, Space & Moon | `src/ui/*.js` |
 | Space & Moon entries and the Moon picture; "similar cases" ranking | `src/data/space.js`, `public/space/`, `src/data/similar.js` |
-| The Moon map: places and landing sites, the globe on the Moon's ellipsoid, the panel | `src/data/moon.js`, `src/app/moonglobe.js`, `src/ui/moonview.js`, `public/space/moon-wac-2k.jpg` |
+| The Moon: places, landing sites and their times, the globe on the Moon's ellipsoid, the Sun's position on it, the Earth-style layout | `src/data/moon.js`, `src/app/moonglobe.js`, `src/app/moonsun.js`, `src/ui/moonview.js`, `public/space/moon-wac-2k.jpg` |
 
 <details>
 <summary><b>Project structure</b></summary>
@@ -503,7 +511,7 @@ Corrections and new cases are welcome, especially with sources.
   - The MUFON files: *Skylook* / *MUFON UFO Journal* © Mutual UFO Network, released as "The MUFON Archive" by MUFON and [The Black Vault](https://www.theblackvault.com/). Mirrored on the [Internet Archive](https://archive.org/details/MUFON_UFO_Journal_-_Skylook) under CC BY-NC-ND 4.0. The app links to the pages and quotes short excerpts with attribution. Chapter newsletters were scanned by the Archives for the Unexplained (AFU).
   - Research archives: the *APRO Bulletin* (Aerial Phenomena Research Organization) and MUFON chapter newsletters as scanned by the [Archives for the Unexplained](https://archive.org/details/ufonewsletters); NICAP's *U.F.O. Investigator* from the Internet Archive's Serials in Microfilm; CUFOS's *International UFO Reporter* from the Internet Archive. Only places, page numbers, short quotes and a word index are stored; the pages are read from the Internet Archive.
   - Space & Moon: NASA's UAP-related documents from the 2026 PURSUE releases (DVIDS, public domain), the NASA Apollo Lunar Surface Journal and technical debriefings, NASA Science and the Scientific Visualization Studio, ESA, and the sources named in each entry. The Moon photograph is by Gregory H. Revera ([CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg)), cropped and resized.
-  - The Moon map: imagery from the Lunar Reconnaissance Orbiter Camera (NASA/GSFC/Arizona State University) and the Lunar Orbiter Laser Altimeter (NASA/GSFC/MIT), served as tiles by [NASA Moon Trek](https://trek.nasa.gov/moon/); the copy that ships with the app is the same mosaic at zoom level 2. Positions are approximate: the Apollo sites match NASA's NSSDC table, and a spot check of the rest against the IAU Gazetteer values on Wikipedia found 81 places within 0.6° and 9 more within about 1.6° (under 50 km); 18 could not be checked that way.
+  - The Moon: imagery from the Lunar Reconnaissance Orbiter Camera (NASA/GSFC/Arizona State University) and the Lunar Orbiter Laser Altimeter (NASA/GSFC/MIT), served as tiles by [NASA Moon Trek](https://trek.nasa.gov/moon/); the copy that ships with the app is the same mosaic at zoom level 2. Positions are approximate: the Apollo sites match NASA's NSSDC table, and a spot check of the rest against the IAU Gazetteer values on Wikipedia found 81 places within 0.6° and 9 more within about 1.6° (under 50 km); 18 could not be checked that way.
   - Night lights: NASA Earth Observatory Black Marble (VIIRS, 2016), served by NASA GIBS.
   - Stars behind the globe: [NASA Deep Star Maps 2020](https://svs.gsfc.nasa.gov/4851) (NASA/Goddard Scientific Visualization Studio; Hipparcos-2, Tycho-2 and Gaia DR2 stars), made into a sky box by `scripts/build-skybox.py`.
   - Dark, Streets and Topographic maps and the place names overlay: Esri (keyless services, attribution shown in the app).

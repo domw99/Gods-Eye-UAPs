@@ -761,5 +761,6 @@ export default {
   "Ranges, valleys, rilles, a fault and a swirl": "山脉、峡谷、月溪、一条断层和一处旋涡",
   "Relief": "地形",
   "Heights from the laser altimeter, in colour": "激光高度计测得的高度，以颜色表示",
+  "Switch between the Earth and the Moon": "在地球和月球之间切换",
   "page|pages": {"other": "页"},
 };
