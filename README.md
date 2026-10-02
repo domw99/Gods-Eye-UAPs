@@ -220,6 +220,10 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
+<a href="docs/media/whats-new-1.2.mp4"><img src="docs/media/whats-new-1.2.webp" alt="What's new in 1.2: the Noir and Snow sensor looks, the day, night and off lighting switch in the top bar, the years bar hiding, a case file switching between Japanese and Russian, live earthquakes along the US west coast, and one of the 12 new cases" width="100%" /></a>
+
+<sub><b>New in 1.2:</b> Noir and Snow looks, lighting in the top bar, a hideable years bar, 16 languages, live earthquakes and 12 more cases. <a href="docs/media/whats-new-1.2.mp4">▶ Watch the 23-second video (MP4)</a></sub>
+
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
 
 **Save it as an app**: on a phone, **⤓ INSTALL APP** in the top bar installs it in one tap where the browser allows it, and otherwise shows the exact steps for your browser (Share → Add to Home Screen on iPhone, the ⋮ menu on Android). It opens full screen, respects the notch and the home bar, reopens quickly, and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
