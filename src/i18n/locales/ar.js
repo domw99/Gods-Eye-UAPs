@@ -761,5 +761,7 @@ export default {
   "Relief": "التضاريس",
   "Heights from the laser altimeter, in colour": "ارتفاعات من مقياس الارتفاع الليزري، بالألوان",
   "Switch between the Earth and the Moon": "التبديل بين الأرض والقمر",
+  "CREWED LANDING": "هبوط مأهول",
+  "IMPACT SITE": "موقع الارتطام",
   "page|pages": {"zero": "صفحة", "one": "صفحة", "two": "صفحتان", "few": "صفحات", "many": "صفحة", "other": "صفحة"},
 };

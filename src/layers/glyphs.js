@@ -23,6 +23,24 @@ export const GLYPHS = {
   nuforc: { path: 'M8 1.4L9.7 6.3 14.6 8 9.7 9.7 8 14.6 6.3 9.7 1.4 8 6.3 6.3z', detail: null, dot: [8, 8] },
 };
 
+/**
+ * The Moon's places, in the same style: a flag where people landed, a lander
+ * for the robotic landings, a burst for an impact, waves for a sea, rings for
+ * a basin, a rim with its central peak for a crater, and peaks for mountains
+ * and valleys. A lunar report is a numbered ring (drawn in app/moonglobe.js);
+ * its symbol here is for the layer list.
+ */
+export const MOON_GLYPHS = {
+  'moon-flag': { path: 'M5.2 2.4h7.4v5.2H5.2z', detail: 'M5.2 2.4v11.8M3.2 14.2h4', dot: [8.9, 5] },
+  'moon-lander': { path: 'M5.4 4.4h5.2l1.3 4.3H4.1z', detail: 'M4.7 8.7 2.6 12.9M11.3 8.7l2.1 4.2M1.6 12.9h2M12.4 12.9h2M8 8.7v3.4M8 4.4V2.4', dot: null },
+  'moon-impact': { path: 'M8 1.6l1.3 3.8 3.9-1.3-2.4 3.3 3.6 1.8-4 .6.6 4L8 11.2l-3 2.6.6-4-4-.6 3.6-1.8-2.4-3.3 3.9 1.3z', detail: null, dot: [8, 8.2] },
+  'moon-sea': { path: 'M2.4 8.2c0-3.2 2.6-5.6 5.8-5.6s5.4 2.2 5.4 5.2-2.4 5.6-5.6 5.6-5.6-2.2-5.6-5.2z', detail: 'M4.4 7.4c1.2-1 2.4 1 3.6 0s2.4 1 3.6 0M4.8 10c1-.8 2 .8 3 0s2 .8 3 0', dot: null },
+  'moon-basin': { path: 'M8 1.8a6.2 6.2 0 1 1 0 12.4A6.2 6.2 0 0 1 8 1.8z', detail: 'M8 4.2a3.8 3.8 0 1 1 0 7.6A3.8 3.8 0 0 1 8 4.2z', dot: [8, 8] },
+  'moon-crater': { path: 'M8 2.2a5.8 5.8 0 1 1 0 11.6A5.8 5.8 0 0 1 8 2.2z', detail: 'M4.5 6.4a4 4 0 0 1 7 0', dot: [8, 9] },
+  'moon-range': { path: 'M1.6 13.2 6 5.4l2.8 4.6 1.9-2.9 3.7 6.1z', detail: 'M4.6 7.9 6 8.9l1.2-1', dot: null },
+  'moon-report': { path: 'M8 1.8a6.2 6.2 0 1 1 0 12.4A6.2 6.2 0 0 1 8 1.8z', detail: 'M6.7 5.6 8.3 4.7v6.6M6.6 11.3h3.4', dot: null },
+};
+
 const cache = new Map();
 const PX = 2; // drawn at twice the size so the symbols stay sharp on high-DPI screens
 
@@ -33,7 +51,7 @@ const PX = 2; // drawn at twice the size so the symbols stay sharp on high-DPI s
  */
 export function glyphUrl(layer) {
   if (cache.has(layer)) return cache.get(layer);
-  const shape = GLYPHS[layer];
+  const shape = GLYPHS[layer] || MOON_GLYPHS[layer];
   const size = 24;
   const c = document.createElement('canvas');
   c.width = c.height = size * PX;
@@ -79,11 +97,11 @@ const LIST_ONLY = {
   buildings: { path: 'M7 14.2V2.2h5.6v12z', detail: 'M3.2 14.2V7.2H7M1.8 14.2h12.4M9 5h1.6M9 7.4h1.6M9 9.8h1.6', dot: null },
 };
 
-/** The symbol for a layer as an inline SVG string (outline in the current colour), for the layer list; null when it has none. */
-export function glyphSvg(layer) {
-  const shape = GLYPHS[layer] || LIST_ONLY[layer];
+/** The symbol for a layer as an inline SVG string (outline in the current colour), for the layer list and list rows; null when it has none. */
+export function glyphSvg(layer, className = 'swatch') {
+  const shape = GLYPHS[layer] || LIST_ONLY[layer] || MOON_GLYPHS[layer];
   if (!shape) return null;
-  return `<svg class="swatch" viewBox="0 0 16 16" aria-hidden="true"><path d="${shape.path}" class="body" />${
+  return `<svg class="${className}" viewBox="0 0 16 16" aria-hidden="true"><path d="${shape.path}" class="body" />${
     shape.detail ? `<path d="${shape.detail}" class="line" />` : ''
   }${shape.dot ? `<circle cx="${shape.dot[0]}" cy="${shape.dot[1]}" r="1.1" class="dot" />` : ''}</svg>`;
 }

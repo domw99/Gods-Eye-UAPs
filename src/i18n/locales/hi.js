@@ -761,5 +761,7 @@ export default {
   "Relief": "उच्चावच",
   "Heights from the laser altimeter, in colour": "लेज़र ऊँचाईमापी से ऊँचाइयाँ, रंगों में",
   "Switch between the Earth and the Moon": "पृथ्वी और चंद्रमा के बीच बदलें",
+  "CREWED LANDING": "मानवयुक्त अवतरण",
+  "IMPACT SITE": "टक्कर स्थल",
   "page|pages": {"one": "पृष्ठ", "other": "पृष्ठ"},
 };

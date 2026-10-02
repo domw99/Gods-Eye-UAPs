@@ -2,7 +2,8 @@ import * as Cesium from 'cesium';
 import { loadStarSky } from './viewer.js';
 import { createEffects } from './effects.js';
 import { sunOnMoon } from './moonsun.js';
-import { MOON_INK, moonGroup } from '../data/moon.js';
+import { MOON_INK, moonGroup, moonGlyph } from '../data/moon.js';
+import { glyphUrl } from '../layers/glyphs.js';
 
 /**
  * The Moon as a globe you can turn and zoom, like the Earth one. Cesium draws
@@ -49,19 +50,26 @@ const INK = MOON_INK;
 const groupOf = moonGroup;
 const HOME = { lat: 8, lon: 0 };
 const SURFACE = 1500; // m above the ground for pins and labels, so the globe doesn't clip them
+// Two sites a few kilometres apart (Apollo 12 and Surveyor 3) share a spot from afar; their symbols and
+// names are nudged apart there (`dy`), and come back to their true places as you close in.
+const NUDGE = new Cesium.NearFarScalar(150_000, 0, 1_000_000, 1);
 
 export const atMoon = (lat, lon, height = 0) => Cesium.Cartesian3.fromDegrees(lon, lat, height, MOON);
 
-/** A round pin with text, drawn at twice its size so it stays sharp on dense screens. */
-function pinImage(text, { fill, ink = '#04101a', size = 30, ring = false }) {
+/**
+ * A numbered report pin in the style of the map symbols: a dark disc, a
+ * glowing ring and the number; or, with `ring`, the selection ring. Drawn at
+ * twice its size so it stays sharp on dense screens.
+ */
+function pinImage(text, { fill, ink = '#e6fbff', size = 30, ring = false }) {
   const px = size * 2;
   const c = document.createElement('canvas');
   c.width = c.height = px;
   const g = c.getContext('2d');
   g.translate(px / 2, px / 2);
   g.beginPath();
-  g.arc(0, 0, px / 2 - 4, 0, Math.PI * 2);
   if (ring) {
+    g.arc(0, 0, px / 2 - 4, 0, Math.PI * 2);
     g.lineWidth = 5;
     g.strokeStyle = fill;
     g.stroke();
@@ -70,39 +78,25 @@ function pinImage(text, { fill, ink = '#04101a', size = 30, ring = false }) {
     g.lineWidth = 3;
     g.stroke();
   } else {
-    g.fillStyle = fill;
+    g.arc(0, 0, px / 2 - 8, 0, Math.PI * 2);
+    g.fillStyle = 'rgba(4, 8, 14, 0.78)';
     g.fill();
-    g.lineWidth = 3;
-    g.strokeStyle = 'rgba(0,0,0,0.65)';
+    g.shadowColor = fill;
+    g.shadowBlur = 12;
+    g.lineWidth = 4;
+    g.strokeStyle = fill;
     g.stroke();
+    g.shadowBlur = 0;
   }
   if (text) {
     g.fillStyle = ink;
-    g.font = `700 ${Math.round(px * 0.46)}px Inter, system-ui, sans-serif`;
+    g.shadowColor = fill;
+    g.shadowBlur = 6;
+    g.font = `700 ${Math.round(px * 0.4)}px Inter, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.textBaseline = 'middle';
     g.fillText(text, 0, 2);
   }
-  return c;
-}
-
-/** A diamond for a landing site. */
-function siteImage(fill) {
-  const c = document.createElement('canvas');
-  c.width = c.height = 36;
-  const g = c.getContext('2d');
-  g.translate(18, 18);
-  g.beginPath();
-  g.moveTo(0, -13);
-  g.lineTo(13, 0);
-  g.lineTo(0, 13);
-  g.lineTo(-13, 0);
-  g.closePath();
-  g.fillStyle = fill;
-  g.fill();
-  g.lineWidth = 3;
-  g.strokeStyle = 'rgba(0,0,0,0.7)';
-  g.stroke();
   return c;
 }
 
@@ -236,8 +230,12 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   // ── Places ──
   const images = {
     report: new Map(),
-    site: siteImage(INK.site),
     ring: pinImage('', { fill: '#ffffff', size: 44, ring: true }),
+  };
+  const tint = new Map(); // a Cesium colour per kind of place
+  const tintOf = (kind) => {
+    if (!tint.has(kind)) tint.set(kind, Cesium.Color.fromCssColorString(INK[kind]));
+    return tint.get(kind);
   };
   let namesOn = true;
   let selectedId = null;
@@ -245,6 +243,7 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   let hoverId = null;
   let shown = { report: true, site: true, sea: true, crater: true, range: true };
   const groupById = new Map(); // entity id → its group
+  const centred = new Set(); // places whose name sits under the symbol (not beside it, as a site's does)
 
   // On a small screen the whole Moon is too small for even the main names: they appear at the first step in.
   const small = () => Math.min(scene.canvas.clientWidth || 1000, scene.canvas.clientHeight || 800) < 420;
@@ -261,8 +260,9 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
     horizontalOrigin: offset ? Cesium.HorizontalOrigin.LEFT : Cesium.HorizontalOrigin.CENTER,
     verticalOrigin: Cesium.VerticalOrigin.CENTER,
-    // Names sit just below their place, so a pin on the place doesn't hide them; sites' names sit beside the diamond.
-    pixelOffset: offset ? new Cesium.Cartesian2(24, dy) : new Cesium.Cartesian2(0, 11 + dy),
+    // Names sit just below their place's symbol, so a pin on the place doesn't hide them; sites' names sit beside theirs.
+    pixelOffset: offset ? new Cesium.Cartesian2(26, dy) : new Cesium.Cartesian2(0, 19 + dy),
+    ...(dy ? { pixelOffsetScaleByDistance: NUDGE } : {}),
     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, reachOf(tier)),
     translucencyByDistance: new Cesium.NearFarScalar(reachOf(tier) * 0.7, 1, reachOf(tier), 0.2),
     show: namesOn,
@@ -272,27 +272,37 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   function setPlaces({ places = [], reports = [] }) {
     entities.removeAll();
     groupById.clear();
+    centred.clear();
     selectedId = null;
     raised = null;
     for (const p of places) {
       const id = `place:${p.id}`;
       const isSite = p.kind === 'site';
       groupById.set(id, groupOf(p.kind));
+      if (!isSite) centred.add(id);
+      // A site's symbol shows from afar; any other place's comes and goes with its name.
+      const reach = isSite ? 1e9 : reachOf(p.tier);
       entities.add({
         id,
         name: p.name,
         show: shown[groupOf(p.kind)] !== false,
         position: atMoon(p.lat, p.lon, SURFACE),
-        ...(isSite
-          ? { billboard: { image: images.site, scale: 0.5, distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 1e9) } }
-          : {}),
+        billboard: {
+          image: glyphUrl(moonGlyph(p)),
+          color: tintOf(p.kind),
+          width: isSite ? 22 : 18,
+          height: isSite ? 22 : 18,
+          ...(p.dy ? { pixelOffset: new Cesium.Cartesian2(0, p.dy), pixelOffsetScaleByDistance: NUDGE } : {}),
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, reach),
+          ...(isSite ? {} : { translucencyByDistance: new Cesium.NearFarScalar(reach * 0.7, 1, reach, 0.2) }),
+        },
         label: label(p.name, { kind: p.kind, tier: p.tier, offset: isSite, dy: p.dy }),
       });
     }
     for (const r of reports) {
       for (const [i, site] of r.sites.entries()) {
         const id = i === 0 ? `report:${r.entry.id}` : `report:${r.entry.id}#${i}`;
-        if (!images.report.has(r.n)) images.report.set(r.n, pinImage(String(r.n), { fill: '#00d4ff', ink: '#001018' }));
+        if (!images.report.has(r.n)) images.report.set(r.n, pinImage(String(r.n), { fill: INK.report }));
         groupById.set(id, 'report');
         entities.add({
           id,
@@ -331,9 +341,9 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       selectedId = '__selected';
       // Between the places (at SURFACE) and the report pins (at twice that), so a numbered pin stays in front of its ring.
       entities.add({ id: selectedId, position: atMoon(at.lat, at.lon, SURFACE * 1.5), billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0 } });
-      // A name written across the middle of the place sits under the ring: move it below.
+      // A name written under the middle of the place sits under the ring: move it below.
       const named = entities.getById(key);
-      if (named?.label && !named.billboard) {
+      if (named?.label && centred.has(key)) {
         raised = { label: named.label, was: named.label.pixelOffset };
         named.label.pixelOffset = new Cesium.Cartesian2(0, 34);
       }

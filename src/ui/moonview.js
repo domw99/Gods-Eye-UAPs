@@ -1,7 +1,8 @@
 import { html, mount, raw, toast, safeUrl } from '../util/dom.js';
 import { t, onLanguageChange } from '../i18n/index.js';
 import { formatDMS } from '../util/geo.js';
-import { MOON_PLACES, MOON_INK, moonGroup, moonReports, searchMoon, viewHeight } from '../data/moon.js';
+import { MOON_PLACES, MOON_INK, MOON_LAYER_GLYPH, moonGlyph, moonGroup, moonReports, searchMoon, viewHeight } from '../data/moon.js';
+import { glyphSvg } from '../layers/glyphs.js';
 import { sunOnMoon } from '../app/moonsun.js';
 import { MODE_LABELS } from '../app/modes.js';
 import { STATUS } from '../data/taxonomy.js';
@@ -17,14 +18,18 @@ import { statusBadge } from './space.js';
  * the Earth.
  */
 const LAYERS = [
-  { id: 'report', name: 'Lunar reports', sub: 'Glows and flashes seen on the Moon, numbered', glyph: '<circle class="body" cx="8" cy="8" r="6"/><path d="M6.6 5.6 8.3 4.6v7"/>' },
-  { id: 'site', name: 'Landing sites', sub: 'Every landing and impact, 1959 to 2024', glyph: '<path class="body" d="M8 2.2 13.8 8 8 13.8 2.2 8z"/>' },
-  { id: 'sea', name: 'Seas and basins', sub: 'The dark plains, and the great impact basins', glyph: '<circle class="body" cx="8" cy="8" r="5.8"/><path d="M4.3 8.6c1.2-1.1 2.5 1.1 3.7 0s2.5 1.1 3.7 0"/>' },
-  { id: 'crater', name: 'Craters', sub: 'More names appear as you zoom in', glyph: '<circle cx="8" cy="8" r="5.8"/><circle class="body" cx="8" cy="8" r="2.6"/>' },
-  { id: 'range', name: 'Mountains and valleys', sub: 'Ranges, valleys, rilles, a fault and a swirl', glyph: '<path class="body" d="M1.6 13 6 5.2l2.8 4.6 1.9-2.9 3.7 6.1z"/>' },
-  { id: 'relief', name: 'Relief', sub: 'Heights from the laser altimeter, in colour', glyph: '<path d="M2 11.5c2-2.6 3.8.9 6-1.6s4-2 6 0M2 7.5c2-2.6 3.8.9 6-1.6s4-2 6 0"/>', color: '#ffb547' },
+  { id: 'report', name: 'Lunar reports', sub: 'Glows and flashes seen on the Moon, numbered' },
+  { id: 'site', name: 'Landing sites', sub: 'Every landing and impact, 1959 to 2024' },
+  { id: 'sea', name: 'Seas and basins', sub: 'The dark plains, and the great impact basins' },
+  { id: 'crater', name: 'Craters', sub: 'More names appear as you zoom in' },
+  { id: 'range', name: 'Mountains and valleys', sub: 'Ranges, valleys, rilles, a fault and a swirl' },
+  { id: 'relief', name: 'Relief', sub: 'Heights from the laser altimeter, in colour', color: '#ffb547' },
 ];
+const RELIEF_GLYPH = '<svg class="swatch" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 11.5c2-2.6 3.8.9 6-1.6s4-2 6 0M2 7.5c2-2.6 3.8.9 6-1.6s4-2 6 0"/></svg>';
 const KIND_LABEL = { sea: 'SEA', basin: 'BASIN', crater: 'CRATER', range: 'RANGE OR VALLEY', site: 'LANDING SITE' };
+const LANDING_LABEL = { crewed: 'CREWED LANDING', impact: 'IMPACT SITE' };
+/** What kind of place it is, in words: a site says whether people landed there or it was an impact. */
+const kindLabel = (p) => t((p.kind === 'site' && LANDING_LABEL[p.landing]) || KIND_LABEL[p.kind]);
 const GROUP_ORDER = ['report', 'site', 'sea', 'crater', 'range'];
 
 // What the visitor chose, kept while the page is open so the Moon comes back as it was left.
@@ -91,17 +96,16 @@ function rowHtml(row, selectedKey) {
     </li>`;
   }
   const p = row.place;
-  const ink = MOON_INK[p.kind];
-  return html`<li class="case-item" role="option" tabindex="0" data-key="${row.key}" aria-selected="${on}">
-    <span class="dot" style="background:${ink};box-shadow:0 0 8px ${ink}"></span>
-    <div><div class="t">${p.name}</div><div class="m">${p.kind === 'site' ? p.when : p.english || t(KIND_LABEL[p.kind])}</div><div class="b"><span class="badge${p.kind === 'site' ? ' path' : ''}">${t(KIND_LABEL[p.kind])}</span>${isFar(p.lon) ? html`<span class="badge">${t('FAR SIDE')}</span>` : ''}</div></div>
+  return html`<li class="case-item glyphed" role="option" tabindex="0" data-key="${row.key}" aria-selected="${on}">
+    <span class="glyph" style="color:${MOON_INK[p.kind]}">${raw(glyphSvg(moonGlyph(p), 'glyph-svg'))}</span>
+    <div><div class="t">${p.name}</div><div class="m">${p.kind === 'site' ? p.when : p.english || fmtLatLon(p.lat, p.lon)}</div><div class="b"><span class="badge${p.kind === 'site' ? ' path' : ''}">${kindLabel(p)}</span>${isFar(p.lon) ? html`<span class="badge">${t('FAR SIDE')}</span>` : ''}</div></div>
   </li>`;
 }
 
 function layersHtml(counts) {
   return html`${LAYERS.map(
     (l) => html`<button type="button" class="layer" data-moon-layer="${l.id}" aria-pressed="${prefs.layers[l.id] ? 'true' : 'false'}" style="color:${l.color || MOON_INK[l.id]}">
-      <svg class="swatch" viewBox="0 0 16 16" aria-hidden="true">${raw(l.glyph)}</svg>
+      ${raw(l.id === 'relief' ? RELIEF_GLYPH : glyphSvg(MOON_LAYER_GLYPH[l.id]))}
       <span style="color:var(--text-primary)"><span class="name">${t(l.name)}</span><span class="sub">${t(l.sub)}</span></span>
       <span class="state">${counts[l.id] ?? ''}</span>
     </button>`,
@@ -112,7 +116,7 @@ function placeDossier(p) {
   return html`
     <div class="d-title">${p.name}</div>
     <div class="d-sub">${p.english ? html`${p.english}<br />` : ''}${p.when ? html`${p.when}<br />` : ''}${formatDMS(p.lat, p.lon)}</div>
-    <div class="d-badges"><span class="badge${p.kind === 'site' ? ' path' : ''}">${t(KIND_LABEL[p.kind])}</span><span class="badge">${t(isFar(p.lon) ? 'FAR SIDE' : 'NEAR SIDE')}</span></div>
+    <div class="d-badges"><span class="badge${p.kind === 'site' ? ' path' : ''}">${kindLabel(p)}</span><span class="badge">${t(isFar(p.lon) ? 'FAR SIDE' : 'NEAR SIDE')}</span></div>
     <div class="btn-row" style="margin:10px 0 0"><button type="button" class="chip on" data-moon="fly">◎ ${t('FLY THERE')}</button><button type="button" class="chip" data-copy="${p.id}">${t('⧉ COPY LINK')}</button></div>
     ${p.note ? section(t('ABOUT'), html`<div class="d-text"><p>${p.note}</p></div>`) : ''}
     ${p.moment

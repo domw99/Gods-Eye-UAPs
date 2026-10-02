@@ -862,8 +862,8 @@ html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .muf
 .moon-map { margin: 0 0 14px; }
 .moon-frame { position: relative; width: min(100%, 460px); aspect-ratio: 1; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--glass-border); }
 .moon-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.moon-pin { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid #fff; background: rgba(0, 212, 255, 0.9); color: #001018; font: 700 11px var(--font-mono); cursor: pointer; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 12px var(--accent-glow); }
-.moon-pin:hover { background: #fff; }
+.moon-pin { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--accent); background: rgba(4, 8, 14, 0.78); color: #e6fbff; font: 700 11px var(--font-mono); cursor: pointer; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 12px var(--accent-glow); text-shadow: 0 0 6px var(--accent); }
+.moon-pin:hover { background: var(--accent); color: #001018; text-shadow: none; }
 .moon-dot { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 8px var(--accent-glow); pointer-events: none; }
 .moon-map figcaption { margin: 6px auto 0; max-width: 460px; font-size: 10.5px; line-height: 1.45; color: var(--text-dim); text-align: center; }
 html[data-text-dir='rtl'] .space-card :is(p, h3, .sc-where, .sc-files li, .sc-sources li) { unicode-bidi: plaintext; text-align: start; }
@@ -891,7 +891,13 @@ body.moon-open #globe { visibility: hidden; }
 .moon-globe .cesium-viewer, .moon-globe .cesium-viewer-cesiumWidgetContainer, .moon-globe .cesium-widget { position: absolute; inset: 0; width: 100%; height: 100%; }
 .moon-globe .cesium-widget canvas { width: 100%; height: 100%; outline: none; }
 .case-item.numbered { grid-template-columns: 20px 1fr; gap: 8px; }
-.case-item .num { display: grid; place-items: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: var(--accent); color: #001018; font: 700 11px var(--font-mono); box-shadow: 0 0 8px var(--accent-glow); }
+.case-item .num { display: grid; place-items: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: rgba(4, 8, 14, 0.6); border: 1.5px solid var(--accent); color: var(--accent); font: 700 10.5px var(--font-mono); box-shadow: 0 0 8px var(--accent-glow); }
+/* Moon places: each row carries its map symbol. */
+.case-item.glyphed { grid-template-columns: 18px 1fr; gap: 8px; }
+.case-item .glyph { display: block; width: 18px; height: 18px; margin-top: 1px; }
+.case-item .glyph-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 3px currentColor); }
+.case-item .glyph-svg .body { fill: currentColor; fill-opacity: 0.22; }
+.case-item .glyph-svg .dot { fill: currentColor; stroke: none; }
 #moon-left .case-empty .dim { font-size: 11px; }
 .link-btn.moon-site { font: 500 12.5px var(--font-sans); letter-spacing: 0; text-align: start; }
 .moon-credit { position: fixed; z-index: 16; left: calc(14px + var(--sal)); right: calc(14px + var(--sar)); bottom: calc(9px + var(--sab)); display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 0 10px; font-size: 10px; line-height: 1.5; text-align: end; color: var(--text-secondary); opacity: 0.75; text-shadow: 0 1px 2px #000; pointer-events: none; }

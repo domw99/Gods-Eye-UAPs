@@ -761,5 +761,7 @@ export default {
   "Relief": "Relief",
   "Heights from the laser altimeter, in colour": "Ketinggian dari altimeter laser, berwarna",
   "Switch between the Earth and the Moon": "Beralih antara Bumi dan Bulan",
+  "CREWED LANDING": "PENDARATAN BERAWAK",
+  "IMPACT SITE": "LOKASI TUMBUKAN",
   "page|pages": {"other": "halaman"},
 };

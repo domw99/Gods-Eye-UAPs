@@ -761,5 +761,7 @@ export default {
   "Relief": "지형",
   "Heights from the laser altimeter, in colour": "레이저 고도계의 높이를 색으로 표시",
   "Switch between the Earth and the Moon": "지구와 달 사이 전환",
+  "CREWED LANDING": "유인 착륙",
+  "IMPACT SITE": "충돌 지점",
   "page|pages": {"other": "페이지"},
 };

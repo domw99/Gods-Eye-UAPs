@@ -761,5 +761,7 @@ export default {
   "Relief": "Relief",
   "Heights from the laser altimeter, in colour": "Höhen aus dem Laser-Höhenmesser, in Farbe",
   "Switch between the Earth and the Moon": "Zwischen Erde und Mond wechseln",
+  "CREWED LANDING": "BEMANNTE LANDUNG",
+  "IMPACT SITE": "EINSCHLAGSTELLE",
   "page|pages": {"one": "Seite", "other": "Seiten"},
 };

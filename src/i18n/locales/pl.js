@@ -761,5 +761,7 @@ export default {
   "Relief": "Rzeźba terenu",
   "Heights from the laser altimeter, in colour": "Wysokości z wysokościomierza laserowego, w kolorach",
   "Switch between the Earth and the Moon": "Przełączaj między Ziemią a Księżycem",
+  "CREWED LANDING": "LĄDOWANIE ZAŁOGOWE",
+  "IMPACT SITE": "MIEJSCE UDERZENIA",
   "page|pages": {"one": "strona", "few": "strony", "many": "stron", "other": "stron"},
 };

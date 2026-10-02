@@ -160,3 +160,44 @@ describe('the Sun on the Moon', () => {
     for (const r of lit) expect(new Date(r.entry.moment.at).getUTCFullYear()).toBe(r.entry.year);
   });
 });
+
+describe('symbols on the Moon map', () => {
+  it('gives every place a symbol of its own kind, drawn in the shared style', async () => {
+    const { moonGlyph, MOON_LAYER_GLYPH, MOON_INK, moonGroup } = await import('../src/data/moon.js');
+    const { MOON_GLYPHS, glyphSvg } = await import('../src/layers/glyphs.js');
+    for (const p of MOON_PLACES) {
+      expect(MOON_GLYPHS[moonGlyph(p)], p.id).toBeTruthy();
+      expect(MOON_INK[p.kind], p.id).toMatch(/^#[0-9a-f]{6}$/);
+    }
+    for (const g of new Set(MOON_PLACES.map((p) => moonGroup(p.kind)))) expect(glyphSvg(MOON_LAYER_GLYPH[g]), g).toContain('class="swatch"');
+    expect(glyphSvg(MOON_LAYER_GLYPH.report)).toContain('class="swatch"');
+  });
+
+  it('marks the Apollo sites as crewed and Luna 2 as an impact', async () => {
+    const { moonGlyph } = await import('../src/data/moon.js');
+    const crewed = MOON_SITES.filter((s) => s.landing === 'crewed').map((s) => s.id);
+    expect(crewed).toEqual(['apollo-11', 'apollo-12', 'apollo-14', 'apollo-15', 'apollo-16', 'apollo-17']);
+    expect(MOON_SITES.filter((s) => s.landing === 'impact').map((s) => s.id)).toEqual(['luna-2']);
+    expect(MOON_SITES.every((s) => ['crewed', 'robotic', 'impact'].includes(s.landing))).toBe(true);
+    expect(moonGlyph(MOON_SITES.find((s) => s.id === 'apollo-11'))).toBe('moon-flag');
+    expect(moonGlyph(MOON_SITES.find((s) => s.id === 'luna-2'))).toBe('moon-impact');
+    expect(moonGlyph(MOON_SITES.find((s) => s.id === 'change-4'))).toBe('moon-lander');
+  });
+
+  it('keeps the Moon symbols distinct and inside the 16 × 16 box', async () => {
+    const { MOON_GLYPHS, GLYPHS } = await import('../src/layers/glyphs.js');
+    const paths = [...Object.values(MOON_GLYPHS), ...Object.values(GLYPHS)].map((g) => `${g.path}|${g.detail}`);
+    expect(new Set(paths).size).toBe(paths.length);
+    for (const [name, g] of Object.entries(MOON_GLYPHS)) {
+      // Absolute coordinates only (upper-case commands), which must stay inside the box.
+      for (const cmd of `${g.path} ${g.detail || ''}`.match(/[MLHVCSQTAZ][^MLHVCSQTAZa-z]*/g) || []) {
+        const nums = (cmd.slice(1).match(/-?\d*\.?\d+/g) || []).map(Number);
+        for (const n of nums) {
+          expect(n, `${name} ${cmd}`).toBeGreaterThanOrEqual(0);
+          expect(n, `${name} ${cmd}`).toBeLessThanOrEqual(16);
+        }
+      }
+      if (g.dot) for (const n of g.dot) expect(n, name).toBeGreaterThan(1);
+    }
+  });
+});

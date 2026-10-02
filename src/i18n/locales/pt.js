@@ -761,5 +761,7 @@ export default {
   "Relief": "Relevo",
   "Heights from the laser altimeter, in colour": "Alturas do altímetro a laser, em cores",
   "Switch between the Earth and the Moon": "Alternar entre a Terra e a Lua",
+  "CREWED LANDING": "POUSO TRIPULADO",
+  "IMPACT SITE": "LOCAL DE IMPACTO",
   "page|pages": {"one": "página", "other": "páginas"},
 };

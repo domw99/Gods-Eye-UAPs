@@ -761,5 +761,7 @@ export default {
   "Relief": "起伏",
   "Heights from the laser altimeter, in colour": "レーザー高度計による高さを色で表示",
   "Switch between the Earth and the Moon": "地球と月を切り替える",
+  "CREWED LANDING": "有人着陸",
+  "IMPACT SITE": "衝突地点",
   "page|pages": {"other": "ページ"},
 };

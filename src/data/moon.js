@@ -21,10 +21,15 @@ import { SPACE } from './space.js';
  */
 export const MOON_KINDS = ['sea', 'basin', 'crater', 'range', 'site'];
 export const MOON_RADIUS_KM = 1737.4;
-/** The colour of each kind of place, on the map and in the list. */
-export const MOON_INK = { sea: '#c9d6e6', basin: '#c9d6e6', crater: '#eef1f5', range: '#b9c6d6', site: '#7dffb2', report: '#00d4ff' };
+/** The colour of each kind of place, on the map, in the list and in the layer list. */
+export const MOON_INK = { sea: '#9fd0ff', basin: '#9fd0ff', crater: '#eef1f5', range: '#d4c2ff', site: '#7dffb2', report: '#00d4ff' };
 /** The groups the layer list turns on and off: a basin goes with the seas. */
 export const moonGroup = (kind) => (kind === 'basin' ? 'sea' : kind);
+/** The symbol for each layer in the layer list (layers/glyphs.js). */
+export const MOON_LAYER_GLYPH = { report: 'moon-report', site: 'moon-lander', sea: 'moon-sea', crater: 'moon-crater', range: 'moon-range' };
+/** The symbol for a place: a landing site by how it got there (crewed, robotic or an impact), the rest by kind. */
+export const moonGlyph = (place) =>
+  place.kind === 'site' ? { crewed: 'moon-flag', impact: 'moon-impact' }[place.landing] || 'moon-lander' : `moon-${place.kind}`;
 
 const f = (id, name, kind, lat, lon, tier, english, view) => ({ id, name, kind, lat, lon, tier, english, view });
 
@@ -133,8 +138,8 @@ export const MOON_SITES = [
   s('luna-2', 'Luna 2', 29.1, 0.0, '13 Sep 1959', 'Soviet probe; the first human-made object to reach the Moon, by impact', 1959),
   s('luna-9', 'Luna 9', 7.08, -64.37, '3 Feb 1966', 'Soviet; the first soft landing and the first pictures from the surface', 1966),
   s('surveyor-1', 'Surveyor 1', -2.47, -43.34, '2 Jun 1966', 'NASA; the first American soft landing', 1966),
-  s('surveyor-3', 'Surveyor 3', -2.94, -23.42, '20 Apr 1967', 'NASA; Apollo 12 landed near it in 1969', 1967, 14),
-  s('surveyor-5', 'Surveyor 5', 1.41, 23.18, '11 Sep 1967', 'NASA; analysed the soil with an alpha-scattering instrument', 1967, -14),
+  s('surveyor-3', 'Surveyor 3', -2.94, -23.42, '20 Apr 1967', 'NASA; Apollo 12 landed near it in 1969', 1967, 22),
+  s('surveyor-5', 'Surveyor 5', 1.41, 23.18, '11 Sep 1967', 'NASA; analysed the soil with an alpha-scattering instrument', 1967, -22),
   s('surveyor-6', 'Surveyor 6', 0.5, -1.4, '10 Nov 1967', 'NASA; the first lift-off from the Moon, a short hop', 1967),
   s('surveyor-7', 'Surveyor 7', -40.9, -11.5, '10 Jan 1968', 'NASA; the last Surveyor, on the rim of Tycho’s ejecta', 1968),
   s('apollo-11', 'Apollo 11', 0.67, 23.47, '20 Jul 1969', 'Tranquility Base: the first crewed landing (Armstrong and Aldrin)', 1969),
@@ -189,9 +194,12 @@ const LANDED = {
   slim: '2024-01-19T15:20:00Z',
   'im-1': '2024-02-22T23:23:00Z',
 };
+/** Luna 2 struck the Moon; the Apollo crews landed; the rest landed on their own. */
+const IMPACTS = new Set(['luna-2']);
 for (const site of MOON_SITES) {
   const at = LANDED[site.id];
   if (at) site.moment = { at: at.replace('≈', ''), approx: at.endsWith('≈') };
+  site.landing = IMPACTS.has(site.id) ? 'impact' : site.id.startsWith('apollo-') ? 'crewed' : 'robotic';
 }
 
 export const MOON_PLACES = [...MOON_FEATURES, ...MOON_SITES];

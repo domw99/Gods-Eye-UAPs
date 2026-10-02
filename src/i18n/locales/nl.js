@@ -761,5 +761,7 @@ export default {
   "Relief": "Reliëf",
   "Heights from the laser altimeter, in colour": "Hoogtes van de laserhoogtemeter, in kleur",
   "Switch between the Earth and the Moon": "Wisselen tussen de aarde en de Maan",
+  "CREWED LANDING": "BEMANDE LANDING",
+  "IMPACT SITE": "INSLAGPLAATS",
   "page|pages": {"one": "pagina", "other": "pagina’s"},
 };

@@ -761,5 +761,7 @@ export default {
   "Relief": "Yükseklik",
   "Heights from the laser altimeter, in colour": "Lazer altimetresinden yükseklikler, renkli",
   "Switch between the Earth and the Moon": "Dünya ile Ay arasında geçiş yap",
+  "CREWED LANDING": "İNSANLI İNİŞ",
+  "IMPACT SITE": "ÇARPMA NOKTASI",
   "page|pages": {"other": "sayfa"},
 };

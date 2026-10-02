@@ -761,5 +761,7 @@ export default {
   "Relief": "Relief",
   "Heights from the laser altimeter, in colour": "Altitudes de l’altimètre laser, en couleur",
   "Switch between the Earth and the Moon": "Passer de la Terre à la Lune et inversement",
+  "CREWED LANDING": "ALUNISSAGE HABITÉ",
+  "IMPACT SITE": "SITE D’IMPACT",
   "page|pages": {"one": "page", "other": "pages"},
 };

@@ -761,5 +761,7 @@ export default {
   "Relief": "地形",
   "Heights from the laser altimeter, in colour": "激光高度计测得的高度，以颜色表示",
   "Switch between the Earth and the Moon": "在地球和月球之间切换",
+  "CREWED LANDING": "载人着陆",
+  "IMPACT SITE": "撞击点",
   "page|pages": {"other": "页"},
 };
