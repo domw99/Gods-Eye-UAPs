@@ -273,12 +273,21 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     scene.requestRender();
   }
 
+  let raised = null; // a name moved off the selection ring, to put back
   function select(key, at) {
     if (selectedId) entities.removeById(selectedId);
+    if (raised) raised.label.pixelOffset = raised.was;
+    raised = null;
     selectedId = null;
     if (key && at) {
       selectedId = '__selected';
       entities.add({ id: selectedId, position: atMoon(at.lat, at.lon, SURFACE * 3), billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0 } });
+      // A name written across the middle of the place sits under the ring: move it below.
+      const named = entities.getById(key);
+      if (named?.label && !named.billboard) {
+        raised = { label: named.label, was: named.label.pixelOffset };
+        named.label.pixelOffset = new Cesium.Cartesian2(0, 34);
+      }
     }
     scene.requestRender();
   }
