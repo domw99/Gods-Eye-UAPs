@@ -33,7 +33,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **148** curated case files<br><sub>1561 → 2024, 33 countries</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **161** curated case files<br><sub>1561 → 2024, 34 countries</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
 | **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **873** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
@@ -42,7 +42,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <img src="docs/media/globe.jpg" alt="The globe with curated case files (cyan and amber) and official U.S. releases (magenta)" width="100%" />
 
-- **148 curated case files** from 1561 to 2024, in 33 countries. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
+- **161 curated case files** from 1561 to 2024, in 34 countries. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. Latest additions: the 1913 Great Meteor Procession, Clyde Tombaugh's 1949 sighting, the Kirtland AFB tower (1957), the Antarctic sightings of 1965, the Paulding Light, Wurtsmith AFB and its tanker chase (1975), Alitalia over Kent (1991), Air France 3532 (1994), British Airways 5061 (1995), Bariloche (1995), the Colorado drones (2019), Langley AFB (2023) and the 2024 drones over the U.S. bases in England. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 74 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
@@ -173,7 +173,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 - **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
 - **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
-- **Case dossiers list the journal pages that discuss them.** 87 of the 148 cases have coverage, for example:
+- **Case dossiers list the journal pages that discuss them.** 92 of the 161 cases have coverage, for example:
   - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
   - 60 on Travis Walton;
   - 39 on the 2008 Stephenville lights.
@@ -370,7 +370,7 @@ flowchart LR
     S5 & S7 --> S8["build-textindex.mjs"]
   end
   S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 --> DATA[("public/data/*.json")]
-  CASES["src/data/cases/*.js<br/>148 curated cases"] --> APP
+  CASES["src/data/cases/*.js<br/>161 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
 ```

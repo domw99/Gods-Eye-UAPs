@@ -369,11 +369,18 @@ export function matchCases(issues, CASES, gz) {
       return out;
     };
     let best = null;
-    // A two-word name is the most specific; use it when it finds enough pages.
-    for (const x of pairs) {
-      const hits = pagesFor(x);
-      if (hits.length >= 3 && (!best || hits.length > best.hits.length)) best = { term: x.t, hits };
+    // A case can name the phrase the journals know it by, when its own words
+    // are too common to find it ("Deception" alone finds “Messengers of Deception”).
+    if (c.journalTerm) {
+      const x = { t: c.journalTerm, n: df(c.journalTerm), re: new RegExp(c.journalTerm.split(' ').join('\\W{1,3}'), 'i'), pair: true };
+      best = { term: x.t, hits: pagesFor(x) };
     }
+    // A two-word name is the most specific; use it when it finds enough pages.
+    if (!best)
+      for (const x of pairs) {
+        const hits = pagesFor(x);
+        if (hits.length >= 3 && (!best || hits.length > best.hits.length)) best = { term: x.t, hits };
+      }
     if (!best)
       for (const x of terms) {
         const hits = pagesFor(x);
