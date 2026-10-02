@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { MODE_LABELS } from './modes.js';
 
 /**
  * Sensor looks rendered as Cesium post-process stages — the same idea as
@@ -170,15 +171,7 @@ const SHADERS = {
   snow: SNOW,
 };
 
-export const MODE_LABELS = {
-  normal: 'EO / NORMAL',
-  nvg: 'NVG / GEN III',
-  flir: 'FLIR / WHITE-HOT',
-  ironbow: 'FLIR / IRONBOW',
-  crt: 'CRT / ANALOG',
-  noir: 'NOIR / FILM',
-  snow: 'SNOW / FROST',
-};
+export { MODE_LABELS };
 
 export function createEffects(viewer) {
   const t0 = performance.now();

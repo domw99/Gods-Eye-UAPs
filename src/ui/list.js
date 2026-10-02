@@ -196,6 +196,7 @@ export function bindList({ onSelect }) {
   });
   document.getElementById('skip-link')?.addEventListener('click', (e) => {
     e.preventDefault();
+    if (document.body.classList.contains('moon-open')) return void document.getElementById('moon-search')?.focus(); // the Moon's list
     document.getElementById('left').classList.remove('collapsed');
     document.body.classList.remove('left-collapsed');
     search.focus();

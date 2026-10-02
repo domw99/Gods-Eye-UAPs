@@ -21,6 +21,10 @@ import { SPACE } from './space.js';
  */
 export const MOON_KINDS = ['sea', 'basin', 'crater', 'range', 'site'];
 export const MOON_RADIUS_KM = 1737.4;
+/** The colour of each kind of place, on the map and in the list. */
+export const MOON_INK = { sea: '#c9d6e6', basin: '#c9d6e6', crater: '#eef1f5', range: '#b9c6d6', site: '#7dffb2', report: '#00d4ff' };
+/** The groups the layer list turns on and off: a basin goes with the seas. */
+export const moonGroup = (kind) => (kind === 'basin' ? 'sea' : kind);
 
 const f = (id, name, kind, lat, lon, tier, english, view) => ({ id, name, kind, lat, lon, tier, english, view });
 
@@ -152,6 +156,43 @@ export const MOON_SITES = [
   s('slim', 'SLIM', -13.3, 25.25, '19 Jan 2024', 'Japan; a precision landing, on the slope of a small crater', 2024),
   s('im-1', 'IM-1 Odysseus', -80.13, 1.44, '22 Feb 2024', 'Intuitive Machines (U.S.); the first commercial landing, near Malapert A', 2024),
 ];
+
+/**
+ * When each one landed (UTC), for lighting the map by the Sun at that moment.
+ * The Apollo times are from the mission reports; `≈` marks the Luna landings,
+ * whose time of day is less certain than their date.
+ */
+const LANDED = {
+  'luna-2': '1959-09-13T21:02:24Z',
+  'luna-9': '1966-02-03T18:45:30Z',
+  'surveyor-1': '1966-06-02T06:17:36Z',
+  'surveyor-3': '1967-04-20T00:04:17Z',
+  'surveyor-5': '1967-09-11T00:46:44Z',
+  'surveyor-6': '1967-11-10T01:01:06Z',
+  'surveyor-7': '1968-01-10T01:05:36Z',
+  'apollo-11': '1969-07-20T20:17:40Z',
+  'apollo-12': '1969-11-19T06:54:35Z',
+  'apollo-14': '1971-02-05T09:18:11Z',
+  'apollo-15': '1971-07-30T22:16:29Z',
+  'apollo-16': '1972-04-21T02:23:35Z',
+  'apollo-17': '1972-12-11T19:54:57Z',
+  'luna-16': '1970-09-20T05:18:00Z≈',
+  'luna-17': '1970-11-17T03:47:00Z≈',
+  'luna-20': '1972-02-21T19:19:00Z≈',
+  'luna-21': '1973-01-15T22:35:00Z≈',
+  'luna-24': '1976-08-18T06:36:00Z≈',
+  'change-3': '2013-12-14T13:11:00Z',
+  'change-4': '2019-01-03T02:26:00Z',
+  'change-5': '2020-12-01T15:11:00Z',
+  'change-6': '2024-06-01T22:23:00Z',
+  'chandrayaan-3': '2023-08-23T12:33:00Z',
+  slim: '2024-01-19T15:20:00Z',
+  'im-1': '2024-02-22T23:23:00Z',
+};
+for (const site of MOON_SITES) {
+  const at = LANDED[site.id];
+  if (at) site.moment = { at: at.replace('≈', ''), approx: at.endsWith('≈') };
+}
 
 export const MOON_PLACES = [...MOON_FEATURES, ...MOON_SITES];
 

@@ -1,7 +1,9 @@
 name: Release
 
 # Publish a GitHub release from the notes in .github/release-notes/<tag>.md,
-# tagging the commit this runs on. Run it from the Actions tab.
+# tagging the commit this runs on. Run it from the Actions tab. Run it again
+# for a release that already exists to refresh its notes and assets (a new
+# video, say); the tag stays where it is.
 on:
   workflow_dispatch:
     inputs:
@@ -30,4 +32,9 @@ jobs:
           test -f "$notes" || { echo "Missing $notes"; exit 1; }
           assets=()
           for f in docs/media/demo.mp4 "docs/media/whats-new-${TAG#v}.mp4" docs/media/share-card.jpg; do [ -f "$f" ] && assets+=("$f"); done
-          gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" --notes-file "$notes" --latest "${assets[@]}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TITLE" --notes-file "$notes"
+            if [ ${#assets[@]} -gt 0 ]; then gh release upload "$TAG" "${assets[@]}" --clobber; fi
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" --notes-file "$notes" --latest "${assets[@]}"
+          fi

@@ -14,6 +14,8 @@ import { link } from './cases/helpers.js';
  *   moon   [{ lat, lon, label }] selenographic positions (east longitudes
  *          positive), drawn on the near-side map
  *   moonFar  the same, for places past the limb: only the Moon map shows them
+ *   moment   { at: ISO time, approx } when it was seen, for lighting the Moon
+ *            map by the Sun at that moment (the reports give a night, not a minute)
  *   earth  { lat, lon, note } where the spacecraft was, for a fly-to on the globe
  *   official  DVIDS ids of the NASA files in the 2026 PURSUE releases; they open
  *          in the app like any other official record
@@ -182,6 +184,7 @@ export const SPACE = [
       'On the night of April 19, 1787 the astronomer William Herschel saw three red glowing spots on the dark part of the Moon, and the next night they were still glowing, with the one near Aristarchus brighter and larger, at least five kilometres across. He took them to be erupting volcanoes and invited King George III to look through the royal telescope. His “Account of Three Volcanoes in the Moon” was read to the Royal Society on April 26.',
     explanation:
       'The cause is not settled. The reports coincided with a rare aurora seen in Padua, and a recent paper asks whether the glow was impact melt from a meteoroid of the Lyrid shower.',
+    moment: { at: '1787-04-19T22:00:00Z', approx: true },
     moon: [{ lat: 23.7, lon: -47.4, label: 'Aristarchus' }],
     sources: [
       link('Wikipedia — Transient lunar phenomenon', 'https://en.wikipedia.org/wiki/Transient_lunar_phenomenon'),
@@ -200,6 +203,7 @@ export const SPACE = [
       'Using a 48-inch reflector with a spectrograph, the Soviet astronomer Nikolai Kozyrev watched the central peak of Alphonsus for about half an hour, as its colour and brightness changed, and it brightened before it faded. His spectra showed bright gaseous emission bands, which he took to be from carbon molecules (C2 and C3). It is among the best-known reports of a transient lunar phenomenon, because he recorded a spectrum and not just a colour.',
     explanation:
       'Gas escaping from beneath the surface is the usual explanation offered, but it has not been confirmed. The Lunar Prospector spacecraft did later detect radon coming from the craters Aristarchus and Kepler.',
+    moment: { at: '1958-11-03T00:00:00Z', approx: true },
     moon: [{ lat: -13.4, lon: -3.2, label: 'Alphonsus' }],
     sources: [
       link('Wikipedia — Alphonsus (crater)', 'https://en.wikipedia.org/wiki/Alphonsus_(crater)'),
@@ -218,6 +222,7 @@ export const SPACE = [
       'Two cartographers at the Lowell Observatory, James Greenacre and Edward Barr, saw very bright red, orange and pink glows near Aristarchus and Schröter’s Valley, in three places at once. The reports were written by hand and nothing was photographed, but Greenacre’s reputation as a careful observer led professional astronomers to take the whole subject more seriously. Patrick Moore coined the term “transient lunar phenomena” in a 1968 NASA report that he co-wrote.',
     explanation:
       'No agreed explanation. Outgassing, impacts, electrostatic effects and the conditions of observation (Earth’s atmosphere above all) have all been proposed.',
+    moment: { at: '1963-10-30T01:50:00Z', approx: true },
     moon: [{ lat: 24.2, lon: -49.5, label: 'Aristarchus / Schröter’s Valley' }],
     sources: [link('Wikipedia — Transient lunar phenomenon', 'https://en.wikipedia.org/wiki/Transient_lunar_phenomenon')],
   },
@@ -251,6 +256,7 @@ export const SPACE = [
       'NASA’s lunar impact monitoring at Marshall Space Flight Center recorded the brightest and longest-lasting flash its telescopes have seen, in Mare Imbrium, almost ten times brighter than anything it had observed before. It was caused by a meteoroid of about 40 kilograms, 0.3 to 0.4 metres across, striking at about 56,000 mph, with the energy of some five tons of TNT. The Lunar Reconnaissance Orbiter later found the new crater, 18 metres wide, with rays of ejecta reaching several kilometres.',
     explanation:
       'This one was solved: it is an example of what an impact flash looks like, and of how a transient event can be checked against a crater photographed afterwards.',
+    moment: { at: '2013-03-17T03:51:00Z', approx: true },
     moon: [{ lat: 20.6, lon: -23.9, label: 'Impact site' }],
     sources: [
       link('NASA Science — Bright explosion on the Moon', 'https://science.nasa.gov/science-research/planetary-science/16may_lunarimpact/'),

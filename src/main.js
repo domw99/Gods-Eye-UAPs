@@ -33,7 +33,7 @@ import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
-import { openMoon, closeMoon, isMoonOpen, moonGlobe } from './ui/moonview.js';
+import { openMoon, closeMoon, isMoonOpen, moonGlobe, setMoonMode, setMoonLighting } from './ui/moonview.js';
 import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
@@ -604,6 +604,7 @@ function setLighting(mode) {
     localStorage.setItem(LIGHT_KEY, mode);
   } catch {}
   applyLighting();
+  setMoonLighting(mode); // the switch lights whichever world is showing
 }
 document.getElementById('light-switch').addEventListener('click', (e) => {
   const b = e.target.closest('[data-light]');
@@ -1566,6 +1567,7 @@ function openExplainNow(prefill) {
 /* ── Sensor modes ──────────────────────────────────────── */
 function setMode(mode) {
   const m = effects.set(mode);
+  setMoonMode(m);
   render.request(); // keeps rendering while a sensor effect animates
   for (const b of document.querySelectorAll('.modes button')) b.setAttribute('aria-checked', String(b.dataset.mode === m));
   document.getElementById('hud-mode').textContent = MODE_LABELS[m];
@@ -1803,8 +1805,9 @@ function setCleanView(on = !document.body.classList.contains('clean')) {
 }
 document.getElementById('clean-exit').addEventListener('click', () => setCleanView(false));
 
-/** Opening a record takes the camera: stop orbiting, and bring the panels back to show it. */
+/** Opening a record takes the camera: back to the Earth, stop orbiting, and bring the panels back to show it. */
 function focusRecord() {
+  leaveMoon();
   if (flycam.orbiting) setOrbit(false);
   if (document.body.classList.contains('clean')) setCleanView(false);
 }
@@ -1860,7 +1863,10 @@ document.getElementById('map-controls').addEventListener('click', (e) => {
 });
 
 /* ── Top bar & keyboard ────────────────────────────────── */
-document.getElementById('btn-tour').addEventListener('click', startTour);
+document.getElementById('btn-tour').addEventListener('click', () => {
+  leaveMoon(); // the tour is of the Earth
+  startTour();
+});
 const openFiles = () =>
   openGovFiles(
     {
@@ -1886,6 +1892,7 @@ function openSpaceNow(focus) {
     focus,
     onMoonGlobe: () => openMoonNow(),
     onFly: ({ lat, lon }) => {
+      leaveMoon();
       deselect();
       viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 });
     },
@@ -1901,6 +1908,9 @@ let moonPushed = false; // this visit added a history entry for the map
 function openMoonNow(focus) {
   if (isMoonOpen()) return void openMoon({ focus });
   hideHover();
+  stopTour();
+  if (flycam.orbiting) setOrbit(false);
+  if (sweepTimer) toggleHistorySweep(); // the sweep through the years is the Earth's
   deselect({ keepHash: true });
   viewer.useDefaultRenderLoop = false;
   if (!MOON_ROUTE.test(location.hash)) {
@@ -1912,10 +1922,16 @@ function openMoonNow(focus) {
     officialById,
     focus,
     profile: deviceProfile(),
+    mode: effects.mode,
+    lighting: lightMode,
     onRoute: (id) => history.replaceState(history.state, '', `${location.pathname}${location.search}#/moon${id ? `/${encodeURIComponent(id)}` : ''}`),
-    onFly: ({ lat, lon }) => viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 }),
+    onFly: ({ lat, lon }) => {
+      leaveMoon();
+      viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 });
+    },
     onClose: () => {
       viewer.useDefaultRenderLoop = true;
+      markWorld();
       render.request();
       // Leave the address as it was: step back over the entry the map added, or clear it.
       if (MOON_ROUTE.test(location.hash)) {
@@ -1925,8 +1941,27 @@ function openMoonNow(focus) {
       moonPushed = false;
     },
   });
+  markWorld();
 }
-document.getElementById('btn-moon').addEventListener('click', () => openMoonNow());
+/** Back to the Earth because something there was asked for: the Moon's address is replaced rather than stepped back over. */
+function leaveMoon() {
+  if (!isMoonOpen()) return;
+  moonPushed = false;
+  closeMoon({ silent: true });
+}
+/** EARTH | MOON in the top bar (and U): which world is showing. */
+function markWorld() {
+  const moon = isMoonOpen();
+  for (const b of document.querySelectorAll('#world-switch [data-world]')) b.setAttribute('aria-checked', String((b.dataset.world === 'moon') === moon));
+}
+function showWorld(world) {
+  if (world === 'moon') openMoonNow();
+  else closeMoon();
+}
+document.getElementById('world-switch').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-world]');
+  if (b) showWorld(b.dataset.world);
+});
 document.getElementById('btn-space').addEventListener('click', () => openSpaceNow());
 document.getElementById('btn-log').addEventListener('click', openLog);
 document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
@@ -1969,7 +2004,10 @@ function openMapSettingsNow() {
     reopen: openMapSettingsNow,
   });
 }
-document.getElementById('btn-map').addEventListener('click', openMapSettingsNow);
+document.getElementById('btn-map').addEventListener('click', () => {
+  leaveMoon(); // the Earth's map settings
+  openMapSettingsNow();
+});
 
 /* Language: the picker in the top bar; what the pages translate on their own stays, what was built in code is redrawn. */
 {
@@ -2002,9 +2040,36 @@ function neighbour(delta) {
   select(keys[next], 'list');
 }
 
+const MODES = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
+/** Keys on the Moon: it has its own for turning, zooming and its list (ui/moonview.js); these are the ones the two worlds share. */
+function moonKey(e, typing) {
+  const dialog = document.getElementById('modal-root').children.length;
+  if (e.key === 'Escape') {
+    if (dialog) return backModal();
+    if (document.body.classList.contains('clean')) return setCleanView(false);
+    return showWorld('earth');
+  }
+  if (typing || dialog || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (/^[1-7]$/.test(e.key)) setMode(MODES[Number(e.key) - 1]);
+  else if (k === 'u') showWorld('earth');
+  else if (k === 't') {
+    leaveMoon();
+    startTour();
+  } else if (k === 'd') nextLighting();
+  else if (k === 'h') document.body.classList.toggle('hud-off');
+  else if (k === 'f') setCleanView();
+  else if (e.key === '?') openAboutModal();
+  else if (k === 'g') openFiles();
+  else if (k === 's') openStatsNow();
+  else if (k === 'k') openSpaceNow();
+  else if (k === 'l') openLog();
+  else if (k === 'e') openExplainNow();
+}
+
 window.addEventListener('keydown', (e) => {
-  if (isMoonOpen()) return; // the Moon map has its own keys
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+  if (isMoonOpen()) return moonKey(e, typing);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return backModal();
     if (story.active) return story.stop();
@@ -2025,8 +2090,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Shift') return flycam.key(e, true);
   if (e.key === ' ' && e.target.closest?.('button, a, summary, [role="option"], [tabindex]:not(body)')) return;
-  const modes = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
-  if (/^[1-7]$/.test(e.key)) setMode(modes[Number(e.key) - 1]);
+  if (/^[1-7]$/.test(e.key)) setMode(MODES[Number(e.key) - 1]);
   else if (e.key === '/') {
     e.preventDefault();
     document.getElementById('search').focus();

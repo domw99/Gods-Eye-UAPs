@@ -1,5 +1,8 @@
 import * as Cesium from 'cesium';
 import { loadStarSky } from './viewer.js';
+import { createEffects } from './effects.js';
+import { sunOnMoon } from './moonsun.js';
+import { MOON_INK, moonGroup } from '../data/moon.js';
 
 /**
  * The Moon as a globe you can turn and zoom, like the Earth one. Cesium draws
@@ -42,7 +45,8 @@ const TIER = {
   2: { reach: 0.85, font: '500 12px Inter, system-ui, sans-serif' },
   3: { reach: 0.5, font: '500 11px Inter, system-ui, sans-serif' },
 };
-const INK = { sea: '#c9d6e6', basin: '#c9d6e6', crater: '#eef1f5', range: '#b9c6d6', site: '#7dffb2', report: '#00d4ff' };
+const INK = MOON_INK;
+const groupOf = moonGroup;
 const HOME = { lat: 8, lon: 0 };
 const SURFACE = 1500; // m above the ground for pins and labels, so the globe doesn't clip them
 
@@ -113,8 +117,9 @@ function siteImage(fill) {
  * @param {(view: {lat: number, lon: number, height: number}) => void} [o.onView]  the camera moved
  * @param {(at: {lat: number, lon: number}|null) => void} [o.onPointer]  the ground under the pointer
  * @param {() => void} [o.onOffline]  NASA's detailed tiles can't be reached
+ * @param {() => number} [o.coveredTop]  how many pixels at the top of the globe the top bar hides
  */
-export async function createMoonGlobe(container, { base, creditContainer, profile = {}, onSelect, onHover, onView, onPointer, onOffline } = {}) {
+export async function createMoonGlobe(container, { base, creditContainer, profile = {}, onSelect, onHover, onView, onPointer, onOffline, coveredTop } = {}) {
   const viewer = new Cesium.Viewer(container, {
     ellipsoid: MOON,
     baseLayer: false,
@@ -138,6 +143,11 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   const low = Boolean(profile.low);
   const { scene, camera, entities } = viewer;
   scene.globe.enableLighting = false;
+  scene.globe.showGroundAtmosphere = false;
+  if (scene.skyAtmosphere) scene.skyAtmosphere.show = false;
+  // Cesium turns the shading off close to the ground (for the Earth's sake); on the Moon it stays at every height.
+  scene.globe.lightingFadeOutDistance = 0;
+  scene.globe.lightingFadeInDistance = 1;
   scene.globe.baseColor = Cesium.Color.fromCssColorString('#101114');
   scene.backgroundColor = Cesium.Color.fromCssColorString('#020306');
   scene.fog.enabled = false;
@@ -191,6 +201,15 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   }
   viewer.imageryLayers.addImageryProvider(provider(MOON_STYLES.photo));
   probe(MOON_STYLES.photo);
+  let light = 'off'; // see setLight
+  /** Night by earthshine: the pictures dimmed and greyed. */
+  function shadeLayers() {
+    for (let i = 0; i < viewer.imageryLayers.length; i++) {
+      const layer = viewer.imageryLayers.get(i);
+      layer.brightness = light === 'night' ? 0.42 : 1;
+      layer.saturation = light === 'night' ? 0.35 : 1;
+    }
+  }
   let reliefLayer = null;
   let style = 'photo';
   function useStyle(id) {
@@ -202,6 +221,7 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       reliefLayer = viewer.imageryLayers.addImageryProvider(provider(MOON_STYLES.relief));
       reliefLayer.alpha = MOON_STYLES.relief.alpha;
       probe(MOON_STYLES.relief);
+      shadeLayers();
     }
     scene.requestRender();
   }
@@ -217,9 +237,17 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   };
   let namesOn = true;
   let selectedId = null;
+  let raised = null; // a name moved off the selection ring, to put back
   let hoverId = null;
+  let shown = { report: true, site: true, sea: true, crater: true, range: true };
+  const groupById = new Map(); // entity id → its group
 
-  const reachOf = (tier) => (Number.isFinite(TIER[tier].reach) ? TIER[tier].reach * homeHeight() : 1e9);
+  // On a small screen the whole Moon is too small for even the main names: they appear at the first step in.
+  const small = () => Math.min(scene.canvas.clientWidth || 1000, scene.canvas.clientHeight || 800) < 420;
+  const reachOf = (tier) => {
+    const reach = tier === 1 && small() ? TIER[2].reach : TIER[tier].reach;
+    return Number.isFinite(reach) ? reach * homeHeight() : 1e9;
+  };
   const label = (text, { kind, tier = 2, offset = false, size, dy = 0 }) => ({
     text,
     font: size || (offset ? '600 12px Inter, system-ui, sans-serif' : TIER[tier].font),
@@ -239,12 +267,17 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   /** Put the places and the numbered reports on the globe. Keys: `place:<id>`, `report:<id>`. */
   function setPlaces({ places = [], reports = [] }) {
     entities.removeAll();
+    groupById.clear();
+    selectedId = null;
+    raised = null;
     for (const p of places) {
       const id = `place:${p.id}`;
       const isSite = p.kind === 'site';
+      groupById.set(id, groupOf(p.kind));
       entities.add({
         id,
         name: p.name,
+        show: shown[groupOf(p.kind)] !== false,
         position: atMoon(p.lat, p.lon, SURFACE),
         ...(isSite
           ? { billboard: { image: images.site, scale: 0.5, distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 1e9) } }
@@ -256,13 +289,25 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       for (const [i, site] of r.sites.entries()) {
         const id = i === 0 ? `report:${r.entry.id}` : `report:${r.entry.id}#${i}`;
         if (!images.report.has(r.n)) images.report.set(r.n, pinImage(String(r.n), { fill: '#00d4ff', ink: '#001018' }));
+        groupById.set(id, 'report');
         entities.add({
           id,
           name: r.entry.title,
+          show: shown.report !== false,
           position: atMoon(site.lat, site.lon, SURFACE * 2),
           billboard: { image: images.report.get(r.n), scale: 0.5, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, pixelOffset: new Cesium.Cartesian2(0, -2) },
         });
       }
+    }
+    scene.requestRender();
+  }
+
+  /** Show or hide groups of places: { report, site, sea, crater, range }. */
+  function setGroups(next) {
+    shown = { ...shown, ...next };
+    for (const e of entities.values) {
+      const g = groupById.get(e.id);
+      if (g) e.show = shown[g] !== false;
     }
     scene.requestRender();
   }
@@ -273,7 +318,6 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     scene.requestRender();
   }
 
-  let raised = null; // a name moved off the selection ring, to put back
   function select(key, at) {
     if (selectedId) entities.removeById(selectedId);
     if (raised) raised.label.pixelOffset = raised.was;
@@ -281,7 +325,8 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     selectedId = null;
     if (key && at) {
       selectedId = '__selected';
-      entities.add({ id: selectedId, position: atMoon(at.lat, at.lon, SURFACE * 3), billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0 } });
+      // Between the places (at SURFACE) and the report pins (at twice that), so a numbered pin stays in front of its ring.
+      entities.add({ id: selectedId, position: atMoon(at.lat, at.lon, SURFACE * 1.5), billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0 } });
       // A name written across the middle of the place sits under the ring: move it below.
       const named = entities.getById(key);
       if (named?.label && !named.billboard) {
@@ -306,13 +351,14 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
     });
   }
-  /** How high to look from so the whole Moon fills about three quarters of the shorter side. */
+  /** How high to look from so the whole Moon fills about three quarters of the shorter side, clear of the top bar. */
   function homeHeight() {
     const w = scene.canvas.clientWidth || 1000;
     const h = scene.canvas.clientHeight || 800;
     // The field of view spans the longer side.
     const focal = Math.max(w, h) / 2 / Math.tan(camera.frustum.fov / 2);
-    const distance = MOON.maximumRadius * Math.sqrt(1 + (focal / (0.39 * Math.min(w, h))) ** 2);
+    const radius = Math.max(60, Math.min(0.39 * Math.min(w, h), h / 2 - Math.max(0, coveredTop?.() || 0) - 14)); // on screen, in pixels
+    const distance = MOON.maximumRadius * Math.sqrt(1 + (focal / radius) ** 2);
     return distance - MOON.maximumRadius;
   }
   let framed = 0; // the height the whole-Moon view last looked from
@@ -340,6 +386,39 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     const step = Cesium.Math.clamp(height / (MOON.maximumRadius + height), 0.03, 1) * 0.35;
     if (dx) (dx > 0 ? camera.rotateRight : camera.rotateLeft).call(camera, Math.abs(dx) * step);
     if (dy) (dy > 0 ? camera.rotateDown : camera.rotateUp).call(camera, Math.abs(dy) * step);
+    scene.requestRender();
+  }
+
+  // ── Sensor looks and lighting, as on the Earth ──
+  const effects = createEffects(viewer);
+  let pulse = 0;
+  const lessMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  /** A sensor look (normal, nvg, flir, …); the grain is redrawn about 15 times a second. */
+  function setMode(mode) {
+    const m = effects.set(mode);
+    clearInterval(pulse);
+    if (m !== 'normal' && !lessMotion()) pulse = setInterval(() => !document.hidden && scene.requestRender(), 66);
+    scene.requestRender();
+    return m;
+  }
+  const flatLight = scene.light;
+  const viewLight = new Cesium.DirectionalLight({ direction: Cesium.Cartesian3.clone(Cesium.Cartesian3.UNIT_X) });
+  const stopFollow = scene.preRender.addEventListener(() => {
+    if (light === 'day') Cesium.Cartesian3.clone(camera.directionWC, viewLight.direction);
+  });
+  /**
+   * off: evenly lit. day: lit from where you look. night: by earthshine, dim
+   * and grey. moment: by the Sun as it stood at `at` (a Date).
+   */
+  function setLight(mode, at) {
+    light = mode === 'moment' && !at ? 'off' : mode;
+    if (light === 'moment') {
+      const sun = sunOnMoon(at);
+      // The light travels from the Sun, so it points the other way.
+      scene.light = new Cesium.DirectionalLight({ direction: new Cesium.Cartesian3(-sun.x, -sun.y, -sun.z) });
+    } else scene.light = light === 'day' ? viewLight : flatLight;
+    scene.globe.enableLighting = light === 'moment' || light === 'day';
+    shadeLayers();
     scene.requestRender();
   }
 
@@ -382,6 +461,12 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     zoom,
     turn,
     where,
+    setGroups,
+    setMode,
+    setLight,
+    get light() {
+      return light;
+    },
     setStyle: useStyle,
     get style() {
       return style;
@@ -399,6 +484,8 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       if (on) scene.requestRender();
     },
     destroy() {
+      clearInterval(pulse);
+      stopFollow();
       stopChanged();
       stopMove();
       handler.destroy();

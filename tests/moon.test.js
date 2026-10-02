@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { MOON_FEATURES, MOON_SITES, MOON_PLACES, MOON_KINDS, moonReports, searchMoon, viewHeight } from '../src/data/moon.js';
 import { SPACE } from '../src/data/space.js';
-import { parseKey, fmtLatLon } from '../src/ui/moonview.js';
+import { parseKey, fmtLatLon, sunElevation } from '../src/ui/moonview.js';
+import { sunOnMoon } from '../src/app/moonsun.js';
 
 describe('places on the Moon', () => {
   it('has unique ids that don’t collide with the lunar reports', () => {
@@ -116,5 +117,46 @@ describe('map keys and positions', () => {
   it('writes latitude and longitude with their hemispheres', () => {
     expect(fmtLatLon(0.674, 23.473)).toBe('0.67°N 23.47°E');
     expect(fmtLatLon(-69.37, -32.32)).toBe('69.37°S 32.32°W');
+  });
+});
+
+describe('the Sun on the Moon', () => {
+  const lonDiff = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
+
+  it('stands over the middle of the near side at full Moon, and over the far side at new Moon', () => {
+    expect(lonDiff(sunOnMoon(new Date('2024-01-25T17:54:00Z')).lon, 0)).toBeLessThan(8); // full Moon (libration moves it a few degrees)
+    expect(lonDiff(sunOnMoon(new Date('2024-01-11T11:57:00Z')).lon, 180)).toBeLessThan(8); // new Moon
+    expect(lonDiff(sunOnMoon(new Date('2024-01-18T03:52:00Z')).lon, 90)).toBeLessThan(8); // first quarter: the east half is lit
+    expect(Math.abs(sunOnMoon(new Date('2024-01-18T03:52:00Z')).lat)).toBeLessThan(2); // the Moon's axis is nearly upright
+  });
+
+  it('gives a unit vector that agrees with its latitude and longitude', () => {
+    const s = sunOnMoon(new Date('2020-06-01T00:00:00Z'));
+    expect(Math.hypot(s.x, s.y, s.z)).toBeCloseTo(1, 9);
+    expect(Math.atan2(s.y, s.x) * (180 / Math.PI)).toBeCloseTo(s.lon, 6);
+  });
+
+  it('puts the Sun low in the east at the Apollo landings, as the missions planned', () => {
+    // Documented Sun elevations: Apollo 11 10.8°, Apollo 12 5.1°, Apollo 17 13.3°.
+    const at = (id) => MOON_SITES.find((p) => p.id === id);
+    for (const [id, deg] of [['apollo-11', 10.8], ['apollo-12', 5.1], ['apollo-17', 13.3]]) {
+      const p = at(id);
+      expect(sunElevation(p.lat, p.lon, new Date(p.moment.at)), id).toBeCloseTo(deg, 0);
+    }
+  });
+
+  it('has a landing time for every site, flagged when only the date is sure', () => {
+    for (const p of MOON_SITES) {
+      expect(p.moment?.at, p.id).toMatch(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/);
+      expect(new Date(p.moment.at).getUTCFullYear(), p.id).toBe(p.year);
+    }
+    expect(MOON_SITES.find((p) => p.id === 'luna-24').moment.approx).toBe(true);
+    expect(MOON_SITES.find((p) => p.id === 'apollo-11').moment.approx).toBe(false);
+  });
+
+  it('gives the lunar reports with a known night a moment to light the map by', () => {
+    const lit = moonReports().filter((r) => r.entry.moment);
+    expect(lit.map((r) => r.entry.id)).toEqual(['moon-1787', 'moon-1958', 'moon-1963', 'moon-2013']);
+    for (const r of lit) expect(new Date(r.entry.moment.at).getUTCFullYear()).toBe(r.entry.year);
   });
 });

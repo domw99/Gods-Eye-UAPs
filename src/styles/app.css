@@ -97,7 +97,7 @@ body.dossier-open #globe .cesium-widget-credits { right: calc(var(--right-w) + 2
 .cesium-viewer .cesium-widget canvas { outline: none; }
 
 /* Scope ring vignette used by sensor modes */
-#scope {
+#scope, .moon-scope {
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -105,9 +105,9 @@ body.dossier-open #globe .cesium-widget-credits { right: calc(var(--right-w) + 2
   transition: opacity var(--smooth);
   background: radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.9) 100%);
 }
-body[data-mode='nvg'] #scope,
-body[data-mode='flir'] #scope,
-body[data-mode='ironbow'] #scope { opacity: 1; }
+body[data-mode='nvg'] :is(#scope, .moon-scope),
+body[data-mode='flir'] :is(#scope, .moon-scope),
+body[data-mode='ironbow'] :is(#scope, .moon-scope) { opacity: 1; }
 
 /* ── Top bar ───────────────────────────────────── */
 .topbar {
@@ -188,11 +188,11 @@ body[data-mode='ironbow'] #scope { opacity: 1; }
   z-index: 15;
   min-height: 0;
 }
-#left { left: calc(10px + var(--sal)); width: var(--left-w); transition: transform var(--smooth); }
-#left.collapsed { transform: translateX(calc(-1 * var(--left-w) + 46px)); }
-#left.collapsed .panel-body { visibility: hidden; }
-#left.collapsed #left-collapse { transform: rotate(180deg); }
-#dossier { right: calc(10px + var(--sar)); width: var(--right-w); }
+:is(#left, #moon-left) { left: calc(10px + var(--sal)); width: var(--left-w); transition: transform var(--smooth); }
+:is(#left, #moon-left).collapsed { transform: translateX(calc(-1 * var(--left-w) + 46px)); }
+:is(#left, #moon-left).collapsed .panel-body { visibility: hidden; }
+#left.collapsed #left-collapse, #moon-left.collapsed #moon-collapse { transform: rotate(180deg); }
+:is(#dossier, #moon-dossier) { right: calc(10px + var(--sar)); width: var(--right-w); }
 
 .panel-head {
   display: flex;
@@ -205,8 +205,8 @@ body[data-mode='ironbow'] #scope { opacity: 1; }
 .panel-head .muted { font-size: 11px; margin-right: auto; }
 .panel-body { overflow-y: auto; padding: 12px 14px 16px; min-height: 0; flex: 1; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.15) transparent; }
 
-#search { width: 100%; padding: 9px 11px; font-size: 13px; }
-#search::placeholder { color: var(--text-dim); }
+:is(#search, #moon-search) { width: 100%; padding: 9px 11px; font-size: 13px; }
+:is(#search, #moon-search)::placeholder { color: var(--text-dim); }
 
 .section-label {
   font-family: var(--font-mono);
@@ -545,7 +545,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
 @media (max-width: 900px) {
   :root { --top-h: 96px; }
   .topbar { flex-wrap: wrap; padding: 8px 10px; gap: 6px 8px; }
-  .brand { order: 1; }
+  .brand, .worlds { order: 1; }
   .lighting { order: 2; margin-left: auto; }
   .modes { margin-left: 0; order: 3; width: 100%; justify-content: space-between; }
   .modes button { flex: 1; padding: 6px 4px; font-size: 10px; }
@@ -560,13 +560,13 @@ body:not(.tl-hidden) .tl-show { display: none; }
   .brand-name { font-size: 12px; }
   .top-actions .chip { font-size: 10px; padding: 6px 7px; }
   #btn-log { display: none; }
-  #left { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); width: auto; top: auto; bottom: var(--bottom-gap); height: 44vh; }
-  #left.collapsed { transform: translateY(calc(44vh - 44px)); }
-  #left.collapsed #left-collapse { transform: rotate(-90deg); }
-  #left-collapse { transform: rotate(90deg); }
-  #dossier { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); width: auto; top: calc(var(--top-off) + 16px); bottom: var(--bottom-gap); z-index: 18; transition: top var(--smooth); }
-  #dossier.peek { top: calc(100vh - var(--bottom-gap) - 36vh); }
-  #dossier.peek #dossier-peek { transform: rotate(180deg); }
+  :is(#left, #moon-left) { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); width: auto; top: auto; bottom: var(--bottom-gap); height: 44vh; }
+  :is(#left, #moon-left).collapsed { transform: translateY(calc(44vh - 44px)); }
+  #left.collapsed #left-collapse, #moon-left.collapsed #moon-collapse { transform: rotate(-90deg); }
+  #left-collapse, #moon-collapse { transform: rotate(90deg); }
+  :is(#dossier, #moon-dossier) { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); width: auto; top: calc(var(--top-off) + 16px); bottom: var(--bottom-gap); z-index: 18; transition: top var(--smooth); }
+  :is(#dossier, #moon-dossier).peek { top: calc(100vh - var(--bottom-gap) - 36vh); }
+  #dossier.peek #dossier-peek, #moon-dossier.peek [data-moon='peek'] { transform: rotate(180deg); }
   .mobile-only { display: inline-grid !important; }
   body.dossier-open #playback { bottom: calc(36vh + var(--bottom-gap) + 8px); }
   body.dossier-open:not(.dossier-peek) #playback { display: none; }
@@ -754,7 +754,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .made-by { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--text-dim); opacity: 0.75; text-transform: none; }
 .made-by a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; pointer-events: auto; }
 .made-by a:hover { color: var(--accent); }
-#left .made-by { margin: 14px 0 2px; text-align: center; }
+:is(#left, #moon-left) .made-by { margin: 14px 0 2px; text-align: center; }
 .hud-br .made-by { margin-top: 4px; }
 #loading .made-by { color: var(--text-secondary); opacity: 1; position: absolute; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; text-align: center; letter-spacing: 0.2em; }
 .modal .made-by { margin: 6px 0 0; }
@@ -762,7 +762,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 
 /* ── Clean view (F): only the globe ───────────────────── */
 body.clean .topbar, body.clean #left, body.clean #dossier, body.clean #timeline, body.clean .tl-show, body.clean #playback,
-body.clean .map-controls, body.clean #active-filters { opacity: 0; pointer-events: none; transition: opacity 200ms; }
+body.clean .map-controls, body.clean #active-filters, body.clean .moon-view .panel, body.clean .moon-credit { opacity: 0; pointer-events: none; transition: opacity 200ms; }
 body.clean .hud-br, body.clean .hud-tl { opacity: 0.7; }
 .clean-exit { position: fixed; top: calc(12px + var(--sat)); right: calc(12px + var(--sar)); z-index: 40; font-size: 10px; opacity: 0.75; }
 .clean-exit:hover { opacity: 1; }
@@ -805,6 +805,11 @@ body.clean .thermal-scale { left: 20px; }
 .install-steps li::marker { color: var(--accent); font-family: var(--font-mono); }
 .welcome .install-chip { display: none; }
 @media (pointer: coarse) { body.can-install .welcome .install-chip { display: inline-block; } }
+/* A phone keeps the logo, and gives the brand name's room to EARTH | MOON and the lighting, on one row. */
+@media (max-width: 560px) {
+  .brand > div { display: none; }
+  .worlds button { padding: 0 9px 0 7px; font-size: 10.5px; }
+}
 @media (max-width: 400px) {
   .brand-name { font-size: 11px; letter-spacing: 0.08em; }
   .brand img { width: 22px; height: 22px; }
@@ -864,62 +869,42 @@ html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .muf
 html[data-text-dir='rtl'] .space-card :is(p, h3, .sc-where, .sc-files li, .sc-sources li) { unicode-bidi: plaintext; text-align: start; }
 @media (prefers-reduced-motion: reduce) { .space-card.flash { animation: none; border-color: var(--accent); } }
 
-/* ── Moon map: a full-screen globe of the Moon ── */
+/* ── Two worlds: EARTH | MOON in the top bar ── */
+.worlds { display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); }
+.worlds button { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px 0 8px; border-radius: 7px; font: 500 11px var(--font-mono); letter-spacing: 0.08em; color: var(--text-secondary); transition: background var(--fast), color var(--fast); }
+@media (hover: hover) { .worlds button:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.06); } }
+.worlds button[aria-checked='true'] { color: #001018; background: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+.worlds svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.worlds svg .fill { fill: currentColor; stroke: none; }
+
+/* ── The Moon: the Earth's layout, under the same top bar ──
+   The Moon's own globe, list, dossier, HUD and controls replace the Earth's
+   while it is open; the sensor looks and the lighting carry over. */
 .moon-launch { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 12px; }
 .moon-launch .dim { font-size: 11.5px; line-height: 1.45; flex: 1 1 220px; }
-.moon-view { position: fixed; inset: 0; z-index: 35; background: #020306; color: var(--text-primary); }
-.moon-globe { position: absolute; top: 0; bottom: 0; right: 0; left: calc(var(--sal) + 360px); overflow: hidden; }
+body.moon-open { --bottom-gap: calc(38px + var(--sab)); }
+body.moon-open :is(#left, #dossier, #hud, #map-controls, #timeline, .tl-show, #playback, #story, #welcome, #thermal-scale, #scope) { display: none !important; }
+body.moon-open #globe { visibility: hidden; }
+.moon-view { position: fixed; inset: 0; z-index: 12; background: #020306; color: var(--text-primary); }
+.moon-globe { position: absolute; inset: 0; overflow: hidden; }
 .moon-globe:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
 .moon-globe .cesium-viewer, .moon-globe .cesium-viewer-cesiumWidgetContainer, .moon-globe .cesium-widget { position: absolute; inset: 0; width: 100%; height: 100%; }
 .moon-globe .cesium-widget canvas { width: 100%; height: 100%; outline: none; }
-.moon-top { position: absolute; z-index: 3; top: calc(10px + var(--sat)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); display: flex; align-items: center; gap: 10px 14px; padding: 8px 12px; border-radius: var(--panel-radius); }
-.moon-heading { display: grid; line-height: 1.25; min-width: 0; }
-.moon-heading b { font: 600 12px var(--font-mono); letter-spacing: 0.22em; color: var(--accent); }
-.moon-heading span { font-size: 10px; letter-spacing: 0.14em; }
-.moon-tools { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.moon-styles { display: flex; gap: 4px; }
-.moon-panel { position: absolute; z-index: 2; left: calc(10px + var(--sal)); top: calc(var(--sat) + 72px); bottom: calc(10px + var(--sab)); width: min(340px, calc(100% - 20px)); display: flex; flex-direction: column; border-radius: var(--panel-radius); overflow: hidden; }
-.moon-panel .panel-body { overflow-y: auto; padding: 10px 12px 14px; min-height: 0; flex: 1; }
-.moon-fold { display: none; }
-.moon-search { width: 100%; padding: 8px 10px; margin-bottom: 4px; }
-.moon-search[hidden], #moon-list[hidden], #moon-detail[hidden] { display: none; }
-.moon-group h3 { margin: 14px 0 5px; font: 600 10px var(--font-mono); letter-spacing: 0.14em; color: var(--accent); }
-.moon-group ul { list-style: none; display: grid; gap: 1px; }
-.moon-item { display: flex; align-items: flex-start; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 8px; text-align: start; }
-.moon-item:hover, .moon-item:focus-visible { background: var(--accent-dim); }
-.moon-item .sc-num { margin-top: 1px; }
-.mi-text { display: grid; min-width: 0; flex: 1; }
-.mi-name { font-size: 12.5px; font-weight: 500; line-height: 1.35; }
-.mi-note { font-size: 11px; line-height: 1.35; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.moon-none { margin-top: 14px; line-height: 1.5; }
-.moon-detail { display: grid; gap: 8px; min-width: 0; }
-.moon-detail h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
-.moon-detail p { font-size: 13px; line-height: 1.55; color: rgba(232, 234, 237, 0.88); }
-.moon-detail .space-list { list-style: none; display: grid; gap: 10px; }
-.moon-detail .space-card { padding: 0; border: 0; background: none; }
-.moon-detail .chip.small { justify-self: start; }
-.moon-hud { position: absolute; z-index: 2; right: calc(16px + var(--sar)); bottom: calc(50px + var(--sab)); display: flex; gap: 0; font-size: 10.5px; letter-spacing: 0.06em; color: var(--text-primary); text-shadow: 0 1px 2px #000; pointer-events: none; }
-.moon-zoom { position: absolute; z-index: 2; right: calc(16px + var(--sar)); top: 50%; transform: translateY(-50%); display: grid; width: 46px; padding: 3px; border-radius: 12px; }
-.moon-zoom .icon-btn { width: 40px; height: 40px; font-size: 20px; }
-.moon-credit { position: absolute; z-index: 2; right: calc(14px + var(--sar)); bottom: calc(6px + var(--sab)); max-width: calc(100% - 400px); display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-size: 10px; line-height: 1.4; text-align: end; color: var(--text-secondary); text-shadow: 0 1px 2px #000; }
-.moon-credit .cesium-widget-credits { position: static; display: block; padding: 0; }
-.moon-credit .cesium-credit-textContainer, .moon-credit .cesium-credit-logoContainer { display: inline; }
-.moon-credit a { color: var(--text-secondary); }
-.moon-credit img { vertical-align: middle; max-height: 14px; }
-body.moon-open { overflow: hidden; }
-@media (max-width: 720px) {
-  .moon-top { flex-wrap: wrap; padding: 8px 10px; }
-  .moon-tools { margin-left: 0; width: 100%; }
-  .moon-panel { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); top: auto; bottom: calc(8px + var(--sab)); width: auto; max-height: 46vh; }
-  .moon-globe { left: 0; top: 92px; bottom: 46vh; }
-  .moon-view.folded .moon-globe { bottom: 52px; }
-  .moon-panel.collapsed { max-height: none; }
-  .moon-panel.collapsed .panel-body { display: none; }
-  .moon-fold { display: grid; }
-  .moon-hud { display: none; }
-  .moon-zoom { top: 150px; transform: none; }
-  .moon-credit { bottom: calc(46vh + 6px + var(--sab)); max-width: calc(100% - 24px); }
-  .moon-view.folded .moon-credit { bottom: calc(56px + var(--sab)); }
-}
-html[data-text-dir='rtl'] :is(.moon-item .mi-name, .moon-item .mi-note, .moon-detail :is(p, h3, .sc-where)) { unicode-bidi: plaintext; text-align: start; }
+.case-item.numbered { grid-template-columns: 20px 1fr; gap: 8px; }
+.case-item .num { display: grid; place-items: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: var(--accent); color: #001018; font: 700 11px var(--font-mono); box-shadow: 0 0 8px var(--accent-glow); }
+#moon-left .case-empty .dim { font-size: 11px; }
+.link-btn.moon-site { font: 500 12.5px var(--font-sans); letter-spacing: 0; text-align: start; }
+.moon-credit { position: fixed; z-index: 16; left: calc(14px + var(--sal)); right: calc(14px + var(--sar)); bottom: calc(9px + var(--sab)); display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 0 10px; font-size: 10px; line-height: 1.5; text-align: end; color: var(--text-secondary); opacity: 0.75; text-shadow: 0 1px 2px #000; pointer-events: none; }
+.moon-credit a { color: inherit; pointer-events: auto; }
+.moon-credit .cesium-widget-credits { position: static; display: inline; padding: 0; }
+.moon-credit .cesium-credit-textContainer { display: inline; }
+.moon-credit .cesium-credit-logoContainer { display: none !important; }
 #moon-credit-text { unicode-bidi: plaintext; }
+@media (max-width: 720px) {
+  body.moon-open { --bottom-gap: calc(54px + var(--sab)); }
+  /* The Moon is one round thing to look at: on a phone it fits the space between the top bar and the list. */
+  .moon-globe { top: calc(var(--top-off) + 6px); }
+  body.moon-open:not(.left-collapsed) .moon-globe { bottom: calc(44vh + var(--bottom-gap)); }
+  .moon-credit { justify-content: center; text-align: center; bottom: calc(6px + var(--sab)); }
+}
+html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }

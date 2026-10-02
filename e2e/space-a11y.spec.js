@@ -82,73 +82,133 @@ test.describe('Space & Moon links', () => {
   });
 });
 
-test.describe('Moon map', () => {
-  test('opens from the top bar with a globe, places and pins, and Esc returns to the Earth', async ({ page }) => {
+test.describe('The Moon', () => {
+  test('EARTH | MOON in the top bar switches worlds, and the sensor looks, lighting and dialogs work on both', async ({ page }) => {
     const errors = await openApp(page);
-    await page.locator('#btn-moon').click();
+    await page.locator('[data-world="moon"]').click();
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
-    expect(await page.locator('#moon-view .moon-item').count()).toBeGreaterThan(100);
-    await expect(page.locator('#moon-view [data-key^="report:"]')).toHaveCount(6);
+    await expect(page.locator('[data-world="moon"]')).toHaveAttribute('aria-checked', 'true');
+    expect(await page.locator('#moon-list .case-item').count()).toBeGreaterThan(100);
+    await expect(page.locator('#moon-list [data-key^="report:"]')).toHaveCount(6);
     expect(await page.evaluate(() => location.hash)).toBe('#/moon');
-    // The Earth is switched off behind it: no drawing, no keys, nothing to tab to.
+    // The Earth's panels give way to the Moon's, and the Earth stops drawing.
+    await expect(page.locator('#left')).toBeHidden();
+    await expect(page.locator('#moon-left')).toBeVisible();
+    await expect(page.locator('.topbar')).toBeVisible();
     expect(await page.evaluate(() => window.__uap.viewer.useDefaultRenderLoop)).toBe(false);
-    expect(await page.locator('#left').evaluate((el) => el.closest('[inert]') !== null || el.hasAttribute('inert'))).toBe(true);
-    await page.keyboard.press('k');
-    await expect(page.locator('#modal-root .modal')).toHaveCount(0);
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#moon-view')).toHaveCount(0);
-    expect(await page.evaluate(() => location.hash)).toBe('');
-    expect(await page.evaluate(() => window.__uap.viewer.useDefaultRenderLoop)).toBe(true);
+    await page.waitForFunction(() => window.__uap.moonGlobe());
+    // A sensor look (3: FLIR) and the lighting switch apply to the Moon.
+    await page.locator('#moon-globe').focus();
+    await page.keyboard.press('3');
+    await expect(page.locator('#moon-view [data-hud="mode"]')).toHaveText('FLIR / WHITE-HOT');
+    const flir = () =>
+      page.evaluate(() => {
+        const stages = window.__uap.moonGlobe().viewer.scene.postProcessStages;
+        for (let i = 0; i < stages.length; i++) if (stages.get(i).name === 'uap-flir') return stages.get(i).enabled;
+        return null;
+      });
+    expect(await flir()).toBe(true);
+    await page.keyboard.press('1');
+    await page.locator('[data-light="day"]').click();
+    expect(await page.evaluate(() => window.__uap.moonGlobe().light)).toBe('day');
+    await page.locator('[data-light="auto"]').click();
+    expect(await page.evaluate(() => window.__uap.moonGlobe().light)).toBe('off'); // nothing selected: evenly lit
+    // A dialog opens over the Moon, and Esc closes the dialog, not the Moon.
     await page.keyboard.press('k');
     await expect(page.locator('#modal-root .modal')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#modal-root .modal')).toHaveCount(0);
+    await expect(page.locator('#moon-view')).toHaveCount(1);
+    await page.locator('[data-world="earth"]').click();
+    await expect(page.locator('#moon-view')).toHaveCount(0);
+    await expect(page.locator('[data-world="earth"]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('#left')).toBeVisible();
+    expect(await page.evaluate(() => location.hash)).toBe('');
+    expect(await page.evaluate(() => window.__uap.viewer.useDefaultRenderLoop)).toBe(true);
     expect(errors).toEqual([]);
   });
 
-  test('flies to a place from the list, shows what it is, and goes back to the list', async ({ page }) => {
+  test('a place from the list opens its dossier, lit by the Sun of its landing, and closing it keeps the Moon', async ({ page }) => {
     await openApp(page);
     await page.keyboard.press('u');
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
-    await page.locator('[data-key="place:apollo-11"]').click();
-    await expect(page.locator('#moon-detail h3')).toHaveText('Apollo 11');
-    await expect(page.locator('#moon-detail')).toContainText('20 Jul 1969');
+    await page.waitForFunction(() => window.__uap.moonGlobe());
+    await page.locator('#moon-list [data-key="place:apollo-11"]').click();
+    await expect(page.locator('#moon-dossier .d-title')).toHaveText('Apollo 11');
+    await expect(page.locator('#moon-dossier')).toContainText('20 Jul 1969');
+    await expect(page.locator('#moon-dossier')).toContainText('10.7° above the horizon');
+    await expect(page.locator('#moon-list [data-key="place:apollo-11"]')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#moon-view [data-hud="utc"]')).toContainText('1969-07-20 20:17:40');
+    await expect(page.locator('#moon-view [data-hud="tgt"]')).toHaveText('APOLLO 11');
+    expect(await page.evaluate(() => window.__uap.moonGlobe().light)).toBe('moment');
     expect(await page.evaluate(() => location.hash)).toBe('#/moon/apollo-11');
-    await page.locator('[data-moon="all"]').click();
-    await expect(page.locator('#moon-list')).toBeVisible();
+    await page.locator('[data-moon="close-dossier"]').click();
+    await expect(page.locator('#moon-dossier')).toBeHidden();
     expect(await page.evaluate(() => location.hash)).toBe('#/moon');
+    await expect(page.locator('#moon-view')).toHaveCount(1);
+    // ] opens the next row, Esc closes its dossier, and the next Esc goes back to the Earth.
+    await page.locator('#moon-globe').focus();
+    await page.keyboard.press(']');
+    await expect(page.locator('#moon-dossier')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#moon-dossier')).toBeHidden();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#moon-view')).toHaveCount(0);
   });
 
-  test('search narrows the list by name, English name or year', async ({ page }) => {
+  test('search and the layers narrow the list, and a layer hides its places on the globe', async ({ page }) => {
     await openApp(page);
-    await page.locator('#btn-moon').click();
+    await page.locator('[data-world="moon"]').click();
     await expect(page.locator('#moon-search')).toBeVisible({ timeout: 60_000 });
+    await page.waitForFunction(() => window.__uap.moonGlobe()?.viewer.entities.values.length > 100);
     await page.locator('#moon-search').fill('tranquility');
-    await expect(page.locator('#moon-list .moon-item')).toContainText(['Mare Tranquillitatis']);
+    await expect(page.locator('#moon-list .case-item')).toContainText(['Mare Tranquillitatis']);
     await page.locator('#moon-search').fill('1972');
     await expect(page.locator('#moon-list')).toContainText('Apollo 17');
     await page.locator('#moon-search').fill('zzzzqq');
-    await expect(page.locator('#moon-list .moon-none')).toBeVisible();
-    // Esc clears the search first, and only then closes.
+    await expect(page.locator('#moon-list .case-empty')).toBeVisible();
+    // Esc clears the search first, and the Moon stays.
     await page.keyboard.press('Escape');
     await expect(page.locator('#moon-search')).toHaveValue('');
     await expect(page.locator('#moon-view')).toHaveCount(1);
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#moon-view')).toHaveCount(0);
+    // Craters off: out of the list and off the globe.
+    await page.locator('[data-moon-layer="crater"]').click();
+    await expect(page.locator('[data-moon-layer="crater"]')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('#moon-list [data-key="place:tycho"]')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__uap.moonGlobe().viewer.entities.getById('place:tycho').show)).toBe(false);
+    await page.locator('[data-moon-layer="crater"]').click();
+    await expect(page.locator('#moon-list [data-key="place:tycho"]')).toHaveCount(1);
+    // Relief lays the altimeter's colours over the photograph.
+    await page.locator('[data-moon-layer="relief"]').click();
+    expect(await page.evaluate(() => window.__uap.moonGlobe().style)).toBe('relief');
+    await expect(page.locator('#moon-view [data-hud="map"]')).toContainText('LOLA RELIEF');
+    // A–Z puts Aitken first.
+    await page.locator('#moon-sort').selectOption('name');
+    await expect(page.locator('#moon-list .case-item .t').first()).toHaveText('Aitken');
   });
 
-  test('a link opens a lunar report, and Back leaves the map', async ({ page }) => {
+  test('a link opens a lunar report, Back leaves the Moon, and an Earth case brings the Earth back', async ({ page }) => {
     await openApp(page, '/#/moon/moon-1963');
-    await expect(page.locator('#moon-detail')).toContainText('Greenacre and Barr', { timeout: 60_000 });
-    await expect(page.locator('#moon-detail')).toContainText('WHAT IS KNOWN');
-    // Opened from a link: closing clears the address instead of stepping back out of the app.
-    await page.locator('[data-moon="close"]').click();
+    await expect(page.locator('#moon-dossier')).toContainText('Greenacre and Barr', { timeout: 60_000 });
+    await expect(page.locator('#moon-dossier')).toContainText('ASSESSMENT');
+    await expect(page.locator('#moon-dossier')).toContainText('LUNAR REPORT 4');
+    // Opened from a link: going to the Earth clears the address instead of stepping back out of the app.
+    await page.locator('[data-world="earth"]').click();
     await expect(page.locator('#moon-view')).toHaveCount(0);
     expect(await page.evaluate(() => location.hash)).toBe('');
     // Opened from the page: Back closes it.
-    await page.locator('#btn-moon').click();
+    await page.locator('[data-world="moon"]').click();
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
     await page.goBack();
     await expect(page.locator('#moon-view')).toHaveCount(0);
     expect(await page.evaluate(() => window.__uap.viewer.useDefaultRenderLoop)).toBe(true);
+    // A case asked for while on the Moon (a link, or a dialog) opens on the Earth.
+    await page.locator('[data-world="moon"]').click();
+    await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
+    await page.evaluate(() => (location.hash = '#/case/socorro-zamora-1964'));
+    await expect(page.locator('#moon-view')).toHaveCount(0);
+    await expect(page.locator('#dossier')).not.toHaveClass(/hidden/);
+    await expect(page.locator('[data-world="earth"]')).toHaveAttribute('aria-checked', 'true');
   });
 
   test('the keyboard turns and zooms the Moon, and clicking a pin on the globe shows its report', async ({ page }) => {
@@ -157,7 +217,7 @@ test.describe('Moon map', () => {
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
     await page.waitForFunction(() => window.__uap.moonGlobe() && window.__uap.moonGlobe().viewer.entities.values.length > 100);
     const where = () => page.evaluate(() => window.__uap.moonGlobe().where());
-    await expect.poll(async () => (await where()).height, { timeout: 20_000 }).toBeLessThan(4_000_000); // the first fly-in has finished
+    await expect.poll(async () => (await where()).height, { timeout: 20_000 }).toBeLessThan(6_000_000); // the first fly-in has finished
     const home = await where();
     await page.locator('#moon-globe').focus();
     await page.keyboard.press('ArrowRight');
@@ -168,11 +228,12 @@ test.describe('Moon map', () => {
     await expect.poll(async () => (await where()).height, { timeout: 8_000 }).toBeLessThan(home.height * 0.8);
     await page.keyboard.press('0');
     await expect.poll(async () => Math.abs((await where()).lon), { timeout: 15_000 }).toBeLessThan(1);
-    // N hides the names and shows them again.
+    // N hides the names and shows them again (and so does the button).
     const labels = () => page.evaluate(() => window.__uap.moonGlobe().viewer.entities.values.filter((e) => e.label).map((e) => e.label.show.getValue()));
     await page.keyboard.press('n');
     expect((await labels()).every((v) => v === false)).toBe(true);
-    await page.keyboard.press('n');
+    await expect(page.locator('[data-moon="names"]')).toHaveAttribute('aria-pressed', 'false');
+    await page.locator('[data-moon="names"]').click();
     expect((await labels()).every((v) => v === true)).toBe(true);
     // A pin: hover names it, a click opens its report.
     const at = await page.evaluate(() => {
@@ -184,10 +245,10 @@ test.describe('Moon map', () => {
     await page.mouse.move(at.x, at.y);
     await expect(page.locator('.moon-tip')).toContainText('Kozyrev at Alphonsus');
     await page.mouse.click(at.x, at.y);
-    await expect(page.locator('#moon-detail h3')).toHaveText('Kozyrev at Alphonsus');
+    await expect(page.locator('#moon-dossier .d-title')).toHaveText('Kozyrev at Alphonsus');
   });
 
-  test('the Moon tab of Space & Moon opens the map', async ({ page }) => {
+  test('the Moon tab of Space & Moon opens the Moon', async ({ page }) => {
     await openApp(page);
     await page.locator('#btn-space').click();
     await page.locator('#space-tab-moon').click();
@@ -199,14 +260,14 @@ test.describe('Moon map', () => {
   test('COPY LINK gives a link that opens that place', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await openApp(page, '/#/moon/tycho');
-    await expect(page.locator('#moon-detail h3')).toHaveText('Tycho', { timeout: 60_000 });
-    await page.locator('#moon-detail [data-copy]').click();
+    await expect(page.locator('#moon-dossier .d-title')).toHaveText('Tycho', { timeout: 60_000 });
+    await page.locator('#moon-dossier [data-copy]').click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/#\/moon\/tycho$/);
   });
 
   test('has no detectable accessibility violations', async ({ page }) => {
     await openApp(page);
-    await page.locator('#btn-moon').click();
+    await page.locator('[data-world="moon"]').click();
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
     await page.locator('[data-key="report:moon-1958"]').click();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice']).exclude('.moon-globe canvas').analyze();

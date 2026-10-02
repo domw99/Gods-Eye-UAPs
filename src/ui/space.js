@@ -37,7 +37,7 @@ export function moonXY(lat, lon) {
 /** The link to one report: the app opens Space & Moon on it. */
 export const spaceLink = (id) => `${location.origin}${location.pathname}#/space/${id}`;
 
-const statusBadge = (s) => html`<span class="badge status-${s}">${t(STATUS[s]?.label || s)}</span>`;
+export const statusBadge = (s) => html`<span class="badge status-${s}">${t(STATUS[s]?.label || s)}</span>`;
 
 /** One report as a card: what was reported, what is known, the NASA files and the sources. */
 export function spaceCard(e, { officialById, number }) {
