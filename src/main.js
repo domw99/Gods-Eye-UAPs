@@ -1769,7 +1769,7 @@ function closeWelcome() {
   } catch {}
 }
 // Returning visitors hear once about what changed since they were here.
-const RELEASE = '1.4';
+const RELEASE = '1.5';
 const RELEASE_KEY = 'gods-eye-uap:release';
 function maybeWelcome() {
   let seen = false;
@@ -1782,12 +1782,7 @@ function maybeWelcome() {
   if (navigator.webdriver) return;
   if (!seen && !location.hash && !state.selected) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast(
-      matchMedia('(pointer: coarse)').matches
-        ? 'New: Moon map and Space & Moon in the top bar · 16 languages · 10 more cases · save it to your home screen'
-        : 'New: the Moon map (U) · Space & Moon (K) · 16 languages (top bar) · 10 more cases',
-      7000,
-    );
+    toast('New: 13 more cases, 161 in all, from the 1913 meteor procession to the 2024 drones over U.S. bases in England', 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
