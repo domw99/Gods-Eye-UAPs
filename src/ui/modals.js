@@ -1,6 +1,7 @@
 import { html, mount, safeUrl, toast } from '../util/dom.js';
 import { t, plural, locale } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
+import { shareRow } from './sharelinks.js';
 import { commonsPage } from '../services/wiki.js';
 import { STATUS, CATEGORY, EVIDENCE, SHAPES, evidenceScore, shapeClasses } from '../data/taxonomy.js';
 import { trackStats } from '../layers/tracks.js';
@@ -256,7 +257,9 @@ export function openAbout(meta) {
   const content = html`
     <h2>About God’s Eye // UAP</h2>
     <p class="lead">A UAP-only edition of the God’s Eye View globe: documented encounters, reconstructed flight paths, the official U.S. government footage and files, and reference imagery of each place.</p>
-    <p class="made-by">made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">source on GitHub</a></p>
+    <p class="made-by">made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">source on GitHub</a> · <a href="./case/">All case files</a> · <a href="./open-data/">Open data</a></p>
+    <div class="section-label">SHARE GOD’S EYE // UAP</div>
+    ${shareRow({ url: new URL(import.meta.env.BASE_URL, location.origin).href, title: "God's Eye // UAP", text: t('Every well-documented UFO/UAP case on a 3D globe, with the evidence and the best explanation') })}
     <div class="section-label">WHAT YOU ARE LOOKING AT</div>
     <div class="d-text">
       <p><b style="color:#00d4ff">Case files</b> — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).</p>
@@ -338,6 +341,39 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
     closeModal();
     onSave(entry);
   });
+}
+
+/**
+ * Share something: the card image (when there is one), links that start a
+ * post on X, Reddit, Bluesky and the rest, the link to copy, and the image to
+ * save. Used where the browser can't hand the card to the phone's own share sheet.
+ */
+export function openShare({ title, url, text, image, onSaveImage }) {
+  const backdrop = modal(
+    'SHARE',
+    html`<h2>${title}</h2>
+      ${image ? html`<img class="share-card-img" src="${image}" alt="${t('The share card for {title}', { title })}" width="1200" height="630" />` : ''}
+      <div class="section-label">${t('POST IT')}</div>
+      ${shareRow({ url, text, title })}
+      <div class="section-label">${t('OR COPY THE LINK')}</div>
+      <div class="share-link"><input type="text" readonly value="${url}" aria-label="${t('The link')}" /><button type="button" class="chip" data-share="copy">⧉ COPY LINK</button>${image ? html`<button type="button" class="chip" data-share="save">⤓ SAVE IMAGE</button>` : ''}</div>`,
+    { wide: false },
+  );
+  const input = backdrop.querySelector('.share-link input');
+  input.addEventListener('focus', () => input.select());
+  backdrop.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-share]');
+    if (!b) return;
+    if (b.dataset.share === 'save') return onSaveImage?.();
+    // Clipboard access needs a secure context; otherwise select the link for copying by hand.
+    input.select();
+    if (!navigator.clipboard?.writeText) return toast(t('Press Ctrl+C (⌘C) to copy the link'), 3500);
+    navigator.clipboard.writeText(url).then(
+      () => toast('Link copied'),
+      () => toast(t('Press Ctrl+C (⌘C) to copy the link'), 3500),
+    );
+  });
+  return backdrop;
 }
 
 /** How to save the app on this device, for browsers that can't do it with one tap. */

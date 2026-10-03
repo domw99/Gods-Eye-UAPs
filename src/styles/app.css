@@ -914,3 +914,27 @@ body.moon-open #globe { visibility: hidden; }
   .moon-credit { justify-content: center; text-align: center; bottom: calc(6px + var(--sab)); }
 }
 html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
+
+/* ── Share dialog ─────────────────────────────────────── */
+.share-card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  margin: 4px 0 6px;
+}
+.share-targets {
+  flex-wrap: wrap;
+}
+.share-link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.share-link input {
+  flex: 1 1 220px;
+  min-width: 0;
+  font: 12px var(--font-mono);
+}

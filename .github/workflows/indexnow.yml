@@ -1,7 +1,8 @@
 name: Tell search engines
 
 # After each deploy, send the pages in the sitemap to IndexNow (Bing and the
-# other engines that share it), so new case pages are crawled soon.
+# other engines that share it), so new case pages are crawled soon, and ask the
+# Wayback Machine to keep a copy of the main pages.
 on:
   workflow_run:
     workflows: [Deploy to GitHub Pages]
@@ -21,3 +22,8 @@ jobs:
         if: ${{ github.event_name == 'workflow_run' }}
         run: sleep 90
       - run: node scripts/indexnow.mjs
+      - name: Keep a copy in the Wayback Machine
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 10
+        run: node scripts/archive-pages.mjs

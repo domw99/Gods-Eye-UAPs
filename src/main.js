@@ -27,7 +27,7 @@ import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
 import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } from './services/geipan.js';
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
-import { snapshotGlobe, drawCard, shareCard } from './ui/sharecard.js';
+import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } from './ui/sharecard.js';
 import { shareLink, decodeHashPart } from './app/links.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
@@ -35,7 +35,7 @@ import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
 import { openMoon, closeMoon, isMoonOpen, moonGlobe, setMoonMode, setMoonLighting } from './ui/moonview.js';
 import { dropCaches } from './util/storage.js';
-import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, backModal } from './ui/modals.js';
+import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { launchesNear } from './services/launches.js';
@@ -45,6 +45,7 @@ import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm } from './util/geo.js';
 import { shapeClasses, evidenceScore, STATUS, EVIDENCE } from './data/taxonomy.js';
 import { classInfo as geipanClassInfo } from './services/geipan.js';
+import { RELEASE } from './config.js';
 
 const BASE = import.meta.env.BASE_URL;
 const LOG_KEY = 'gods-eye-uap:log';
@@ -97,6 +98,7 @@ let userItems = loadUserLog().map(userToItem);
 let bluebook = null; // { meta, records }
 let nuforc = null;
 let mufon = null; // { issues, records, byIssueId, cases, chapters }
+let shareImage = ''; // the card last shown in the share dialog, released when the next is made
 let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
 const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
@@ -1394,11 +1396,15 @@ bindDossierActions({
     btn.textContent = 'MAKING CARD…';
     try {
       const url = shareLink(`${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`);
-      const canvas = await makeCard(item, url);
-      const how = await shareCard(canvas, { title: item.title, url, filename: `gods-eye-uap-${item.id}.png` });
-      if (how === 'downloaded') {
-        navigator.clipboard?.writeText(url).catch(() => {});
-        toast('Card saved as an image, and the link copied', 3500);
+      const blob = await cardBlob(await makeCard(item, url));
+      const filename = `gods-eye-uap-${item.id}.png`;
+      const title = item.year ? `${item.title} (${item.year})` : item.title;
+      const text = t('{title}, on a 3D globe with the evidence and the best explanation', { title });
+      // A phone's own share sheet first; elsewhere the app's share dialog, with links to post it.
+      if ((await shareCardNatively(blob, { title, text, url, filename })) === 'unsupported') {
+        URL.revokeObjectURL(shareImage);
+        shareImage = URL.createObjectURL(blob);
+        openShare({ title, url, text, image: shareImage, onSaveImage: () => downloadBlob(blob, filename) });
       }
     } catch (e) {
       console.warn('[share card]', e);
@@ -1775,7 +1781,6 @@ function closeWelcome() {
   } catch {}
 }
 // Returning visitors hear once about what changed since they were here.
-const RELEASE = '1.6';
 const RELEASE_KEY = 'gods-eye-uap:release';
 function maybeWelcome() {
   let seen = false;
@@ -1788,8 +1793,7 @@ function maybeWelcome() {
   if (navigator.webdriver) return;
   if (!seen && !location.hash && !state.selected) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    // Someone who saw 1.5's note hears only about the Moon; anyone from before also hears about the cases.
-    toast(release === '1.5' ? t('New: the Moon has map symbols of its own, for the landings, seas, craters, mountains and reports') : t('New: 13 more cases, 161 in all, and map symbols of its own on the Moon'), 7000);
+    toast('New: share any case to X, Reddit, Bluesky and more in one click, and download every case file as open data', 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');

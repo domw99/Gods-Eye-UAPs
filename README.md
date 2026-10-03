@@ -201,7 +201,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 <tr>
 <td><sub><b>Statistics</b> (<kbd>S</kbd>): what every archive holds, year by year, each on its own scale; the curated cases by status, evidence and country; and GEIPAN's findings, where 4% remain unexplained after investigation.</sub></td>
-<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet. Every case also has its own link, like <a href="https://domw99.github.io/Gods-Eye-UAPs/case/phoenix-lights-1997/"><code>…/case/phoenix-lights-1997/</code></a>, that shows the case's card when posted on X, Reddit or Discord and opens it on the globe.</sub></td>
+<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet; on a computer it opens a share dialog with the card, one-click posts to X, Reddit, Bluesky, Facebook, WhatsApp, Telegram, LinkedIn and email, and the link to copy. Every case also has its own page, like <a href="https://domw99.github.io/Gods-Eye-UAPs/case/phoenix-lights-1997/"><code>…/case/phoenix-lights-1997/</code></a>, that shows the case's card when posted and opens it on the globe.</sub></td>
 </tr>
 </table>
 
@@ -413,16 +413,28 @@ src/
               stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
-              build-cards.mjs (case preview images) · indexnow.mjs (search engines)
+              build-cards.mjs (case preview images) · indexnow.mjs (search engines) · archive-pages.mjs (Wayback Machine)
               build-skybox.py (NASA star map → sky box)
               verify-media.mjs · check-links.mjs · fix-cesium-base.mjs
-              lib/ (GeoNames gazetteer · case-pages.mjs: a page per case + sitemap, made at build)
+              lib/ (GeoNames gazetteer · case-pages.mjs: a page per case, the case index + sitemap · open-data.mjs: JSON, CSV, GeoJSON; made at build)
 public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
 docs/SPEC.md  the full product spec (the improved prompt this was built from)
 ```
 
 </details>
+
+## Open data
+
+The 161 case files are free to reuse, under the same MIT licence as the code, from **[the open data page](https://domw99.github.io/Gods-Eye-UAPs/open-data/)**:
+
+| File | What's in it |
+|---|---|
+| [`cases.json`](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.json) | Every field: date and place with coordinates, category, evidence, status and explanation, summary, timeline, sources, and the 70 reconstructed flight paths with what each is based on |
+| [`cases.csv`](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.csv) | One row per case, for spreadsheets |
+| [`cases.geojson`](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.geojson) | A point per case and a 3D line per flight path, for GIS tools and web maps |
+
+They are made from `src/data/cases/` on every build, with the page describing them as a schema.org Dataset so dataset search engines can find it. There is also a plain **[list of all case files](https://domw99.github.io/Gods-Eye-UAPs/case/)**, with no 3D globe needed.
 
 ## Where the data comes from
 
@@ -475,9 +487,9 @@ It then appears on the globe.
 3. Go to **Settings → Pages → Deploy from a branch** and pick `gh-pages` / `(root)`.
 4. Your copy appears at `https://<user>.github.io/<repository>/`.
 
-`ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
+`ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
-The build writes a page per case (`case/<id>/`) and a `sitemap.xml`. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
+The build writes a page per case (`case/<id>/`), an index of them (`case/`), the open data (`open-data/`) and a `sitemap.xml`. A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 
 ## Contributing
 

@@ -28,7 +28,10 @@ describe('case pages', () => {
       const page = casePage(c, { site: SITE, card: true });
       expect(page).toContain(`<meta property="og:url" content="${SITE}case/${c.id}/">`);
       expect(page).toContain(`<meta property="og:image" content="${SITE}cards/${c.id}.jpg">`);
-      expect(page).toContain(`location.replace("../../#/case/${c.id}")`);
+      // Only a link shared from the app (#globe) goes straight on to the globe; a search result stays on the page.
+      expect(page).toContain(`if(location.hash==="#globe")location.replace("../../#/case/${c.id}")`);
+      expect(page).not.toMatch(/<script>location\.replace/);
+      expect(page).toContain('<a class="open" href="../../#/case/');
       expect(page).toContain('made by <a href="https://github.com/domw99">domw99</a>');
       expect(page).not.toMatch(/undefined|\[object Object\]/);
     }
@@ -40,16 +43,18 @@ describe('case pages', () => {
     expect(page).not.toContain('<img');
   });
 
-  it('lists the app and every case in the sitemap', () => {
+  it('lists the app, the case index, the open data and every case in the sitemap', () => {
     const xml = sitemap(SITE, ['a', 'b'], '2026-01-02');
-    expect(xml.match(/<url>/g)).toHaveLength(3);
+    expect(xml.match(/<url>/g)).toHaveLength(5);
+    expect(xml).toContain(`<loc>${SITE}case/</loc>`);
+    expect(xml).toContain(`<loc>${SITE}open-data/</loc>`);
     expect(xml).toContain(`<loc>${SITE}case/b/</loc><lastmod>2026-01-02</lastmod>`);
   });
 });
 
 describe('share links', () => {
   it('shares a case through its page', () => {
-    expect(shareableUrl('https://x.github.io/app/#/case/nimitz-2004', '/app/')).toBe('https://x.github.io/app/case/nimitz-2004/');
+    expect(shareableUrl('https://x.github.io/app/#/case/nimitz-2004', '/app/')).toBe('https://x.github.io/app/case/nimitz-2004/#globe');
   });
   it('leaves other views, camera views and the dev server alone', () => {
     for (const href of ['https://x.github.io/app/#/bluebook/123', 'https://x.github.io/app/#/case/nimitz-2004/cam/1,2', 'https://x.github.io/app/'])

@@ -41,7 +41,9 @@ self.addEventListener('fetch', (event) => {
       return res;
     });
     event.waitUntil(network.catch(() => {})); // a late answer is still saved for next time
-    const saved = () => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./', { ignoreSearch: true }));
+    // Only the app itself falls back to the saved app; a case page or the open data waits for its own copy.
+    const isApp = url.pathname === new URL('./', self.location.href).pathname;
+    const saved = () => caches.match(req, { ignoreSearch: true }).then((hit) => hit || (isApp ? caches.match('./', { ignoreSearch: true }) : undefined));
     const tooSlow = new Promise((resolve) => setTimeout(resolve, PATIENCE, null));
     event.respondWith(
       Promise.race([network, tooSlow]).then(

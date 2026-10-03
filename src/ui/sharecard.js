@@ -2,7 +2,7 @@
  * Share cards: a 1200×630 image of a case (the size link previews use), with
  * a snapshot of the globe at the case, its title, date, place, status,
  * evidence score and link. Shared through the system share sheet where the
- * browser supports files, otherwise downloaded.
+ * browser supports files, otherwise through the app's share dialog.
  */
 import { AUTHOR } from '../config.js';
 
@@ -180,29 +180,37 @@ export async function drawCard(c, snap) {
   // Link, and who made it.
   g.fillStyle = 'rgba(0,212,255,0.9)';
   g.font = '500 15px "JetBrains Mono", monospace';
-  g.fillText(c.url.replace(/^https?:\/\//, '').replace(/\/$/, '').slice(0, 64), x, H - 44);
+  g.fillText(c.url.replace(/^https?:\/\//, '').replace(/#globe$/, '').replace(/\/$/, '').slice(0, 64), x, H - 44);
   g.fillStyle = 'rgba(232,234,237,0.45)';
   g.font = '500 12px "JetBrains Mono", monospace';
   g.fillText(`made by ${AUTHOR}`, x, H - 22);
   return canvas;
 }
 
-/** Share the card image, or download it. Returns how it went: 'shared' | 'downloaded' | 'cancelled'. */
-export async function shareCard(canvas, { title, url, filename }) {
-  const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+/** The card as a PNG. */
+export const cardBlob = (canvas) => new Promise((r) => canvas.toBlob(r, 'image/png'));
+
+/**
+ * Hand the card to the system share sheet (phones, and some desktop browsers).
+ * Returns 'shared' or 'cancelled', or 'unsupported' when the browser can't share
+ * files (or the share failed), for the caller to offer its own share dialog.
+ */
+export async function shareCardNatively(blob, { title, text, url, filename }) {
   const file = new File([blob], filename, { type: 'image/png' });
-  if (navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title, text: `${title} — on God's Eye // UAP`, url });
-      return 'shared';
-    } catch (e) {
-      if (e.name === 'AbortError') return 'cancelled';
-    }
+  if (!navigator.canShare?.({ files: [file] })) return 'unsupported';
+  try {
+    await navigator.share({ files: [file], title, text, url });
+    return 'shared';
+  } catch (e) {
+    return e.name === 'AbortError' ? 'cancelled' : 'unsupported';
   }
+}
+
+/** Save a file to the device. */
+export function downloadBlob(blob, filename) {
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  return 'downloaded';
 }

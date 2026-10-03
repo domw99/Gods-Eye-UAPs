@@ -17,7 +17,7 @@ function loadWorker({ fetchImpl, saved = null }) {
     delete: async () => true,
   };
   const scope = {
-    self: { location: { origin: 'https://example.test' }, addEventListener: (type, fn) => (handlers[type] = fn), skipWaiting() {}, clients: { claim() {} } },
+    self: { location: { origin: 'https://example.test', href: `${PAGE}sw.js` }, addEventListener: (type, fn) => (handlers[type] = fn), skipWaiting() {}, clients: { claim() {} } },
     caches,
     fetch: fetchImpl,
     URL,
@@ -28,9 +28,9 @@ function loadWorker({ fetchImpl, saved = null }) {
   return { handlers, store };
 }
 
-function navigate(handlers) {
+function navigate(handlers, url = PAGE) {
   const event = {
-    request: { method: 'GET', mode: 'navigate', url: PAGE, headers: new Headers() },
+    request: { method: 'GET', mode: 'navigate', url, headers: new Headers() },
     answer: null,
     respondWith(p) {
       this.answer = p;
@@ -75,6 +75,15 @@ describe('service worker: opening the app', () => {
     const answer = navigate(handlers);
     await vi.advanceTimersByTimeAsync(20_001);
     expect(await text(answer)).toBe('live');
+  });
+
+  it('waits for a case page on a slow network rather than showing the app in its place', async () => {
+    vi.useFakeTimers();
+    // The app is saved, the case page is not: the app must not stand in for it at the case page's address.
+    const { handlers } = loadWorker({ fetchImpl: () => new Promise((resolve) => setTimeout(() => resolve(new Response('case page')), 20_000)), saved: new Response('saved app') });
+    const answer = navigate(handlers, `${PAGE}case/roswell-1947/`);
+    await vi.advanceTimersByTimeAsync(20_001);
+    expect(await text(answer)).toBe('case page');
   });
 
   it('still saves a late answer for next time', async () => {
