@@ -202,7 +202,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
         <button type="button" class="icon-btn" id="moon-collapse" data-moon="collapse" aria-label="${t('Collapse panel')}" aria-expanded="true" title="${t('Collapse')}">‹</button>
       </div>
       <div class="panel-body">
-        <input id="moon-search" type="search" placeholder="${t('Search craters, seas, landing sites, reports…  ( / )')}" aria-label="${t('Search the Moon')}" autocomplete="off" />
+        <input id="moon-search" type="search" placeholder="${t('Search craters, seas, landing sites, reports…')}" aria-label="${t('Search the Moon')}" autocomplete="off" />
         <div class="section-label">${t('LAYERS')}</div>
         <div id="moon-layers" class="layer-list"></div>
         <div class="section-label list-label">

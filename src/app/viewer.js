@@ -1,5 +1,6 @@
 import * as Cesium from 'cesium';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
+import { translateDom } from '../i18n/index.js';
 
 /**
  * Globe setup. Mirrors God's Eye View's keyless start: Esri World Imagery and
@@ -191,6 +192,7 @@ export async function createViewer(container) {
   scene.screenSpaceCameraController.minimumZoomDistance = 50;
   scene.postProcessStages.fxaa.enabled = true;
   viewer.cesiumWidget.creditContainer.style.display = 'block';
+  translateDom(container); // Cesium's own labels (the data attribution box) are built after the first pass
 
   createTerrain().then((terrain) => {
     viewer.terrainProvider = terrain;

@@ -212,7 +212,7 @@ function autoFillLaunches() {
 }
 
 const airspaceRow = (a, why) => html`<li><span class="badge" style="color:${AIRSPACE_TYPES[a.type]?.color}">${a.type}</span>
-  <span><b>${a.name}</b> · ${AIRSPACE_TYPES[a.type]?.label || a.type}<br /><span class="dim">${formatFt(a.lowerFt)} to ${formatFt(a.upperFt)}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}${a.timesOfUse ? ` · in use: ${a.timesOfUse.toLowerCase()}` : ''}${why && why !== 'location' ? ` · crossed by: ${why}` : ''}</span></span></li>`;
+  <span><b>${a.name}</b> · ${t(AIRSPACE_TYPES[a.type]?.label || a.type)}<br /><span class="dim">${t('{from} to {to}', { from: formatFt(a.lowerFt), to: formatFt(a.upperFt) })}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}${a.timesOfUse ? ` · ${t('in use: {times}', { times: a.timesOfUse.toLowerCase() })}` : ''}${why && why !== 'location' ? ` · ${t('crossed by: {track}', { track: why })}` : ''}</span></span></li>`;
 
 async function fillAirspace(token, promise) {
   const el = document.getElementById('d-airspace');
@@ -239,7 +239,7 @@ export function renderAirspace(a) {
   mount(
     body(),
     html`<div class="d-title">${a.name}</div>
-    <div class="d-sub">${AIRSPACE_TYPES[a.type]?.label || a.type}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}</div>
+    <div class="d-sub">${t(AIRSPACE_TYPES[a.type]?.label || a.type)}${a.city ? ` · ${a.city}${a.state ? `, ${a.state}` : ''}` : ''}</div>
     ${section(
       'LIMITS',
       html`<dl class="d-kv"><dt>FLOOR</dt><dd>${formatFt(a.lowerFt)}</dd><dt>CEILING</dt><dd>${formatFt(a.upperFt)}</dd><dt>IN USE</dt><dd>${a.timesOfUse || '—'}</dd><dt>CONTROL</dt><dd>${a.controller || '—'}</dd></dl>`,
@@ -345,7 +345,7 @@ function dvidsCard(item, caption) {
       <span class="badge official kind">OFFICIAL IMAGE</span>
       <figcaption>${caption || item.title}</figcaption></figure>`;
   return html`<div class="video-wrap" data-dvids="${item.dvidsId}">
-      <button class="dvids-play" aria-label="Play official video: ${item.title}" style="position:absolute;inset:0;display:grid;place-items:center;background:#000 url('${raw(esc(thumb))}') center/cover">
+      <button class="dvids-play" aria-label="${t('Play official video: {title}', { title: item.title })}" style="position:absolute;inset:0;display:grid;place-items:center;background:#000 url('${raw(esc(thumb))}') center/cover">
         <span class="chip" style="background:rgba(0,0,0,.65)">▶ PLAY OFFICIAL VIDEO</span>
       </button>
     </div>
@@ -353,7 +353,7 @@ function dvidsCard(item, caption) {
 }
 
 function commonsBlock(info, caption) {
-  if (!info) return html`<div class="loading-line">File unavailable: ${caption || ''}</div>`;
+  if (!info) return html`<div class="loading-line">${t('File unavailable: {caption}', { caption: caption || '' })}</div>`;
   const credit = [info.artist, info.license].filter(Boolean).join(' · ');
   if (/^video\//.test(info.mime))
     return html`<div class="video-wrap"><video controls preload="none" playsinline poster="${safeUrl(info.thumb)}" src="${safeUrl(info.url)}"></video></div>
@@ -399,7 +399,7 @@ async function fillMedia(token, container, media, officialById) {
       const block = info && commonsBlock(info, m.caption);
       if (block) players.push(block);
       else if (info) images.push(imageCard(info, m.caption, m.page));
-      else players.push(html`<div class="loading-line">Could not load ${m.commons}</div>`);
+      else players.push(html`<div class="loading-line">${t('Could not load {file}', { file: m.commons })}</div>`);
     }
   }
   mount(
@@ -640,14 +640,14 @@ export function renderBlueBook(rec) {
   const token = open('PROJECT BLUE BOOK');
   const id = encodeURIComponent(rec.id);
   const content = html`
-    <div class="d-title">Blue Book case file — ${rec.place}</div>
-    <div class="d-sub">${rec.year}${rec.month ? `-${String(rec.month).padStart(2, '0')}` : ''} · U.S. Air Force · file ${rec.naid}<br />${
+    <div class="d-title">${t('Blue Book case file — {place}', { place: rec.place })}</div>
+    <div class="d-sub">${rec.year}${rec.month ? `-${String(rec.month).padStart(2, '0')}` : ''} · ${t('U.S. Air Force · file {n}', { n: rec.naid })}<br />${
       rec.lat != null ? `${formatDMS(rec.lat, rec.lon)} · ${['NOT PLACED', 'REGION', 'TOWN', 'COORDINATES'][rec.prec]}` : 'Location not placed'
     }</div>
     <div class="d-badges"><span class="badge official">U.S. GOV FILE</span><span class="badge">OFFICIAL DOCUMENT</span></div>
     ${section(
       'SCANNED CASE FILE',
-      html`<div class="video-wrap" style="aspect-ratio:3/4"><iframe src="https://archive.org/embed/${id}" title="Project Blue Book file ${rec.id}" loading="lazy" allowfullscreen></iframe></div>
+      html`<div class="video-wrap" style="aspect-ratio:3/4"><iframe src="https://archive.org/embed/${id}" title="${t('Project Blue Book file {id}', { id: rec.id })}" loading="lazy" allowfullscreen></iframe></div>
       <div class="btn-row"><a class="chip" target="_blank" rel="noopener" href="https://archive.org/details/${id}">Open on Internet Archive ↗</a><a class="chip" target="_blank" rel="noopener" href="https://archive.org/download/${id}/${id}.pdf">PDF ↗</a><button class="chip" data-action="ocr" data-id="${rec.id}">READ OCR TEXT</button><button class="chip" data-action="share">⧉ COPY LINK</button></div>
       <div id="d-ocr"></div>
       <p class="caveat">Scans of National Archives microfilm T1206 mirrored on the Internet Archive. Place names were geocoded from the file name, so the pin marks the named town, not the exact sighting spot.</p>`,
@@ -740,16 +740,16 @@ function mufonHitList(hits) {
 
 function mufonCaseBlock(m) {
   if (!m.hits.length && !m.near.length)
-    return html`<div class="loading-line">No pages in the journal archive matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of Skylook and the MUFON UFO Journal (1967–2008) for “${m.term || 'the case name'}”.</p>`;
+    return html`<div class="loading-line">No pages in the journal archive matched this case.</div><p class="caveat">${t('Searched the OCR text of {n} issues of Skylook and the MUFON UFO Journal (1967–2008) for “{term}”.', { n: m.issues, term: m.term || t('the case name') })}</p>`;
   return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">${th('Pages that mention <b>{term}</b>', { term: m.term })}${m.total > m.hits.length ? ` ${t('(first {a} of {b})', { a: m.hits.length, b: m.total })}` : ''}:</p>${mufonHitList(m.hits)}` : ''}
     ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in the journal:</p>${mufonHitList(m.near)}` : ''}
     <p class="caveat">Found automatically in the OCR text of the MUFON UFO Journal archive (1967–2008). Open a page to read it in context.</p>
-    ${m.term ? html`<div class="btn-row"><button class="chip" data-action="journal-search" data-q="${m.term}">⌕ SEARCH ALL JOURNALS FOR “${m.term}”</button></div>` : ''}`;
+    ${m.term ? html`<div class="btn-row"><button class="chip" data-action="journal-search" data-q="${m.term}">${t('⌕ SEARCH ALL JOURNALS FOR “{term}”', { term: m.term })}</button></div>` : ''}`;
 }
 
 function journalCaseBlock(m) {
   if (!m.hits.length && !m.near.length)
-    return html`<div class="loading-line">No pages in these archives matched this case.</div><p class="caveat">Searched the OCR text of ${m.issues} issues of the APRO Bulletin, NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON chapter newsletters for “${m.term || 'the case name'}”.</p>`;
+    return html`<div class="loading-line">No pages in these archives matched this case.</div><p class="caveat">${t('Searched the OCR text of {n} issues of the APRO Bulletin, NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON chapter newsletters for “{term}”.', { n: m.issues, term: m.term || t('the case name') })}</p>`;
   return html`${m.hits.length ? html`<p class="d-text" style="margin:0 0 6px">${th('Pages that mention <b>{term}</b>', { term: m.term })}${m.total > m.hits.length ? ` ${t('(first {a} of {b})', { a: m.hits.length, b: m.total })}` : ''}:</p>${mufonHitList(m.hits)}` : ''}
     ${m.near.length ? html`<p class="d-text" style="margin:10px 0 6px">Reports from nearby places named in these journals:</p>${mufonHitList(m.near)}` : ''}
     <p class="caveat">Found automatically in the OCR text of the scans on the Internet Archive. Open a page to read it in context.</p>`;
@@ -800,13 +800,13 @@ export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
       'SOURCE',
       is.series
         ? html`<ul class="source-list">
-        <li>${pageBadge(is)}<span>${is.title}, published by ${org || 'its organisation'}.</span></li>
+        <li>${pageBadge(is)}<span>${t('{title}, published by {org}.', { title: is.title, org: org || t('its organisation') })}</span></li>
         <li><span class="badge">ARCHIVE</span><a href="${itemUrl(is)}" target="_blank" rel="noopener">This scan on the Internet Archive</a></li>
         ${SERIES_LINKS[is.series] ? html`<li><span class="badge">SERIES</span><a href="${SERIES_LINKS[is.series].url}" target="_blank" rel="noopener">${SERIES_LINKS[is.series].label}</a></li>` : ''}
       </ul>
       <p class="caveat">The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.</p>`
         : html`<ul class="source-list">
-        <li><span class="badge mufon">MUFON</span><span>${is.title}, published by the Mutual UFO Network. Released free as “The MUFON Archive” by MUFON and <a href="https://www.theblackvault.com/" target="_blank" rel="noopener">The Black Vault</a>.</span></li>
+        <li><span class="badge mufon">MUFON</span><span>${th('{title}, published by the Mutual UFO Network. Released free as “The MUFON Archive” by MUFON and {vault}.', { title: is.title, vault: raw('<a href="https://www.theblackvault.com/" target="_blank" rel="noopener">The Black Vault</a>') })}</span></li>
         <li><span class="badge">ARCHIVE</span><a href="${itemUrl()}" target="_blank" rel="noopener">Internet Archive: MUFON UFO Journal / Skylook, 1967–2008</a></li>
         <li><span class="badge">LICENCE</span><a href="${MUFON_LICENSE}" target="_blank" rel="noopener">CC BY-NC-ND 4.0 (as published on the Internet Archive)</a></li>
       </ul>`,
@@ -845,7 +845,7 @@ export function renderNearby({ label, lat, lon, data }) {
   const total = ['cases', 'bluebook', 'geipan', 'mufon', 'journals'].reduce((n, k) => n + (d[k]?.length || 0), 0);
   mount(
     body(),
-    html`<div class="d-title">${t('Reported near {place}', { place: label })}</div>
+    html`<div class="d-title">${label === 'you' ? t('Reported near you') : t('Reported near {place}', { place: label })}</div>
     <div class="d-sub">${formatDMS(lat, lon)}${d.done ? html`<br />${t('{n} records within range', { n: total.toLocaleString(locale()) })}${d.nuforc != null ? ` · ${t('{n} civilian reports within 50 km', { n: d.nuforc.toLocaleString(locale()) })}` : ''}` : ''}</div>
     ${section('CASE FILES WITHIN 250 KM', block(d.cases, (c) => html`<li>${statusBadge(c.status)}<span><a href="#/${c.kind}/${encodeURIComponent(c.id)}">${c.title}</a> · ${c.year} · ${km(c.distKm)} km</span></li>`))}
     ${section('PROJECT BLUE BOOK WITHIN 100 KM', block(d.bluebook, (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · ${km(r.distKm)} km</span></li>`, 'Air Force case files placed at the town in their file name.'))}
@@ -868,7 +868,7 @@ export function renderNuforc(r) {
   open('NUFORC REPORT');
   mount(
     body(),
-    html`<div class="d-title">Civilian report — ${r.place}</div>
+    html`<div class="d-title">${t('Civilian report — {place}', { place: r.place })}</div>
     <div class="d-sub">${r.date} · ${formatDMS(r.lat, r.lon)}</div>
     <div class="d-badges">${statusBadge('unassessed')}<span class="badge">CIVILIAN REPORT</span></div>
     ${section('REPORT', html`<dl class="d-kv"><dt>SHAPE</dt><dd>${r.shape}</dd><dt>DURATION</dt><dd>${formatDuration(r.dur)}</dd><dt>PLACE</dt><dd>${r.place}</dd></dl>
@@ -954,7 +954,7 @@ export function renderSkyCheck(list) {
   }
   mount(
     el,
-    html`<p class="d-text" style="margin-top:8px"><b>${list.length}</b> satellites are more than 10° above the horizon here right now${list.length ? ':' : '.'}</p>
+    html`<p class="d-text" style="margin-top:8px">${list.length ? th('<b>{n}</b> satellites are more than 10° above the horizon here right now:', { n: list.length }) : t('No satellites are more than 10° above the horizon here right now.')}</p>
     <ul class="source-list" style="margin-top:6px">${list.slice(0, 15).map((s) => html`<li><span class="badge">${Math.round(s.elevation)}°</span><span>${s.name} <span class="dim">· az ${Math.round(s.azimuth)}° · ${Math.round(s.rangeKm)} km · ${s.group}</span></span></li>`)}</ul>`,
   );
 }
@@ -970,7 +970,7 @@ export function bindDossierActions(handlers) {
     const play = e.target.closest('.dvids-play');
     if (play) {
       const wrap = play.closest('[data-dvids]');
-      wrap.innerHTML = `<iframe src="https://www.dvidshub.net/video/embed/${encodeURIComponent(wrap.dataset.dvids)}" allow="autoplay; fullscreen" allowfullscreen title="Official DVIDS video"></iframe>`;
+      wrap.innerHTML = `<iframe src="https://www.dvidshub.net/video/embed/${encodeURIComponent(wrap.dataset.dvids)}" allow="autoplay; fullscreen" allowfullscreen title="${esc(t('Official DVIDS video'))}"></iframe>`;
       return;
     }
     const btn = e.target.closest('[data-action]');

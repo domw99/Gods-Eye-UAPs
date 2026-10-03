@@ -173,10 +173,11 @@ export function openJournalSearch({ query = '', run }) {
     try {
       const r = await run(q);
       if (my !== seq) return;
+      const quoted = (words) => `“${words.join('”, “')}”`;
       const notes = [
-        r.common.length ? `“${r.common.join('”, “')}” ${r.common.length > 1 ? 'are' : 'is'} on too many pages to narrow the search.` : '',
-        r.missing.length ? `“${r.missing.join('”, “')}” ${r.missing.length > 1 ? 'are' : 'is'} on fewer than three pages or nowhere, so nothing matches every word.` : '',
-        !r.terms.length && !r.missing.length ? 'Add a less common word of four letters or more.' : '',
+        r.common.length ? t(r.common.length > 1 ? '{words} are on too many pages to narrow the search.' : '{words} is on too many pages to narrow the search.', { words: quoted(r.common) }) : '',
+        r.missing.length ? t(r.missing.length > 1 ? '{words} are on fewer than three pages or nowhere, so nothing matches every word.' : '{words} is on fewer than three pages or nowhere, so nothing matches every word.', { words: quoted(r.missing) }) : '',
+        !r.terms.length && !r.missing.length ? t('Add a less common word of four letters or more.') : '',
       ].filter(Boolean);
       const shown = r.hits.slice(0, 250);
       const q1 = r.terms[0] || '';
@@ -271,7 +272,7 @@ export function openAbout(meta) {
       <p><b style="color:#8fd3ff">Space &amp; Moon</b> — reports from beyond the atmosphere: what astronauts saw from orbit, what astronomers have seen on the Moon, and a few distant objects, each with its explanation and sources. The NASA files that were part of the 2026 PURSUE releases are linked from it. Press <b>K</b>. <b>EARTH | MOON</b> in the top bar (or <b>U</b>) switches to the Moon itself: a globe of the Moon laid out like the Earth, with the craters and seas named, every landing site from Luna 2 to Chandrayaan-3, and the lunar reports as pins, lit as the Sun stood at the landing or the report.</p>
     </div>
     <div class="section-label">DATA SNAPSHOT</div>
-    <div class="d-text"><p>Official catalogue synced ${meta.officialGenerated?.slice(0, 10) || '—'} · Blue Book layer built ${meta.bluebookGenerated?.slice(0, 10) || '(loads on demand)'}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
+    <div class="d-text"><p>${t('Official catalogue synced {date}', { date: meta.officialGenerated?.slice(0, 10) || '—' })} · ${t('Blue Book layer built {date}', { date: meta.bluebookGenerated?.slice(0, 10) || t('(loads on demand)') })}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
     <div class="section-label">KEYBOARD</div>
     <dl class="d-kv"><dt>1 – 7</dt><dd>Sensor modes: Normal, NVG, FLIR, Ironbow, CRT, Noir, Snow</dd><dt>/</dt><dd>Search</dd><dt>[ ]</dt><dd>Previous / next case</dd><dt>SPACE</dt><dd>Play / pause flight path</dd><dt>T</dt><dd>Guided tour</dd><dt>G</dt><dd>Files library (government + MUFON)</dd><dt>E</dt><dd>What did I see? (sighting checker)</dd><dt>L</dt><dd>Log a sighting</dd><dt>M</dt><dd>3D map settings (OSM buildings, your Google key)</dd><dt>V</dt><dd>Witness view during playback</dd><dt>S</dt><dd>Statistics</dd><dt>K</dt><dd>Space and Moon: reports from orbit, the Moon and deep space</dd><dt>U</dt><dd>Switch between the Earth and the Moon</dd><dt>N</dt><dd>Near me: what has been reported around you</dd><dt>C</dt><dd>Group nearby markers on / off</dd><dt>D</dt><dd>Lighting: auto (case time) → day → night → off</dd><dt>F</dt><dd>Clean view: hide every panel</dd><dt>Y</dt><dd>Hide or show the years bar</dd><dt>O</dt><dd>Orbit slowly around the middle of the screen</dd><dt>← ↑ → ↓</dt><dd>Fly the camera; with Shift, turn and tilt</dd><dt>R</dt><dd>Reset view: whole globe, north up</dd><dt>+ −</dt><dd>Zoom toward the centre of the screen</dd><dt>H</dt><dd>Hide HUD</dd><dt>&#96;</dt><dd>Show the frame rate</dd><dt>ESC</dt><dd>Close, or back to the previous dialog</dd><dt>BROWSER BACK</dt><dd>The record you had open before</dd></dl>
     <div class="section-label">CREDITS</div>
@@ -354,7 +355,7 @@ export function openLightbox({ lightbox, caption, credit, href }) {
   lastFocus = document.activeElement;
   mount(
     root(),
-    html`<div class="lightbox" data-close role="dialog" aria-modal="true" aria-label="${caption || 'Image'}">
+    html`<div class="lightbox" data-close role="dialog" aria-modal="true" aria-label="${caption || t('Image')}">
       <img src="${safeUrl(lightbox)}" alt="${caption || ''}" />
       <div class="cap">${caption || ''}${credit ? html`<br /><span class="dim">${credit}</span>` : ''}${href && href !== '#' ? html` · <a href="${safeUrl(href)}" target="_blank" rel="noopener">source ↗</a>` : ''}</div>
       <button class="icon-btn" data-close aria-label="Close">✕</button>

@@ -3,7 +3,7 @@ import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGo
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { createInstall, installSteps } from './app/install.js';
-import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, locale } from './i18n/index.js';
+import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale } from './i18n/index.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -268,11 +268,13 @@ async function applyLayers() {
   if (L.launches) ensureLaunches();
   airspaceLayer.show = L.airspace;
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
-  if (L.bluebook && !bluebook) await ensureBlueBook();
-  if (L.mufon && !mufon) await ensureMufon();
-  if (L.journals && !journals) await ensureJournals();
-  if (L.geipan && !geipan) await ensureGeipan();
-  if (L.nuforc && !nuforc) await ensureNuforc();
+  // Each says so itself when it can't load; the others still load, and the counts still refresh.
+  const quiet = () => {};
+  if (L.bluebook && !bluebook) await ensureBlueBook().catch(quiet);
+  if (L.mufon && !mufon) await ensureMufon().catch(quiet);
+  if (L.journals && !journals) await ensureJournals().catch(quiet);
+  if (L.geipan && !geipan) await ensureGeipan().catch(quiet);
+  if (L.nuforc && !nuforc) await ensureNuforc().catch(quiet);
   timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
   timeline.setMufon(L.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
   timeline.setJournals(L.journals && journals ? countByYear(journals.records.map((r) => r.year)) : null);
@@ -308,19 +310,25 @@ async function airspaceFor(c) {
 
 let quakeRows = [];
 let quakesLoaded = 0;
-async function ensureQuakes() {
-  if (quakeRows.length && Date.now() - quakesLoaded < 10 * 60e3) return;
-  renderLayersNow({ quakes: 'loading…' });
-  try {
-    quakeRows = await loadQuakes();
-    quakesLoaded = Date.now();
-    quakeLayer.setData(quakeRows, { lat: (q) => q.lat, lon: (q) => q.lon, year: () => YEAR_MAX, size: (q) => quakeSize(q.mag), color: (q) => quakeColor(q.mag) });
-    renderLayersNow({ quakes: quakeRows.length.toLocaleString() });
-  } catch (error) {
-    console.warn(error);
-    renderLayersNow({ quakes: 'offline' });
-    toast('Earthquake feed unavailable');
-  }
+let quakesLoading = null; // the request in flight, so toggling the layer quickly asks once
+function ensureQuakes() {
+  if (quakeRows.length && Date.now() - quakesLoaded < 10 * 60e3) return Promise.resolve();
+  quakesLoading ||= (async () => {
+    renderLayersNow({ quakes: 'loading…' });
+    try {
+      quakeRows = await loadQuakes();
+      quakesLoaded = Date.now();
+      quakeLayer.setData(quakeRows, { lat: (q) => q.lat, lon: (q) => q.lon, year: () => YEAR_MAX, size: (q) => quakeSize(q.mag), color: (q) => quakeColor(q.mag) });
+      renderLayersNow({ quakes: quakeRows.length.toLocaleString() });
+    } catch (error) {
+      console.warn(error);
+      renderLayersNow({ quakes: 'offline' });
+      toast('Earthquake feed unavailable');
+    } finally {
+      quakesLoading = null;
+    }
+  })();
+  return quakesLoading;
 }
 
 let launchesLoaded = 0;
@@ -1027,14 +1035,14 @@ async function statsData(withNuforc) {
 const openStatsNow = () => openStats({ load: statsData });
 
 /* ── Near me / near a place ───────────────────────────── */
-let nearPoint = null; // { lat, lon } while the nearby dossier is open
+let nearPoint = null; // { lat, lon, label } while the nearby dossier is open
 
 /** Everything reported near a point, filled in as each archive loads. */
 async function showNearby(lat, lon, label, { fly = true } = {}) {
   focusRecord();
   deselect({ keepHash: true });
   const token = selectToken;
-  nearPoint = { lat, lon };
+  nearPoint = { lat, lon, label };
   if (fly)
     viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 420_000), duration: 2 });
   const within = (list, r, pos = (x) => x) =>
@@ -1065,7 +1073,7 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
   };
   draw();
   setHash(`#/near/${lat.toFixed(4)},${lon.toFixed(4)}/${encodeURIComponent(label)}`);
-  document.getElementById('hud-tgt').textContent = t('NEAR {place}', { place: label }).slice(0, 40).toUpperCase();
+  document.getElementById('hud-tgt').textContent = (label === 'you' ? t('NEAR YOU') : t('NEAR {place}', { place: label })).slice(0, 40).toUpperCase();
   const fill = (key, promise, pick) =>
     promise.then(
       (d) => ((data[key] = pick(d)), draw()),
@@ -1203,37 +1211,38 @@ handler.setInputAction((move) => {
       const c = itemLayer.cluster(hit.index);
       if (c) {
         const official = c.members.filter((m) => m.kind === 'official').length;
-        const parts = [c.members.length - official && `${c.members.length - official} case files`, official && `${official} official releases`].filter(Boolean);
-        lines = [`${c.members.length} records here · click to zoom in`, `${parts.join(' · ')} — ${c.members.slice(0, 2).map((m) => m.title.slice(0, 28)).join('; ')}${c.members.length > 2 ? '…' : ''}`];
+        const cases = c.members.length - official;
+        const parts = [cases && plural(cases, '{n} case file', '{n} case files'), official && plural(official, '{n} official release', '{n} official releases')].filter(Boolean);
+        lines = [t('{n} records here · click to zoom in', { n: c.members.length }), `${parts.join(' · ')} — ${c.members.slice(0, 2).map((m) => m.title.slice(0, 28)).join('; ')}${c.members.length > 2 ? '…' : ''}`];
       }
     }
     else if (hit?.type === 'bluebook') {
       const r = bluebook.records[hit.index];
-      lines = [`Blue Book · ${r.place}`, `${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · USAF case file`];
+      lines = [`Blue Book · ${r.place}`, `${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · ${t('USAF case file')}`];
     } else if (hit?.type === 'geipan') {
       const r = geipan.records[hit.index];
-      lines = [`GEIPAN · ${r.place}`, `${geipanDate(r)} · class ${r.cls} — ${classInfo(r.cls).label.replace(/^\w+ · /, '').toLowerCase()}`];
+      lines = [`GEIPAN · ${r.place}`, `${geipanDate(r)} · ${t('class {cls}', { cls: r.cls })} — ${t(classInfo(r.cls).label).replace(/^\w+ · /, '').toLowerCase()}`];
     } else if (hit?.type === 'mufon') {
       const r = mufon.records[hit.index];
       const is = mufon.issues[r.issue];
-      lines = [`MUFON · ${r.place}`, `${issueDate(is)} · journal p. ${pageNumber(is, r.leaf)}`];
+      lines = [`MUFON · ${r.place}`, `${issueDate(is)} · ${t('journal p. {n}', { n: pageNumber(is, r.leaf) })}`];
     } else if (hit?.type === 'journals') {
       const r = journals.records[hit.index];
       const is = journals.issues[r.issue];
       lines = [`${SERIES_SHORT[is.series]} · ${r.place}`, `${is.title} · ${issueDate(is)} · p. ${pageNumber(is, r.leaf)}`];
     } else if (hit?.type === 'nuforc')
       lines = [nuforc.places[nuforc.place[hit.index]], `${String(nuforc.date[hit.index]).slice(0, 4)} · ${nuforc.shapes[nuforc.shape[hit.index]]}`];
-    else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || 'Satellite', 'live position'];
+    else if (hit?.type === 'satellite') lines = [satLayer.info(hit.index)?.name || t('Satellite'), t('live position')];
     else if (hit?.type === 'airspace') {
       const a = airspaceLayer.info(hit.index);
-      if (a) lines = [a.name, `${AIRSPACE_TYPES[a.type]?.label || a.type} · ${formatFt(a.lowerFt)} to ${formatFt(a.upperFt)}`];
+      if (a) lines = [a.name, `${t(AIRSPACE_TYPES[a.type]?.label || a.type)} · ${t('{from} to {to}', { from: formatFt(a.lowerFt), to: formatFt(a.upperFt) })}`];
     } else if (hit?.type === 'quakes') {
       const q = quakeRows[hit.index];
-      if (q) lines = [`${q.mag != null ? `M ${q.mag.toFixed(1)}` : 'Quake'} · ${q.place}`, relativeTime(new Date(q.time).toISOString())];
+      if (q) lines = [`${q.mag != null ? `M ${q.mag.toFixed(1)}` : t('Earthquake')} · ${q.place}`, relativeTime(new Date(q.time).toISOString())];
     } else if (hit?.type === 'launch') {
       const p = launchLayer.info(hit.index);
       const l = p?.next || p?.last;
-      if (p) lines = [p.location || p.pad, l ? `${p.next ? 'Next' : 'Last'}: ${l.name}` : `${p.launches.length} launches`];
+      if (p) lines = [p.location || p.pad, l ? t(p.next ? 'Next: {name}' : 'Last: {name}', { name: l.name }) : plural(p.launches.length, '{n} launch', '{n} launches')];
     }
     if (lines) {
       hoverEl.innerHTML = `${esc(lines[0])}<br><span class="dim">${esc(lines[1])}</span>`;
@@ -1264,7 +1273,7 @@ function showPlayback() {
   pb.pov.setAttribute('aria-pressed', 'false');
   const who = trackLayer.witnessLabel;
   pb.pov.classList.toggle('hidden', !who);
-  pb.pov.title = who ? `See it from: ${who} (V)` : '';
+  pb.pov.title = who ? t('See it from: {who} (V)', { who }) : '';
   pb.speed.value = '1';
   updatePlaybackUi();
 }
@@ -1406,10 +1415,7 @@ bindDossierActions({
     const at = nearPoint;
     await ensureNuforc();
     if (nearPoint === at) toast(t('{n} civilian reports within 50 km', { n: countNuforc(at.lat, at.lon).toLocaleString(locale()) }), 4000);
-    if (nearPoint === at) {
-      const label = document.querySelector('#dossier-body .d-title')?.textContent.replace(/^Reported near /, '') || 'here';
-      showNearby(at.lat, at.lon, label, { fly: false });
-    }
+    if (nearPoint === at) showNearby(at.lat, at.lon, at.label, { fly: false });
   },
   'explain-user': () => {
     const item = itemByKey(state.selected);
@@ -1507,7 +1513,7 @@ const openLog = () => openLogForm({ ...viewCenter(), onSave: addUser });
 /* ── "What did I see?" checker ─────────────────────────── */
 async function explainSighting({ date, lat, lon, report }) {
   const when = new Date(date);
-  const checked = ['sky (planets, bright stars, Moon)'];
+  const checked = [t('sky (planets, bright stars, Moon)')];
   const notes = [];
   const sky = skyAt(lat, lon, when, { minAlt: 0 });
   const recent = Math.abs(Date.now() - when.getTime()) < 21 * 86400e3;
@@ -1528,7 +1534,7 @@ async function explainSighting({ date, lat, lon, report }) {
             })),
           )
           .catch((e) => {
-            notes.push(e instanceof RateLimitError ? 'Launch Library limit reached, so launches were skipped.' : 'Launch Library was unreachable.');
+            notes.push(t(e instanceof RateLimitError ? 'Launch Library limit reached, so launches were skipped.' : 'Launch Library was unreachable.'));
             return null;
           })
       : Promise.resolve(null),
@@ -2060,6 +2066,10 @@ function moonKey(e, typing) {
   else if (k === 'k') openSpaceNow();
   else if (k === 'l') openLog();
   else if (k === 'e') openExplainNow();
+  else if (k === 'm') {
+    leaveMoon(); // the Earth's map settings, as the MAP button does
+    openMapSettingsNow();
+  }
 }
 
 window.addEventListener('keydown', (e) => {
@@ -2163,7 +2173,7 @@ subscribe((s, reason) => {
   const q = s.search;
   if (!q || q.length < 3 || q.startsWith('#')) return mount(placeList, html``);
   // Searching the journals' full text is always offered for a real word.
-  const journalRow = q.length >= 4 ? html`<li><button type="button" data-journals>⌕ <span>Search inside the journals for “${q}”</span><span class="go">TEXT</span></button></li>` : '';
+  const journalRow = q.length >= 4 ? html`<li><button type="button" data-journals>⌕ <span>${t('Search inside the journals for “{q}”', { q })}</span><span class="go">TEXT</span></button></li>` : '';
   mount(placeList, journalRow);
   placeTimer = setTimeout(async () => {
     placeAbort = new AbortController();

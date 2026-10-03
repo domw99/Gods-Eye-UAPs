@@ -4,6 +4,7 @@ import { createEffects } from './effects.js';
 import { sunOnMoon } from './moonsun.js';
 import { MOON_INK, moonGroup, moonGlyph } from '../data/moon.js';
 import { glyphUrl } from '../layers/glyphs.js';
+import { translateDom } from '../i18n/index.js';
 
 /**
  * The Moon as a globe you can turn and zoom, like the Earth one. Cesium draws
@@ -53,6 +54,9 @@ const SURFACE = 1500; // m above the ground for pins and labels, so the globe do
 // Two sites a few kilometres apart (Apollo 12 and Surveyor 3) share a spot from afar; their symbols and
 // names are nudged apart there (`dy`), and come back to their true places as you close in.
 const NUDGE = new Cesium.NearFarScalar(150_000, 0, 1_000_000, 1);
+// The symbols that show from afar (sites, report pins) shrink as you back away, so the whole Moon,
+// small on a phone, isn't covered by them; close in they are full size.
+const SHRINK = new Cesium.NearFarScalar(1_500_000, 1, 9_000_000, 0.6);
 
 export const atMoon = (lat, lon, height = 0) => Cesium.Cartesian3.fromDegrees(lon, lat, height, MOON);
 
@@ -134,6 +138,9 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     msaaSamples: profile.msaa ?? 4,
     creditContainer,
   });
+  // Cesium's own labels (the data attribution box) are built after the page was translated.
+  translateDom(container);
+  if (creditContainer && !container.contains(creditContainer)) translateDom(creditContainer);
   const low = Boolean(profile.low);
   const { scene, camera, entities } = viewer;
   scene.globe.enableLighting = false;
@@ -244,6 +251,27 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   let shown = { report: true, site: true, sea: true, crater: true, range: true };
   const groupById = new Map(); // entity id → its group
   const centred = new Set(); // places whose name sits under the symbol (not beside it, as a site's does)
+  // Symbols and names on the near side skip the depth test, so the rim of the globe can't cut them in
+  // half; those past the rim are hidden outright, rather than a half name poking out into space.
+  const placed = new Map(); // entity id → its position
+  const facing = new Map(); // entity id → whether it is on the side facing the camera
+  const occluder = new Cesium.EllipsoidalOccluder(MOON, camera.positionWC);
+  const onTop = { disableDepthTestDistance: Number.POSITIVE_INFINITY };
+  function updateFacing() {
+    occluder.cameraPosition = camera.positionWC;
+    let changed = false;
+    for (const e of entities.values) {
+      const at = placed.get(e.id);
+      if (!at) continue;
+      const on = occluder.isPointVisible(at);
+      if (facing.get(e.id) === on) continue;
+      facing.set(e.id, on);
+      if (e.billboard) e.billboard.show = on;
+      if (e.label) e.label.show = on && namesOn;
+      changed = true;
+    }
+    if (changed) scene.requestRender(); // the entities take the change on the next frame
+  }
 
   // On a small screen the whole Moon is too small for even the main names: they appear at the first step in.
   const small = () => Math.min(scene.canvas.clientWidth || 1000, scene.canvas.clientHeight || 800) < 420;
@@ -273,6 +301,8 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     entities.removeAll();
     groupById.clear();
     centred.clear();
+    placed.clear();
+    facing.clear();
     selectedId = null;
     raised = null;
     for (const p of places) {
@@ -282,37 +312,59 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
       if (!isSite) centred.add(id);
       // A site's symbol shows from afar; any other place's comes and goes with its name.
       const reach = isSite ? 1e9 : reachOf(p.tier);
+      placed.set(id, atMoon(p.lat, p.lon, SURFACE));
       entities.add({
         id,
         name: p.name,
         show: shown[groupOf(p.kind)] !== false,
-        position: atMoon(p.lat, p.lon, SURFACE),
+        position: placed.get(id),
         billboard: {
+          ...onTop,
           image: glyphUrl(moonGlyph(p)),
           color: tintOf(p.kind),
           width: isSite ? 22 : 18,
           height: isSite ? 22 : 18,
           ...(p.dy ? { pixelOffset: new Cesium.Cartesian2(0, p.dy), pixelOffsetScaleByDistance: NUDGE } : {}),
+          ...(isSite ? { scaleByDistance: SHRINK } : {}),
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, reach),
           ...(isSite ? {} : { translucencyByDistance: new Cesium.NearFarScalar(reach * 0.7, 1, reach, 0.2) }),
         },
-        label: label(p.name, { kind: p.kind, tier: p.tier, offset: isSite, dy: p.dy }),
+        label: { ...label(p.name, { kind: p.kind, tier: p.tier, offset: isSite, dy: p.dy }), ...onTop },
       });
     }
-    for (const r of reports) {
-      for (const [i, site] of r.sites.entries()) {
-        const id = i === 0 ? `report:${r.entry.id}` : `report:${r.entry.id}#${i}`;
+    // Reports at the same place (Aristarchus has three) would hide each other, so their pins stand
+    // side by side there, as in the Space & Moon dialog.
+    const pins = reports.flatMap((r) => r.sites.map((site, i) => ({ r, site, id: i === 0 ? `report:${r.entry.id}` : `report:${r.entry.id}#${i}` })));
+    const groups = [];
+    for (const pin of pins) {
+      const near = (q) => Math.hypot(q.site.lat - pin.site.lat, (q.site.lon - pin.site.lon) * Math.cos(Cesium.Math.toRadians(pin.site.lat))) < 3;
+      const g = groups.find((members) => near(members[0]));
+      if (g) g.push(pin);
+      else groups.push([pin]);
+    }
+    for (const g of groups) {
+      for (const [i, { r, site, id }] of g.entries()) {
         if (!images.report.has(r.n)) images.report.set(r.n, pinImage(String(r.n), { fill: INK.report }));
         groupById.set(id, 'report');
+        placed.set(id, atMoon(site.lat, site.lon, SURFACE * 2));
         entities.add({
           id,
           name: r.entry.title,
           show: shown.report !== false,
-          position: atMoon(site.lat, site.lon, SURFACE * 2),
-          billboard: { image: images.report.get(r.n), scale: 0.5, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, pixelOffset: new Cesium.Cartesian2(0, -2) },
+          position: placed.get(id),
+          billboard: {
+            ...onTop,
+            image: images.report.get(r.n),
+            scale: 0.5,
+            scaleByDistance: SHRINK,
+            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+            pixelOffset: new Cesium.Cartesian2(Math.round((i - (g.length - 1) / 2) * 24), -2),
+            pixelOffsetScaleByDistance: SHRINK, // the gaps shrink with the pins, so a small Moon keeps them together
+          },
         });
       }
     }
+    updateFacing();
     scene.requestRender();
   }
 
@@ -328,7 +380,7 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
 
   function setNames(on) {
     namesOn = on;
-    for (const e of entities.values) if (e.label) e.label.show = on;
+    for (const e of entities.values) if (e.label) e.label.show = on && facing.get(e.id) !== false;
     scene.requestRender();
   }
 
@@ -339,8 +391,14 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     selectedId = null;
     if (key && at) {
       selectedId = '__selected';
-      // Between the places (at SURFACE) and the report pins (at twice that), so a numbered pin stays in front of its ring.
-      entities.add({ id: selectedId, position: atMoon(at.lat, at.lon, SURFACE * 1.5), billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0 } });
+      // The ring is depth-tested and the symbols and pins are not, so a numbered pin or a symbol stays in front of it.
+      // A report pin standing beside others at its place takes its ring along.
+      const dx = entities.getById(key)?.billboard?.pixelOffset?.getValue(Cesium.JulianDate.now())?.x || 0;
+      entities.add({
+        id: selectedId,
+        position: atMoon(at.lat, at.lon, SURFACE * 1.5),
+        billboard: { image: images.ring, scale: 0.5, disableDepthTestDistance: 0, ...(dx ? { pixelOffset: new Cesium.Cartesian2(dx, 0), pixelOffsetScaleByDistance: SHRINK } : {}) },
+      });
       // A name written under the middle of the place sits under the ring: move it below.
       const named = entities.getById(key);
       if (named?.label && centred.has(key)) {
@@ -419,6 +477,7 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
   const viewLight = new Cesium.DirectionalLight({ direction: Cesium.Cartesian3.clone(Cesium.Cartesian3.UNIT_X) });
   const stopFollow = scene.preRender.addEventListener(() => {
     if (light === 'day') Cesium.Cartesian3.clone(camera.directionWC, viewLight.direction);
+    updateFacing();
   });
   /**
    * off: evenly lit. day: lit from where you look. night: by earthshine, dim
@@ -458,11 +517,12 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     } else if (key) {
       onHover?.(key, { x: move.endPosition.x, y: move.endPosition.y });
     }
+    if (!onPointer) return; // nobody is listening for the ground under the pointer
     const ground = camera.pickEllipsoid(move.endPosition, MOON);
     if (ground) {
       const c = MOON.cartesianToCartographic(ground);
-      onPointer?.({ lat: toDeg(c.latitude), lon: toDeg(c.longitude) });
-    } else onPointer?.(null);
+      onPointer({ lat: toDeg(c.latitude), lon: toDeg(c.longitude) });
+    } else onPointer(null);
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
   return {

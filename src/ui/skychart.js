@@ -1,4 +1,5 @@
-import { html, raw } from '../util/dom.js';
+import { html, raw, esc } from '../util/dom.js';
+import { t } from '../i18n/index.js';
 import { compass } from '../services/sky.js';
 
 /**
@@ -57,7 +58,7 @@ export function skyChartSvg(sky, named = new Set()) {
   }
   const rings = [30, 60].map((alt) => `<circle cx="${C}" cy="${C}" r="${(((90 - alt) / 90) * R).toFixed(1)}" class="sky-ring" />`);
   const bg = sky.sun.alt > -0.833 ? 'sky-day' : sky.sun.alt > -12 ? 'sky-twilight' : 'sky-night';
-  return raw(`<svg class="sky-chart ${bg}" viewBox="0 0 ${SIZE} ${SIZE}" role="img" aria-label="Sky chart for ${sky.time.toISOString()}">
+  return raw(`<svg class="sky-chart ${bg}" viewBox="0 0 ${SIZE} ${SIZE}" role="img" aria-label="${esc(t('Sky chart for {time}', { time: sky.time.toISOString() }))}">
     <circle cx="${C}" cy="${C}" r="${R}" class="sky-disc" />
     ${rings.join('')}
     <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" class="sky-ring" />

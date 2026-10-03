@@ -1,5 +1,5 @@
 import { html, mount, raw } from '../util/dom.js';
-import { t } from '../i18n/index.js';
+import { t, translateDom } from '../i18n/index.js';
 import { glyphSvg } from '../layers/glyphs.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer, filtersActive, resetFilters, DEFAULT_LAYERS } from '../state.js';
@@ -49,7 +49,7 @@ export function renderActiveFilters() {
   if (!el) return;
   const chips = [];
   if (state.search) chips.push(html`<button class="chip small on" data-clear="search" title="Clear the search">“${state.search}” ✕</button>`);
-  if (state.yearRange) chips.push(html`<button class="chip small on" data-clear="years" title="All years">${state.yearRange[0]}–${state.yearRange[1]} ✕</button>`);
+  if (state.yearRange) chips.push(html`<button class="chip small on" data-clear="years" title="${t('All years')}">${state.yearRange[0]}–${state.yearRange[1]} ✕</button>`);
   for (const e of state.evidence) chips.push(html`<button class="chip small on" data-clear-evidence="${e}">${EVIDENCE[e]?.label || e} ✕</button>`);
   for (const k of state.shape) chips.push(html`<button class="chip small on" data-clear-shape="${k}">${SHAPES[k]?.label || k} ✕</button>`);
   for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${STATUS[k]?.label || k} ✕</button>`);
@@ -117,7 +117,7 @@ export function renderList(items) {
       if (it.lat == null) badges.push(html`<span class="badge">NO LOCATION</span>`);
       return html`<li class="case-item" role="option" tabindex="0" data-key="${it.key}" aria-selected="${state.selected === it.key ? 'true' : 'false'}">
         <span class="dot" style="background:${itemColor(it)};box-shadow:0 0 8px ${itemColor(it)}"></span>
-        <div><div class="t">${state.starred.has(it.key) ? html`<span class="star" title="Starred">★</span> ` : ''}${it.title}</div><div class="m">${y} · ${it.place}</div><div class="b">${badges}</div></div>
+        <div><div class="t">${state.starred.has(it.key) ? html`<span class="star" title="${t('Starred')}">★</span> ` : ''}${it.title}</div><div class="m">${y} · ${it.place}</div><div class="b">${badges}</div></div>
       </li>`;
     })}`,
   );
@@ -128,6 +128,15 @@ export function markSelected(key) {
     li.setAttribute('aria-selected', li.dataset.key === key ? 'true' : 'false');
   const el = key && document.querySelector(`#case-list [data-key="${CSS.escape(key)}"]`);
   el?.scrollIntoView({ block: 'nearest' });
+}
+
+// Say which way the panel button goes, as the Moon's panel does. The label is written in English and
+// translated in place, so it follows a later change of language too.
+function setCollapseLabel(button, collapsed) {
+  button.setAttribute('aria-expanded', String(!collapsed));
+  button.setAttribute('aria-label', collapsed ? 'Expand panel' : 'Collapse panel');
+  button.setAttribute('title', collapsed ? 'Expand' : 'Collapse');
+  translateDom(button);
 }
 
 export function bindList({ onSelect }) {
@@ -199,11 +208,13 @@ export function bindList({ onSelect }) {
     if (document.body.classList.contains('moon-open')) return void document.getElementById('moon-search')?.focus(); // the Moon's list
     document.getElementById('left').classList.remove('collapsed');
     document.body.classList.remove('left-collapsed');
+    setCollapseLabel(document.getElementById('left-collapse'), false);
     search.focus();
   });
-  document.getElementById('left-collapse').addEventListener('click', () => {
+  document.getElementById('left-collapse').addEventListener('click', (e) => {
     const left = document.getElementById('left');
-    left.classList.toggle('collapsed');
-    document.body.classList.toggle('left-collapsed', left.classList.contains('collapsed'));
+    const collapsed = left.classList.toggle('collapsed');
+    document.body.classList.toggle('left-collapsed', collapsed);
+    setCollapseLabel(e.currentTarget, collapsed);
   });
 }

@@ -187,6 +187,21 @@ test.describe('The Moon', () => {
     await expect(page.locator('#moon-list .case-item .t').first()).toHaveText('Aitken');
   });
 
+  test('reports at one place stand side by side, and what is past the rim is hidden', async ({ page }) => {
+    const errors = await openApp(page, '/#/moon');
+    await page.waitForFunction(() => window.__uap.moonGlobe()?.viewer.entities.values.length > 100, null, { timeout: 60_000 });
+    // Aristarchus has three reports (2, 4 and the first site of 5): their pins must not cover each other.
+    const xs = await page.evaluate(() =>
+      ['report:moon-1787', 'report:moon-1963', 'report:moon-apollo'].map((id) => window.__uap.moonGlobe().viewer.entities.getById(id).billboard.pixelOffset.getValue().x),
+    );
+    expect(new Set(xs).size).toBe(3);
+    // From the whole-Moon view over the near side, report 1 (on the far side) is hidden, Tycho is not.
+    const shown = (id) => page.evaluate((id) => window.__uap.moonGlobe().viewer.entities.getById(id).billboard.show?.getValue(), id);
+    await expect.poll(() => shown('report:moon-1178')).toBe(false);
+    await expect.poll(() => shown('place:tycho')).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
   test('a link opens a lunar report, Back leaves the Moon, and an Earth case brings the Earth back', async ({ page }) => {
     await openApp(page, '/#/moon/moon-1963');
     await expect(page.locator('#moon-dossier')).toContainText('Greenacre and Barr', { timeout: 60_000 });
@@ -234,7 +249,12 @@ test.describe('The Moon', () => {
     expect((await labels()).every((v) => v === false)).toBe(true);
     await expect(page.locator('[data-moon="names"]')).toHaveAttribute('aria-pressed', 'false');
     await page.locator('[data-moon="names"]').click();
-    expect((await labels()).every((v) => v === true)).toBe(true);
+    // Back on the near side; the far side's stay hidden, past the rim.
+    const label = (id) => page.evaluate((id) => window.__uap.moonGlobe().viewer.entities.getById(id).label.show.getValue(), id);
+    expect(await label('place:tycho')).toBe(true);
+    expect(await label('place:mare-imbrium')).toBe(true);
+    expect(await label('place:apollo-11')).toBe(true);
+    expect((await labels()).filter((v) => v === false).length).toBeLessThan((await labels()).length / 2);
     // A pin: hover names it, a click opens its report.
     const at = await page.evaluate(() => {
       const v = window.__uap.moonGlobe().viewer;
