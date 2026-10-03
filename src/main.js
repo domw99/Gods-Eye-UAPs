@@ -1775,7 +1775,7 @@ function closeWelcome() {
   } catch {}
 }
 // Returning visitors hear once about what changed since they were here.
-const RELEASE = '1.5';
+const RELEASE = '1.6';
 const RELEASE_KEY = 'gods-eye-uap:release';
 function maybeWelcome() {
   let seen = false;
@@ -1788,7 +1788,8 @@ function maybeWelcome() {
   if (navigator.webdriver) return;
   if (!seen && !location.hash && !state.selected) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('New: 13 more cases, 161 in all, from the 1913 meteor procession to the 2024 drones over U.S. bases in England', 7000);
+    // Someone who saw 1.5's note hears only about the Moon; anyone from before also hears about the cases.
+    toast(release === '1.5' ? t('New: the Moon has map symbols of its own, for the landings, seas, craters, mountains and reports') : t('New: 13 more cases, 161 in all, and map symbols of its own on the Moon'), 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
