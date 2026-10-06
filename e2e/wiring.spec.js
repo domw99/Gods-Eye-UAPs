@@ -68,8 +68,8 @@ test.describe('wiring', () => {
   test('opening a Blue Book file takes the orbit view of the case before it away', async ({ page }) => {
     await openApp(page);
     const layers = () => page.evaluate(() => window.__uap.viewer.imageryLayers.length);
+    await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004')); // lights the globe for its moment: a city-lights layer joins
     const before = await layers();
-    await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004'));
     await page.evaluate(() => window.__uap.setOrbitDay('2004-11-14'));
     expect(await layers()).toBe(before + 1);
     await page.evaluate(() => window.__uap.selectBlueBook('1952-07-7273984-Tremonton-Utah-1377-'));
