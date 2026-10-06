@@ -1,5 +1,6 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
 import { t, locale, translateDom } from '../i18n/index.js';
+import { fmtDate, localAndUtc } from '../util/when.js';
 import { CASES } from '../data/cases/index.js';
 import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
@@ -40,23 +41,6 @@ let renderToken = 0;
 async function settle(token, ms = 350) {
   await new Promise((r) => setTimeout(r, ms));
   return token === renderToken;
-}
-
-const fmtDate = (d, opts = {}) =>
-  d.toLocaleString(locale(), { year: 'numeric', month: 'short', day: 'numeric', ...opts });
-
-/** "13 Mar 1997, 19:55 local (UTC−07:00) · 02:55 UTC" from an ISO string with offset. */
-function localAndUtc(iso, approx = false) {
-  if (approx) return `${localAndUtc(iso).replace(/(\d{2}:\d{2})/, '~$1').replace(/ · \d{2}:\d{2} UTC$/, '')} · ${t('time of day approximate')}`;
-  const d = new Date(iso);
-  const m = iso.match(/T(\d{2}):(\d{2}).*([+-]\d{2}):?(\d{2})$/);
-  const utc = `${d.toISOString().slice(11, 16)} UTC`;
-  if (!m) return `${fmtDate(d, { timeZone: 'UTC' })} · ${utc}`;
-  const offMin = (m[3].startsWith('-') ? -1 : 1) * (Math.abs(+m[3]) * 60 + +m[4]);
-  const local = new Date(d.getTime() + offMin * 60000);
-  const day = fmtDate(local, { timeZone: 'UTC' });
-  const off = `UTC${offMin < 0 ? '−' : '+'}${m[3].replace(/^[+-]/, '')}:${m[4]}`;
-  return t('{day}, {time} local ({off}) · {utc}', { day, time: `${m[1]}:${m[2]}`, off, utc });
 }
 
 function statusBadge(status) {
