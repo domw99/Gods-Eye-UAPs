@@ -763,7 +763,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 
 /* ── Clean view (F): only the globe ───────────────────── */
 body.clean .topbar, body.clean #left, body.clean #dossier, body.clean #timeline, body.clean .tl-show, body.clean #playback,
-body.clean .map-controls, body.clean #active-filters, body.clean .moon-view .panel, body.clean .moon-credit { opacity: 0; pointer-events: none; transition: opacity 200ms; }
+body.clean .map-controls, body.clean #active-filters, body.clean .moon-view .panel, body.clean .moon-credit { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 200ms, visibility 0s 200ms; } /* hidden once faded, so the controls cannot be tabbed to */
 body.clean .hud-br, body.clean .hud-tl { opacity: 0.7; }
 /* The radar scope in the Near me panel. */
 .radar { display: block; width: min(100%, 270px); height: auto; margin: 14px auto 2px; }

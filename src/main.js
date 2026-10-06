@@ -593,7 +593,7 @@ const LIGHT_KEY = 'gods-eye-uap:lighting';
 let lightMode = (() => {
   try {
     const m = localStorage.getItem(LIGHT_KEY);
-    return m in LIGHT_MODES ? m : 'auto';
+    return Object.hasOwn(LIGHT_MODES, m) ? m : 'auto';
   } catch {
     return 'auto';
   }
@@ -629,7 +629,7 @@ function applyLighting() {
 }
 
 function setLighting(mode) {
-  if (!(mode in LIGHT_MODES)) return;
+  if (!Object.hasOwn(LIGHT_MODES, mode)) return;
   lightMode = mode;
   try {
     localStorage.setItem(LIGHT_KEY, mode);
@@ -2027,9 +2027,12 @@ const openAboutModal = () =>
   openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated });
 document.getElementById('btn-about').addEventListener('click', openAboutModal);
 // In an embed, the way out: the full app at the same place, in a new tab.
-document.getElementById('embed-open').addEventListener('click', (e) => {
-  e.currentTarget.href = withoutEmbed(location.href);
-});
+{
+  const open = document.getElementById('embed-open');
+  // Set when the link is reached (pointer, focus, press), so a middle click or "open in a new tab" carries the place too.
+  const aim = () => (open.href = withoutEmbed(location.href));
+  for (const type of ['pointerenter', 'pointerdown', 'focus', 'contextmenu', 'click']) open.addEventListener(type, aim);
+}
 
 /* ── Map settings: OSM buildings and the user's own Google key ── */
 function openMapSettingsNow() {
@@ -2107,6 +2110,8 @@ const MODES = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
 // An embed hides the years bar and the clean view's way out (see the CSS), so their keys would change the page
 // with nothing on screen to say so or to undo it.
 const hiddenInEmbed = (e) => EMBED && ['y', 'f'].includes(e.key.toLowerCase());
+/** A held letter, digit or Space repeats the key: for a toggle (T, H, O, C, D, Space…) that flickers it on and off. Arrows, Shift and [ ] keep repeating. */
+const repeatedToggle = (e) => e.repeat && /^[a-z0-9? /`]$/i.test(e.key);
 /** Keys on the Moon: it has its own for turning, zooming and its list (ui/moonview.js); these are the ones the two worlds share. */
 function moonKey(e, typing) {
   const dialog = document.getElementById('modal-root').children.length;
@@ -2115,7 +2120,7 @@ function moonKey(e, typing) {
     if (document.body.classList.contains('clean')) return setCleanView(false);
     return showWorld('earth');
   }
-  if (typing || dialog || e.metaKey || e.ctrlKey || e.altKey || hiddenInEmbed(e)) return;
+  if (typing || dialog || e.metaKey || e.ctrlKey || e.altKey || hiddenInEmbed(e) || repeatedToggle(e)) return;
   const k = e.key.toLowerCase();
   if (/^[1-7]$/.test(e.key)) setMode(MODES[Number(e.key) - 1]);
   else if (k === 'u') showWorld('earth');
@@ -2158,7 +2163,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (document.getElementById('modal-root').children.length) return; // a dialog is open
-  if (hiddenInEmbed(e)) return;
+  if (hiddenInEmbed(e) || repeatedToggle(e)) return;
   // Arrow keys fly the camera unless a list or control has the focus.
   const onGlobe = e.target === document.body || e.target.closest?.('#globe');
   if (onGlobe && flycam.key(e, true)) {
@@ -2372,7 +2377,7 @@ const OPEN_TARGETS = {
 const openTarget = Object.keys(OPEN_TARGETS).includes(params.get('open')) ? OPEN_TARGETS[params.get('open')] : null;
 if (params.get('mode')) setMode(params.get('mode'));
 if (params.get('layers'))
-  for (const l of params.get('layers').split(',')) if (l in state.layers) setLayer(l, true);
+  for (const l of params.get('layers').split(',')) if (Object.hasOwn(state.layers, l)) setLayer(l, true);
 
 routing = true;
 const routed = routeFromHash();

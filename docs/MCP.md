@@ -1,6 +1,6 @@
 # Use the case files from an AI assistant (MCP)
 
-`scripts/mcp-server.mjs` is a [Model Context Protocol](https://modelcontextprotocol.io/) server for the case files. It lets an assistant such as Claude search the cases, read a case's file, find the cases near a place and see what happened on a date, with each case's status, explanation and sources. It runs on your machine, reads the cases in this repository, needs **no network, no API key and no dependencies** (Node 18 or later), and talks over stdin and stdout.
+`scripts/mcp-server.mjs` is a [Model Context Protocol](https://modelcontextprotocol.io/) server for the case files. It lets an assistant such as Claude search the cases, read a case's file, find the cases near a place and see what happened on a date, with each case's status, explanation and sources. It runs on your machine, reads the cases in this repository, needs **no network, no API key and no dependencies** (Node 20 or later), and talks over stdin and stdout.
 
 ## Add it
 
