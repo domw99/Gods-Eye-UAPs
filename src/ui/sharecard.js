@@ -34,9 +34,28 @@ export function snapshotGlobe(viewer, focus = null) {
   });
 }
 
+/**
+ * A word wider than the line, cut into pieces that each fit it: a long web address, or
+ * Japanese and Chinese text, which has no spaces to wrap at.
+ */
+function breakWord(measure, word, width) {
+  if (measure(word) <= width) return [word];
+  const pieces = [];
+  let piece = '';
+  for (const ch of Array.from(word)) {
+    if (piece && measure(piece + ch) > width) {
+      pieces.push(piece);
+      piece = '';
+    }
+    piece += ch;
+  }
+  if (piece) pieces.push(piece);
+  return pieces;
+}
+
 /** Break text into at most `maxLines` lines of `width` pixels, with an ellipsis if cut. */
 export function wrapText(measure, text, width, maxLines) {
-  const words = String(text).split(/\s+/).filter(Boolean);
+  const words = String(text).split(/\s+/).filter(Boolean).flatMap((w) => breakWord(measure, w, width));
   const lines = [];
   let line = '';
   for (let i = 0; i < words.length; i++) {
