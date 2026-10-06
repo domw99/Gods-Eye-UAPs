@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ रोकें",
   "✓ THAT DAY FROM ORBIT": "✓ उस दिन की कक्षा से तस्वीर",
   "MAKING CARD…": "कार्ड बनाया जा रहा है…",
+  "Enlarge picture: {caption}": "तस्वीर बड़ी करें: {caption}",
 };

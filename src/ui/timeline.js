@@ -1,5 +1,5 @@
 import { state, update, YEAR_MIN, YEAR_MAX } from '../state.js';
-import { t } from '../i18n/index.js';
+import { t, translateDom } from '../i18n/index.js';
 
 /**
  * Year histogram with brush selection. Bars: curated + official + user items
@@ -93,7 +93,7 @@ export function createTimeline({ onPlayToggle }) {
       g.stroke();
     }
     // Axis labels.
-    g.fillStyle = 'rgba(232,234,237,0.45)';
+    g.fillStyle = 'rgba(232,234,237,0.62)';
     g.font = '10px JetBrains Mono, monospace';
     g.textAlign = 'center';
     for (let y = 1900; y <= YEAR_MAX; y += w < 520 ? 40 : 20) g.fillText(String(y), xOf(y, w), h - 2);

@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ 停止",
   "✓ THAT DAY FROM ORBIT": "✓ 当天的轨道影像",
   "MAKING CARD…": "正在生成卡片…",
+  "Enlarge picture: {caption}": "放大图片：{caption}",
 };

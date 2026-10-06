@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ إيقاف",
   "✓ THAT DAY FROM ORBIT": "✓ ذلك اليوم من المدار",
   "MAKING CARD…": "جارٍ إنشاء البطاقة…",
+  "Enlarge picture: {caption}": "تكبير الصورة: {caption}",
 };

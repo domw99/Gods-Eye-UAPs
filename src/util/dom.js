@@ -35,6 +35,29 @@ export function mount(el, fragment) {
   return el;
 }
 
+const CONTROLS = 'button, a[href], input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+
+/** Where the keyboard focus is among the controls under `root` (-1: not in it), to find its place again after a redraw. */
+export function focusPosition(root) {
+  return [...root.querySelectorAll(CONTROLS)].indexOf(document.activeElement);
+}
+
+/** Put the focus back on the control at `position` under `root`, if it is still there. */
+export function restoreFocus(root, position) {
+  if (position >= 0) [...root.querySelectorAll(CONTROLS)][position]?.focus({ preventScroll: true });
+}
+
+/**
+ * mount() for controls that redraw themselves when they are used (filter chips, layer
+ * switches): the one that had the keyboard focus gets it again, instead of the page.
+ */
+export function remount(el, fragment) {
+  const position = focusPosition(el);
+  mount(el, fragment);
+  restoreFocus(el, position);
+  return el;
+}
+
 /** Translated markup: the key may hold tags (<b>…</b>); the {placeholders} are filled with escaped values. */
 export function th(key, vars = {}) {
   const safe = Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, v && v[RAW] !== undefined ? v[RAW] : esc(v)]));

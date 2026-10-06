@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ STOP",
   "✓ THAT DAY FROM ORBIT": "✓ DIE DAG VANUIT DE ORBIT",
   "MAKING CARD…": "KAART MAKEN…",
+  "Enlarge picture: {caption}": "Afbeelding vergroten: {caption}",
 };

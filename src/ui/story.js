@@ -95,13 +95,23 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
   }
   let state = null; // { c, steps, i, paused, timer, orbit }
 
+  // The utterance being read. A cancelled one reports an error a moment later; that must not
+  // count as "finished" and start the next caption's timer a second time.
+  let utterance = null;
+  function silence() {
+    utterance = null;
+    if (canSpeak) speechSynthesis.cancel();
+  }
+
   function speak(t, done) {
     if (!voiceOn || !canSpeak) return false;
-    speechSynthesis.cancel();
+    silence();
     const u = new SpeechSynthesisUtterance(t);
+    utterance = u;
+    const finished = () => utterance === u && done();
     u.rate = 1.02;
-    u.onend = done;
-    u.onerror = done;
+    u.onend = finished;
+    u.onerror = finished;
     speechSynthesis.speak(u);
     return true;
   }
@@ -187,7 +197,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
   function stop(silent = false) {
     if (!state) return;
     clearTimeout(state.timer);
-    if (canSpeak) speechSynthesis.cancel();
+    silence();
     stopOrbit();
     state = null;
     el.classList.add('hidden');
@@ -207,7 +217,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
       btnPause.textContent = state.paused ? '▶' : '❚❚';
       if (state.paused) {
         clearTimeout(state.timer);
-        if (canSpeak) speechSynthesis.cancel();
+        silence();
       } else show(state.i);
     } else if (action === 'voice') {
       voiceOn = !voiceOn;
@@ -217,7 +227,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
       } catch {
         /* ignore */
       }
-      if (!voiceOn && canSpeak) speechSynthesis.cancel();
+      if (!voiceOn) silence();
       show(state.i);
     }
   });

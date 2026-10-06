@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ DETENER",
   "✓ THAT DAY FROM ORBIT": "✓ ESE DÍA DESDE LA ÓRBITA",
   "MAKING CARD…": "CREANDO TARJETA…",
+  "Enlarge picture: {caption}": "Ampliar la imagen: {caption}",
 };

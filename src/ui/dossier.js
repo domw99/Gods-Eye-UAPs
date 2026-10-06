@@ -1,5 +1,6 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
-import { t, plural, locale } from '../i18n/index.js';
+import { t, plural, locale, translateDom } from '../i18n/index.js';
+import { fmtDate, localAndUtc } from '../util/when.js';
 import { CASES } from '../data/cases/index.js';
 import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
@@ -31,6 +32,23 @@ import { classInfo, geipanDate, caseUrl, translateUrl, bodiesNamed, GEIPAN_SITE,
 const panel = () => document.getElementById('dossier');
 const body = () => document.getElementById('dossier-body');
 let renderToken = 0;
+let redraw = null; // how to draw the open record again
+
+/** Remember the call that drew the open record, to repeat it when the language changes. */
+const remember = (render, args) => {
+  redraw = () => render(...args);
+};
+
+/**
+ * Draw the open record again, keeping its place in the panel. What the code wrote in the
+ * old language ("2 TRACKS", the date line) follows a change of language this way.
+ */
+export function redrawDossier() {
+  if (!redraw || panel().classList.contains('hidden')) return;
+  const top = body().scrollTop;
+  redraw();
+  body().scrollTop = top;
+}
 
 /**
  * Wait a moment before calling remote services, and skip the call if another
@@ -40,23 +58,6 @@ let renderToken = 0;
 async function settle(token, ms = 350) {
   await new Promise((r) => setTimeout(r, ms));
   return token === renderToken;
-}
-
-const fmtDate = (d, opts = {}) =>
-  d.toLocaleString(locale(), { year: 'numeric', month: 'short', day: 'numeric', ...opts });
-
-/** "13 Mar 1997, 19:55 local (UTC−07:00) · 02:55 UTC" from an ISO string with offset. */
-function localAndUtc(iso, approx = false) {
-  if (approx) return `${localAndUtc(iso).replace(/(\d{2}:\d{2})/, '~$1').replace(/ · \d{2}:\d{2} UTC$/, '')} · ${t('time of day approximate')}`;
-  const d = new Date(iso);
-  const m = iso.match(/T(\d{2}):(\d{2}).*([+-]\d{2}):?(\d{2})$/);
-  const utc = `${d.toISOString().slice(11, 16)} UTC`;
-  if (!m) return `${fmtDate(d, { timeZone: 'UTC' })} · ${utc}`;
-  const offMin = (m[3].startsWith('-') ? -1 : 1) * (Math.abs(+m[3]) * 60 + +m[4]);
-  const local = new Date(d.getTime() + offMin * 60000);
-  const day = fmtDate(local, { timeZone: 'UTC' });
-  const off = `UTC${offMin < 0 ? '−' : '+'}${m[3].replace(/^[+-]/, '')}:${m[4]}`;
-  return t('{day}, {time} local ({off}) · {utc}', { day, time: `${m[1]}:${m[2]}`, off, utc });
 }
 
 function statusBadge(status) {
@@ -308,6 +309,7 @@ async function fillAirspace(token, promise) {
 }
 
 export function renderAirspace(a) {
+  remember(renderAirspace, arguments);
   open('AIRSPACE');
   mount(
     body(),
@@ -333,6 +335,7 @@ export function renderAirspace(a) {
 }
 
 export function renderLaunchPad(p) {
+  remember(renderLaunchPad, arguments);
   open('LAUNCH SITE');
   const now = Date.now();
   mount(
@@ -357,6 +360,7 @@ export function renderLaunchPad(p) {
 }
 
 export function renderQuake(q) {
+  remember(renderQuake, arguments);
   open('EARTHQUAKE');
   const when = new Date(q.time);
   mount(
@@ -400,6 +404,7 @@ function open(idLabel) {
 
 export function closeDossier() {
   renderToken++;
+  redraw = null;
   panel().classList.add('hidden');
   panel().classList.remove('peek');
   document.body.classList.remove('dossier-open', 'dossier-peek');
@@ -413,7 +418,7 @@ function dvidsCard(item, caption) {
   // Percent-encode characters that could end a CSS url('…') token.
   const thumb = item.thumbnail ? safeUrl(item.thumbnail).replace(/['"()\s\\]/g, (c) => `%${c.charCodeAt(0).toString(16)}`) : '';
   if (item.type === 'image')
-    return html`<figure class="media-card" data-lightbox="${thumb}" data-caption="${caption || item.title}" data-credit="DVIDS · U.S. Government (public domain)" data-href="${item.page}">
+    return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || item.title })}" data-lightbox="${thumb}" data-caption="${caption || item.title}" data-credit="DVIDS · U.S. Government (public domain)" data-href="${item.page}">
       <img src="${thumb}" alt="${caption || item.title}" loading="lazy" referrerpolicy="no-referrer" />
       <span class="badge official kind">OFFICIAL IMAGE</span>
       <figcaption>${caption || item.title}</figcaption></figure>`;
@@ -444,7 +449,7 @@ function imageCard(info, caption, page = null) {
   const thumb = pdf && page ? info.thumb.replace(/\/page\d+-/, `/page${page}-`) : info.thumb;
   const big = pdf ? thumb.replace(/-\d+px-/, '-1280px-') : info.url;
   const href = pdf && page ? `${info.page}?page=${page}` : info.page;
-  return html`<figure class="media-card" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}" data-credit="${credit}" data-href="${safeUrl(href)}">
+  return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || info.title.replace(/^File:/, '') })}" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}"data-credit="${credit}" data-href="${safeUrl(href)}">
     <img src="${safeUrl(thumb)}" alt="${caption || info.title}" loading="lazy" />
     ${info.mime === 'application/pdf' ? html`<span class="badge kind">PDF</span>` : ''}
     <figcaption>${caption || info.title.replace(/^File:/, '')}</figcaption>
@@ -552,6 +557,7 @@ function similarBlock(c) {
 }
 
 export function renderCase(item, ctx) {
+  remember(renderCase, arguments);
   const c = item.ref;
   const token = open(c.id);
   const date = new Date(c.date);
@@ -686,6 +692,7 @@ export function renderCase(item, ctx) {
 }
 
 export function renderOfficial(item, ctx) {
+  remember(renderOfficial, arguments);
   const o = item.ref;
   const token = open(o.releaseId || `DVIDS ${o.dvidsId}`);
   const loc = o.location;
@@ -714,6 +721,7 @@ export function renderOfficial(item, ctx) {
 }
 
 export function renderBlueBook(rec) {
+  remember(renderBlueBook, arguments);
   const token = open('PROJECT BLUE BOOK');
   const id = encodeURIComponent(rec.id);
   const content = html`
@@ -742,7 +750,7 @@ export async function showOcr(id) {
     const res = await fetch(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`);
     if (!res.ok) throw new Error(res.status);
     const text = joinBrokenWords(await res.text()).replace(/\n{3,}/g, '\n\n').slice(0, 6000);
-    mount(el, html`<pre class="mono" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);
+    mount(el, html`<pre class="mono" tabindex="0" role="region" aria-label="READ OCR TEXT" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">OCR text unavailable for this file.</div>`);
   }
@@ -754,6 +762,7 @@ const PREC_LABEL = ['NOT PLACED', 'DEPARTMENT', 'COMMUNE'];
 
 /** A GEIPAN case: its classification, GEIPAN's French summary, and the sky and weather when the time is known. */
 export function renderGeipan(r) {
+  remember(renderGeipan, arguments);
   const token = open('GEIPAN · FRANCE');
   const info = classInfo(r.cls);
   const when = r.utc ? `${geipanDate(r)}, ${r.localTime} local · ${r.utc.slice(11, 16)} UTC` : geipanDate(r);
@@ -770,7 +779,7 @@ export function renderGeipan(r) {
       <blockquote class="mufon-quote big" lang="fr">${r.short}</blockquote>`)}
     ${section(
       'CASE SUMMARY (FRENCH)',
-      html`<div class="d-text geipan-text" lang="fr">${r.summary.split(/\n+/).map((p) => html`<p>${p}</p>`)}${cut ? html`<p class="dim">… continued in the full file.</p>` : ''}</div>
+      html`<div class="d-text geipan-text" lang="fr" tabindex="0" role="region" aria-label="CASE SUMMARY (FRENCH)">${r.summary.split(/\n+/).map((p) => html`<p>${p}</p>`)}${cut ? html`<p class="dim">… continued in the full file.</p>` : ''}</div>
       <div class="btn-row">
         <a class="chip on" target="_blank" rel="noopener" href="${caseUrl(r)}">Full file on cnes-geipan.fr ↗</a>
         <a class="chip" target="_blank" rel="noopener" href="${translateUrl(`${r.short}\n\n${r.summary}`)}">Translate to English ↗</a>
@@ -843,6 +852,7 @@ function journalCaseBlock(m) {
  * the publisher of an archive issue).
  */
 export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
+  remember(renderMufon, arguments);
   const token = open(is.series ? 'RESEARCH ARCHIVES' : 'MUFON FILES');
   const page = pageNumber(is, leaf);
   const others = inIssue.filter((r) => r !== record);
@@ -903,7 +913,7 @@ export async function showMufonText(is, leaf) {
   try {
     const text = await pageText(is, leaf);
     if (!document.body.contains(el)) return;
-    mount(el, html`<pre class="mono ocr-text">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
+    mount(el, html`<pre class="mono ocr-text" tabindex="0" role="region" aria-label="READ OCR TEXT">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">Page text unavailable. Try the Internet Archive reader.</div>`);
   }
@@ -918,6 +928,7 @@ const km = (d) => (d < 10 ? d.toFixed(1) : Math.round(d).toLocaleString());
  * nearest first. `data` fields arrive as they load; missing ones show a note.
  */
 export function renderNearby({ label, lat, lon, data }) {
+  remember(renderNearby, arguments);
   const token = open('NEAR HERE');
   const list = (rows, row) => (rows.length ? html`<ul class="source-list">${rows.map(row)}</ul>` : html`<div class="loading-line">Nothing within range.</div>`);
   const pending = html`<div class="loading-line">Loading…</div>`;
@@ -955,6 +966,7 @@ export function renderNearby({ label, lat, lon, data }) {
 }
 
 export function renderNuforc(r) {
+  remember(renderNuforc, arguments);
   open('NUFORC REPORT');
   mount(
     body(),
@@ -969,6 +981,7 @@ export function renderNuforc(r) {
 }
 
 export function renderUser(item, { onDelete }) {
+  remember(renderUser, arguments);
   const u = item.ref;
   const token = open('MY SIGHTING');
   mount(
@@ -1025,6 +1038,7 @@ export function renderUser(item, { onDelete }) {
 }
 
 export function renderSatellite(info) {
+  remember(renderSatellite, arguments);
   open('SATELLITE');
   mount(
     body(),
@@ -1035,8 +1049,8 @@ export function renderSatellite(info) {
   );
 }
 
-export function renderSkyCheck(list) {
-  const el = document.getElementById('d-sky');
+/** `el`: the box the check was started in, so a late answer never lands in another record's box. */
+export function renderSkyCheck(list, el = document.getElementById('d-sky')) {
   if (!el) return;
   if (list === 'loading') {
     mount(el, html`<div class="loading-line">Loading satellite orbits from CelesTrak…</div>`);
@@ -1055,6 +1069,13 @@ export function renderSkyCheck(list) {
 
 /** Delegated button handling inside the dossier. */
 export function bindDossierActions(handlers) {
+  // A picture opens full size from the keyboard too (the card is a button, reached with Tab).
+  body().addEventListener('keydown', (e) => {
+    const card = e.target.closest?.('[data-lightbox]');
+    if (!card || card !== e.target || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    handlers.lightbox(card.dataset);
+  });
   body().addEventListener('click', (e) => {
     const lb = e.target.closest('[data-lightbox]');
     if (lb) {
@@ -1065,6 +1086,7 @@ export function bindDossierActions(handlers) {
     if (play) {
       const wrap = play.closest('[data-dvids]');
       wrap.innerHTML = `<iframe src="https://www.dvidshub.net/video/embed/${encodeURIComponent(wrap.dataset.dvids)}" allow="autoplay; fullscreen" allowfullscreen title="${esc(t('Official DVIDS video'))}"></iframe>`;
+      wrap.querySelector('iframe').focus(); // the play button that had the focus is gone
       return;
     }
     const btn = e.target.closest('[data-action]');
@@ -1079,6 +1101,7 @@ export function bindDossierActions(handlers) {
       toggleStar(btn.dataset.key);
       const next = mount(document.createElement('div'), starButton(btn.dataset.key)).firstElementChild;
       btn.replaceWith(next);
+      next.focus(); // the button that had the focus is gone; a keyboard user stays where they were
       toast(next.classList.contains('on') ? 'Starred — find it under Filters › Saved' : 'Removed from your starred cases', 2200);
       return;
     }

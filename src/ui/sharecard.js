@@ -34,9 +34,28 @@ export function snapshotGlobe(viewer, focus = null) {
   });
 }
 
+/**
+ * A word wider than the line, cut into pieces that each fit it: a long web address, or
+ * Japanese and Chinese text, which has no spaces to wrap at.
+ */
+function breakWord(measure, word, width) {
+  if (measure(word) <= width) return [word];
+  const pieces = [];
+  let piece = '';
+  for (const ch of Array.from(word)) {
+    if (piece && measure(piece + ch) > width) {
+      pieces.push(piece);
+      piece = '';
+    }
+    piece += ch;
+  }
+  if (piece) pieces.push(piece);
+  return pieces;
+}
+
 /** Break text into at most `maxLines` lines of `width` pixels, with an ellipsis if cut. */
 export function wrapText(measure, text, width, maxLines) {
-  const words = String(text).split(/\s+/).filter(Boolean);
+  const words = String(text).split(/\s+/).filter(Boolean).flatMap((w) => breakWord(measure, w, width));
   const lines = [];
   let line = '';
   for (let i = 0; i < words.length; i++) {
@@ -123,7 +142,7 @@ export async function drawCard(c, snap) {
   const brand = "GOD'S EYE // UAP";
   const bw = g.measureText(brand).width;
   g.fillText(brand, x, y);
-  g.fillStyle = 'rgba(232,234,237,0.45)';
+  g.fillStyle = 'rgba(232,234,237,0.6)';
   g.font = '500 13px "JetBrains Mono", monospace';
   g.fillText(c.kind || 'CASE FILE', x + bw + 16, y);
 
@@ -181,7 +200,7 @@ export async function drawCard(c, snap) {
   g.fillStyle = 'rgba(0,212,255,0.9)';
   g.font = '500 15px "JetBrains Mono", monospace';
   g.fillText(c.url.replace(/^https?:\/\//, '').replace(/#globe$/, '').replace(/\/$/, '').slice(0, 64), x, H - 44);
-  g.fillStyle = 'rgba(232,234,237,0.45)';
+  g.fillStyle = 'rgba(232,234,237,0.6)';
   g.font = '500 12px "JetBrains Mono", monospace';
   g.fillText(`made by ${AUTHOR}`, x, H - 22);
   return canvas;

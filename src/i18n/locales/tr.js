@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ DURDUR",
   "✓ THAT DAY FROM ORBIT": "✓ O GÜN YÖRÜNGEDEN",
   "MAKING CARD…": "KART OLUŞTURULUYOR…",
+  "Enlarge picture: {caption}": "Görseli büyüt: {caption}",
 };

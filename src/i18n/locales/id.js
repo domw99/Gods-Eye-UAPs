@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ BERHENTI",
   "✓ THAT DAY FROM ORBIT": "✓ HARI ITU DARI ORBIT",
   "MAKING CARD…": "MEMBUAT KARTU…",
+  "Enlarge picture: {caption}": "Perbesar gambar: {caption}",
 };

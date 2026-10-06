@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ 정지",
   "✓ THAT DAY FROM ORBIT": "✓ 그날의 궤도 영상",
   "MAKING CARD…": "카드 만드는 중…",
+  "Enlarge picture: {caption}": "이미지 확대: {caption}",
 };

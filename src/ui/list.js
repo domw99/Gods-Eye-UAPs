@@ -1,4 +1,4 @@
-import { html, mount, raw } from '../util/dom.js';
+import { html, mount, raw, remount } from '../util/dom.js';
 import { t, translateDom } from '../i18n/index.js';
 import { glyphSvg } from '../layers/glyphs.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
@@ -31,7 +31,7 @@ const layersAreDefault = () => Object.entries(DEFAULT_LAYERS).every(([k, v]) => 
 
 export function renderLayers(counts) {
   document.getElementById('layers-reset')?.classList.toggle('hidden', layersAreDefault());
-  mount(
+  remount(
     document.getElementById('layers'),
     html`${LAYER_DEFS.map(
       (l) => html`<button class="layer" data-layer="${l.id}" aria-pressed="${state.layers[l.id] ? 'true' : 'false'}" style="color:${l.color}">
@@ -55,30 +55,30 @@ export function renderActiveFilters() {
   for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${t(STATUS[k]?.label || k)} ✕</button>`);
   if (state.starredOnly) chips.push(html`<button class="chip small on" data-clear="starred">${t('★ STARRED')} ✕</button>`);
   el.classList.toggle('hidden', !chips.length);
-  mount(el, chips.length ? html`<span class="af-label">FILTERED BY</span>${chips}<button class="chip small af-reset" data-clear="all">RESET ALL</button>` : html``);
+  remount(el, chips.length ? html`<span class="af-label">FILTERED BY</span>${chips}<button class="chip small af-reset" data-clear="all">RESET ALL</button>` : html``);
 }
 
 export function renderFilters() {
   const n = state.evidence.size + state.status.size + state.shape.size + (state.starredOnly ? 1 : 0);
   const stars = state.starred.size;
-  mount(
+  remount(
     document.getElementById('starred-filter'),
     html`<button class="chip small ${state.starredOnly ? 'on' : ''}" data-starred-only aria-pressed="${state.starredOnly ? 'true' : 'false'}" ${stars || state.starredOnly ? '' : 'disabled'} title="${stars ? 'Show only the cases you starred' : 'Star a case (☆ in its file) to save it here'}">${t('★ STARRED ONLY · {n}', { n: stars })}</button>`,
   );
   document.getElementById('filter-count').textContent = n ? t('· {n} ACTIVE', { n }) : '';
-  mount(
+  remount(
     document.getElementById('evidence-filters'),
     html`${EVIDENCE_FILTERS.map(
       (e) => html`<button class="chip small ${state.evidence.has(e) ? 'on' : ''}" data-evidence="${e}" title="${EVIDENCE[e].long}">${EVIDENCE[e].label}</button>`,
     )}`,
   );
-  mount(
+  remount(
     document.getElementById('shape-filters'),
     html`${Object.entries(SHAPES).map(
       ([k, s]) => html`<button class="chip small ${state.shape.has(k) ? 'on' : ''}" data-shape="${k}">${s.label}</button>`,
     )}`,
   );
-  mount(
+  remount(
     document.getElementById('status-filters'),
     html`${Object.entries(STATUS).map(
       ([k, s]) => html`<button class="chip small ${state.status.has(k) ? 'on' : ''}" data-status="${k}" title="${s.long}">${s.label}</button>`,

@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ FERMA",
   "✓ THAT DAY FROM ORBIT": "✓ QUEL GIORNO DALL’ORBITA",
   "MAKING CARD…": "CREAZIONE DELLA CARD…",
+  "Enlarge picture: {caption}": "Ingrandisci l’immagine: {caption}",
 };

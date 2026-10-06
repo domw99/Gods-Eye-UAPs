@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ СТОП",
   "✓ THAT DAY FROM ORBIT": "✓ ТОТ ДЕНЬ С ОРБИТЫ",
   "MAKING CARD…": "СОЗДАНИЕ КАРТОЧКИ…",
+  "Enlarge picture: {caption}": "Увеличить изображение: {caption}",
 };

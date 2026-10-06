@@ -21,7 +21,7 @@ import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList,
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
+  renderSkyCheck, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
@@ -1399,10 +1399,9 @@ bindDossierActions({
     if (!item) return;
     const token = selectToken; // the answer is for this record: another one opened meanwhile has its own sky check
     if (!state.layers.satellites) setLayer('satellites', true);
-    renderSkyCheck('loading');
-    satLayer.ensureLoaded().then(() => {
-      if (token === selectToken) renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null);
-    });
+    const box = document.getElementById('d-sky'); // the answer belongs in this record's box, even if another is open by then
+    renderSkyCheck('loading', box);
+    satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null, box));
   },
   'export-user': exportUserLog,
   compare: () => {
@@ -2085,6 +2084,7 @@ document.getElementById('btn-map').addEventListener('click', () => {
     renderActiveFilters();
     refresh();
     setGrouping(itemLayer.grouping, { save: false });
+    redrawDossier(); // the open record's text was written in the old language
   });
 }
 

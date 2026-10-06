@@ -1123,4 +1123,5 @@ export default {
   "■ STOP": "■ 停止",
   "✓ THAT DAY FROM ORBIT": "✓ その日を軌道から",
   "MAKING CARD…": "カードを作成中…",
+  "Enlarge picture: {caption}": "画像を拡大: {caption}",
 };
