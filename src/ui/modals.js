@@ -1,5 +1,5 @@
 import { html, mount, safeUrl, toast } from '../util/dom.js';
-import { t, plural, locale } from '../i18n/index.js';
+import { t, plural, locale, upper } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { shareRow } from './sharelinks.js';
 import { commonsPage } from '../services/wiki.js';
@@ -427,7 +427,7 @@ export function openMapSettings(o) {
 
     <div class="section-label">MAP STYLE</div>
     <div class="btn-row" id="ms-style" role="radiogroup" aria-label="Map style">${o.styles.map(
-      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.style ? 'on' : ''}" data-style="${id}" aria-checked="${id === o.style ? 'true' : 'false'}">${t(label).toUpperCase()}</button>`,
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.style ? 'on' : ''}" data-style="${id}" aria-checked="${id === o.style ? 'true' : 'false'}">${upper(t(label))}</button>`,
     )}</div>
     <div class="btn-row">${o.style === 'satellite'
       ? html`<button type="button" class="chip ${o.names ? 'on' : ''}" id="ms-names" aria-pressed="${o.names ? 'true' : 'false'}">${o.names ? t('✓ PLACE NAMES & BORDERS') : t('PLACE NAMES & BORDERS OFF')}</button>`
@@ -435,7 +435,7 @@ export function openMapSettings(o) {
 
     <div class="section-label">LIGHTING<span class="tips-mouse"> · D</span></div>
     <div class="btn-row" id="ms-light" role="radiogroup" aria-label="Lighting">${o.lightModes.map(
-      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${t(label).toUpperCase()}</button>`,
+      ([id, label]) => html`<button type="button" role="radio" class="chip ${id === o.lighting ? 'on' : ''}" data-light="${id}" aria-checked="${id === o.lighting ? 'true' : 'false'}">${upper(t(label))}</button>`,
     )}</div>
     <p class="muted" style="margin:6px 0 12px;font-size:12px;line-height:1.5">Auto lights an open case by the sun at the time it happened, with city lights on the night side. Day and Night hold that look everywhere; Off keeps the globe evenly lit.</p>
 

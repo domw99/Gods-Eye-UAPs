@@ -50,6 +50,9 @@ export const direction = () => LANGUAGES.find((l) => l.code === lang)?.dir || 'l
 /** The locale to hand to Intl, for dates and numbers. */
 export const locale = () => ({ en: 'en-GB', pt: 'pt-BR', zh: 'zh-CN' })[lang] || lang;
 
+/** Upper case by the language's own rules (Turkish i → İ); CSS text-transform already follows <html lang>, but toUpperCase() in code does not. */
+export const upper = (text) => String(text).toLocaleUpperCase(locale());
+
 /** Fill in {name} placeholders. */
 export function fill(text, vars) {
   return vars ? text.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m)) : text;

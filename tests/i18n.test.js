@@ -6,7 +6,7 @@ import { join } from 'node:path';
 globalThis.document = { documentElement: { dataset: {} }, body: null };
 globalThis.localStorage = { setItem() {}, getItem: () => null };
 const i18n = await import('../src/i18n/index.js');
-const { LANGUAGES, setLanguage, t, th: _th, plural, fill, locale, pickLanguage, direction } = i18n;
+const { LANGUAGES, setLanguage, t, th: _th, plural, fill, locale, pickLanguage, direction, upper } = i18n;
 
 const locales = {};
 for (const { code } of LANGUAGES.filter((l) => l.code !== 'en')) locales[code] = (await import(`../src/i18n/locales/${code}.js`)).default;
@@ -119,6 +119,15 @@ describe('t() and friends', () => {
     await setLanguage('de', { save: false });
     for (const word of ['constructor', 'toString', 'valueOf', 'hasOwnProperty', '__proto__']) expect(t(word), word).toBe(word);
     expect(plural(2, 'constructor', 'toString')).toBe('toString');
+  });
+
+  it('upper-cases translated labels by the language’s own rules', async () => {
+    await setLanguage('tr', { save: false });
+    expect(upper('otomatik (vaka zamanı)')).toBe('OTOMATİK (VAKA ZAMANI)'); // toUpperCase() would give OTOMATIK
+    await setLanguage('de', { save: false });
+    expect(upper('Straßen')).toBe('STRASSEN');
+    await setLanguage('en', { save: false });
+    expect(upper('topographic')).toBe('TOPOGRAPHIC');
   });
 
   it('fill() leaves unknown placeholders alone', () => {

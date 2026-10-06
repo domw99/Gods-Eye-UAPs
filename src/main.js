@@ -3,7 +3,7 @@ import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGo
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { createInstall, installSteps } from './app/install.js';
-import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale } from './i18n/index.js';
+import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale, upper } from './i18n/index.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
@@ -1083,7 +1083,7 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
   };
   draw();
   setHash(`#/near/${lat.toFixed(4)},${lon.toFixed(4)}/${encodeURIComponent(label)}`);
-  document.getElementById('hud-tgt').textContent = (label === 'you' ? t('NEAR YOU') : t('NEAR {place}', { place: label })).slice(0, 40).toUpperCase();
+  document.getElementById('hud-tgt').textContent = upper((label === 'you' ? t('NEAR YOU') : t('NEAR {place}', { place: label })).slice(0, 40));
   const fill = (key, promise, pick) =>
     promise.then(
       (d) => ((data[key] = pick(d)), draw()),
