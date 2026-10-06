@@ -36,6 +36,19 @@ test.describe('panels', () => {
     expect(await page.evaluate(() => document.getElementById('dossier-body').scrollWidth <= document.getElementById('dossier-body').clientWidth)).toBe(true);
   });
 
+  test('the open case file is written again in the new language, where it was scrolled', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004', 'list'));
+    await expect(page.locator('#dossier-body .badge.path')).toHaveText('2 TRACKS');
+    await page.evaluate(() => (document.getElementById('dossier-body').scrollTop = 300));
+    await page.selectOption('#lang', 'de');
+    await expect(page.locator('#dossier-body .badge.path')).toHaveText('2 FLUGBAHNEN'); // built in code, not by the page translator
+    await expect(page.locator('#dossier-body .d-sub')).toContainText('Ortszeit');
+    expect(await page.evaluate(() => document.getElementById('dossier-body').scrollTop)).toBeGreaterThan(200);
+    await page.selectOption('#lang', 'en');
+    await expect(page.locator('#dossier-body .badge.path')).toHaveText('2 TRACKS');
+  });
+
   test('the star button keeps the keyboard focus when it flips', async ({ page }) => {
     await openApp(page);
     await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004', 'list'));

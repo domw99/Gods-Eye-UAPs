@@ -32,6 +32,23 @@ import { classInfo, geipanDate, caseUrl, translateUrl, bodiesNamed, GEIPAN_SITE,
 const panel = () => document.getElementById('dossier');
 const body = () => document.getElementById('dossier-body');
 let renderToken = 0;
+let redraw = null; // how to draw the open record again
+
+/** Remember the call that drew the open record, to repeat it when the language changes. */
+const remember = (render, args) => {
+  redraw = () => render(...args);
+};
+
+/**
+ * Draw the open record again, keeping its place in the panel. What the code wrote in the
+ * old language ("2 TRACKS", the date line) follows a change of language this way.
+ */
+export function redrawDossier() {
+  if (!redraw || panel().classList.contains('hidden')) return;
+  const top = body().scrollTop;
+  redraw();
+  body().scrollTop = top;
+}
 
 /**
  * Wait a moment before calling remote services, and skip the call if another
@@ -292,6 +309,7 @@ async function fillAirspace(token, promise) {
 }
 
 export function renderAirspace(a) {
+  remember(renderAirspace, arguments);
   open('AIRSPACE');
   mount(
     body(),
@@ -317,6 +335,7 @@ export function renderAirspace(a) {
 }
 
 export function renderLaunchPad(p) {
+  remember(renderLaunchPad, arguments);
   open('LAUNCH SITE');
   const now = Date.now();
   mount(
@@ -341,6 +360,7 @@ export function renderLaunchPad(p) {
 }
 
 export function renderQuake(q) {
+  remember(renderQuake, arguments);
   open('EARTHQUAKE');
   const when = new Date(q.time);
   mount(
@@ -384,6 +404,7 @@ function open(idLabel) {
 
 export function closeDossier() {
   renderToken++;
+  redraw = null;
   panel().classList.add('hidden');
   panel().classList.remove('peek');
   document.body.classList.remove('dossier-open', 'dossier-peek');
@@ -536,6 +557,7 @@ function similarBlock(c) {
 }
 
 export function renderCase(item, ctx) {
+  remember(renderCase, arguments);
   const c = item.ref;
   const token = open(c.id);
   const date = new Date(c.date);
@@ -670,6 +692,7 @@ export function renderCase(item, ctx) {
 }
 
 export function renderOfficial(item, ctx) {
+  remember(renderOfficial, arguments);
   const o = item.ref;
   const token = open(o.releaseId || `DVIDS ${o.dvidsId}`);
   const loc = o.location;
@@ -698,6 +721,7 @@ export function renderOfficial(item, ctx) {
 }
 
 export function renderBlueBook(rec) {
+  remember(renderBlueBook, arguments);
   const token = open('PROJECT BLUE BOOK');
   const id = encodeURIComponent(rec.id);
   const content = html`
@@ -738,6 +762,7 @@ const PREC_LABEL = ['NOT PLACED', 'DEPARTMENT', 'COMMUNE'];
 
 /** A GEIPAN case: its classification, GEIPAN's French summary, and the sky and weather when the time is known. */
 export function renderGeipan(r) {
+  remember(renderGeipan, arguments);
   const token = open('GEIPAN · FRANCE');
   const info = classInfo(r.cls);
   const when = r.utc ? `${geipanDate(r)}, ${r.localTime} local · ${r.utc.slice(11, 16)} UTC` : geipanDate(r);
@@ -827,6 +852,7 @@ function journalCaseBlock(m) {
  * the publisher of an archive issue).
  */
 export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
+  remember(renderMufon, arguments);
   const token = open(is.series ? 'RESEARCH ARCHIVES' : 'MUFON FILES');
   const page = pageNumber(is, leaf);
   const others = inIssue.filter((r) => r !== record);
@@ -902,6 +928,7 @@ const km = (d) => (d < 10 ? d.toFixed(1) : Math.round(d).toLocaleString());
  * nearest first. `data` fields arrive as they load; missing ones show a note.
  */
 export function renderNearby({ label, lat, lon, data }) {
+  remember(renderNearby, arguments);
   const token = open('NEAR HERE');
   const list = (rows, row) => (rows.length ? html`<ul class="source-list">${rows.map(row)}</ul>` : html`<div class="loading-line">Nothing within range.</div>`);
   const pending = html`<div class="loading-line">Loading…</div>`;
@@ -939,6 +966,7 @@ export function renderNearby({ label, lat, lon, data }) {
 }
 
 export function renderNuforc(r) {
+  remember(renderNuforc, arguments);
   open('NUFORC REPORT');
   mount(
     body(),
@@ -953,6 +981,7 @@ export function renderNuforc(r) {
 }
 
 export function renderUser(item, { onDelete }) {
+  remember(renderUser, arguments);
   const u = item.ref;
   const token = open('MY SIGHTING');
   mount(
@@ -1011,6 +1040,7 @@ export function renderUser(item, { onDelete }) {
 }
 
 export function renderSatellite(info) {
+  remember(renderSatellite, arguments);
   open('SATELLITE');
   mount(
     body(),

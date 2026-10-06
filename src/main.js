@@ -21,7 +21,7 @@ import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList,
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
+  renderSkyCheck, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
@@ -2052,6 +2052,7 @@ document.getElementById('btn-map').addEventListener('click', () => {
     renderActiveFilters();
     refresh();
     setGrouping(itemLayer.grouping, { save: false });
+    redrawDossier(); // the open record's text was written in the old language
   });
 }
 
