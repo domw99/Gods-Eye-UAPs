@@ -89,8 +89,10 @@ function infoRow(html, label) {
   return decode(html.match(re)?.[1] || '');
 }
 
+/** Assets found by the search, and how many search pages could not be read (a missing page is just the end of the results). */
 async function discover() {
   const found = new Map();
+  let failed = 0;
   for (const type of TYPES) {
     for (const q of QUERIES) {
       let idle = 0;
@@ -101,6 +103,7 @@ async function discover() {
           html = await fetchText(url);
         } catch (e) {
           console.warn('search failed', url, e.message);
+          if (!/^404\b/.test(e.message)) failed++;
           break;
         }
         const re = new RegExp(`href="/${type}/(\\d+)/([^"#?]+)"`, 'g');
@@ -122,7 +125,16 @@ async function discover() {
       }
     }
   }
-  return [...found.values()];
+  return { assets: [...found.values()], failed };
+}
+
+/**
+ * The new items, plus every earlier item they do not include. Used when some search pages could not
+ * be read: the assets on them were never looked at, so they are not gone.
+ */
+export function keepUnseen(items, previous) {
+  const seen = new Set(items.map((i) => `${i.type}:${i.dvidsId}`));
+  return [...items, ...previous.filter((p) => !seen.has(`${p.type}:${p.dvidsId}`))];
 }
 
 function parseTitle(title) {
@@ -212,9 +224,12 @@ async function main() {
     return;
   }
   console.log('Discovering DVIDS UAP assets…');
-  const assets = (await discover()).slice(0, MAX);
+  const found = await discover();
+  const assets = found.assets.slice(0, MAX);
   console.log(`Found ${assets.length} candidate assets`);
-  const items = [];
+  // DVIDS down or refusing us finds nothing; that must not replace the catalogue with an empty one.
+  if (!assets.length) throw new Error(`The DVIDS search found no assets (${found.failed} search pages failed); the catalogue is unchanged`);
+  let items = [];
   for (const [i, a] of assets.entries()) {
     try {
       const item = await readAsset(a);
@@ -226,6 +241,10 @@ async function main() {
       if (old) items.push(old);
     }
     await sleep(DELAY_MS);
+  }
+  if (found.failed) {
+    console.warn(`\n${found.failed} search pages could not be read; keeping the earlier items they may have held`);
+    items = keepUnseen(items, previous);
   }
   items.sort((a, b) =>
     String(b.dateTaken || b.year || '').localeCompare(
@@ -243,7 +262,8 @@ async function main() {
   console.log(`\nWrote ${items.length} items to ${path.relative(ROOT, OUT)}`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url))
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
