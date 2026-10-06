@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "雷达视图:{range} 公里内 {n} 条记录,上方为北",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新功能:在搜索框输入坐标,并查看每个案例的极光和最近的机场",
   "less than 1 km away": "不到 1 公里",
+  "offline": "离线",
+  "STARTING GLOBE…": "正在启动地球…",
+  "LOADING CASE FILES…": "正在加载案件档案…",
+  "ACQUIRING IMAGERY…": "正在获取影像…",
+  "■ STOP": "■ 停止",
+  "✓ THAT DAY FROM ORBIT": "✓ 当天的轨道影像",
+  "MAKING CARD…": "正在生成卡片…",
 };

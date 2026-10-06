@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "레이더 보기: {range}km 이내 기록 {n}건, 북쪽이 위",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "새 기능: 검색창에 좌표를 입력하고, 각 사례의 오로라와 가장 가까운 비행장을 확인하세요",
   "less than 1 km away": "1km 미만",
+  "offline": "오프라인",
+  "STARTING GLOBE…": "지구본 시작 중…",
+  "LOADING CASE FILES…": "사건 파일 로딩 중…",
+  "ACQUIRING IMAGERY…": "영상 가져오는 중…",
+  "■ STOP": "■ 정지",
+  "✓ THAT DAY FROM ORBIT": "✓ 그날의 궤도 영상",
+  "MAKING CARD…": "카드 만드는 중…",
 };

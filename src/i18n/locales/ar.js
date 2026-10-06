@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "عرض الرادار: {n} سجلًا ضمن {range} كم، والشمال في الأعلى",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "جديد: اكتب الإحداثيات في مربع البحث، وشاهد الشفق القطبي وأقرب المطارات لكل حالة",
   "less than 1 km away": "على بعد أقل من 1 كم",
+  "offline": "غير متصل",
+  "STARTING GLOBE…": "جارٍ تشغيل الكرة الأرضية…",
+  "LOADING CASE FILES…": "جارٍ تحميل ملفات الحالات…",
+  "ACQUIRING IMAGERY…": "جارٍ استلام الصور…",
+  "■ STOP": "■ إيقاف",
+  "✓ THAT DAY FROM ORBIT": "✓ ذلك اليوم من المدار",
+  "MAKING CARD…": "جارٍ إنشاء البطاقة…",
 };

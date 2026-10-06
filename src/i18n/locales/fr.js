@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Vue radar : {n} dossiers dans un rayon de {range} km, nord en haut",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nouveau : saisissez des coordonnées dans la recherche, et voyez l'aurore et les aérodromes les plus proches pour chaque cas",
   "less than 1 km away": "à moins d'1 km",
+  "offline": "hors ligne",
+  "STARTING GLOBE…": "DÉMARRAGE DU GLOBE…",
+  "LOADING CASE FILES…": "CHARGEMENT DES DOSSIERS DE CAS…",
+  "ACQUIRING IMAGERY…": "RÉCUPÉRATION DES IMAGES…",
+  "■ STOP": "■ ARRÊTER",
+  "✓ THAT DAY FROM ORBIT": "✓ CE JOUR-LÀ VU DE L’ORBITE",
+  "MAKING CARD…": "CRÉATION DE LA CARTE…",
 };

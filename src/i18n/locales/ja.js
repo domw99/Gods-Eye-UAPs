@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "レーダー表示:{range} km 以内の記録 {n} 件(上が北)",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新機能:検索ボックスに座標を入力でき、各事例のオーロラと最寄りの飛行場も見られます",
   "less than 1 km away": "1 km 未満",
+  "offline": "オフライン",
+  "STARTING GLOBE…": "地球儀を起動中…",
+  "LOADING CASE FILES…": "事案ファイルを読み込み中…",
+  "ACQUIRING IMAGERY…": "衛星画像を取得中…",
+  "■ STOP": "■ 停止",
+  "✓ THAT DAY FROM ORBIT": "✓ その日を軌道から",
+  "MAKING CARD…": "カードを作成中…",
 };

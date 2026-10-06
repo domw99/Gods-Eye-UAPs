@@ -3,6 +3,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseNearHash } from '../src/app/links.js';
 import { isLogEntry } from '../src/data/items.js';
+import { parseStars } from '../src/state.js';
 
 describe('#/near/ addresses', () => {
   it('reads a place, with or without a label', () => {
@@ -39,6 +40,19 @@ describe('the saved sighting log', () => {
     const { id, ...noId } = good;
     for (const bad of [null, 5, 'x', [], {}, noDate, noId, { ...good, date: 'garbage' }, { ...good, date: 1714594500000 }, { ...good, lat: '40' }, { ...good, lat: 91 }, { ...good, lon: NaN }, { ...good, lon: 200 }])
       expect(isLogEntry(bad), JSON.stringify(bad)).toBe(false);
+  });
+});
+
+describe('the saved stars', () => {
+  it('reads a list of keys', () => {
+    expect([...parseStars('["case:a","official:7"]')]).toEqual(['case:a', 'official:7']);
+    expect(parseStars(null).size).toBe(0);
+  });
+
+  it('takes anything else in storage for no stars (a string would have become a set of letters)', () => {
+    for (const raw of ['"abc"', '{"a":1}', '123', 'null', 'true', '[1,2,null]', '{oops', ''])
+      expect(parseStars(raw).size, raw).toBe(0);
+    expect([...parseStars('["case:a",3,{"x":1}]')]).toEqual(['case:a']);
   });
 });
 

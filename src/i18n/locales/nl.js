@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Radarbeeld: {n} meldingen binnen {range} km, noorden boven",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nieuw: typ coördinaten in het zoekvak en zie voor elk geval het poollicht en de dichtstbijzijnde vliegvelden",
   "less than 1 km away": "minder dan 1 km verderop",
+  "offline": "offline",
+  "STARTING GLOBE…": "WERELDBOL STARTEN…",
+  "LOADING CASE FILES…": "ZAAKDOSSIERS LADEN…",
+  "ACQUIRING IMAGERY…": "BEELDEN OPHALEN…",
+  "■ STOP": "■ STOP",
+  "✓ THAT DAY FROM ORBIT": "✓ DIE DAG VANUIT DE ORBIT",
+  "MAKING CARD…": "KAART MAKEN…",
 };

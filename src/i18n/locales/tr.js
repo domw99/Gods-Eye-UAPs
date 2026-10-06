@@ -887,4 +887,11 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Radar görünümü: {range} km içinde {n} kayıt, kuzey yukarıda",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Yeni: arama kutusuna koordinat yazın ve her vaka için kutup ışığını ve en yakın havaalanlarını görün",
   "less than 1 km away": "1 km'den yakın",
+  "offline": "çevrimdışı",
+  "STARTING GLOBE…": "KÜRE BAŞLATILIYOR…",
+  "LOADING CASE FILES…": "VAKA DOSYALARI YÜKLENİYOR…",
+  "ACQUIRING IMAGERY…": "GÖRÜNTÜLER ALINIYOR…",
+  "■ STOP": "■ DURDUR",
+  "✓ THAT DAY FROM ORBIT": "✓ O GÜN YÖRÜNGEDEN",
+  "MAKING CARD…": "KART OLUŞTURULUYOR…",
 };

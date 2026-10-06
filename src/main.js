@@ -62,11 +62,11 @@ const GROUP_KEY = 'gods-eye-uap:group';
 /* ── Boot ──────────────────────────────────────────────── */
 await initLanguage(); // the saved language, else the browser's, before anything is drawn
 const loadingStep = (text, pct) => {
-  document.getElementById('loading-step').textContent = t(text);
+  document.getElementById('loading-step').textContent = text;
   document.getElementById('loading-fill').style.width = `${pct}%`;
   document.getElementById('loading').setAttribute('aria-valuenow', String(pct));
 };
-loadingStep('STARTING GLOBE…', 25);
+loadingStep(t('STARTING GLOBE…'), 25);
 // The catalogue downloads while the globe starts.
 const officialPromise = loadOfficial(BASE).catch((e) => e);
 const viewer = await createViewer(document.getElementById('globe'));
@@ -111,7 +111,7 @@ let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
 const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
-loadingStep('LOADING CASE FILES…', 45);
+loadingStep(t('LOADING CASE FILES…'), 45);
 try {
   const o = await officialPromise;
   if (o instanceof Error) throw o;
@@ -241,7 +241,7 @@ function refresh() {
   layerCounts.user = userItems.length;
   renderLayersNow();
   renderActiveFilters();
-  markSelected(state.selected);
+  markSelected(state.selected, { scroll: false });
   render.request();
 }
 
@@ -378,9 +378,11 @@ function ensureBlueBook() {
       jitter: (r, i, la, lo) => (r.prec === 3 ? [la, lo] : townJitter(r.id, la, lo, r.prec === 1 ? 25 : 2.5)),
     });
     layerCounts.bluebook = records.filter((r) => r.lat != null).length.toLocaleString();
+    renderLayersNow(); // a case file loads this too, with no refresh after it to replace "loading…"
     return bluebook;
   })().catch((e) => {
     bluebookPromise = null;
+    renderLayersNow({ bluebook: 'offline' }); // not "loading…" for good
     toast('Could not load Blue Book layer');
     throw e;
   });
@@ -399,9 +401,11 @@ function ensureMufon() {
       jitter: (r, i, la, lo) => townJitter(`m${i}`, la, lo, 2.5),
     });
     layerCounts.mufon = mufon.records.length.toLocaleString();
+    renderLayersNow();
     return mufon;
   })().catch((e) => {
     mufonPromise = null;
+    renderLayersNow({ mufon: 'offline' }); // not "loading…" for good
     toast('Could not load the MUFON files');
     throw e;
   });
@@ -422,9 +426,11 @@ function ensureGeipan() {
       jitter: (r, i, la, lo) => townJitter(`g${r.id}`, la, lo, r.prec === 1 ? 20 : 2),
     });
     layerCounts.geipan = geipan.records.filter((r) => r.lat != null).length.toLocaleString();
+    renderLayersNow();
     return geipan;
   })().catch((e) => {
     geipanPromise = null;
+    renderLayersNow({ geipan: 'offline' }); // not "loading…" for good
     toast('Could not load the GEIPAN files');
     throw e;
   });
@@ -480,9 +486,11 @@ function ensureJournals() {
       jitter: (r, i, la, lo) => townJitter(`j${i}`, la, lo, 2.5),
     });
     layerCounts.journals = journals.records.length.toLocaleString();
+    renderLayersNow();
     return journals;
   })().catch((e) => {
     journalsPromise = null;
+    renderLayersNow({ journals: 'offline' }); // not "loading…" for good
     toast('Could not load the research archives');
     throw e;
   });
@@ -507,9 +515,12 @@ function ensureNuforc() {
       year: (_, i) => Math.floor(nuforc.date[i] / 10000),
       jitter: (_, i, la, lo) => townJitter(String(i), la, lo, 4),
     });
+    layerCounts.nuforc = nuforc.lat.length.toLocaleString();
+    renderLayersNow();
     return nuforc;
   })().catch((e) => {
     nuforcPromise = null;
+    renderLayersNow({ nuforc: 'offline' }); // not "loading…" for good
     toast('Could not load civilian reports');
     throw e;
   });
@@ -1358,7 +1369,7 @@ bindDossierActions({
     setOrbitDay(on ? btn.dataset.day : null);
     btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('on', on);
-    btn.textContent = on ? '✓ THAT DAY FROM ORBIT' : '🛰 THAT DAY FROM ORBIT';
+    btn.textContent = on ? t('✓ THAT DAY FROM ORBIT') : t('🛰 THAT DAY FROM ORBIT');
     // Rise high enough to see the weather systems around the site.
     const item = itemByKey(state.selected);
     if (on && item && viewer.camera.positionCartographic.height < 900e3)
@@ -1414,7 +1425,7 @@ bindDossierActions({
     if (!item || btn.disabled) return;
     const label = btn.textContent;
     btn.disabled = true;
-    btn.textContent = 'MAKING CARD…';
+    btn.textContent = t('MAKING CARD…');
     try {
       const url = shareLink(`${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`);
       const blob = await cardBlob(await makeCard(item, url));
@@ -1626,33 +1637,43 @@ document.querySelector('.modes').addEventListener('click', (e) => {
 
 /* ── History sweep (timeline ▶) ────────────────────────── */
 let sweepTimer = null;
-function toggleHistorySweep() {
-  if (document.body.classList.contains('tl-hidden')) setTimelineHidden(false); // the sweep shows on the bar
-  if (sweepTimer) {
-    clearInterval(sweepTimer);
-    sweepTimer = null;
-    timeline.setPlaying(false);
-    return;
+let sweeping = false; // true while the sweep itself is moving the range
+function stopHistorySweep() {
+  if (!sweepTimer) return;
+  clearInterval(sweepTimer);
+  sweepTimer = null;
+  timeline.setPlaying(false);
+}
+function sweepTo(yearRange) {
+  sweeping = true;
+  try {
+    update({ yearRange }, 'yearRange');
+  } finally {
+    sweeping = false;
   }
+}
+// Anything else that sets the years (a chip's ✕, RESET ALL) takes over from the sweep, or it would put its range back.
+subscribe((s, reason) => {
+  if (!sweeping && (reason === 'yearRange' || reason === 'reset')) stopHistorySweep();
+});
+function toggleHistorySweep() {
+  if (sweepTimer) return stopHistorySweep();
+  if (document.body.classList.contains('tl-hidden')) setTimelineHidden(false); // the sweep shows on the bar
   let y = 1940;
   timeline.setPlaying(true);
   sweepTimer = setInterval(() => {
     if (y > YEAR_MAX) {
-      clearInterval(sweepTimer);
-      sweepTimer = null;
-      timeline.setPlaying(false);
-      update({ yearRange: null }, 'yearRange');
+      stopHistorySweep();
+      sweepTo(null);
       return;
     }
-    update({ yearRange: [Math.max(YEAR_MIN, y), Math.min(YEAR_MAX, y + 4)] }, 'yearRange');
+    sweepTo([Math.max(YEAR_MIN, y), Math.min(YEAR_MAX, y + 4)]);
     y += 1;
   }, 450);
 }
 
 // Brushing the histogram by hand takes over from the automatic sweep.
-document.getElementById('tl-canvas').addEventListener('pointerdown', () => {
-  if (sweepTimer) toggleHistorySweep();
-});
+document.getElementById('tl-canvas').addEventListener('pointerdown', stopHistorySweep);
 
 /* ── Guided tour ───────────────────────────────────────── */
 const TOUR = [
@@ -1684,7 +1705,7 @@ function startTour() {
   if (tourTimer) return stopTour();
   tourIndex = 0;
   tourTimer = true;
-  document.getElementById('btn-tour').textContent = '■ STOP';
+  document.getElementById('btn-tour').textContent = t('■ STOP');
   tourStep();
 }
 function stopTour() {
@@ -1692,7 +1713,7 @@ function stopTour() {
   clearTimeout(tourTimer);
   clearTimeout(tourPlayTimer);
   tourTimer = null;
-  document.getElementById('btn-tour').textContent = '▶ TOUR';
+  document.getElementById('btn-tour').textContent = t('▶ TOUR');
 }
 
 /* ── Map view: zoom about the screen centre, reset ─────── */
@@ -1948,7 +1969,7 @@ function openMoonNow(focus) {
   hideHover();
   stopTour();
   if (flycam.orbiting) setOrbit(false);
-  if (sweepTimer) toggleHistorySweep(); // the sweep through the years is the Earth's
+  stopHistorySweep(); // the sweep through the years is the Earth's
   deselect({ keepHash: true });
   viewer.useDefaultRenderLoop = false;
   if (!MOON_ROUTE.test(location.hash)) {
@@ -2083,9 +2104,9 @@ function neighbour(delta) {
 }
 
 const MODES = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
-// An embed hides the case list, the years bar and the clean view's way out (see the CSS), so the keys that
-// drive them would change what the globe shows with nothing on screen to say so or to undo it.
-const hiddenInEmbed = (e) => EMBED && ['/', '[', ']', 'y', 'f'].includes(e.key.toLowerCase());
+// An embed hides the years bar and the clean view's way out (see the CSS), so their keys would change the page
+// with nothing on screen to say so or to undo it.
+const hiddenInEmbed = (e) => EMBED && ['y', 'f'].includes(e.key.toLowerCase());
 /** Keys on the Moon: it has its own for turning, zooming and its list (ui/moonview.js); these are the ones the two worlds share. */
 function moonKey(e, typing) {
   const dialog = document.getElementById('modal-root').children.length;
@@ -2121,6 +2142,12 @@ window.addEventListener('keydown', (e) => {
   if (isMoonOpen()) return moonKey(e, typing);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return backModal();
+    // In the search box Esc clears the words first (as on the Moon), and does not close the case file beside it.
+    const box = document.getElementById('search');
+    if (e.target === box && box.value) {
+      box.value = '';
+      return update({ search: '' }, 'search');
+    }
     if (story.active) return story.stop();
     if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
@@ -2373,10 +2400,10 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     }, 250);
     removeProgress();
   };
-  loadingStep('ACQUIRING IMAGERY…', 60);
+  loadingStep(t('ACQUIRING IMAGERY…'), 60);
   const removeProgress = viewer.scene.globe.tileLoadProgressEvent.addEventListener((pending) => {
     peak = Math.max(peak, pending);
-    if (peak) loadingStep('ACQUIRING IMAGERY…', Math.round(60 + 40 * (1 - pending / peak)));
+    if (peak) loadingStep(t('ACQUIRING IMAGERY…'), Math.round(60 + 40 * (1 - pending / peak)));
     if (peak && pending === 0) finish();
   });
   setTimeout(finish, 6000); // never hold the page for slow tiles
