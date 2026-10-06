@@ -1,4 +1,4 @@
-import { html, mount, raw, toast, safeUrl } from '../util/dom.js';
+import { html, mount, raw, remount, toast, safeUrl } from '../util/dom.js';
 import { t, onLanguageChange } from '../i18n/index.js';
 import { formatDMS } from '../util/geo.js';
 import { MOON_PLACES, MOON_INK, MOON_LAYER_GLYPH, moonGlyph, moonGroup, moonReports, searchMoon, viewHeight } from '../data/moon.js';
@@ -287,7 +287,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
     ...Object.fromEntries(['site', 'sea', 'crater', 'range'].map((g) => [g, MOON_PLACES.filter((p) => moonGroup(p.kind) === g).length])),
   });
   function renderLayers() {
-    mount($('#moon-layers'), layersHtml(counts()));
+    remount($('#moon-layers'), layersHtml(counts()));
   }
   function renderList() {
     const query = searchEl.value.trim();

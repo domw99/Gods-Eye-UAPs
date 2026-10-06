@@ -39,6 +39,29 @@ test.describe('panels', () => {
     await expect(page.locator('#dossier-body [data-action="star"]')).toBeFocused();
   });
 
+  test('filter chips and layer switches keep the keyboard focus when they redraw', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() => document.querySelector('details.filters')?.setAttribute('open', ''));
+    for (const sel of ['[data-evidence="video"]', '[data-status="unresolved"]', '[data-layer="official"]']) {
+      await page.locator(sel).focus();
+      await page.keyboard.press('Enter');
+      await expect(page.locator(sel)).toBeFocused();
+    }
+    // Removing a chip from the "filtered by" bar hands the focus to the next one, not to the page.
+    await page.locator('[data-clear-evidence="video"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#active-filters button:focus')).toHaveCount(1);
+  });
+
+  test('a choice in the map settings keeps the focus on the control that was used', async ({ page }) => {
+    await openApp(page);
+    await page.keyboard.press('m');
+    await page.locator('#ms-light [data-light="day"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#ms-light [data-light="day"]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('#ms-light [data-light="day"]')).toBeFocused();
+  });
+
   test('the timeline play button is named for what it does now', async ({ page }) => {
     await openApp(page);
     const play = page.locator('#tl-play');

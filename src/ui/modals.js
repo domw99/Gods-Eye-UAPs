@@ -1,4 +1,4 @@
-import { html, mount, safeUrl, toast } from '../util/dom.js';
+import { html, mount, safeUrl, toast, focusPosition, restoreFocus } from '../util/dom.js';
 import { t, plural, locale } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { shareRow } from './sharelinks.js';
@@ -55,6 +55,8 @@ function modal(title, content, { wide = true } = {}) {
   // A dialog re-rendering itself replaces itself; a different one stacks.
   if (current && current.dataset.title !== title) stack.push(current);
   else if (!current) lastFocus = document.activeElement;
+  // Redrawing itself (a choice in the map settings), it keeps the focus on the control that was used.
+  const position = current && current.dataset.title === title ? focusPosition(current) : -1;
   mount(
     root(),
     html`<div class="modal-backdrop" data-close data-title="${title}">
@@ -72,7 +74,8 @@ function modal(title, content, { wide = true } = {}) {
     else if (e.target.closest('a[href^="#/"]')) closeModal();
   });
   setBackgroundInert(true);
-  backdrop.querySelector('.modal button, .modal input, .modal a')?.focus();
+  if (position >= 0) restoreFocus(backdrop, position);
+  else backdrop.querySelector('.modal button, .modal input, .modal a')?.focus();
   return backdrop;
 }
 
