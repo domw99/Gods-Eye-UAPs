@@ -6,9 +6,10 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { addStrings, entry, fileText, languageCodes } from '../scripts/add-strings.mjs';
 import { isMain } from '../scripts/lib/is-main.mjs';
+import { siteUrl } from '../scripts/lib/site.mjs';
 import { productionPackages, repoUrl } from '../scripts/build-notices.mjs';
 import { byVersionDesc, noteBody, addedOn } from '../scripts/build-changelog.mjs';
-import { RELEASE } from '../src/config.js';
+import { RELEASE, SITE_URL } from '../src/config.js';
 
 const CODES = languageCodes();
 const blank = () => Object.fromEntries(CODES.map((c) => [c, { Hello: `hello-${c}` }]));
@@ -130,5 +131,20 @@ describe('running a script', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe('the public address', () => {
+  it('always ends in one slash, so page addresses built from it do not run together', () => {
+    expect(siteUrl('https://example.org/sub')).toBe('https://example.org/sub/');
+    expect(siteUrl('https://example.org/sub/')).toBe('https://example.org/sub/');
+    expect(siteUrl(' https://example.org// ')).toBe('https://example.org/');
+    expect(`${siteUrl('https://example.org/sub')}case/x/`).toBe('https://example.org/sub/case/x/');
+  });
+
+  it('is the default site when SITE_URL is unset or blank', () => {
+    expect(siteUrl('')).toBe(SITE_URL);
+    expect(siteUrl('  ')).toBe(SITE_URL);
+    expect(siteUrl(undefined)).toBe(process.env.SITE_URL ? siteUrl(process.env.SITE_URL) : SITE_URL);
   });
 });

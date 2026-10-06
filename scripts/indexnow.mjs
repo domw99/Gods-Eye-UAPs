@@ -10,9 +10,10 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { siteUrl } from './lib/site.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const SITE = process.env.SITE_URL || 'https://domw99.github.io/Gods-Eye-UAPs/';
+const SITE = siteUrl();
 
 async function main() {
   const file = (await readdir(path.join(ROOT, 'public'))).find((f) => /^[a-f0-9]{32}\.txt$/.test(f));

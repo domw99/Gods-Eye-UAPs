@@ -20,10 +20,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 import { CASES } from '../src/data/cases/index.js';
+import { siteUrl } from './lib/site.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUT = path.join(ROOT, 'public/cards');
-const SITE = process.env.SITE_URL || 'https://domw99.github.io/Gods-Eye-UAPs/';
+const SITE = siteUrl();
 
 const args = process.argv.slice(2);
 const force = args.includes('--force');
