@@ -18,7 +18,7 @@ const compact = (n) => (n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}
 
 const LABEL_W = 144; // user units between the row names and the plot
 /** Rough width of a 12px label: Chinese, Japanese and Korean letters are square, the rest about half that. */
-const labelWidth = (s) => [...s].reduce((w, c) => w + (c.charCodeAt(0) >= 0x2e80 ? 12 : 6.3), 0);
+const labelWidth = (s) => [...s].reduce((w, c) => w + (c.charCodeAt(0) >= 0x2e80 ? 12 : 5.8), 0);
 /**
  * An SVG label does not wrap and a translated name can be twice the English
  * length: break one that is too wide at the space nearest its middle.
