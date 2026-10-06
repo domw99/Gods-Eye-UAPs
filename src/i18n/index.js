@@ -55,9 +55,12 @@ export function fill(text, vars) {
   return vars ? text.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m)) : text;
 }
 
+// Own entries only: a text that reads "constructor" or "toString" must not find Object's methods.
+const lookup = (key) => (Object.hasOwn(dict, key) ? dict[key] : undefined);
+
 /** The translation of `key` (English text, optionally with {placeholders}), or the key itself. */
 export function t(key, vars) {
-  return fill(dict[key] ?? key, vars);
+  return fill(lookup(key) ?? key, vars);
 }
 
 /**
@@ -66,7 +69,7 @@ export function t(key, vars) {
  * other }) under the 'one|many' key, and the right one is chosen for n.
  */
 export function plural(n, one, many, vars = {}) {
-  const forms = dict[`${one}|${many}`];
+  const forms = lookup(`${one}|${many}`);
   if (forms && typeof forms === 'object') {
     const text = forms[new Intl.PluralRules(locale()).select(n)] ?? forms.other;
     if (text !== undefined) return fill(text, { n, ...vars });
@@ -82,7 +85,7 @@ function translateText(node) {
   const key = src.trim();
   if (!key) return;
   if (globalThis.__i18nSeen) globalThis.__i18nSeen.add(key);
-  const tr = lang === 'en' ? undefined : dict[key];
+  const tr = lang === 'en' ? undefined : lookup(key);
   if (tr === undefined) {
     if (saved && node.nodeValue === saved.out) node.nodeValue = src; // back to English
     originals.delete(node);
@@ -103,7 +106,7 @@ function translateAttrs(el) {
     const cur = el.getAttribute(a);
     const src = saved[a] && cur === saved[a].out ? saved[a].src : cur;
     if (globalThis.__i18nSeen && src.trim()) globalThis.__i18nSeen.add(`[${a}] ${src.trim()}`);
-    const tr = lang === 'en' ? undefined : dict[src.trim()];
+    const tr = lang === 'en' ? undefined : lookup(src.trim());
     if (tr === undefined) {
       if (saved[a] && cur === saved[a].out) el.setAttribute(a, src);
       if (saved[a]) delete saved[a];
@@ -138,25 +141,29 @@ export const onLanguageChange = (fn) => (listeners.add(fn), () => listeners.dele
 /** The best supported language for a list of browser language tags. */
 export function pickLanguage(tags) {
   for (const tag of tags || []) {
-    const base = String(tag).toLowerCase().split('-')[0];
+    const base = String(tag).toLowerCase().split(/[-_]/)[0]; // "es-MX", or "es_MX" written with an underscore
     if (LANGUAGES.some((l) => l.code === base)) return base;
   }
   return 'en';
 }
 
+let newest = 0; // the latest setLanguage() call: a dictionary that arrives after a newer choice must not replace it
+
 export async function setLanguage(code, { save = true } = {}) {
+  const mine = ++newest;
   if (!LANGUAGES.some((l) => l.code === code)) code = 'en';
-  if (code === 'en') dict = {};
-  else {
+  let next = {};
+  if (code !== 'en') {
     const load = loaders[`./locales/${code}.js`];
     try {
-      dict = load ? (await load()).default : {};
+      next = load ? (await load()).default : {};
     } catch (e) {
       console.warn('[i18n] could not load', code, e);
-      dict = {};
       code = 'en';
     }
   }
+  if (mine !== newest) return lang;
+  dict = next;
   lang = code;
   const root = document.documentElement;
   root.lang = code;
