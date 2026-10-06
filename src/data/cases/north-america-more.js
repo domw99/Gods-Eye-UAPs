@@ -156,7 +156,7 @@ export default [
         kind: 'aircraft',
         basis: 'approximate',
         points: [
-          p(40.3, -74.2, 20000, 24 * MIN),
+          p(40.3, -74.2, 20000, 23 * MIN),
           p(40.09, -74.08, 20000, 25 * MIN, 'Disc seen below, over Point Pleasant'),
           p(40.0, -73.95, 12000, 27 * MIN, 'Dives after it; object pulls away out to sea'),
         ],

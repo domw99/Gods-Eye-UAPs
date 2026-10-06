@@ -1,4 +1,4 @@
-import { p, commons, DAY } from './helpers.js';
+import { p, commons, DAY, HR } from './helpers.js';
 
 /**
  * Pre-1947 accounts: broadsheets, folk records, newspaper waves and the
@@ -10,6 +10,7 @@ export default [
     id: 'basel-1566',
     title: 'Celestial phenomenon over Basel',
     date: '1566-08-07T06:00:00+01:00',
+    timeApprox: true,
     place: 'Basel, Swiss Confederacy (Switzerland)',
     country: 'Switzerland',
     cc: 'CH',
@@ -144,7 +145,8 @@ export default [
           p(41.2586, -95.9375, 1500, 132 * DAY, 'Omaha, Nebraska'),
           p(39.0997, -94.5786, 1500, 136 * DAY, 'Kansas City, early April'),
           p(41.8781, -87.6298, 1500, 143 * DAY, 'Chicago, Apr 9–10'),
-          p(33.0506, -97.5042, 1500, 151 * DAY, 'Aurora, Texas, Apr 17'),
+          // 06:00 CST on Apr 17, the case's `end`: 150 days 10 h after the first point.
+          p(33.0506, -97.5042, 1500, 150 * DAY + 10 * HR, 'Aurora, Texas, Apr 17'),
         ],
       },
     ],

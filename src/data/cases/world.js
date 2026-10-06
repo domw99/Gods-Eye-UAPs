@@ -7,6 +7,7 @@ export default [
     id: 'nuremberg-1561',
     title: 'Celestial phenomenon over Nuremberg',
     date: '1561-04-14T05:00:00+01:00',
+    timeApprox: true,
     place: 'Nuremberg, Holy Roman Empire (Germany)',
     country: 'Germany',
     cc: 'DE',
@@ -886,7 +887,7 @@ export default [
   {
     id: 'kaikoura-1978',
     title: 'Kaikōura lights',
-    date: '1978-12-31T00:00:00+13:00',
+    date: '1978-12-30T23:50:00+13:00',
     end: '1978-12-31T03:00:00+13:00',
     place: 'Kaikōura coast, New Zealand',
     country: 'New Zealand',

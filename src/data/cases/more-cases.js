@@ -168,7 +168,7 @@ export default [
   {
     id: 'coyne-1973',
     title: 'Coyne helicopter incident',
-    date: '1973-10-18T23:05:00-04:00',
+    date: '1973-10-18T22:30:00-04:00',
     place: 'Near Mansfield, Ohio',
     country: 'United States',
     cc: 'US',
