@@ -16,6 +16,8 @@ export function caseRecord(c, { site }) {
     id: c.id,
     title: c.title,
     date: c.date,
+    // The sources often give no time of day; the date then carries a guessed one (as the case page says).
+    timeApproximate: c.timeApprox === true,
     year: Number(c.date.slice(0, 4)),
     place: c.place,
     country: c.country ?? null,
@@ -49,15 +51,19 @@ export function caseRecord(c, { site }) {
 }
 
 const CSV_COLUMNS = [
-  'id', 'title', 'date', 'year', 'place', 'country', 'countryCode', 'latitude', 'longitude', 'locationPrecision',
+  'id', 'title', 'date', 'timeApproximate', 'year', 'place', 'country', 'countryCode', 'latitude', 'longitude', 'locationPrecision',
   'category', 'status', 'statusLabel', 'explanation', 'evidence', 'shape', 'witnesses', 'duration', 'summary',
   'tracks', 'wikipedia', 'sources', 'page', 'globe',
 ];
 
-/** A CSV field: quoted when it has to be, quotes doubled. */
+/**
+ * A CSV field: quoted when it has to be, quotes doubled. Text a spreadsheet would run as a formula
+ * (it starts with = + - @, a tab or a return) gets a leading apostrophe; numbers are left as they are.
+ */
 export function csvField(v) {
   if (v == null) return '';
-  const s = String(v);
+  let s = String(v);
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
@@ -82,7 +88,7 @@ export function toGeoJson(records) {
         id: r.id,
         geometry: { type: 'Point', coordinates: [r.longitude, r.latitude] },
         properties: {
-          id: r.id, title: r.title, date: r.date, year: r.year, place: r.place, countryCode: r.countryCode,
+          id: r.id, title: r.title, date: r.date, timeApproximate: r.timeApproximate, year: r.year, place: r.place, countryCode: r.countryCode,
           locationPrecision: r.locationPrecision, category: r.category, status: r.status, evidence: r.evidence.join(', '),
           shape: r.shape, summary: r.summary, explanation: r.explanation, page: r.page, globe: r.globe,
         },
@@ -126,7 +132,7 @@ export function openData(cases, { site, version, date }) {
   ];
   const fields = [
     ['id', 'Stable identifier; the case page is case/<id>/'],
-    ['date', 'Local date and time with its UTC offset, as recorded (ISO 8601)'],
+    ['date, timeApproximate', 'Local date and time with its UTC offset, as recorded (ISO 8601); timeApproximate is true when the time of day is a guess'],
     ['place, country, countryCode', 'Where it happened; ISO 3166-1 alpha-2 country code'],
     ['latitude, longitude, locationPrecision', `WGS 84 degrees; how exact the position is: ${Object.keys(PRECISION).join(', ')}`],
     ['category', `The kind of encounter: ${Object.keys(CATEGORY).join(', ')}`],

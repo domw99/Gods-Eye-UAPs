@@ -32,6 +32,18 @@ describe('open data', () => {
     expect(data.json).not.toMatch(/undefined|\[object Object\]|NaN/);
   });
 
+  it('says when the time of day is a guess, in all three files', () => {
+    const guessed = CASES.filter((c) => c.timeApprox);
+    expect(guessed.length).toBeGreaterThan(0);
+    const { records } = JSON.parse(data.json);
+    for (const r of records) expect(r.timeApproximate, r.id).toBe(guessed.some((c) => c.id === r.id));
+    const header = data.csv.split('\r\n')[0].split(',');
+    expect(header[header.indexOf('date') + 1]).toBe('timeApproximate');
+    const points = JSON.parse(data.geojson).features.filter((f) => f.geometry.type === 'Point');
+    expect(points.filter((f) => f.properties.timeApproximate)).toHaveLength(guessed.length);
+    expect(data.page).toContain('timeApproximate');
+  });
+
   it('keeps each flight path with what it is based on, as longitude, latitude, altitude and time', () => {
     const nimitz = caseRecord(CASES.find((c) => c.id === 'nimitz-tic-tac-2004'), { site: SITE });
     const [track] = nimitz.tracks;
@@ -46,6 +58,11 @@ describe('open data', () => {
     expect(csvField('two\nlines')).toBe('"two\nlines"');
     expect(csvField(null)).toBe('');
     expect(csvField(0)).toBe('0');
+    // Text a spreadsheet would run as a formula is neutralised; a negative coordinate is a number and stays one.
+    expect(csvField('=HYPERLINK("http://x.test","a")')).toBe(`"'=HYPERLINK(""http://x.test"",""a"")"`);
+    for (const lead of ['+', '-', '@', '\t']) expect(csvField(`${lead}1`)).toBe(`'${lead}1`);
+    expect(csvField(-33.9)).toBe('-33.9');
+    expect(csvField('1952-07-19T21:30:00-04:00')).toBe('1952-07-19T21:30:00-04:00');
     // Count rows the way a CSV reader does: line breaks inside quotes don't end a row.
     let rows = 0;
     let quoted = false;
