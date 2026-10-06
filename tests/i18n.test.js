@@ -120,10 +120,29 @@ describe('dictionary quality', () => {
   it('has no mojibake, replacement characters, or invisible control and direction characters', () => {
     const mojibake = new RegExp(`${chars(0xfffd)}|[${chars(0xc2, 0xc3)}][${range(0x80, 0xbf)}]|${chars(0xe2, 0x20ac)}`);
     const invisible = new RegExp(`[${range(0, 8)}${range(0xb, 0xc)}${range(0xe, 0x1f)}${range(0x7f, 0x9f)}${range(0x200b, 0x200f)}${range(0x202a, 0x202e)}${range(0x2060, 0x2064)}${chars(0xfeff)}]`);
-    eachText(({ text, where }) => {
-      expect(mojibake.test(text), `${where}: mojibake`).toBe(false);
-      expect(invisible.test(text), `${where}: invisible character`).toBe(false);
+    eachText(({ code, text, where }) => {
+      // One right-to-left mark at the start of an Arabic text is deliberate (see the next test).
+      const body = code === 'ar' && text.startsWith(chars(0x200f)) ? text.slice(1) : text;
+      expect(mojibake.test(body), `${where}: mojibake`).toBe(false);
+      expect(invisible.test(body), `${where}: invisible character`).toBe(false);
     });
+  });
+
+  it('starts an Arabic text with a right-to-left mark when its first letter is Latin', () => {
+    // The detail panels lay each block out from its first strong letter (plaintext bidi), so an Arabic sentence that opens with
+    // GEIPAN or Kp would otherwise run left to right.
+    const rlm = chars(0x200f);
+    const latin = /[A-Za-z]/;
+    const arabic = new RegExp(`[${range(0x600, 0x6ff)}]`);
+    const bad = [];
+    eachText(({ code, key, text, where }) => {
+      if (code !== 'ar') return;
+      const plain = text.replace(rlm, '').replace(/<[^>]*>/g, '').replace(/\{\w+\}/g, '');
+      const first = [...plain].find((c) => latin.test(c) || arabic.test(c));
+      const opensLatin = first && latin.test(first) && arabic.test(plain);
+      if ((opensLatin || key.startsWith('{name}')) && !text.startsWith(rlm)) bad.push(where);
+    });
+    expect(bad).toEqual([]);
   });
 
   it('writes each language in its own script', () => {

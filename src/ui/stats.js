@@ -52,11 +52,7 @@ export function yearMultiples(rows, from, to) {
     const y = (v) => top + H - (v / max) * H;
     const pts = vals.map((v, k) => `${x(from + k).toFixed(1)},${y(v).toFixed(1)}`);
     const lines = labelLines(t(r.label));
-    // A line wider than the gap is squeezed to fit (a Japanese name has no space to break at).
-    const nameText = lines.map((line, k) => {
-      const squeeze = labelWidth(line) > LABEL_W ? ` textLength="${LABEL_W}" lengthAdjust="spacingAndGlyphs"` : '';
-      return `<text x="0" y="${top + (lines.length > 1 ? 9 + k * 12 : H / 2 - 2)}" class="sv-label"${squeeze}>${esc(line)}</text>`;
-    });
+    const nameText = lines.map((line, k) => `<text x="0" y="${top + (lines.length > 1 ? 9 + k * 12 : H / 2 - 2)}" class="sv-label">${esc(line)}</text>`);
     parts.push(
       ...nameText,
       `<text x="0" y="${top + (lines.length > 1 ? 34 : H / 2 + 12)}" class="sv-sub">${esc(t('{n} total', { n: r.total.toLocaleString() }))}</text>`,
@@ -78,6 +74,12 @@ export function yearMultiples(rows, from, to) {
     svg: html`<svg class="stats-svg" viewBox="0 0 ${W} ${height}" role="img" aria-label="${t('Records per year in each archive, {from} to {to}', { from, to })}">${raw(parts.join(''))}</svg>`,
     bind(root, tooltip) {
       const svg = root.querySelector('.stats-svg');
+      // A name that is still wider than the gap after breaking (a Japanese one has no space to break at) is squeezed to fit; measured, because textLength also stretches a shorter one.
+      for (const label of svg.querySelectorAll('.sv-label'))
+        if (label.getComputedTextLength?.() > LABEL_W) {
+          label.setAttribute('textLength', LABEL_W);
+          label.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+        }
       const rule = svg.querySelector('.sv-rule');
       const hit = svg.querySelector('.sv-hit');
       hit.addEventListener('pointermove', (e) => {
