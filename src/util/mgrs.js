@@ -38,10 +38,9 @@ export function utmZone(lat, lon) {
   return Math.min(60, Math.max(1, zone));
 }
 
-/** { zone, band, hemisphere, easting, northing } for a latitude and longitude, or null outside 80°S–84°N. */
-export function toUtm(lat, lon) {
+/** { zone, band, hemisphere, easting, northing } for a latitude and longitude, or null outside 80°S–84°N. `zone` projects into that zone instead of the one the place is in. */
+export function toUtm(lat, lon, zone = utmZone(lat, lon)) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -80 || lat > 84) return null;
-  const zone = utmZone(lat, lon);
   const lon0 = rad((zone - 1) * 6 - 180 + 3);
   const phi = rad(lat);
   const dl = rad(lon) - lon0;
@@ -96,12 +95,13 @@ export function toMgrs(lat, lon, digits = 5) {
 
 /**
  * The lowest northing in a latitude band within a zone, to place a grid row in the right 2,000 km cycle.
- * A parallel's northing changes across the zone, so the middle and both edges are tried.
+ * A parallel's northing changes across the zone, so the middle and both edges are tried, all projected
+ * into this zone (a longitude on the middle of 31 is in 32 where Norway's exception starts).
  */
 function bandSouthNorthing(band, zone) {
   const lat = Math.min(-80 + BANDS.indexOf(band) * 8 + 0.0001, 83.9999);
   const middle = (zone - 1) * 6 - 180 + 3;
-  return Math.min(...[-2.99, 0, 2.99].map((d) => toUtm(lat, middle + d).northing));
+  return Math.min(...[-3, 0, 3].map((d) => toUtm(lat, middle + d, zone).northing));
 }
 
 const PATTERN = /^\s*(\d{1,2})\s*([C-HJ-NP-X])\s*([A-HJ-NP-Z])\s*([A-HJ-NP-V])\s*(\d*)\s*(\d*)\s*$/i;
@@ -113,6 +113,7 @@ export function fromMgrs(text) {
   let [, z, band, col, row, d1, d2] = m;
   const zone = Number(z);
   if (zone < 1 || zone > 60) return null;
+  if (band === 'X' && zone % 2 === 0 && zone >= 32 && zone <= 36) return null; // Svalbard's wider zones took the place of 32X, 34X and 36X
   let east = d1;
   let north = d2;
   if (!d2 && d1) {
@@ -131,7 +132,8 @@ export function fromMgrs(text) {
   const nOffset = digits ? Number(north) * cell : 0;
   let northing = rowIndex * 100000 + nOffset;
   const floor = bandSouthNorthing(band, zone);
-  while (northing < floor - 1000) northing += 2000000;
+  // A coarse square can start below the band's southern edge and still lie in the band: it is the top of the square that has to reach it.
+  while (northing + cell < floor - 1000) northing += 2000000;
   const hemisphere = band < 'N' ? 'S' : 'N';
   const position = fromUtm({ zone, hemisphere, easting: e100 + eOffset + cell / 2, northing: northing + cell / 2 });
   return Number.isFinite(position.lat) && position.lat >= -80.5 && position.lat <= 84.5 ? position : null;
