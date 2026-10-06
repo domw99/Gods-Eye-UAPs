@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Najlepsze dopasowanie narzędzia: {name} ({confidence}). {reason}",
+  "in {span}": "za {span}",
+  "{span} ago": "{span} temu",
+  "{n} day|{n} days": {"one": "{n} dzień", "few": "{n} dni", "many": "{n} dni", "other": "{n} dnia"},
 };

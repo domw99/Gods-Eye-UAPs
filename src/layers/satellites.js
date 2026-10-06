@@ -42,7 +42,18 @@ async function fetchTle(url) {
   }
 }
 
-function parseTle(text) {
+/**
+ * The satellite's position (km, ECI) at `date`, or null. satellite.js does not throw on a damaged element set:
+ * it hands back a position of NaN, which on the globe stops Cesium drawing at all ("Invalid array length").
+ */
+export function propagatePosition(satrec, date) {
+  const pv = satellite.propagate(satrec, date);
+  const r = pv?.position;
+  if (!r || typeof r === 'boolean' || !Number.isFinite(r.x + r.y + r.z)) return null;
+  return { ...pv, position: r };
+}
+
+export function parseTle(text) {
   const lines = text.split(/\r?\n/).map((l) => l.trimEnd()).filter(Boolean);
   const out = [];
   for (let i = 0; i + 2 < lines.length + 1; i += 3) {
@@ -102,8 +113,8 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
   }
 
   function position(sat, date) {
-    const pv = satellite.propagate(sat.satrec, date);
-    if (!pv?.position || typeof pv.position === "boolean") return null;
+    const pv = propagatePosition(sat.satrec, date);
+    if (!pv) return null;
     const gmst = satellite.gstime(date);
     const geo = satellite.eciToGeodetic(pv.position, gmst);
     return {
@@ -149,8 +160,8 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
       const observer = { latitude: satellite.degreesToRadians(lat), longitude: satellite.degreesToRadians(lon), height: 0.1 };
       const out = [];
       for (const s of sats) {
-        const pv = satellite.propagate(s.satrec, now);
-        if (!pv?.position || typeof pv.position === "boolean") continue;
+        const pv = propagatePosition(s.satrec, now);
+        if (!pv) continue;
         const look = satellite.ecfToLookAngles(observer, satellite.eciToEcf(pv.position, gmst));
         const el = satellite.radiansToDegrees(look.elevation);
         if (el >= minElevationDeg)
@@ -176,8 +187,8 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
       const s = { x: sun.x / sLen, y: sun.y / sLen, z: sun.z / sLen };
       const out = [];
       for (const sat of sats) {
-        const pv = satellite.propagate(sat.satrec, date);
-        if (!pv?.position || typeof pv.position === 'boolean') continue;
+        const pv = propagatePosition(sat.satrec, date);
+        if (!pv) continue;
         const look = satellite.ecfToLookAngles(observer, satellite.eciToEcf(pv.position, gmst));
         const el = satellite.radiansToDegrees(look.elevation);
         if (el < minElevationDeg) continue;

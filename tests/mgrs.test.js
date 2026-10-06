@@ -94,6 +94,32 @@ describe('MGRS to a latitude and longitude', () => {
     }
   });
 
+  it('puts a coarse square that starts below the edge of its band in the right cycle', () => {
+    // A 100 km (or 10 km, 1 km) square can start below the band's southern edge and still be in the band: the
+    // top of the square decides the cycle. These used to land 2,000 km to the north.
+    const metres = (a, b) => Math.hypot((a.lat - b.lat) * 111320, (a.lon - b.lon) * 111320 * Math.cos((b.lat * Math.PI) / 180));
+    const places = [[-71.8963, -129.1242, 0], [32.1371, -62.2736, 0], [56.015, 125.1609, 1], [64.0061, 71.1034, 1], [56.0252, 2.9815, 2], [56.0182, 2.7189, 2], [56.01, 1.747, 3]];
+    for (const [lat, lon, digits] of places) {
+      const text = toMgrs(lat, lon, digits);
+      expect(metres(fromMgrs(text), { lat, lon }), text).toBeLessThan((digits ? 10 ** (5 - digits) : 100000) * 0.75);
+    }
+  });
+
+  it('reads the grid in zone 31 within a couple of kilometres of 56°N, where Norway\'s zone 32 starts at 3°E', () => {
+    // The edge of the band was worked out from longitudes that are in zone 32, which put it about a kilometre too far north.
+    for (const [lat, lon] of [[56.005, 2.99], [56.003, 2.9], [56.002, 1.0], [56.0252, 2.9815]]) {
+      const text = toMgrs(lat, lon);
+      const back = fromMgrs(text);
+      expect(Math.abs(back.lat - lat) * 111320, text).toBeLessThan(1);
+      expect(Math.abs(back.lon - lon) * 111320 * Math.cos((lat * Math.PI) / 180), text).toBeLessThan(1);
+    }
+  });
+
+  it('has no 32X, 34X or 36X: Svalbard\'s wide zones took their place', () => {
+    for (const text of ['32X NF 00000 00000', '34X DM 50000 50000', '36X VK 12345 12345']) expect(fromMgrs(text), text).toBeNull();
+    expect(fromMgrs('33X WG 14278 83355')).not.toBeNull();
+  });
+
   it('turns down what is not a reference', () => {
     for (const text of ['', 'Roswell', '13S', '13S ES 123', '13S ES 12345 6789', '13I ES 12345 67890', '13S ES 123456 123456', '61S ES 12345 67890', '13S JA 12345 67890', '51.5, -0.12', null, undefined]) expect(fromMgrs(text), String(text)).toBeNull();
   });

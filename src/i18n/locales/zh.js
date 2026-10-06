@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}；{b}",
   "{a} {b}": "{a}{b}",
   "Checker's top match: {name} ({confidence}). {reason}": "检查器的最佳匹配：{name}（{confidence}）。{reason}",
+  "in {span}": "{span}后",
+  "{span} ago": "{span}前",
+  "{n} day|{n} days": {"other": "{n} 天"},
 };

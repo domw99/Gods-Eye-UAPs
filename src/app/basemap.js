@@ -32,7 +32,7 @@ const NAMES_GONE = 8_000; // and gone below this
 function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
-    return { style: saved.style in BASEMAPS ? saved.style : 'satellite', names: Boolean(saved.names) };
+    return { style: Object.hasOwn(BASEMAPS, saved.style) ? saved.style : 'satellite', names: Boolean(saved.names) };
   } catch {
     return { style: 'satellite', names: false };
   }
@@ -47,6 +47,7 @@ export function createBasemap(viewer, { onChange = () => {} } = {}) {
   const layers = viewer.imageryLayers;
   let state = load();
   let namesLayer = null;
+  let shown = 'satellite'; // the style on the map: the viewer starts on satellite
   let busy = Promise.resolve();
 
   const save = () => {
@@ -78,6 +79,7 @@ export function createBasemap(viewer, { onChange = () => {} } = {}) {
     if (old) next.brightness = old.brightness; // keep any night dimming
     layers.add(next, 0);
     if (old) layers.remove(old, true);
+    shown = style;
     viewer.__baseMapName = map.hud;
     if (!/GOOGLE/.test(viewer.__mapName || '')) viewer.__mapName = map.hud;
   }
@@ -98,7 +100,13 @@ export function createBasemap(viewer, { onChange = () => {} } = {}) {
   });
 
   // Start with the saved choice (the viewer always starts on satellite).
-  if (state.style !== 'satellite') run(() => applyStyle(state.style));
+  if (state.style !== 'satellite')
+    run(() =>
+      applyStyle(state.style).catch((e) => {
+        state = { ...state, style: shown }; // not saved: the next visit tries the remembered map again
+        throw e;
+      }),
+    );
   if (namesUrl()) run(applyNames);
 
   return {
@@ -113,17 +121,19 @@ export function createBasemap(viewer, { onChange = () => {} } = {}) {
       return Boolean(namesUrl());
     },
     setStyle(style) {
-      if (!(style in BASEMAPS) || style === state.style) return busy;
-      const previous = state.style;
+      if (!Object.hasOwn(BASEMAPS, style) || style === state.style) return busy;
       state = { ...state, style };
       save();
       return run(async () => {
+        if (state.style !== style) return; // asked for something else since: that request is next in line
         try {
           await applyStyle(style);
         } catch (e) {
-          // Couldn't reach the map service: keep the map that is showing.
-          state = { ...state, style: previous };
-          save();
+          // Couldn't reach the map service: keep the map that is showing (not the one before the last request, which may not have loaded either).
+          if (state.style === style) {
+            state = { ...state, style: shown };
+            save();
+          }
           throw e;
         }
         await applyNames();

@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Kecocokan terbaik dari pemeriksa: {name} ({confidence}). {reason}",
+  "in {span}": "dalam {span}",
+  "{span} ago": "{span} yang lalu",
+  "{n} day|{n} days": {"one": "{n} hari", "other": "{n} hari"},
 };

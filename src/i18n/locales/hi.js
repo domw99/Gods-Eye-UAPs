@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "जाँचकर्ता का सबसे अच्छा मेल: {name} ({confidence}). {reason}",
+  "in {span}": "{span} में",
+  "{span} ago": "{span} पहले",
+  "{n} day|{n} days": {"one": "{n} दिन", "other": "{n} दिन"},
 };

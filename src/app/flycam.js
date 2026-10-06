@@ -12,6 +12,15 @@ import * as Cesium from 'cesium';
 const ORBIT_DEG_PER_S = 6;
 const TURN_DEG_PER_S = 45;
 
+/**
+ * How far to tilt (radians, positive raises the view towards the horizon) so the pitch stays between
+ * looking straight down and just below the horizon. The limits were mirrored, so tilting up from a
+ * level view sailed past the horizon and tilting down from a steep one stopped short of the ground.
+ */
+export function tiltStep(pitch, up) {
+  return Math.max(-Math.PI / 2 + 0.01 - pitch, Math.min(-0.05 - pitch, up));
+}
+
 export function createFlycam(viewer, { blocked = () => false, onMove = () => {} } = {}) {
   const { scene, camera } = viewer;
   const held = new Set();
@@ -31,9 +40,7 @@ export function createFlycam(viewer, { blocked = () => false, onMove = () => {} 
     if (right) camera.rotateRight(right);
     if (up) {
       // Keep the tilt between looking straight down and just above the horizon.
-      const pitch = camera.pitch;
-      const limited = Math.max(-Math.PI / 2 + 0.01 - pitch, Math.min(-0.05 - pitch, -up));
-      camera.rotateUp(-limited);
+      camera.rotateUp(tiltStep(camera.pitch, up));
     }
     camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
   }

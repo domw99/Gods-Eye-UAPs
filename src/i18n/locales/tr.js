@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Denetleyicinin en iyi eşleşmesi: {name} ({confidence}). {reason}",
+  "in {span}": "{span} sonra",
+  "{span} ago": "{span} önce",
+  "{n} day|{n} days": {"one": "{n} gün", "other": "{n} gün"},
 };

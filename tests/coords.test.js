@@ -41,6 +41,10 @@ describe('reading coordinates from text', () => {
   it('reads the links maps and phones share', () => {
     near('geo:51.5,-0.12', 51.5, -0.12);
     near('geo:37.786971,-122.399677?z=11', 37.786971, -122.399677);
+    near('geo:0,0?q=34.99,-106.61(Treasure)', 34.99, -106.61); // 0,0 stands in for the place, which is in q
+    near('geo:0.0,0.0?q=-33.87%2C151.21', -33.87, 151.21);
+    near('geo:0,0', 0, 0);
+    near('geo:37.7,-122.4?q=48.85,2.35', 37.7, -122.4); // a real position wins over q
     near('https://www.google.com/maps/@51.5072,-0.1276,15z', 51.5072, -0.1276);
     near('https://www.google.com/maps/place/Roswell/data=!3d33.3943!4d-104.523', 33.3943, -104.523);
     near('https://www.openstreetmap.org/#map=12/48.8566/2.3522', 48.8566, 2.3522);

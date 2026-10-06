@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Beste Übereinstimmung der Prüfung: {name} ({confidence}). {reason}",
+  "in {span}": "in {span}",
+  "{span} ago": "vor {span}",
+  "{n} day|{n} days": {"one": "{n} Tag", "other": "{n} Tage"},
 };

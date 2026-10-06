@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}؛ {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "أفضل تطابق وفق الفاحص: {name} ({confidence}). {reason}",
+  "in {span}": "بعد {span}",
+  "{span} ago": "منذ {span}",
+  "{n} day|{n} days": {"zero": "{n} يوم", "one": "{n} يوم", "two": "{n} يومان", "few": "{n} أيام", "many": "{n} يومًا", "other": "{n} يوم"},
 };

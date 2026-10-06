@@ -17,6 +17,7 @@ const LOAD_BELOW_M = 9000; // camera height at which tiles start loading
 const SHOW_BELOW_M = 40000; // keep already-built tiles visible up to here
 const MAX_TILES = 49;
 const GRID = 8; // terrain samples per tile side (GRID+1)²
+const RETRY_MS = 20_000; // before a tile that failed to load is asked for again
 
 const CREDIT_HTML =
   'Buildings © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>';
@@ -63,21 +64,26 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
   const tiles = new Map(); // key → { primitive, count, center, done }
   const credit = new Cesium.Credit(CREDIT_HTML, true);
   let template = null;
+  let templatePending = null;
   let enabled = false;
   let suspended = false;
   let timer = null;
   let generation = 0;
 
+  // One look-up for all the tiles asking at once.
   async function tileTemplate() {
     if (template) return template;
-    try {
-      const res = await fetch(TILEJSON);
-      const json = await res.json();
-      template = json.tiles?.[0] || FALLBACK_TILES;
-    } catch {
-      template = FALLBACK_TILES;
-    }
-    return template;
+    templatePending ||= (async () => {
+      try {
+        const res = await fetch(TILEJSON);
+        const json = await res.json();
+        template = json.tiles?.[0] || FALLBACK_TILES;
+      } catch {
+        template = FALLBACK_TILES;
+      }
+      return template;
+    })();
+    return templatePending;
   }
 
   async function groundGrid(b) {
@@ -156,7 +162,7 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
   }
 
   async function loadTile(x, y, key, gen) {
-    const entry = { primitive: null, count: 0, center: tileBounds(x, y), done: false };
+    const entry = { primitive: null, count: 0, center: tileBounds(x, y), done: false, failedAt: 0 };
     tiles.set(key, entry);
     try {
       const url = (await tileTemplate()).replace('{z}', Z).replace('{x}', x).replace('{y}', y);
@@ -188,9 +194,12 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
       entry.count = instances.length;
     } catch (error) {
       console.warn('[buildings] tile failed', key, error);
+      entry.failedAt = Date.now();
+    } finally {
+      // Every way out ends here, so the status never stays on "loading…" after the last tile came back empty.
+      entry.done = true;
+      report();
     }
-    entry.done = true;
-    report();
   }
 
   function dropTile(key) {
@@ -235,6 +244,8 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
     wanted.sort((a, b) => a[2] - b[2]);
     for (const [x, y] of wanted) {
       const key = `${x}/${y}`;
+      // A tile that failed (a dropped connection, a busy server) is asked for again, but not on every camera move.
+      if (tiles.get(key)?.failedAt && Date.now() - tiles.get(key).failedAt > RETRY_MS) dropTile(key);
       if (!tiles.has(key)) loadTile(x, y, key, generation);
     }
     // Evict the farthest tiles once over budget.

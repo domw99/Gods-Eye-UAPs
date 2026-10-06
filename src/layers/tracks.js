@@ -76,6 +76,11 @@ export function createTrackLayer(viewer) {
     if (!current) return;
     for (const fn of tickListeners) fn(clock);
   });
+  // Cesium holds a clamped clock at the end of its range but leaves it "running", which would keep the
+  // button on pause and make the next press do nothing visible; at the end the playback is over.
+  viewer.clock.onStop.addEventListener((clock) => {
+    if (current) clock.shouldAnimate = false;
+  });
 
   function clear() {
     witnessView(false);

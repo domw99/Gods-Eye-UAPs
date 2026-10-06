@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Beste overeenkomst van de controle: {name} ({confidence}). {reason}",
+  "in {span}": "over {span}",
+  "{span} ago": "{span} geleden",
+  "{n} day|{n} days": {"one": "{n} dag", "other": "{n} dagen"},
 };

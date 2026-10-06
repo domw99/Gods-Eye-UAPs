@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Лучшее совпадение проверки: {name} ({confidence}). {reason}",
+  "in {span}": "через {span}",
+  "{span} ago": "{span} назад",
+  "{n} day|{n} days": {"one": "{n} день", "few": "{n} дня", "many": "{n} дней", "other": "{n} дня"},
 };

@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}、{b}",
   "{a} {b}": "{a}{b}",
   "Checker's top match: {name} ({confidence}). {reason}": "チェッカーの最有力候補：{name}（{confidence}）。{reason}",
+  "in {span}": "{span}後",
+  "{span} ago": "{span}前",
+  "{n} day|{n} days": {"other": "{n}日"},
 };

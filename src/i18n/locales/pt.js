@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "Melhor correspondência do verificador: {name} ({confidence}). {reason}",
+  "in {span}": "em {span}",
+  "{span} ago": "há {span}",
+  "{n} day|{n} days": {"one": "{n} dia", "other": "{n} dias"},
 };

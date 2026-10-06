@@ -1113,4 +1113,7 @@ export default {
   "{a}; {b}": "{a}; {b}",
   "{a} {b}": "{a} {b}",
   "Checker's top match: {name} ({confidence}). {reason}": "검사기의 가장 유력한 일치: {name} ({confidence}). {reason}",
+  "in {span}": "{span} 후",
+  "{span} ago": "{span} 전",
+  "{n} day|{n} days": {"other": "{n}일"},
 };
