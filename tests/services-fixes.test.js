@@ -50,6 +50,18 @@ describe('weather at the time of a sighting', () => {
     expect(calls).toHaveLength(2);
   });
 
+  it('does not trust an entry an earlier version filed under the clock hour but that holds the next hour', async () => {
+    const calls = fakeOpenMeteo();
+    store.set('wx:45.50,-100.25,1965-07-05T12', JSON.stringify({ hour: '1965-07-05T13:00Z', temperature_2m: 99, source: 'old' }));
+    const wx = await weatherAt(45.5, -100.25, new Date('1965-07-05T12:10:00Z')); // reads 12:00
+    expect(wx.hour).toBe('1965-07-05T12:00Z');
+    expect(wx.temperature_2m).not.toBe(99);
+    expect(calls).toHaveLength(1);
+    // An entry that does hold the hour is still used.
+    expect((await weatherAt(45.5, -100.25, new Date('1965-07-05T12:20:00Z'))).temperature_2m).toBe(wx.temperature_2m);
+    expect(calls).toHaveLength(1);
+  });
+
   it('reads the earlier hour when a sighting falls exactly half-way, as nearestHourIndex does', async () => {
     fakeOpenMeteo();
     expect((await weatherAt(10, 10, new Date('1965-07-05T12:30:00Z'))).hour).toBe('1965-07-05T12:00Z');

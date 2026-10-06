@@ -76,10 +76,12 @@ export async function weatherAt(lat, lon, when) {
   if (!weatherAvailable(when)) return null;
   const t = new Date(when);
   // Keyed by the hour that is read, so 12:10 and 12:40 (which read 12:00 and 13:00) do not share an entry.
-  const key = `wx:${lat.toFixed(2)},${lon.toFixed(2)},${nearestHourKey(t.getTime())}`;
+  const hour = nearestHourKey(t.getTime());
+  const key = `wx:${lat.toFixed(2)},${lon.toFixed(2)},${hour}`;
   try {
     const hit = JSON.parse(localStorage.getItem(key) || 'null');
-    if (hit) return hit;
+    // Entries kept by earlier versions were filed under the clock hour, and may hold the next one.
+    if (hit?.hour?.startsWith(hour)) return hit;
   } catch {
     /* ignore */
   }
