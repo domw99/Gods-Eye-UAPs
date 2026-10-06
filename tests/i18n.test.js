@@ -114,6 +114,13 @@ describe('t() and friends', () => {
     expect(pickLanguage([])).toBe('en');
   });
 
+  it('never mistakes an inherited object property for a translation', async () => {
+    // A text node or a title that happens to read "constructor" is not a dictionary key.
+    await setLanguage('de', { save: false });
+    for (const word of ['constructor', 'toString', 'valueOf', 'hasOwnProperty', '__proto__']) expect(t(word), word).toBe(word);
+    expect(plural(2, 'constructor', 'toString')).toBe('toString');
+  });
+
   it('fill() leaves unknown placeholders alone', () => {
     expect(fill('{a} and {b}', { a: 1 })).toBe('1 and {b}');
   });

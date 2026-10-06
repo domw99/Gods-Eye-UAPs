@@ -55,9 +55,12 @@ export function fill(text, vars) {
   return vars ? text.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m)) : text;
 }
 
+/** What the dictionary holds for `key`. A text that reads "constructor" or "toString" is not a key, so nothing inherited counts. */
+const lookup = (key) => (Object.prototype.hasOwnProperty.call(dict, key) ? dict[key] : undefined);
+
 /** The translation of `key` (English text, optionally with {placeholders}), or the key itself. */
 export function t(key, vars) {
-  return fill(dict[key] ?? key, vars);
+  return fill(lookup(key) ?? key, vars);
 }
 
 /**
@@ -66,7 +69,7 @@ export function t(key, vars) {
  * other }) under the 'one|many' key, and the right one is chosen for n.
  */
 export function plural(n, one, many, vars = {}) {
-  const forms = dict[`${one}|${many}`];
+  const forms = lookup(`${one}|${many}`);
   if (forms && typeof forms === 'object') {
     const text = forms[new Intl.PluralRules(locale()).select(n)] ?? forms.other;
     if (text !== undefined) return fill(text, { n, ...vars });
@@ -82,7 +85,7 @@ function translateText(node) {
   const key = src.trim();
   if (!key) return;
   if (globalThis.__i18nSeen) globalThis.__i18nSeen.add(key);
-  const tr = lang === 'en' ? undefined : dict[key];
+  const tr = lang === 'en' ? undefined : lookup(key);
   if (tr === undefined) {
     if (saved && node.nodeValue === saved.out) node.nodeValue = src; // back to English
     originals.delete(node);
@@ -103,7 +106,7 @@ function translateAttrs(el) {
     const cur = el.getAttribute(a);
     const src = saved[a] && cur === saved[a].out ? saved[a].src : cur;
     if (globalThis.__i18nSeen && src.trim()) globalThis.__i18nSeen.add(`[${a}] ${src.trim()}`);
-    const tr = lang === 'en' ? undefined : dict[src.trim()];
+    const tr = lang === 'en' ? undefined : lookup(src.trim());
     if (tr === undefined) {
       if (saved[a] && cur === saved[a].out) el.setAttribute(a, src);
       if (saved[a]) delete saved[a];
