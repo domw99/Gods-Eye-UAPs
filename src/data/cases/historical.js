@@ -211,11 +211,12 @@ export default [
     witnesses: '1 (Gösta Carlsson)',
     duration: '—',
     summary:
-      'Businessman Gösta Carlsson said that in May 1946, during the Swedish ghost-rocket summer, he came upon a disc-shaped craft standing in a clearing in the Kronoskogen forest and was warned off by its occupants. In 1963 he built a small memorial at the spot, marking where he said the craft had stood. It is now a local landmark.',
+      'Businessman Gösta Carlsson said that in May 1946, during the Swedish ghost-rocket summer, he came upon a disc-shaped craft standing in a clearing in the Kronoskogen forest and was warned off by its occupants. In 1972 he built a small memorial at the spot, marking where he said the craft had stood. It is now a local landmark.',
     timeline: [
       { t: 'May 18, 1946 (night)', text: 'Carlsson says he saw a landed craft and occupants in a clearing.' },
-      { t: '1963', text: 'Carlsson erects a memorial marking the landing marks he described.' },
-      { t: '1970s', text: 'His account is published in book form and grows in detail.' },
+      { t: '1971', text: 'Carlsson first tells the story in public, in an interview with a journalist.' },
+      { t: '1972', text: 'Carlsson erects a memorial marking the landing marks he described.' },
+      { t: 'Later', text: 'His account is published in book form and grows in detail.' },
     ],
     tracks: [],
     wiki: 'Ängelholm UFO memorial',

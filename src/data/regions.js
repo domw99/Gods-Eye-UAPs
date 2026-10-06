@@ -52,6 +52,8 @@ export const REGIONS = [
   { match: /gulf of (america|mexico)/i, name: 'Gulf of Mexico (Gulf of America)', lat: 25.5, lon: -90.0, radiusKm: 600, precision: 'region' },
   { match: /east coast/i, name: 'U.S. East Coast', lat: 36.0, lon: -75.5, radiusKm: 600, precision: 'region' },
   { match: /atlantic/i, name: 'Western Atlantic (off U.S. East Coast)', lat: 33.0, lon: -72.0, radiusKm: 700, precision: 'region' },
+  // "Indo-Pacific" contains "Pacific": it has to be read before the ocean, or it lands mid-ocean near Hawaii.
+  { match: /indo-?pacific/i, name: 'Indo-Pacific (INDOPACOM AOR)', lat: 22.0, lon: 135.0, radiusKm: 2500, precision: 'region' },
   { match: /pacific/i, name: 'Pacific Ocean', lat: 25.0, lon: -140.0, radiusKm: 2000, precision: 'region' },
   // ── U.S. regions and states ──
   { match: /north-?eastern united states|northeast(ern)? u\.?s/i, name: 'Northeastern United States', lat: 42.0, lon: -73.5, radiusKm: 450, precision: 'region' },
@@ -63,6 +65,7 @@ export const REGIONS = [
   { match: /\bnevada\b/i, name: 'Nevada', lat: 38.8, lon: -116.4, radiusKm: 350, precision: 'region' },
   { match: /\butah\b/i, name: 'Utah', lat: 39.3, lon: -111.1, radiusKm: 250, precision: 'region' },
   { match: /\bflorida\b/i, name: 'Florida', lat: 27.8, lon: -81.7, radiusKm: 350, precision: 'region' },
+  { match: /west virginia/i, name: 'West Virginia', lat: 38.6, lon: -80.6, radiusKm: 200, precision: 'region' }, // before "Virginia", which it contains
   { match: /\bvirginia\b/i, name: 'Virginia', lat: 37.5, lon: -78.8, radiusKm: 250, precision: 'region' },
   { match: /\bnew jersey\b/i, name: 'New Jersey', lat: 40.1, lon: -74.5, radiusKm: 100, precision: 'region' },
   { match: /\bnew york\b/i, name: 'New York', lat: 42.9, lon: -75.5, radiusKm: 250, precision: 'region' },

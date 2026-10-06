@@ -887,7 +887,7 @@ export default [
   {
     id: 'kaikoura-1978',
     title: 'Kaikōura lights',
-    date: '1978-12-30T23:50:00+13:00',
+    date: '1978-12-31T00:00:00+13:00',
     end: '1978-12-31T03:00:00+13:00',
     place: 'Kaikōura coast, New Zealand',
     country: 'New Zealand',

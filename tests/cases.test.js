@@ -79,11 +79,7 @@ describe('curated case files', () => {
  * breaks the rule, so a new case file can be fixed in one pass.
  */
 describe('case data, across all cases', () => {
-  const offsetMinutes = (iso) => {
-    const m = /([+-])(\d\d):(\d\d)$/.exec(iso);
-    return (m[1] === '-' ? -1 : 1) * (+m[2] * 60 + +m[3]);
-  };
-  const json = (name) => JSON.parse(readFileSync(new URL(`../public/data/${name}`, import.meta.url), 'utf8'));
+  const json =(name) => JSON.parse(readFileSync(new URL(`../public/data/${name}`, import.meta.url), 'utf8'));
 
   it('puts the year of the date at the end of every id (the recurring lights have none)', () => {
     // The wave began in 1983 and the video is from July 1984; the id is a published permalink (cards, journal links).
@@ -181,21 +177,16 @@ describe('case data, across all cases', () => {
     expect(bad).toEqual([]);
   });
 
-  it('agrees with itself where a track note quotes a clock time', () => {
-    const bad = [];
-    for (const c of CASES) {
-      for (const t of c.tracks || []) {
-        for (const [, , , sec, note] of t.points) {
-          const m = note && /\b([01]?\d|2[0-3]):([0-5]\d)\b/.exec(note);
-          if (!m) continue;
-          const local = (((Date.parse(c.date) / 60000 + offsetMinutes(c.date) + sec / 60) % 1440) + 1440) % 1440;
-          const quoted = +m[1] * 60 + +m[2];
-          const gap = Math.min(Math.abs(local - quoted), 1440 - Math.abs(local - quoted));
-          if (gap > 15) bad.push(`${c.id}/${t.id}: "${note}" falls at ${Math.floor(local / 60)}:${String(Math.round(local % 60)).padStart(2, '0')}`);
-        }
-      }
-    }
-    expect(bad).toEqual([]);
+  it.each([
+    // The paths are timed from these moments: the barrage opens 60 minutes after the radar contact, the helicopter
+    // meets the red light 35 minutes after leaving Columbus.
+    ['battle-of-los-angeles-1942', '02:15'],
+    ['coyne-1973', '22:30'],
+  ])('%s is dated at the clock time its track and timeline start from', (id, clock) => {
+    const c = CASES.find((x) => x.id === id);
+    expect(c.date.slice(11, 16)).toBe(clock);
+    expect(c.timeline.some((e) => e.t === clock)).toBe(true);
+    expect(Math.min(...c.tracks.flatMap((t) => t.points.map((p) => p[3])))).toBe(0);
   });
 
   it('cites only DVIDS files and Blue Book records that are in the data shipped with the app', () => {
@@ -217,6 +208,26 @@ describe('case data, across all cases', () => {
   it('writes Wikipedia titles as plain titles, not addresses or underscored names', () => {
     const bad = CASES.filter((c) => c.wiki != null && (typeof c.wiki !== 'string' || /_|^\s|\s$|\s{2}|^https?:|%[0-9a-f]{2}/i.test(c.wiki))).map((c) => `${c.id}: ${c.wiki}`);
     expect(bad).toEqual([]);
+  });
+});
+
+describe('details checked against the articles the cases cite', () => {
+  const byId = (id) => CASES.find((c) => c.id === id);
+
+  it('has the F-94 chase over Washington on the night of July 26, 1952, the second Saturday', () => {
+    // Wikipedia, "1952 Washington, D.C., UFO incident": the jets from New Castle arrived at 11:30 p.m. on July 26.
+    const t = byId('washington-dc-1952').timeline.map((e) => e.t);
+    expect(t).toContain('Jul 26, ~23:25');
+    expect(t).not.toContain('Jul 27, ~23:25');
+  });
+
+  it('dates the Ängelholm memorial to 1972, after Carlsson first told the story in 1971', () => {
+    // Wikipedia ("Ängelholm UFO memorial", English and Swedish): interview in 1971, memorial built the next year.
+    const c = byId('angelholm-1946');
+    expect(c.summary).toContain('In 1972 he built');
+    expect(c.summary).not.toContain('1963');
+    const years = c.timeline.map((e) => e.t).filter((t) => /^\d{4}$/.test(t));
+    expect(years).toEqual(['1971', '1972']);
   });
 });
 

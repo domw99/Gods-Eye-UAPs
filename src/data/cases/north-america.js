@@ -504,7 +504,7 @@ export default [
       { t: 'Jul 19, 23:40', text: 'National Airport radar shows seven targets 15 mi SSW of the city.' },
       { t: 'Jul 20, ~03:00', text: 'F-94s arrive; targets vanish, then return after they leave.' },
       { t: 'Jul 26, ~21:30', text: 'Targets return; Capital Airlines crews see lights.' },
-      { t: 'Jul 27, ~23:25', text: 'F-94s from New Castle chase lights that outrun them.' },
+      { t: 'Jul 26, ~23:25', text: 'F-94s from New Castle chase lights that outrun them.' },
       { t: 'Jul 29', text: 'Gen. Samford’s press conference: temperature inversions.' },
     ],
     tracks: [
