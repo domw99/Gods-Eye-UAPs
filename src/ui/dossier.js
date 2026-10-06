@@ -1,5 +1,5 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
-import { t, locale } from '../i18n/index.js';
+import { t, plural, locale } from '../i18n/index.js';
 import { CASES } from '../data/cases/index.js';
 import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
@@ -691,7 +691,7 @@ export function renderOfficial(item, ctx) {
   const loc = o.location;
   const content = html`
     <div class="d-title">${o.title}</div>
-    <div class="d-sub">${o.dateTaken ? `Taken ${o.dateTaken}` : ''}${o.datePosted ? ` · released ${o.datePosted}` : ''}<br />${o.agency}${o.duration ? ` · ${o.duration}` : ''}</div>
+    <div class="d-sub">${o.dateTaken ? t('Taken {date}', { date: o.dateTaken }) : ''}${o.datePosted ? ` · ${t('released {date}', { date: o.datePosted })}` : ''}<br />${o.agency}${o.duration ? ` · ${o.duration}` : ''}</div>
     <div class="d-badges">${statusBadge(item.status)}<span class="badge official">OFFICIAL U.S. RELEASE</span>${evidenceBadges(item.evidence)}</div>
     ${section('FOOTAGE', dvidsCard(o, o.title))}
     ${section('OFFICIAL DESCRIPTION', html`<div class="d-text" style="white-space:pre-line">${o.description}</div>`)}
@@ -719,7 +719,7 @@ export function renderBlueBook(rec) {
   const content = html`
     <div class="d-title">${t('Blue Book case file — {place}', { place: rec.place })}</div>
     <div class="d-sub">${rec.year}${rec.month ? `-${String(rec.month).padStart(2, '0')}` : ''} · ${t('U.S. Air Force · file {n}', { n: rec.naid })}<br />${
-      rec.lat != null ? `${formatDMS(rec.lat, rec.lon)} · ${['NOT PLACED', 'REGION', 'TOWN', 'COORDINATES'][rec.prec]}` : 'Location not placed'
+      rec.lat != null ? `${formatDMS(rec.lat, rec.lon)} · ${t(['NOT PLACED', 'REGION', 'TOWN', 'COORDINATES'][rec.prec])}` : t('Location not placed')
     }</div>
     <div class="d-badges"><span class="badge official">U.S. GOV FILE</span><span class="badge">OFFICIAL DOCUMENT</span></div>
     ${section(
@@ -737,7 +737,7 @@ export function renderBlueBook(rec) {
 export async function showOcr(id) {
   const el = document.getElementById('d-ocr');
   if (!el) return;
-  el.innerHTML = '<div class="loading-line">Fetching OCR text…</div>';
+  mount(el, html`<div class="loading-line">Fetching OCR text…</div>`);
   try {
     const res = await fetch(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`);
     if (!res.ok) throw new Error(res.status);
@@ -759,12 +759,12 @@ export function renderGeipan(r) {
   const when = r.utc ? `${geipanDate(r)}, ${r.localTime} local · ${r.utc.slice(11, 16)} UTC` : geipanDate(r);
   const cut = r.summary.length >= 1200;
   const content = html`
-    <div class="d-title">GEIPAN case — ${r.place}</div>
-    <div class="d-sub">${when}<br />${r.zone}${r.dept && r.dept !== r.zone ? ` (${r.dept})` : ''} · file ${r.id}<br />${
-      r.lat != null ? `${formatDMS(r.lat, r.lon)} · ${PREC_LABEL[r.prec]}` : 'Location not placed'
+    <div class="d-title">${t('GEIPAN case — {place}', { place: r.place })}</div>
+    <div class="d-sub">${when}<br />${r.zone}${r.dept && r.dept !== r.zone ? ` (${r.dept})` : ''} · ${t('file {id}', { id: r.id })}<br />${
+      r.lat != null ? `${formatDMS(r.lat, r.lon)} · ${t(PREC_LABEL[r.prec])}` : t('Location not placed')
     }</div>
     <div class="d-badges">${statusBadge(info.status)}${classBadge(r.cls)}<span class="badge official">FRENCH GOV FILE</span>${
-      r.witnesses ? html`<span class="badge">${r.witnesses} WITNESS${r.witnesses > 1 ? 'ES' : ''}</span>` : ''
+      r.witnesses ? html`<span class="badge">${plural(r.witnesses, '{n} WITNESS', '{n} WITNESSES')}</span>` : ''
     }</div>
     ${section('GEIPAN’S FINDING', html`<div class="explain"><b>${info.label}</b>${info.long}</div>
       <blockquote class="mufon-quote big" lang="fr">${r.short}</blockquote>`)}
@@ -848,7 +848,7 @@ export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
   const others = inIssue.filter((r) => r !== record);
   const content = html`
     <div class="d-title">${record ? html`${record.place} <span class="dim">in</span> ${issueDate(is)}` : issueLabel(is)}</div>
-    <div class="d-sub">${issueLabel(is)} · page ${page}${record ? html`<br />${formatDMS(record.lat, record.lon)} · TOWN NAMED IN THE TEXT` : ''}</div>
+    <div class="d-sub">${issueLabel(is)} · ${t('page {n}', { n: page })}${record ? html`<br />${formatDMS(record.lat, record.lon)} · ${t('TOWN NAMED IN THE TEXT')}` : ''}</div>
     <div class="d-badges">${statusBadge('unassessed')}${is.series ? pageBadge(is) : html`<span class="badge mufon">MUFON FILES</span>`}<span class="badge">CIVILIAN INVESTIGATION</span></div>
     ${record
       ? section('WHAT THE PAGE SAYS', html`<blockquote class="mufon-quote big">${record.quote}</blockquote>
@@ -861,8 +861,8 @@ export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
       'THE JOURNAL PAGE',
       html`<div class="video-wrap" style="aspect-ratio:3/4"><iframe src="${embedUrl(is, leaf)}" title="${issueLabel(is)}, page ${page}" loading="lazy" allowfullscreen></iframe></div>
       <div class="btn-row">
-        ${leaf > (is.cover ? 1 : 0) ? html`<a class="chip" href="${pageHref(is, leaf - 1)}">◀ PAGE ${page - 1}</a>` : ''}
-        ${leaf < is.pages - 1 ? html`<a class="chip" href="${pageHref(is, leaf + 1)}">PAGE ${page + 1} ▶</a>` : ''}
+        ${leaf > (is.cover ? 1 : 0) ? html`<a class="chip" href="${pageHref(is, leaf - 1)}">${t('◀ PAGE {n}', { n: page - 1 })}</a>` : ''}
+        ${leaf < is.pages - 1 ? html`<a class="chip" href="${pageHref(is, leaf + 1)}">${t('PAGE {n} ▶', { n: page + 1 })}</a>` : ''}
         <button class="chip" data-action="${is.series ? 'journal-text' : 'mufon-text'}" data-issue="${is.id}" data-leaf="${leaf}">READ PAGE TEXT</button>
         <a class="chip" target="_blank" rel="noopener" href="${readerUrl(is, leaf)}">Internet Archive ↗</a>
         <a class="chip" target="_blank" rel="noopener" href="${pdfUrl(is)}">PDF ↗</a>
@@ -872,7 +872,7 @@ export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
     )}
     ${others.length
       ? section(
-          `ELSEWHERE IN THIS ISSUE (${others.length})`,
+          t('ELSEWHERE IN THIS ISSUE ({n})', { n: others.length }),
           mufonHitList(others.slice(0, 40).map((r) => ({ is, leaf: r.leaf, place: r.place, quote: r.quote }))),
         )
       : ''}
@@ -899,7 +899,7 @@ export function renderMufon({ is, leaf, record, onPage, inIssue, org = null }) {
 export async function showMufonText(is, leaf) {
   const el = document.getElementById('d-mufon-text');
   if (!el) return;
-  el.innerHTML = '<div class="loading-line">Fetching the page text…</div>';
+  mount(el, html`<div class="loading-line">Fetching the page text…</div>`);
   try {
     const text = await pageText(is, leaf);
     if (!document.body.contains(el)) return;
@@ -973,10 +973,10 @@ export function renderUser(item, { onDelete }) {
   const token = open('MY SIGHTING');
   mount(
     body(),
-    html`<div class="d-title">${u.title || 'My sighting'}</div>
+    html`<div class="d-title">${u.title || t('My sighting')}</div>
     <div class="d-sub">${fmtDate(new Date(u.date), { hour: '2-digit', minute: '2-digit' })} · ${formatDMS(u.lat, u.lon)}</div>
     <div class="d-badges"><span class="badge" style="color:#c6ff5c">LOGGED BY YOU</span>${u.shape ? html`<span class="badge">${u.shape.toUpperCase()}</span>` : ''}</div>
-    ${section('NOTES', html`<div class="d-text"><p>${u.description || 'No notes.'}</p></div>
+    ${section('NOTES', html`<div class="d-text"><p>${u.description || t('No notes.')}</p></div>
       <dl class="d-kv" style="margin-top:8px"><dt>DURATION</dt><dd>${u.duration || '—'}</dd><dt>WITNESSES</dt><dd>${u.witnesses || '—'}</dd>${
         u.media ? html`<dt>MEDIA</dt><dd><a href="${safeUrl(u.media)}" target="_blank" rel="noopener">${u.media}</a></dd>` : ''
       }</dl>`)}
@@ -986,7 +986,7 @@ export function renderUser(item, { onDelete }) {
     ${launchBlock(u.lat, u.lon, u.date)}
     ${geomagBlock(u.date)}
     ${airfieldBlock()}
-    ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
+    ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">${th('Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.')}</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
     ${section('REPORT IT OFFICIALLY', html`<div class="btn-row"><a class="chip" href="https://nuforc.org/" target="_blank" rel="noopener">NUFORC ↗</a><a class="chip" href="https://www.mufoncms.com/" target="_blank" rel="noopener">MUFON ↗</a><a class="chip" href="https://www.aaro.mil/" target="_blank" rel="noopener">AARO (gov/mil personnel) ↗</a><a class="chip" href="https://www.cnes-geipan.fr/" target="_blank" rel="noopener">GEIPAN (France) ↗</a></div>`)}
     ${section('THE LOCATION', siteLinks(u.lat, u.lon))}
@@ -1004,7 +1004,7 @@ export function renderUser(item, { onDelete }) {
     clearTimeout(armed);
     armed = null;
     document.removeEventListener('pointerdown', elsewhere, true);
-    del.textContent = 'Delete this entry';
+    del.textContent = t('Delete this entry');
     del.classList.remove('danger');
   };
   const elsewhere = (e) => {
@@ -1017,7 +1017,7 @@ export function renderUser(item, { onDelete }) {
       onDelete(u.id);
       return;
     }
-    del.textContent = 'Press again to delete';
+    del.textContent = t('Press again to delete');
     del.classList.add('danger');
     armed = setTimeout(disarm, 8000);
     document.addEventListener('pointerdown', elsewhere, true);
