@@ -156,7 +156,7 @@ export default [
         kind: 'aircraft',
         basis: 'approximate',
         points: [
-          p(40.3, -74.2, 20000, 24 * MIN),
+          p(40.3, -74.2, 20000, 23 * MIN),
           p(40.09, -74.08, 20000, 25 * MIN, 'Disc seen below, over Point Pleasant'),
           p(40.0, -73.95, 12000, 27 * MIN, 'Dives after it; object pulls away out to sea'),
         ],
@@ -539,7 +539,7 @@ export default [
         kind: 'rocket',
         basis: 'approximate',
         points: [
-          p(34.7513, -120.5202, 300, 0, 'Launch from Vandenberg'),
+          p(34.7513, -120.5202, 545, 0, 'Launch from Vandenberg'),
           p(34.85, -121.4, 250000, 150, 'Staging'),
           p(35.0, -123.6, 800000, 400, 'Re-entry vehicle deploys decoys (filmed)'),
           p(34.6, -127.5, 900000, 700, 'Out of the telescope\'s view, down-range'),
@@ -674,7 +674,7 @@ export default [
         points: [
           p(48.735, -101.87, 12000, 70 * MIN, 'Keeps station with the bomber'),
           p(48.615, -101.66, 6000, 78 * MIN, 'Closest approach'),
-          p(48.55, -101.62, 500, 90 * MIN, 'Bright light seen near the ground'),
+          p(48.55, -101.62, 2265, 90 * MIN, 'Bright light seen near the ground'), // ground about 1,765 ft above sea level, light about 500 ft above it
         ],
       },
     ],

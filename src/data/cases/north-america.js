@@ -9,7 +9,7 @@ export default [
   {
     id: 'battle-of-los-angeles-1942',
     title: 'Battle of Los Angeles',
-    date: '1942-02-25T03:15:00-07:00',
+    date: '1942-02-25T02:15:00-07:00',
     end: '1942-02-25T04:14:00-07:00',
     place: 'Los Angeles, California',
     country: 'United States',
@@ -24,7 +24,7 @@ export default [
       'The Navy attributed the alarm to "war nerves" after a Japanese submarine shelled the Ellwood oil field the night before; a weather balloon is thought to have started the barrage. The famous Los Angeles Times photo was heavily retouched.',
     shape: 'Unidentified targets / searchlight cone',
     witnesses: 'Thousands; coastal anti-aircraft batteries',
-    duration: 'About 1 hour',
+    duration: 'About 2 hours, with the barrage lasting about 1 hour',
     summary:
       'Less than three months after Pearl Harbor, radar and observers reported an unidentified target approaching Los Angeles. Anti-aircraft batteries fired more than 1,400 shells into the night sky while searchlights converged over Santa Monica and Culver City. No aircraft was downed and no bombs fell; falling shrapnel and heart attacks caused deaths on the ground.',
     timeline: [
@@ -213,7 +213,7 @@ export default [
           p(37.9067, -85.9721, 15000, 90 * MIN, 'Diverted over Godman Field, climbing'),
           p(37.4, -86.25, 22500, 105 * MIN, 'Wingmen level off; Mantell keeps climbing'),
           p(36.95, -86.45, 25000, 120 * MIN, 'Above 25,000 ft without oxygen — blacks out'),
-          p(36.6678, -86.5578, 0, 125 * MIN, 'Crash site south of Franklin, KY'),
+          p(36.6678, -86.5578, 715, 125 * MIN, 'Crash site south of Franklin, KY'),
         ],
       },
     ],
@@ -262,7 +262,8 @@ export default [
         label: 'Eastern Air Lines DC-3',
         kind: 'aircraft',
         basis: 'approximate',
-        points: [p(32.33, -86.36, 5000, 0), p(32.37, -86.3, 5000, 6), p(32.41, -86.24, 5000, 13)],
+        // About 280 km/h for 13 seconds: a DC-3 covers roughly one kilometre while the sighting lasts.
+        points: [p(32.3674, -86.3039, 5000, 0), p(32.37, -86.3, 5000, 6), p(32.373, -86.2954, 5000, 13)],
       },
     ],
     wiki: 'Chiles-Whitted UFO encounter',
@@ -503,7 +504,7 @@ export default [
       { t: 'Jul 19, 23:40', text: 'National Airport radar shows seven targets 15 mi SSW of the city.' },
       { t: 'Jul 20, ~03:00', text: 'F-94s arrive; targets vanish, then return after they leave.' },
       { t: 'Jul 26, ~21:30', text: 'Targets return; Capital Airlines crews see lights.' },
-      { t: 'Jul 27, ~23:25', text: 'F-94s from New Castle chase lights that outrun them.' },
+      { t: 'Jul 26, ~23:25', text: 'F-94s from New Castle chase lights that outrun them.' },
       { t: 'Jul 29', text: 'Gen. Samford’s press conference: temperature inversions.' },
     ],
     tracks: [
@@ -526,7 +527,7 @@ export default [
         kind: 'aircraft',
         basis: 'official-report',
         points: [
-          p(39.6787, -75.6065, 0, 190 * MIN, 'Scramble from New Castle AFB, Delaware'),
+          p(39.6787, -75.6065, 70, 190 * MIN, 'Scramble from New Castle AFB, Delaware'),
           p(39.25, -76.4, 25000, 205 * MIN),
           p(38.88, -77.02, 20000, 220 * MIN, 'Arrive over Washington'),
           p(38.8, -76.9, 20000, 250 * MIN, 'Targets gone; return to base'),
@@ -586,7 +587,8 @@ export default [
         label: 'Pan Am DC-4',
         kind: 'aircraft',
         basis: 'approximate',
-        points: [p(37.3, -76.3, 8000, 0), p(37.2, -76.31, 8000, 12)],
+        // About 330 km/h for 12 seconds, heading south for Norfolk: roughly a kilometre.
+        points: [p(37.3, -76.3, 8000, 0), p(37.29, -76.3011, 8000, 12)],
       },
     ],
     wiki: 'Nash-Fortenberry UFO sighting',
@@ -825,7 +827,7 @@ export default [
           p(42.6, -83.4, 250000, 0, 'Seen over the Detroit–Windsor area'),
           p(41.7, -81.9, 150000, 12, 'Over Lake Erie / northern Ohio'),
           p(40.5, -80.1, 40000, 25, 'Sonic booms near Pittsburgh'),
-          p(40.1848, -79.462, 0, 30, 'Claimed impact in the woods at Kecksburg'),
+          p(40.1848, -79.462, 1170, 30, 'Claimed impact in the woods at Kecksburg'),
         ],
       },
     ],
@@ -1428,8 +1430,9 @@ export default [
           p(47.5, -111.2, 60000, 4.1 * DAY, 'Over Montana — Malmstrom AFB area'),
           p(40.5, -97.0, 60000, 5.5 * DAY, 'Over Kansas / Nebraska'),
           p(38.6, -92.5, 60000, 6.1 * DAY, 'Over Missouri'),
-          p(35.2, -84.0, 60000, 7.1 * DAY, 'Over the Carolinas'),
-          p(33.57, -78.6, 60000, 7.6 * DAY, 'Shot down off Surfside Beach, SC'),
+          p(35.2, -84.0, 60000, 6.5 * DAY, 'Over the Carolinas'),
+          // 14:39 EST on Feb 4, the case's `end`: 6 days 22 h 39 min after the first point.
+          p(33.57, -78.6, 60000, 6 * DAY + 22 * HR + 39 * MIN, 'Shot down off Surfside Beach, SC'),
         ],
       },
     ],

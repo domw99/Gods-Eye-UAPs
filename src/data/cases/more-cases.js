@@ -168,7 +168,7 @@ export default [
   {
     id: 'coyne-1973',
     title: 'Coyne helicopter incident',
-    date: '1973-10-18T23:05:00-04:00',
+    date: '1973-10-18T22:30:00-04:00',
     place: 'Near Mansfield, Ohio',
     country: 'United States',
     cc: 'US',
@@ -198,12 +198,12 @@ export default [
         kind: 'aircraft',
         basis: 'flight-plan',
         points: [
-          p(39.998, -82.8917, 0, 0, 'Port Columbus'),
+          p(39.998, -82.8917, 815, 0, 'Port Columbus'),
           p(40.4, -82.7, 2500, 14 * MIN),
           p(40.74, -82.4, 2500, 35 * MIN, 'Red light closes; descent begins'),
           p(40.75, -82.39, 1700, 36 * MIN, 'Bottom of the emergency descent'),
           p(40.76, -82.38, 3800, 37 * MIN + 30, 'Found climbing, ~3,500 ft'),
-          p(41.5175, -81.6833, 0, 80 * MIN, 'Cleveland'),
+          p(41.5175, -81.6833, 580, 80 * MIN, 'Cleveland'),
         ],
       },
       {
@@ -257,10 +257,11 @@ export default [
         kind: 'uap',
         basis: 'approximate',
         points: [
-          p(47.0, -67.96, 300, 0, 'Seen near the north perimeter'),
-          p(46.97, -67.91, 150, 15 * MIN, 'Circles near the weapons storage area'),
-          p(46.94, -67.87, 150, 30 * MIN),
-          p(47.03, -67.76, 300, 40 * MIN, 'Leaves toward New Brunswick'),
+          // The base stands about 745 ft above sea level; the reports give heights of 300 and 150 ft above the ground.
+          p(47.0, -67.96, 1045, 0, 'Seen near the north perimeter'),
+          p(46.97, -67.91, 895, 15 * MIN, 'Circles near the weapons storage area'),
+          p(46.94, -67.87, 895, 30 * MIN),
+          p(47.03, -67.76, 1045, 40 * MIN, 'Leaves toward New Brunswick'),
         ],
       },
     ],
@@ -331,7 +332,7 @@ export default [
         points: [
           p(44.535, 135.605, 2400, 0, 'Seen coming from the south-east'),
           p(44.55, 135.58, 2300, 110, 'Crosses part of the town'),
-          p(44.561, 135.563, 0, 190, 'Strikes Izvestkovaya (Height 611)'),
+          p(44.561, 135.563, 1165, 190, 'Strikes Izvestkovaya (Height 611)'),
         ],
       },
     ],

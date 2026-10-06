@@ -1,4 +1,4 @@
-import { p, commons, DAY } from './helpers.js';
+import { p, commons, DAY, HR } from './helpers.js';
 
 /**
  * Pre-1947 accounts: broadsheets, folk records, newspaper waves and the
@@ -10,6 +10,7 @@ export default [
     id: 'basel-1566',
     title: 'Celestial phenomenon over Basel',
     date: '1566-08-07T06:00:00+01:00',
+    timeApprox: true,
     place: 'Basel, Swiss Confederacy (Switzerland)',
     country: 'Switzerland',
     cc: 'CH',
@@ -144,7 +145,8 @@ export default [
           p(41.2586, -95.9375, 1500, 132 * DAY, 'Omaha, Nebraska'),
           p(39.0997, -94.5786, 1500, 136 * DAY, 'Kansas City, early April'),
           p(41.8781, -87.6298, 1500, 143 * DAY, 'Chicago, Apr 9–10'),
-          p(33.0506, -97.5042, 1500, 151 * DAY, 'Aurora, Texas, Apr 17'),
+          // 06:00 CST on Apr 17, the case's `end`: 150 days 10 h after the first point.
+          p(33.0506, -97.5042, 1500, 150 * DAY + 10 * HR, 'Aurora, Texas, Apr 17'),
         ],
       },
     ],
@@ -209,11 +211,12 @@ export default [
     witnesses: '1 (Gösta Carlsson)',
     duration: '—',
     summary:
-      'Businessman Gösta Carlsson said that in May 1946, during the Swedish ghost-rocket summer, he came upon a disc-shaped craft standing in a clearing in the Kronoskogen forest and was warned off by its occupants. In 1963 he built a small memorial at the spot, marking where he said the craft had stood. It is now a local landmark.',
+      'Businessman Gösta Carlsson said that in May 1946, during the Swedish ghost-rocket summer, he came upon a disc-shaped craft standing in a clearing in the Kronoskogen forest and was warned off by its occupants. In 1972 he built a small memorial at the spot, marking where he said the craft had stood. It is now a local landmark.',
     timeline: [
       { t: 'May 18, 1946 (night)', text: 'Carlsson says he saw a landed craft and occupants in a clearing.' },
-      { t: '1963', text: 'Carlsson erects a memorial marking the landing marks he described.' },
-      { t: '1970s', text: 'His account is published in book form and grows in detail.' },
+      { t: '1971', text: 'Carlsson first tells the story in public, in an interview with a journalist.' },
+      { t: '1972', text: 'Carlsson erects a memorial marking the landing marks he described.' },
+      { t: 'Later', text: 'His account is published in book form and grows in detail.' },
     ],
     tracks: [],
     wiki: 'Ängelholm UFO memorial',
