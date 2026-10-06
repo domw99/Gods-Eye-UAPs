@@ -189,7 +189,7 @@ export default {
   "U.S. restricted, warning & training areas (FAA)": "Zones américaines réglementées, d’avertissement et d’entraînement (FAA)",
   "3D buildings": "Bâtiments 3D",
   "OpenStreetMap, no key needed · zoom into a city": "OpenStreetMap, sans clé · zoomez sur une ville",
-  "zoom in": "zoome",
+  "zoom in": "zoomez",
   "My sightings": "Mes observations",
   "Stored only in this browser": "Stockés uniquement dans ce navigateur",
   "OFFICIAL": "OFFICIEL",
@@ -886,5 +886,5 @@ export default {
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Elle cherche aussi les aérodromes proches, où les avions sont une cause fréquente, et l'activité géomagnétique qui aurait pu allumer une aurore.",
   "Radar view: {n} records within {range} km, north at the top": "Vue radar : {n} dossiers dans un rayon de {range} km, nord en haut",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nouveau : saisissez des coordonnées dans la recherche, et voyez l'aurore et les aérodromes les plus proches pour chaque cas",
-  "less than 1 km away": "à moins d'1 km",
+  "less than 1 km away": "à moins de 1 km",
 };
