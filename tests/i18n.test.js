@@ -65,6 +65,148 @@ describe('interface languages', () => {
   });
 });
 
+/** Every string of an entry: the value, or each form of a plural table. */
+const forms = (value) => (typeof value === 'string' ? [[null, value]] : Object.entries(value));
+const eachText = (fn) => {
+  for (const [code, dict] of Object.entries(locales))
+    for (const [key, value] of Object.entries(dict)) for (const [form, text] of forms(value)) fn({ code, key, form, text, where: `${code}: ${key}${form ? ` [${form}]` : ''}` });
+};
+const bare = (s) => String(s).replace(/<[^>]+>|\{\w+\}/g, '');
+const chars = (...codes) => codes.map((c) => String.fromCharCode(c)).join('');
+const range = (from, to) => `${String.fromCharCode(from)}-${String.fromCharCode(to)}`;
+const SCRIPTS = {
+  cyrillic: range(0x400, 0x4ff),
+  arabic: range(0x600, 0x6ff),
+  devanagari: range(0x900, 0x97f),
+  hangul: range(0xac00, 0xd7af),
+  kana: range(0x3040, 0x30ff),
+  han: range(0x4e00, 0x9fff),
+};
+const OWN_SCRIPT = { ru: ['cyrillic'], ar: ['arabic'], hi: ['devanagari'], ko: ['hangul'], ja: ['kana', 'han'], zh: ['han'] };
+
+describe('dictionary quality', () => {
+  it('keeps the {placeholders} of the English text in every form of a plural table', () => {
+    eachText(({ key, form, text, where }) => {
+      if (form) expect(placeholders(text), where).toEqual(placeholders(key.split('|')[1]));
+    });
+  });
+
+  it('gives a plural table the forms its language uses for whole numbers, and no others', () => {
+    const CLDR = ['zero', 'one', 'two', 'few', 'many', 'other'];
+    for (const [code, dict] of Object.entries(locales)) {
+      const rules = new Intl.PluralRules({ pt: 'pt-BR', zh: 'zh-CN' }[code] || code);
+      // "other" is always written and "one" may match it (Turkish); few / many / two / zero (ru, pl, ar) must be written out
+      const needed = new Set(Array.from({ length: 201 }, (_, n) => rules.select(n)));
+      needed.delete('one');
+      for (const [key, value] of Object.entries(dict)) {
+        if (!key.includes('|')) continue;
+        for (const f of Object.keys(value)) expect(CLDR, `${code}: ${key} has a form named "${f}"`).toContain(f);
+        for (const f of needed) expect(value, `${code}: ${key} lacks "${f}"`).toHaveProperty(f);
+      }
+    }
+  });
+
+  it('keeps the HTML tags of the English text, in order, and nothing that would break the markup', () => {
+    const tags = (s) => [...String(s).matchAll(/<\/?[a-z][^>]*>/gi)].map((m) => m[0]);
+    eachText(({ key, form, text, where }) => {
+      if (form) return;
+      expect(tags(text), where).toEqual(tags(key));
+      expect(/<(?![/a-z])/i.test(text), `${where}: a bare <`).toBe(false);
+    });
+  });
+
+  it('has no mojibake, replacement characters, or invisible control and direction characters', () => {
+    const mojibake = new RegExp(`${chars(0xfffd)}|[${chars(0xc2, 0xc3)}][${range(0x80, 0xbf)}]|${chars(0xe2, 0x20ac)}`);
+    const invisible = new RegExp(`[${range(0, 8)}${range(0xb, 0xc)}${range(0xe, 0x1f)}${range(0x7f, 0x9f)}${range(0x200b, 0x200f)}${range(0x202a, 0x202e)}${range(0x2060, 0x2064)}${chars(0xfeff)}]`);
+    eachText(({ text, where }) => {
+      expect(mojibake.test(text), `${where}: mojibake`).toBe(false);
+      expect(invisible.test(text), `${where}: invisible character`).toBe(false);
+    });
+  });
+
+  it('writes each language in its own script', () => {
+    eachText(({ code, text, where }) => {
+      for (const [name, span] of Object.entries(SCRIPTS))
+        if (!(OWN_SCRIPT[code] || []).includes(name)) expect(new RegExp(`[${span}]`).test(text), `${where}: ${name} letters`).toBe(false);
+    });
+  });
+
+  it('does not leave a sentence of English in a language that is not written in Latin letters', () => {
+    // Names, codes and units may stay Latin; a text of three or more English words must have a translation in the language's script.
+    const left = [];
+    for (const [code, names] of Object.entries(OWN_SCRIPT)) {
+      const own = new RegExp(`[${names.map((n) => SCRIPTS[n]).join('')}]`);
+      for (const [key, value] of Object.entries(locales[code])) {
+        if (key.includes('|')) continue;
+        const words = bare(key).match(/[A-Za-z]{3,}/g) || [];
+        if (words.length >= 3 && !own.test(value)) left.push(`${code}: ${key}`);
+      }
+    }
+    expect(left).toEqual([]);
+  });
+
+  it('translates a label that is in capitals into capitals, where the script has capitals', () => {
+    const bad = [];
+    for (const code of ['es', 'fr', 'de', 'pt', 'it', 'nl', 'pl', 'tr', 'ru', 'id'])
+      for (const [key, value] of Object.entries(locales[code])) {
+        const letters = bare(key).replace(/[^A-Za-z]/g, '');
+        if (key.includes('|') || letters.length < 3 || letters !== letters.toUpperCase()) continue;
+        if (bare(value) !== bare(value).toLocaleUpperCase(code)) bad.push(`${code}: ${key} → ${value}`);
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it('keeps the closing … ? ! : of a label, and the (K) key hint of a button', () => {
+    const FINAL = { '…': /(…|\.\.\.)$/, '?': /[?？؟]$/, '!': /[!！]$/, ':': /[:：]$/ };
+    const trim = (s) => s.trim().replace(/[)\]）」»”"’]+$/, '');
+    const bad = [];
+    for (const [code, dict] of Object.entries(locales))
+      for (const [key, value] of Object.entries(dict)) {
+        if (key.includes('|')) continue;
+        const end = trim(key).slice(-1);
+        if (FINAL[end] && !FINAL[end].test(trim(value))) bad.push(`${code}: ${key} → ${value}`);
+        const hint = key.match(/ \(([A-Za-z0-9?+−])\)$/); // a one-key hint; (Esc) and (Space) are named on the language's own keyboards
+        if (hint && !value.includes(`(${hint[1]})`) && !value.includes(`（${hint[1]}）`)) bad.push(`${code}: ${key} → ${value} (key hint)`);
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it('keeps no text the code can no longer ask for (an old release toast, a replaced label)', () => {
+    const files = [join('index.html')];
+    const walk = (dir) => {
+      for (const name of readdirSync(dir)) {
+        const path = join(dir, name);
+        if (statSync(path).isDirectory()) {
+          if (name !== 'locales') walk(path);
+        } else if (/\.(js|mjs|html)$/.test(name)) files.push(path);
+      }
+    };
+    walk('src');
+    walk('scripts');
+    const source = files.map((f) => readFileSync(f, 'utf8')).join('\n');
+    const lower = source.toLowerCase().replace(/\s+/g, ' ');
+    // Cesium writes its own attribution box, and one caption is built around two empty interpolations (src/ui/skychart.js).
+    const built = new Set(['Data attribution', 'Data provided by:', 'Close data attribution', 'Chart: looking straight up, north at the top, east on the left; WHERE is compass direction and height above the horizon. Computed for the recorded time and place; old reports can be off by minutes or hours.']);
+    const stale = Object.keys(locales.es).filter((key) => {
+      if (built.has(key)) return false;
+      // a text may be written in another case in the code and upper-cased when it is shown
+      return !key.split('|').some((part) => [part, part.replace(/'/g, "\\'"), part.replace(/&/g, '&amp;'), part.replace(/’/g, '&rsquo;')].some((v) => source.includes(v) || lower.includes(v.toLowerCase().replace(/\s+/g, ' '))));
+    });
+    expect(stale).toEqual([]);
+  });
+
+  it('has no two entries whose English text differs only by spacing or quote style', () => {
+    const seen = new Map();
+    const clash = [];
+    for (const key of Object.keys(locales.es)) {
+      const norm = key.replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
+      if (seen.has(norm)) clash.push(`${JSON.stringify(seen.get(norm))} / ${JSON.stringify(key)}`);
+      seen.set(norm, key);
+    }
+    expect(clash).toEqual([]);
+  });
+});
+
 describe('t() and friends', () => {
   beforeAll(() => setLanguage('en', { save: false }));
 
