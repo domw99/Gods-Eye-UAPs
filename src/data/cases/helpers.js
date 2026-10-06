@@ -3,7 +3,11 @@
  *
  * Track points are stored as [lon, lat, altitudeMeters, secondsFromStart, note?].
  * `p()` lets case files be written in the order analysts quote positions:
- * latitude, longitude, altitude in FEET, seconds.
+ * latitude, longitude, altitude in FEET, seconds. The altitude is above sea
+ * level, because that is how the globe plots it: a point on a runway or at a
+ * crash site is the height of that ground, not 0 (which is under the terrain
+ * wherever the land is above the sea), and a height "above the ground" is
+ * added to the ground's.
  */
 export const FT = 0.3048;
 export const MIN = 60;

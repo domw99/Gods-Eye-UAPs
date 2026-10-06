@@ -297,11 +297,11 @@ export default [
         kind: 'aircraft',
         basis: 'official-report',
         points: [
-          p(50.7586, 4.7684, 0, 65 * MIN, 'Scramble from Beauvechain'),
+          p(50.7586, 4.7684, 330, 65 * MIN, 'Scramble from Beauvechain'),
           p(50.63, 4.72, 10000, 73 * MIN, 'First lock near Gembloux'),
           p(50.85, 4.35, 9000, 85 * MIN, 'Contacts over Brussels'),
           p(50.65, 4.9, 7000, 100 * MIN, 'Further locks near Ramillies'),
-          p(50.7586, 4.7684, 0, 125 * MIN, 'Return to base'),
+          p(50.7586, 4.7684, 330, 125 * MIN, 'Return to base'),
         ],
       },
       {
@@ -451,7 +451,7 @@ export default [
           p(39.5517, 2.7388, 0, 0, 'Departs Palma de Mallorca'),
           p(39.1, 1.7, 30000, 20 * MIN, 'Lights approach near Ibiza'),
           p(39.3, 0.6, 20000, 32 * MIN, 'Diverting to Valencia'),
-          p(39.4893, -0.4816, 0, 45 * MIN, 'Emergency landing at Manises'),
+          p(39.4893, -0.4816, 205, 45 * MIN, 'Emergency landing at Manises'),
         ],
       },
       {
@@ -467,11 +467,11 @@ export default [
         kind: 'aircraft',
         basis: 'official-report',
         points: [
-          p(38.9485, -1.8635, 0, 100 * MIN, 'Scramble from Los Llanos AB'),
+          p(38.9485, -1.8635, 2295, 100 * MIN, 'Scramble from Los Llanos AB'),
           p(39.4, -0.6, 25000, 110 * MIN, 'Visual on a light over Valencia'),
           p(39.68, -0.27, 25000, 130 * MIN, 'New echo near Sagunto'),
           p(39.5, 0.5, 30000, 150 * MIN, 'Pursuit over the sea; avionics interference'),
-          p(38.9485, -1.8635, 0, 175 * MIN, 'Return to base'),
+          p(38.9485, -1.8635, 2295, 175 * MIN, 'Return to base'),
         ],
       },
     ],
@@ -508,7 +508,7 @@ export default [
         label: 'Aurigny Trislander',
         kind: 'aircraft',
         basis: 'flight-plan',
-        points: [p(50.9503, -1.3568, 0, 0, 'Southampton'), p(50.2, -1.9, 4000, 30 * MIN, 'First object sighted ahead'), p(49.7061, -2.2147, 0, 50 * MIN, 'Alderney')],
+        points: [p(50.9503, -1.3568, 0, 0, 'Southampton'), p(50.2, -1.9, 4000, 30 * MIN, 'First object sighted ahead'), p(49.7061, -2.2147, 275, 50 * MIN, 'Alderney')],
       },
       {
         id: 'objects',
@@ -587,14 +587,14 @@ export default [
         label: 'F-4 #1 (Nazeri)',
         kind: 'aircraft',
         basis: 'official-report',
-        points: [p(35.2117, 48.6534, 0, 60 * MIN, 'Shahrokhi AB, Hamadan'), p(35.55, 50.2, 25000, 72 * MIN, 'Object visible ~70 mi away'), p(35.72, 50.95, 25000, 76 * MIN, 'Instruments & comms fail at 25 nmi'), p(35.2117, 48.6534, 0, 95 * MIN, 'Returns')],
+        points: [p(35.2117, 48.6534, 5550, 60 * MIN, 'Shahrokhi AB, Hamadan'), p(35.55, 50.2, 25000, 72 * MIN, 'Object visible ~70 mi away'), p(35.72, 50.95, 25000, 76 * MIN, 'Instruments & comms fail at 25 nmi'), p(35.2117, 48.6534, 5550, 95 * MIN, 'Returns')],
       },
       {
         id: 'f4-2',
         label: 'F-4 #2 (Jafari)',
         kind: 'aircraft',
         basis: 'official-report',
-        points: [p(35.2117, 48.6534, 0, 70 * MIN), p(35.6, 50.4, 26000, 81 * MIN, 'Radar lock at 27 nmi'), p(35.75, 51.1, 26000, 84 * MIN, 'Weapons panel fails; evasive dive'), p(35.68, 51.3, 20000, 90 * MIN), p(35.6892, 51.3134, 0, 110 * MIN, 'Lands at Mehrabad')],
+        points: [p(35.2117, 48.6534, 5550, 70 * MIN), p(35.6, 50.4, 26000, 81 * MIN, 'Radar lock at 27 nmi'), p(35.75, 51.1, 26000, 84 * MIN, 'Weapons panel fails; evasive dive'), p(35.68, 51.3, 20000, 90 * MIN), p(35.6892, 51.3134, 3890, 110 * MIN, 'Lands at Mehrabad')],
       },
       {
         id: 'object',
@@ -651,7 +651,7 @@ export default [
           p(64.84, -147.72, 31000, 22 * MIN, 'Circle near Fairbanks'),
           p(63.4, -149.2, 31000, 34 * MIN),
           p(62.32, -150.11, 25000, 42 * MIN, 'Objects lost near Talkeetna'),
-          p(61.1743, -149.9982, 0, 60 * MIN, 'Anchorage'),
+          p(61.1743, -149.9982, 110, 60 * MIN, 'Anchorage'),
         ],
       },
       {
@@ -920,9 +920,9 @@ export default [
           p(-41.3272, 174.8053, 0, 0, 'Wellington'),
           p(-41.9, 174.2, 14000, 25 * MIN),
           p(-42.4, 173.8, 14000, 40 * MIN, 'Lights filmed off Kaikōura'),
-          p(-43.4894, 172.5322, 0, 80 * MIN, 'Christchurch'),
+          p(-43.4894, 172.5322, 110, 80 * MIN, 'Christchurch'),
           p(-43.2, 172.8, 4000, 145 * MIN, 'Departs 02:16; orb off the wing'),
-          p(-41.5183, 173.8703, 0, 190 * MIN, 'Blenheim (Woodbourne)'),
+          p(-41.5183, 173.8703, 105, 190 * MIN, 'Blenheim (Woodbourne)'),
         ],
       },
       {
@@ -1093,7 +1093,7 @@ export default [
         label: 'Mirage IIIE JG116 (Anápolis)',
         kind: 'aircraft',
         basis: 'official-report',
-        points: [p(-16.2292, -48.9644, 0, 153 * MIN, 'Scramble'), p(-16.3, -50.3, 30000, 165 * MIN, 'Radar contacts at radial 270'), p(-16.6, -49.8, 30000, 175 * MIN, 'Closes to 2 mi; target zig-zags away'), p(-16.2292, -48.9644, 0, 195 * MIN)],
+        points: [p(-16.2292, -48.9644, 3710, 153 * MIN, 'Scramble'), p(-16.3, -50.3, 30000, 165 * MIN, 'Radar contacts at radial 270'), p(-16.6, -49.8, 30000, 175 * MIN, 'Closes to 2 mi; target zig-zags away'), p(-16.2292, -48.9644, 3710, 195 * MIN)],
       },
       {
         id: 'light',

@@ -211,6 +211,28 @@ describe('case data, across all cases', () => {
   });
 });
 
+describe('track heights are above sea level', () => {
+  // The globe plots a height as metres above sea level, so a point on the ground at 0 is buried wherever the land is
+  // higher. Each of these is the ground at that place, in metres (a public elevation model, to within about 20 m).
+  it.each([
+    ['tehran-1976', 'f4-1', 'Shahrokhi AB, Hamadan', 1650],
+    ['tehran-1976', 'f4-2', 'Lands at Mehrabad', 1150],
+    ['manises-1979', 'mirage', 'Scramble from Los Llanos AB', 680],
+    ['brazil-ufo-night-1986', 'jg116', 'Scramble', 1100],
+    ['belgian-wave-1990', 'f16', 'Scramble from Beauvechain', 90],
+    ['mantell-1948', 'mantell', 'Crash site south of Franklin, KY', 200],
+    ['coyne-1973', 'uh1h', 'Port Columbus', 230],
+    ['kecksburg-1965', 'fireball', 'Claimed impact in the woods at Kecksburg', 330],
+    ['dalnegorsk-1986', 'sphere', 'Strikes Izvestkovaya (Height 611)', 330],
+    ['loring-1975', 'intruder', 'Seen near the north perimeter', 220 + 80], // the base is 227 m up; the object was about 90 m above it
+    ['minot-afb-1968', 'object', 'Bright light seen near the ground', 538 + 100],
+  ])('%s: "%s" is not under the ground', (id, track, note, minM) => {
+    const t = CASES.find((c) => c.id === id).tracks.find((x) => x.id === track);
+    const point = t.points.find((q) => q[4] === note);
+    expect(point[2]).toBeGreaterThanOrEqual(minM);
+  });
+});
+
 describe('details checked against the articles the cases cite', () => {
   const byId = (id) => CASES.find((c) => c.id === id);
 
