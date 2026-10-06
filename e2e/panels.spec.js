@@ -63,6 +63,21 @@ test.describe('panels', () => {
     await expect(card).toBeFocused();
   });
 
+  test('the map dialog does not come back after it was closed while a map style was loading', async ({ page }) => {
+    await openApp(page);
+    await page.route(/arcgisonline/, async (route) => {
+      await new Promise((r) => setTimeout(r, 2500)); // a slow map service
+      route.abort();
+    });
+    await page.keyboard.press('m');
+    await page.locator('#ms-style [data-style="dark"]').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.modal-backdrop')).toHaveCount(0);
+    await expect(page.locator('#toast')).toContainText('could not be loaded', { timeout: 15_000 }); // the request is over
+    await page.waitForTimeout(500);
+    await expect(page.locator('.modal-backdrop')).toHaveCount(0);
+  });
+
   test('closing the Moon dossier puts the focus back on the row it came from', async ({ page }) => {
     await openApp(page);
     await page.evaluate(() => document.querySelector('[data-world="moon"]').click());

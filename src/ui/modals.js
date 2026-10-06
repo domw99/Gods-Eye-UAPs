@@ -470,6 +470,11 @@ export function openMapSettings(o) {
     </ol>
     <p class="caveat">Your key is stored only in this browser (localStorage) and sent only to Google's tile server (tile.googleapis.com). It is never uploaded anywhere else. Anyone who uses this browser profile could read it, so remove it on shared computers. If you host your own copy, you can set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> instead.</p>`;
   const el = modal('MAP', content, { wide: false });
+  // Redraw after a change, unless the dialog was closed while a slow map or key request ran:
+  // it would come back on its own over whatever the person went on to do.
+  const again = () => {
+    if (el.isConnected) o.reopen();
+  };
   const status = el.querySelector('#ms-status');
   const busy = (msg) => {
     status.textContent = t('STATUS: {status}', { status: t(msg) });
@@ -487,21 +492,21 @@ export function openMapSettings(o) {
     if (!b || b.classList.contains('on')) return;
     for (const x of el.querySelectorAll('#ms-style [data-style]')) x.disabled = true;
     await o.onStyle(b.dataset.style);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-light').addEventListener('click', (e) => {
     const b = e.target.closest('[data-light]');
     if (!b || b.classList.contains('on')) return;
     o.onLighting(b.dataset.light);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-names')?.addEventListener('click', async () => {
     await o.onNames(!o.names);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-osm').addEventListener('click', () => {
     o.onBuildings(!o.buildingsOn);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -511,23 +516,23 @@ export function openMapSettings(o) {
     busy('Loading Google 3D tiles…');
     const r = await o.onSaveKey(key);
     toast(r.ok ? 'Google photorealistic 3D is on — zoom into a city' : failMessage(r.error), r.ok ? 2600 : 6000);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-remove')?.addEventListener('click', async () => {
     busy('Removing key…');
     await o.onRemoveKey();
     toast('Key removed from this browser');
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-on')?.addEventListener('click', async () => {
     busy('Loading Google 3D tiles…');
     const r = await o.onPhotoreal(true);
     if (!r.ok) toast(failMessage(r.error), 6000);
-    o.reopen();
+    again();
   });
   el.querySelector('#ms-off')?.addEventListener('click', async () => {
     await o.onPhotoreal(false);
-    o.reopen();
+    again();
   });
 }
 
