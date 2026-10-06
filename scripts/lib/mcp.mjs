@@ -37,7 +37,7 @@ const clampLimit = (v, def = 10) => Math.max(1, Math.min(50, Number.isFinite(Num
 class ArgError extends Error {}
 
 function oneOf(name, value, allowed) {
-  if (value == null) return null;
+  if (value == null || value === '') return null; // an unused filter, as clients often send it
   const v = lower(value);
   if (!allowed.includes(v)) throw new ArgError(`${name} must be one of: ${allowed.join(', ')}`);
   return v;
@@ -196,11 +196,35 @@ export const TOOLS = [
 /** The tools as a client lists them (without the functions). */
 export const toolList = () => TOOLS.map(({ run, ...tool }) => tool);
 
+// What each declared type accepts. Numbers sent as text ("50") are read as numbers, as the tools always did.
+const number = (v) => (typeof v === 'number' && Number.isFinite(v)) || (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v)));
+const TYPES = {
+  string: [(v) => typeof v === 'string', 'a string'],
+  number: [number, 'a number'],
+  integer: [(v) => number(v) && Number.isInteger(Number(v)), 'a whole number'],
+  boolean: [(v) => typeof v === 'boolean', 'true or false'],
+};
+
+/** Hold the arguments to the tool's schema, so a misspelt name or a wrong type is told to the model instead of quietly ignored (a typo would otherwise return every case). */
+function checkArguments(schema, args) {
+  if (typeof args !== 'object' || args === null || Array.isArray(args)) throw new ArgError('arguments must be an object');
+  const props = schema.properties || {};
+  const known = Object.keys(props);
+  for (const key of Object.keys(args))
+    if (!Object.hasOwn(props, key)) throw new ArgError(`Unknown argument "${key}". This tool takes: ${known.length ? known.join(', ') : 'no arguments'}`);
+  for (const key of known) {
+    const v = args[key];
+    const [fits, label] = TYPES[props[key].type] || [() => true, ''];
+    if (v != null && !(v === '' && props[key].type !== 'string') && !fits(v)) throw new ArgError(`${key} must be ${label}`);
+  }
+}
+
 /** Run a tool; a bad argument is a result the model can read and correct, not a protocol error. */
 export function callTool(name, args) {
   const tool = TOOLS.find((t) => t.name === name);
   if (!tool) return null;
   try {
+    checkArguments(tool.inputSchema, args ?? {});
     return { content: [{ type: 'text', text: JSON.stringify(tool.run(args ?? {}), null, 1) }] };
   } catch (error) {
     if (!(error instanceof ArgError)) throw error;
@@ -213,12 +237,17 @@ const error = (id, code, message) => ({ jsonrpc: '2.0', id, error: { code, messa
 /** One JSON-RPC message in, the response out (null for a notification). */
 export function handle(message) {
   if (Array.isArray(message)) {
-    const out = message.map(handle).filter(Boolean);
+    // An empty batch, and a batch inside a batch, are invalid requests that still get an answer.
+    if (!message.length) return error(null, -32600, 'Invalid request');
+    const out = message.map((m) => (Array.isArray(m) ? error(null, -32600, 'Invalid request') : handle(m))).filter(Boolean);
     return out.length ? out : null;
   }
+  // A reply to a request of ours (this server sends none) is not a request: say nothing.
+  if (message?.jsonrpc === '2.0' && message.method === undefined && message.id !== undefined && ('result' in message || 'error' in message)) return null;
   if (!message || message.jsonrpc !== '2.0' || typeof message.method !== 'string') return error(message?.id ?? null, -32600, 'Invalid request');
   const { id, method, params } = message;
   if (id === undefined) return null; // a notification (notifications/initialized, notifications/cancelled …)
+  if (typeof id !== 'string' && typeof id !== 'number') return error(null, -32600, 'Invalid request: id must be a string or a number');
   switch (method) {
     case 'initialize': {
       const wanted = params?.protocolVersion;
@@ -229,6 +258,7 @@ export function handle(message) {
     case 'tools/list':
       return { jsonrpc: '2.0', id, result: { tools: toolList() } };
     case 'tools/call': {
+      if (typeof params?.name !== 'string') return error(id, -32602, 'Invalid params: name (the tool to call) is required');
       let result;
       try {
         result = callTool(params?.name, params?.arguments);
