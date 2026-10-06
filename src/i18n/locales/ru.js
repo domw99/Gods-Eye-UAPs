@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Солнце на {n}° над горизонтом",
   "Sun {n}° below the horizon": "Солнце на {n}° ниже горизонта",
   "{phase}, {n}% lit": "{phase}, освещено {n}%",
+  "CASE FILE": "ДЕЛО",
+  "THE SKY THAT MOMENT": "НЕБО В ТОТ МОМЕНТ",
+  "ASSESSMENT — {status}": "ОЦЕНКА — {status}",
 };

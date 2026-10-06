@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Sonne {n}° über dem Horizont",
   "Sun {n}° below the horizon": "Sonne {n}° unter dem Horizont",
   "{phase}, {n}% lit": "{phase}, {n} % beleuchtet",
+  "CASE FILE": "FALLAKTE",
+  "THE SKY THAT MOMENT": "DER HIMMEL IN DIESEM MOMENT",
+  "ASSESSMENT — {status}": "BEWERTUNG — {status}",
 };

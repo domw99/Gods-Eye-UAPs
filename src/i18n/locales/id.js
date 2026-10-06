@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Matahari {n}° di atas cakrawala",
   "Sun {n}° below the horizon": "Matahari {n}° di bawah cakrawala",
   "{phase}, {n}% lit": "{phase}, {n}% terang",
+  "CASE FILE": "BERKAS KASUS",
+  "THE SKY THAT MOMENT": "LANGIT PADA SAAT ITU",
+  "ASSESSMENT — {status}": "PENILAIAN — {status}",
 };

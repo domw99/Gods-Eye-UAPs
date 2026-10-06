@@ -2,7 +2,7 @@ import * as Cesium from 'cesium';
 import { skyAt, compass } from '../services/sky.js';
 import { STATUS } from '../data/taxonomy.js';
 import { lessMotion } from '../app/quality.js';
-import { locale } from '../i18n/index.js';
+import { locale, t } from '../i18n/index.js';
 
 /**
  * Story mode: a narrated fly-through of one case. Captions step through the
@@ -49,6 +49,9 @@ function skySentence(c) {
   }
 }
 
+/** A caption's heading in the interface language. */
+const shownKicker = (step) => (step.kickerKey ? t(step.kickerKey, { status: t(step.kickerVars.status) }) : t(step.kicker));
+
 export function buildStory(c) {
   // The calendar day where it happened (the date as written, with its own UTC offset), not the UTC day,
   // which for an evening case in the Americas is already the next one.
@@ -66,8 +69,11 @@ export function buildStory(c) {
   ];
   const sky = skySentence(c);
   if (sky) steps.push({ kicker: 'THE SKY THAT MOMENT', text: sky });
+  const verdict = (STATUS[c.status]?.label || c.status).toUpperCase();
   steps.push({
-    kicker: `ASSESSMENT — ${(STATUS[c.status]?.label || c.status).toUpperCase()}`,
+    kicker: `ASSESSMENT — ${verdict}`,
+    kickerKey: 'ASSESSMENT — {status}', // what the caption shows, in the interface language
+    kickerVars: { status: verdict },
     text: c.explanation || STATUS[c.status]?.long || '',
   });
   return steps.filter((s) => s.text);
@@ -148,7 +154,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
     state.i = i;
     if (i >= state.steps.length) return stop();
     const step = state.steps[i];
-    kicker.textContent = step.kicker;
+    kicker.textContent = shownKicker(step);
     text.textContent = step.text;
     bar.style.width = `${Math.round(((i + 1) / state.steps.length) * 100)}%`;
     camera(step, state.c);
@@ -163,7 +169,7 @@ export function createStory({ viewer, trackLayer, onStop = () => {} }) {
       const minMs = voiceOn && canSpeak ? Math.max(2500, words * 240) : readMs;
       state.timer = setTimeout(() => show(i + 1), Math.max(700, minMs - (Date.now() - began)));
     };
-    if (!speak(`${step.kicker === 'CASE FILE' || step.kicker === 'WHAT HAPPENED' ? '' : `${step.kicker.toLowerCase()}. `}${step.text}`, next))
+    if (!speak(`${step.kicker === 'CASE FILE' || step.kicker === 'WHAT HAPPENED' ? '' : `${shownKicker(step).toLocaleLowerCase(locale())}. `}${step.text}`, next))
       state.timer = setTimeout(() => show(i + 1), readMs);
   }
 

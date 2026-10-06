@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "सूर्य क्षितिज से {n}° ऊपर",
   "Sun {n}° below the horizon": "सूर्य क्षितिज से {n}° नीचे",
   "{phase}, {n}% lit": "{phase}, {n}% प्रकाशित",
+  "CASE FILE": "केस फ़ाइल",
+  "THE SKY THAT MOMENT": "उस क्षण का आकाश",
+  "ASSESSMENT — {status}": "आकलन — {status}",
 };

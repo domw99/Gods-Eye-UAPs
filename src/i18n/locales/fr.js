@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Soleil à {n}° au-dessus de l’horizon",
   "Sun {n}° below the horizon": "Soleil à {n}° sous l’horizon",
   "{phase}, {n}% lit": "{phase}, {n} % éclairée",
+  "CASE FILE": "DOSSIER DU CAS",
+  "THE SKY THAT MOMENT": "LE CIEL À CET INSTANT",
+  "ASSESSMENT — {status}": "ÉVALUATION — {status}",
 };

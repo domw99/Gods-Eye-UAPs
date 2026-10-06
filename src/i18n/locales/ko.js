@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "태양 고도 {n}°",
   "Sun {n}° below the horizon": "태양이 지평선 {n}° 아래",
   "{phase}, {n}% lit": "{phase}, {n}% 밝음",
+  "CASE FILE": "사건 파일",
+  "THE SKY THAT MOMENT": "그 순간의 하늘",
+  "ASSESSMENT — {status}": "평가 — {status}",
 };

@@ -327,6 +327,12 @@ describe('label tables', () => {
       need(v.long, `GEIPAN_CLASSES.${k}.long`);
     }
     for (const alt of [10, -3, -9, -15, -30]) need(sky.daylight(alt), `daylight(${alt})`);
+    // The headings of story mode's captions (a case's own timeline headings are data and stay as written).
+    // (story.js loads Cesium, so its source is read rather than imported.)
+    const story = readFileSync('src/ui/story.js', 'utf8');
+    const headings = [...story.matchAll(/kicker(?:Key)?:\s*'([^'$]+)'/g)].map((m) => m[1]);
+    expect(headings.length).toBeGreaterThanOrEqual(4);
+    for (const heading of headings) need(heading, 'story heading');
     // Every phase of one lunation: the sky table translates the phase name it is given.
     for (let day = 0; day < 30; day++) {
       const moon = sky.skyAt(40, -100, new Date(Date.UTC(2020, 0, 1 + day, 12)), { minAlt: -90 }).bodies.find((b) => b.kind === 'moon');

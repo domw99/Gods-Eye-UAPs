@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Słońce {n}° nad horyzontem",
   "Sun {n}° below the horizon": "Słońce {n}° poniżej horyzontu",
   "{phase}, {n}% lit": "{phase}, oświetlone w {n}%",
+  "CASE FILE": "AKTA SPRAWY",
+  "THE SKY THAT MOMENT": "NIEBO W TEJ CHWILI",
+  "ASSESSMENT — {status}": "OCENA — {status}",
 };

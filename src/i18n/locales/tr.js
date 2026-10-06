@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Güneş ufkun {n}° üzerinde",
   "Sun {n}° below the horizon": "Güneş ufkun {n}° altında",
   "{phase}, {n}% lit": "{phase}, %{n} aydınlık",
+  "CASE FILE": "VAKA DOSYASI",
+  "THE SKY THAT MOMENT": "O ANDAKİ GÖKYÜZÜ",
+  "ASSESSMENT — {status}": "DEĞERLENDİRME — {status}",
 };

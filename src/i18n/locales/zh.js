@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "太阳高度 {n}°",
   "Sun {n}° below the horizon": "太阳在地平线下 {n}°",
   "{phase}, {n}% lit": "{phase}，被照亮 {n}%",
+  "CASE FILE": "案件档案",
+  "THE SKY THAT MOMENT": "那一刻的天空",
+  "ASSESSMENT — {status}": "评估 — {status}",
 };

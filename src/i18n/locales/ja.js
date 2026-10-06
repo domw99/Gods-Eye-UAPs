@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "太陽は地平線の {n}° 上",
   "Sun {n}° below the horizon": "太陽は地平線の {n}° 下",
   "{phase}, {n}% lit": "{phase}、照らされている割合 {n}%",
+  "CASE FILE": "事案ファイル",
+  "THE SKY THAT MOMENT": "その瞬間の空",
+  "ASSESSMENT — {status}": "評価 — {status}",
 };

@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "Zon {n}° boven de horizon",
   "Sun {n}° below the horizon": "Zon {n}° onder de horizon",
   "{phase}, {n}% lit": "{phase}, {n}% verlicht",
+  "CASE FILE": "ZAAKDOSSIER",
+  "THE SKY THAT MOMENT": "DE HEMEL OP DAT MOMENT",
+  "ASSESSMENT — {status}": "BEOORDELING — {status}",
 };

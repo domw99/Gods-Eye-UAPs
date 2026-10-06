@@ -1061,4 +1061,7 @@ export default {
   "Sun {n}° up": "الشمس على ارتفاع {n}°",
   "Sun {n}° below the horizon": "الشمس على {n}° تحت الأفق",
   "{phase}, {n}% lit": "{phase}، مضيء بنسبة {n}%",
+  "CASE FILE": "ملف الحالة",
+  "THE SKY THAT MOMENT": "السماء في تلك اللحظة",
+  "ASSESSMENT — {status}": "التقييم — {status}",
 };
