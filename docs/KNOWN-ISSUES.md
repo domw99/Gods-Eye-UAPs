@@ -15,7 +15,7 @@ Check here before filing an issue. Some of these are fixable, some are the natur
 ## The data
 
 - **Flight paths are reconstructions.** Seventy cases draw one. Each says what it is based on (radar, an official report, witness reports, a flight plan, or `approximate`), and an approximate path is drawn from descriptions, not measurements.
-- **Times can be approximate.** Fifty-four cases record only a date or part of a day (*time approx.*). The sky, the weather and the story say so, and the day/night lighting uses the best guess.
+- **Times can be approximate.** Fifty-four older cases record only a date or part of a day (*time approx.*). The sky, the weather and the story say so, and the day/night lighting uses the best guess.
 - **Positions follow the sources**, and are only as exact as the case's *precision* (`site`, `city`, `area`, `region`).
 - **Blue Book places come from file names.** About 10,000 case files are placed at the town named in the file, which is not always where the sighting happened. Files that name no town are not placed.
 - **GEIPAN's export is from 2019.** Newer cases are on GEIPAN's own site.

@@ -15,8 +15,8 @@
  */
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ROOT, UA, norm, loadGazetteer, regionCentroid, resolveRegionToken } from './lib/geonames.mjs';
+import { isMain } from './lib/is-main.mjs';
 
 const OUT = path.join(ROOT, 'public/data/bluebook.json');
 
@@ -224,7 +224,7 @@ async function main() {
   console.log('Sample unplaced:', unplaced.slice(0, 40).join(', '));
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

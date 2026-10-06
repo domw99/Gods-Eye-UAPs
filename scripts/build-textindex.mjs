@@ -13,10 +13,10 @@ import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ROOT, CACHE } from './lib/geonames.mjs';
 import { words, shardOf, encodePostings } from '../src/services/textsearch.js';
 import { joinBrokenWords } from '../src/services/mufon.js';
+import { isMain } from './lib/is-main.mjs';
 
 const OUT = path.join(ROOT, 'public/data/textindex');
 const MAX_PAGES = 1200; // words on more pages than this are too common to help
@@ -89,7 +89,7 @@ async function main() {
   console.log(`${pageId} pages (${missing} issues without cached text), ${postings.size} words, ${kept} indexed in ${meta.shards.length} shards, ${(bytes / 1e6).toFixed(2)} MB`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

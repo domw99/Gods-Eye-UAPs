@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # to start the Pages deploy below
 
 concurrency:
   group: cards-${{ github.ref }}
@@ -46,6 +47,7 @@ jobs:
           for i in $(seq 60); do curl -sf http://localhost:4173/ > /dev/null && break; sleep 1; done
           node scripts/build-cards.mjs http://localhost:4173/ $IDS
       - name: Commit the cards
+        id: commit
         env:
           IDS: ${{ inputs.ids }}
         run: |
@@ -55,3 +57,11 @@ jobs:
           if git diff --cached --quiet; then echo "No cards changed."; exit 0; fi
           git commit -q -m "Share cards with map imagery${IDS:+: $IDS}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Redeploy the site
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # A push made with the workflow token doesn't start the Pages deploy, and the case pages only
+        # point at a card once the site is built with it, so start the deploy here.
+        run: gh workflow run pages.yml --ref "$GITHUB_REF_NAME" || echo "Pages deploy not started (is Pages enabled?)"

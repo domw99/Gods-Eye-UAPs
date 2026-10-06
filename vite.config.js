@@ -6,11 +6,12 @@ import { casePage, caseIndex, sitemap, siteStructuredData, ldJson } from './scri
 import { openData } from './scripts/lib/open-data.mjs';
 import { browseGroups, browseIndex, groupPage, groupPath, groupsOf } from './scripts/lib/browse-pages.mjs';
 import { robotsTxt, llmsTxt, llmsFullTxt } from './scripts/lib/llms.mjs';
+import { siteUrl } from './scripts/lib/site.mjs';
 import { similarCases } from './src/data/similar.js';
 import { RELEASE, SITE_URL } from './src/config.js';
 
 // The public address, for link previews (they need absolute URLs).
-const SITE = process.env.SITE_URL || SITE_URL;
+const SITE = siteUrl();
 
 // `base` lets the same build run at a domain root or under a GitHub Pages
 // project path (set BASE_PATH=/Gods-Eye-UAPs/ in CI).
@@ -75,5 +76,8 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.js'],
     environment: 'node',
+    // The tests that import the 15 dictionaries or all the case files take several seconds when the machine is busy
+    // (a second suite running, a small CI runner), and failed on the default 5 s with nothing wrong.
+    testTimeout: 20_000,
   },
 });

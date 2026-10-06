@@ -87,4 +87,9 @@ describe('the Kp builder', () => {
   it('refuses a file that skips an interval', () => {
     expect(() => pack([line(0, 3), line(0.25, 3)].join('\n'))).toThrow(/skips/);
   });
+
+  it('refuses a file with no Kp lines, so an error page cannot empty the series', () => {
+    expect(() => pack('')).toThrow(/No Kp lines/);
+    expect(() => pack('# only a comment\n\n')).toThrow(/No Kp lines/);
+  });
 });

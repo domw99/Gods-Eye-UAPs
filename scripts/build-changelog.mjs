@@ -10,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const NOTES = '.github/release-notes';
@@ -35,10 +36,17 @@ export function noteBody(text) {
     .trim();
 }
 
-function addedOn(file) {
+const localDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/**
+ * The date of the commit that added a note. A note that is not committed yet is the release being made
+ * (the release steps run this before the commit), so it is dated today rather than "undated" for good.
+ * Empty when git cannot say.
+ */
+export function addedOn(file, today = new Date()) {
   try {
     const out = execFileSync('git', ['log', '--diff-filter=A', '--follow', '--format=%ad', '--date=short', '--', `${NOTES}/${file}`], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n');
-    return out.at(-1) || '';
+    return out.at(-1) || localDate(today);
   } catch {
     return '';
   }
@@ -60,7 +68,7 @@ export function buildChangelog(dates = {}) {
   return `${lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd()}\n`;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const out = buildChangelog();
   writeFileSync(path.join(ROOT, 'CHANGELOG.md'), out);
   console.log(`CHANGELOG.md: ${out.split('\n').length} lines`);

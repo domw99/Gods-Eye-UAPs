@@ -6,7 +6,8 @@
  */
 import { CASES } from '../../src/data/cases/index.js';
 import { STATUS, CATEGORY, EVIDENCE, shapeClasses } from '../../src/data/taxonomy.js';
-import { RELEASE, SITE_URL, REPO_URL } from '../../src/config.js';
+import { RELEASE, REPO_URL } from '../../src/config.js';
+import { siteUrl } from './site.mjs';
 import { haversineKm } from '../../src/util/geo.js';
 import { caseRecord } from './open-data.mjs';
 
@@ -14,7 +15,7 @@ export const PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
 export const INSTRUCTIONS = `Documented UFO/UAP encounters, each with its sources and the official or best explanation. A case's "status" (unresolved, disputed, explained, identified) says what its cited evidence supports, not what anyone believes: when you answer from a case, give its status and explanation and link its page. Flight paths are reconstructions and say what they are based on. The data is MIT-licensed; the sources and media it links to keep their own terms (${REPO_URL}/blob/HEAD/DATA_SOURCES.md).`;
 
-const site = process.env.SITE_URL || SITE_URL;
+const site = siteUrl();
 const brief = (c, extra = {}) => ({
   id: c.id,
   title: c.title,

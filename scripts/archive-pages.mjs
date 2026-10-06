@@ -7,7 +7,9 @@
  *
  *   node scripts/archive-pages.mjs
  */
-const SITE = process.env.SITE_URL || 'https://domw99.github.io/Gods-Eye-UAPs/';
+import { siteUrl } from './lib/site.mjs';
+
+const SITE = siteUrl();
 const PAGES = [SITE, `${SITE}case/`, `${SITE}open-data/`];
 
 for (const url of PAGES) {

@@ -228,7 +228,7 @@ describe('numbers the docs quote about the cases', () => {
   it('quote how many cases have a flight path and how many have an approximate time in docs/KNOWN-ISSUES.md', () => {
     const text = doc('docs/KNOWN-ISSUES.md');
     expect(spelled(/([A-Za-z-]+) cases draw one/.exec(text)[1])).toBe(CASES.filter((c) => c.tracks?.length).length);
-    expect(spelled(/([A-Za-z-]+) cases record only a date or part of a day/.exec(text)[1])).toBe(CASES.filter((c) => c.timeApprox).length);
+    expect(spelled(/([A-Za-z-]+)(?: older)? cases record only a date or part of a day/.exec(text)[1])).toBe(CASES.filter((c) => c.timeApprox).length);
   });
 });
 

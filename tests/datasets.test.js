@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { GOV_FILES } from '../src/data/govFiles.js';
 import { parseIdentifier } from '../scripts/build-bluebook.mjs';
+import { keepUnseen } from '../scripts/sync-dvids.mjs';
 import { officialToItem } from '../src/data/items.js';
 
 const json = (p) => JSON.parse(readFileSync(new URL(`../public/data/${p}`, import.meta.url), 'utf8'));
@@ -24,6 +25,13 @@ describe('official U.S. footage catalogue', () => {
     const item = officialToItem(data.items[0]);
     expect(item.key).toBe(`official:${data.items[0].dvidsId}`);
     expect(['unresolved', 'explained', 'unassessed']).toContain(item.status);
+  });
+  it('keeps earlier items a sync could not look at, and takes the new copy of the rest', () => {
+    const old = [{ type: 'video', dvidsId: '1', title: 'old one' }, { type: 'video', dvidsId: '2', title: 'old two' }, { type: 'image', dvidsId: '1', title: 'old image' }];
+    const now = [{ type: 'video', dvidsId: '2', title: 'new two' }];
+    expect(keepUnseen(now, old).map((i) => i.title)).toEqual(['new two', 'old one', 'old image']);
+    expect(keepUnseen([], old)).toEqual(old);
+    expect(keepUnseen(now, [])).toEqual(now);
   });
 });
 

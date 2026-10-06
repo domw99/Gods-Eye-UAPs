@@ -17,8 +17,8 @@
  */
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ROOT, cached, norm, unzipEntry, loadGazetteer, regionCentroid } from './lib/geonames.mjs';
+import { isMain } from './lib/is-main.mjs';
 
 const OUT = path.join(ROOT, 'public/data/geipan.json');
 const BASE = 'https://cnes-geipan.fr/sites/default/files/';
@@ -315,7 +315,7 @@ async function main() {
   console.log(stats, `records with unrepaired characters: ${left}`, `${(JSON.stringify(payload).length / 1e6).toFixed(2)} MB`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);
