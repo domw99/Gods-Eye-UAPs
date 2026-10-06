@@ -18,7 +18,7 @@
   --danger: #ff5a5a;
   --text-primary: #e8eaed;
   --text-secondary: rgba(232, 234, 237, 0.62);
-  --text-dim: rgba(232, 234, 237, 0.38);
+  --text-dim: rgba(232, 234, 237, 0.52); /* 4.5:1 and up on the panel backgrounds (axe cannot check it over the globe, so it is measured against them) */
   --menu-bg: #10121b;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -751,7 +751,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 @media (hover: hover) { .link-btn:hover { text-decoration: underline; } }
 
 /* ── "made by" small print ───────────────────────────── */
-.made-by { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--text-dim); opacity: 0.75; text-transform: none; }
+.made-by { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; color: var(--text-dim); text-transform: none; }
 .made-by a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; pointer-events: auto; }
 .made-by a:hover { color: var(--accent); }
 :is(#left, #moon-left) .made-by { margin: 14px 0 2px; text-align: center; }
