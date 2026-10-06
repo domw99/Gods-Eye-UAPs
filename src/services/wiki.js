@@ -26,7 +26,15 @@ async function cachedJson(url) {
   return promise;
 }
 
-const stripTags = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+// Commons returns its credits as HTML: the tags go, and so do the entities (&amp; would otherwise be shown as written once the page escapes it).
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+const decodeEntities = (s) =>
+  s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, name) => {
+    if (name[0] !== '#') return ENTITIES[name.toLowerCase()] ?? match;
+    const code = name[1] === 'x' || name[1] === 'X' ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10);
+    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+  });
+const stripTags = (s) => decodeEntities(String(s || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
 
 export async function wikiSummary(title) {
   const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`;

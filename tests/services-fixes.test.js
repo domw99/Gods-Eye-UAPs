@@ -21,6 +21,7 @@ const { weatherAt } = await import('../src/services/weather.js');
 const { slimLaunch } = await import('../src/services/launches.js');
 const { fetchWithTimeout, isTimeout } = await import('../src/util/net.js');
 const { toArea, nearUS } = await import('../src/services/airspace.js');
+const { commonsFiles } = await import('../src/services/wiki.js');
 const { searchJournals } = await import('../src/services/textsearch.js');
 const { fold, decodeGeipan } = await import('../src/services/geipan.js');
 
@@ -139,5 +140,29 @@ describe('airspace pre-check', () => {
     const areas = JSON.parse(readFileSync('public/data/airspace.json', 'utf8')).features.map(toArea);
     const outside = areas.filter((a) => !nearUS((a.bbox[1] + a.bbox[3]) / 2, (a.bbox[0] + a.bbox[2]) / 2));
     expect(outside.map((a) => a.name)).toEqual([]);
+  });
+});
+
+describe('Commons credits', () => {
+  it('are shown as text: tags removed and HTML entities decoded once', async () => {
+    const page = {
+      title: 'File:Case.jpg',
+      imageinfo: [
+        {
+          url: 'https://upload.example/a.jpg',
+          mime: 'image/jpeg',
+          extmetadata: {
+            Artist: { value: '<a href="https://example.org/?a=1&amp;b=2">Jim &amp; Pam O&#039;Neil</a>' },
+            ImageDescription: { value: '<p>Arts &amp; Science &lt;b&gt; &#x1F600;&nbsp;done &amp;lt; &bogus; &#0; &#99999999;</p>' },
+            LicenseShortName: { value: 'CC BY-SA 4.0' },
+          },
+        },
+      ],
+    };
+    vi.stubGlobal('fetch', async () => ({ ok: true, status: 200, json: async () => ({ query: { pages: [page] } }) }));
+    const info = (await commonsFiles(['File:Case.jpg'])).get('File:Case.jpg');
+    expect(info.artist).toBe("Jim & Pam O'Neil");
+    expect(info.description).toBe('Arts & Science <b> \u{1F600} done &lt; &bogus; &#0; &#99999999;');
+    expect(info.license).toBe('CC BY-SA 4.0');
   });
 });
