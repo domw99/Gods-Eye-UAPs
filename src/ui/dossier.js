@@ -1,5 +1,5 @@
 import { html, raw, mount, esc, safeUrl, toast, th } from '../util/dom.js';
-import { t, locale } from '../i18n/index.js';
+import { t, locale, translateDom } from '../i18n/index.js';
 import { CASES } from '../data/cases/index.js';
 import { similarCases } from '../data/similar.js';
 import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, evidenceScore } from '../data/taxonomy.js';
@@ -413,7 +413,7 @@ function dvidsCard(item, caption) {
   // Percent-encode characters that could end a CSS url('…') token.
   const thumb = item.thumbnail ? safeUrl(item.thumbnail).replace(/['"()\s\\]/g, (c) => `%${c.charCodeAt(0).toString(16)}`) : '';
   if (item.type === 'image')
-    return html`<figure class="media-card" data-lightbox="${thumb}" data-caption="${caption || item.title}" data-credit="DVIDS · U.S. Government (public domain)" data-href="${item.page}">
+    return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || item.title })}" data-lightbox="${thumb}" data-caption="${caption || item.title}" data-credit="DVIDS · U.S. Government (public domain)" data-href="${item.page}">
       <img src="${thumb}" alt="${caption || item.title}" loading="lazy" referrerpolicy="no-referrer" />
       <span class="badge official kind">OFFICIAL IMAGE</span>
       <figcaption>${caption || item.title}</figcaption></figure>`;
@@ -444,7 +444,7 @@ function imageCard(info, caption, page = null) {
   const thumb = pdf && page ? info.thumb.replace(/\/page\d+-/, `/page${page}-`) : info.thumb;
   const big = pdf ? thumb.replace(/-\d+px-/, '-1280px-') : info.url;
   const href = pdf && page ? `${info.page}?page=${page}` : info.page;
-  return html`<figure class="media-card" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}" data-credit="${credit}" data-href="${safeUrl(href)}">
+  return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || info.title.replace(/^File:/, '') })}" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}"data-credit="${credit}" data-href="${safeUrl(href)}">
     <img src="${safeUrl(thumb)}" alt="${caption || info.title}" loading="lazy" />
     ${info.mime === 'application/pdf' ? html`<span class="badge kind">PDF</span>` : ''}
     <figcaption>${caption || info.title.replace(/^File:/, '')}</figcaption>
@@ -1004,7 +1004,8 @@ export function renderUser(item, { onDelete }) {
     clearTimeout(armed);
     armed = null;
     document.removeEventListener('pointerdown', elsewhere, true);
-    del.textContent = 'Delete this entry';
+    del.textContent = 'Delete this entry'; // English, translated in place like the rest of the panel
+    translateDom(del);
     del.classList.remove('danger');
   };
   const elsewhere = (e) => {
@@ -1018,6 +1019,7 @@ export function renderUser(item, { onDelete }) {
       return;
     }
     del.textContent = 'Press again to delete';
+    translateDom(del);
     del.classList.add('danger');
     armed = setTimeout(disarm, 8000);
     document.addEventListener('pointerdown', elsewhere, true);
@@ -1055,6 +1057,13 @@ export function renderSkyCheck(list) {
 
 /** Delegated button handling inside the dossier. */
 export function bindDossierActions(handlers) {
+  // A picture opens full size from the keyboard too (the card is a button, reached with Tab).
+  body().addEventListener('keydown', (e) => {
+    const card = e.target.closest?.('[data-lightbox]');
+    if (!card || card !== e.target || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    handlers.lightbox(card.dataset);
+  });
   body().addEventListener('click', (e) => {
     const lb = e.target.closest('[data-lightbox]');
     if (lb) {
@@ -1065,6 +1074,7 @@ export function bindDossierActions(handlers) {
     if (play) {
       const wrap = play.closest('[data-dvids]');
       wrap.innerHTML = `<iframe src="https://www.dvidshub.net/video/embed/${encodeURIComponent(wrap.dataset.dvids)}" allow="autoplay; fullscreen" allowfullscreen title="${esc(t('Official DVIDS video'))}"></iframe>`;
+      wrap.querySelector('iframe').focus(); // the play button that had the focus is gone
       return;
     }
     const btn = e.target.closest('[data-action]');
@@ -1079,6 +1089,7 @@ export function bindDossierActions(handlers) {
       toggleStar(btn.dataset.key);
       const next = mount(document.createElement('div'), starButton(btn.dataset.key)).firstElementChild;
       btn.replaceWith(next);
+      next.focus(); // the button that had the focus is gone; a keyboard user stays where they were
       toast(next.classList.contains('on') ? 'Starred — find it under Filters › Saved' : 'Removed from your starred cases', 2200);
       return;
     }

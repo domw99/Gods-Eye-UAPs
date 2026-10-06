@@ -1,5 +1,5 @@
 import { state, update, YEAR_MIN, YEAR_MAX } from '../state.js';
-import { t } from '../i18n/index.js';
+import { t, translateDom } from '../i18n/index.js';
 
 /**
  * Year histogram with brush selection. Bars: curated + official + user items
@@ -193,7 +193,11 @@ export function createTimeline({ onPlayToggle }) {
     },
     draw,
     setPlaying(on) {
-      document.getElementById('tl-play').textContent = on ? '❚❚' : '▶';
+      const button = document.getElementById('tl-play');
+      button.textContent = on ? '❚❚' : '▶';
+      // The name follows the glyph (written in English, translated in place, as the panel buttons are).
+      button.setAttribute('aria-label', on ? 'Stop playback' : 'Play history');
+      translateDom(button);
     },
   };
 }

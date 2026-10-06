@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Radar görünümü: {range} km içinde {n} kayıt, kuzey yukarıda",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Yeni: arama kutusuna koordinat yazın ve her vaka için kutup ışığını ve en yakın havaalanlarını görün",
   "less than 1 km away": "1 km'den yakın",
+  "Enlarge picture: {caption}": "Görseli büyüt: {caption}",
+  "Delete this entry": "Bu kaydı sil",
+  "Press again to delete": "Silmek için tekrar basın",
 };

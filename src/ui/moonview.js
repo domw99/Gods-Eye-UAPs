@@ -382,7 +382,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
     applyLight();
     if (!quiet) onRoute?.(null);
     // The focus was in the dossier, which is gone: back to the row it came from.
-    if (hadFocus) (was && listEl.querySelector(`[data-key="${CSS.escape(`${was.kind}:${was.id}`)}"]`))?.focus() || $('#moon-globe').focus();
+    if (hadFocus) (was && listEl.querySelector(`[data-key="${CSS.escape(`${was.kind}:${was.id}`)}"]`) || $('#moon-globe')).focus();
   }
   /** Open on an id (a report or a place), or ignore one that isn't there. */
   const focusOn = (id) => {

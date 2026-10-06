@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "レーダー表示:{range} km 以内の記録 {n} 件(上が北)",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新機能:検索ボックスに座標を入力でき、各事例のオーロラと最寄りの飛行場も見られます",
   "less than 1 km away": "1 km 未満",
+  "Enlarge picture: {caption}": "画像を拡大: {caption}",
+  "Delete this entry": "このエントリを削除",
+  "Press again to delete": "もう一度押すと削除します",
 };

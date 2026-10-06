@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Vista radar: {n} segnalazioni entro {range} km, nord in alto",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Novità: scrivi le coordinate nella ricerca e vedi l'aurora e gli aeroporti più vicini per ogni caso",
   "less than 1 km away": "a meno di 1 km",
+  "Enlarge picture: {caption}": "Ingrandisci l’immagine: {caption}",
+  "Delete this entry": "Elimina questa voce",
+  "Press again to delete": "Premi di nuovo per eliminare",
 };

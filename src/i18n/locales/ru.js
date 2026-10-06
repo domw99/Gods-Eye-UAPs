@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Радарный вид: {n} записей в радиусе {range} км, север вверху",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Новое: вводите координаты в строку поиска и смотрите полярное сияние и ближайшие аэродромы для каждого случая",
   "less than 1 km away": "менее 1 км",
+  "Enlarge picture: {caption}": "Увеличить изображение: {caption}",
+  "Delete this entry": "Удалить эту запись",
+  "Press again to delete": "Нажмите ещё раз, чтобы удалить",
 };

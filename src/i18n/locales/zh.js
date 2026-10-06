@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "雷达视图:{range} 公里内 {n} 条记录,上方为北",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新功能:在搜索框输入坐标,并查看每个案例的极光和最近的机场",
   "less than 1 km away": "不到 1 公里",
+  "Enlarge picture: {caption}": "放大图片：{caption}",
+  "Delete this entry": "删除此条目",
+  "Press again to delete": "再次点击以删除",
 };

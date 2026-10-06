@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "레이더 보기: {range}km 이내 기록 {n}건, 북쪽이 위",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "새 기능: 검색창에 좌표를 입력하고, 각 사례의 오로라와 가장 가까운 비행장을 확인하세요",
   "less than 1 km away": "1km 미만",
+  "Enlarge picture: {caption}": "이미지 확대: {caption}",
+  "Delete this entry": "이 항목 삭제",
+  "Press again to delete": "삭제하려면 다시 누르세요",
 };

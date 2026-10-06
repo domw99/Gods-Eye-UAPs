@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "عرض الرادار: {n} سجلًا ضمن {range} كم، والشمال في الأعلى",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "جديد: اكتب الإحداثيات في مربع البحث، وشاهد الشفق القطبي وأقرب المطارات لكل حالة",
   "less than 1 km away": "على بعد أقل من 1 كم",
+  "Enlarge picture: {caption}": "تكبير الصورة: {caption}",
+  "Delete this entry": "حذف هذا الإدخال",
+  "Press again to delete": "اضغط مرة أخرى للحذف",
 };

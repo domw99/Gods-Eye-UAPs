@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "रडार दृश्य: {range} किमी के भीतर {n} रिकॉर्ड, उत्तर ऊपर",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "नया: खोज बॉक्स में निर्देशांक लिखें, और हर मामले के लिए अरोरा और सबसे पास के हवाई अड्डे देखें",
   "less than 1 km away": "1 किमी से भी कम दूरी पर",
+  "Enlarge picture: {caption}": "तस्वीर बड़ी करें: {caption}",
+  "Delete this entry": "यह प्रविष्टि हटाएँ",
+  "Press again to delete": "हटाने के लिए फिर से दबाएँ",
 };
