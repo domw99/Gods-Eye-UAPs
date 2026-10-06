@@ -193,7 +193,9 @@ export function createTimeline({ onPlayToggle }) {
     },
     draw,
     setPlaying(on) {
-      document.getElementById('tl-play').textContent = on ? '❚❚' : '▶';
+      const button = document.getElementById('tl-play');
+      button.textContent = on ? '❚❚' : '▶';
+      button.setAttribute('aria-pressed', String(Boolean(on))); // its label says "Play history" either way
     },
   };
 }
