@@ -75,4 +75,9 @@ describe('the airfields builder', () => {
     expect(list.find((a) => a[0].startsWith('Smith'))[6]).toBe(1);
     expect(list.some((a) => /Tiny|Hospital|Old/.test(a[0]))).toBe(false);
   });
+
+  it('refuses text that is not the airports file, so an error page cannot empty the data', () => {
+    expect(() => airfieldsFrom('')).toThrow(/no "type" column/);
+    expect(() => airfieldsFrom('<html><body>Not Found</body></html>')).toThrow(/no "type" column/);
+  });
 });

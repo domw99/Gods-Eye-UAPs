@@ -32,12 +32,20 @@ export function pack(text) {
     expected++;
     out.push(kp < 0 ? '.' : Math.round(kp * 3).toString(36));
   }
+  // An empty answer (an error page, an empty file) must not replace the series: the monthly workflow commits what this writes.
+  if (!out.length) throw new Error('No Kp lines in the file');
   return out.join('');
+}
+
+async function download() {
+  const res = await fetch(SOURCE);
+  if (!res.ok) throw new Error(`${res.status} ${SOURCE}`);
+  return res.text();
 }
 
 async function main() {
   const file = process.argv[2];
-  const text = file ? await readFile(file, 'utf8') : await (await fetch(SOURCE)).text();
+  const text = file ? await readFile(file, 'utf8') : await download();
   const values = pack(text);
   const json = { generated: new Date().toISOString().slice(0, 10), source: SOURCE, license: 'CC BY 4.0, GFZ Helmholtz Centre for Geosciences (Matzka et al. 2021)', start: START, step: 3, values };
   await writeFile(path.join(ROOT, 'public/data/kp.json'), `${JSON.stringify(json)}\n`);

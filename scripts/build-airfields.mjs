@@ -58,8 +58,11 @@ export function parseCsv(text) {
 
 /** The airfields worth keeping from the OurAirports CSV text. */
 export function airfieldsFrom(text) {
-  const [head, ...rows] = parseCsv(text);
+  const [head = [], ...rows] = parseCsv(text);
   const col = Object.fromEntries(head.map((name, i) => [name, i]));
+  // An error page or a changed file would otherwise read as "no airfields" and be written as such.
+  for (const name of ['type', 'name', 'latitude_deg', 'longitude_deg', 'icao_code', 'iso_country'])
+    if (!(name in col)) throw new Error(`The airports CSV has no "${name}" column`);
   const out = [];
   for (const r of rows) {
     const size = SIZE[r[col.type]];
@@ -76,10 +79,17 @@ export function airfieldsFrom(text) {
   return out.sort((a, b) => a[1] - b[1] || a[2] - b[2]);
 }
 
+async function download() {
+  const res = await fetch(SOURCE);
+  if (!res.ok) throw new Error(`${res.status} ${SOURCE}`);
+  return res.text();
+}
+
 async function main() {
   const file = process.argv[2];
-  const text = file ? await readFile(file, 'utf8') : await (await fetch(SOURCE)).text();
+  const text = file ? await readFile(file, 'utf8') : await download();
   const airfields = airfieldsFrom(text);
+  if (!airfields.length) throw new Error('No airfields in the file; public/data/airfields.json is unchanged');
   const json = { generated: new Date().toISOString().slice(0, 10), source: SOURCE, license: 'Public domain (OurAirports)', fields: ['name', 'lat', 'lon', 'size', 'code', 'country', 'military'], airfields };
   await writeFile(path.join(ROOT, 'public/data/airfields.json'), `${JSON.stringify(json)}\n`);
   console.log(`public/data/airfields.json: ${airfields.length} airfields`);
