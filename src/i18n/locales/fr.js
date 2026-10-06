@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "dans {span}",
   "{span} ago": "il y a {span}",
   "{n} day|{n} days": {"one": "{n} jour", "other": "{n} jours"},
+  "offline": "hors ligne",
+  "STARTING GLOBE…": "DÉMARRAGE DU GLOBE…",
+  "LOADING CASE FILES…": "CHARGEMENT DES DOSSIERS DE CAS…",
+  "ACQUIRING IMAGERY…": "RÉCUPÉRATION DES IMAGES…",
+  "■ STOP": "■ ARRÊTER",
+  "✓ THAT DAY FROM ORBIT": "✓ CE JOUR-LÀ VU DE L’ORBITE",
+  "MAKING CARD…": "CRÉATION DE LA CARTE…",
 };

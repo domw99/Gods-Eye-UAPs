@@ -123,10 +123,11 @@ export function renderList(items) {
   );
 }
 
-export function markSelected(key) {
+/** Mark the open record's row. `scroll` brings it into view: wanted when a record is opened, not when the list is only redrawn (a layer or filter changed) and the panel would jump away from the control just used. */
+export function markSelected(key, { scroll = true } = {}) {
   for (const li of document.querySelectorAll('#case-list .case-item'))
     li.setAttribute('aria-selected', li.dataset.key === key ? 'true' : 'false');
-  const el = key && document.querySelector(`#case-list [data-key="${CSS.escape(key)}"]`);
+  const el = scroll && key ? document.querySelector(`#case-list [data-key="${CSS.escape(key)}"]`) : null;
   el?.scrollIntoView({ block: 'nearest' });
 }
 

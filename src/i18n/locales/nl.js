@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "over {span}",
   "{span} ago": "{span} geleden",
   "{n} day|{n} days": {"one": "{n} dag", "other": "{n} dagen"},
+  "offline": "offline",
+  "STARTING GLOBE…": "WERELDBOL STARTEN…",
+  "LOADING CASE FILES…": "ZAAKDOSSIERS LADEN…",
+  "ACQUIRING IMAGERY…": "BEELDEN OPHALEN…",
+  "■ STOP": "■ STOP",
+  "✓ THAT DAY FROM ORBIT": "✓ DIE DAG VANUIT DE ORBIT",
+  "MAKING CARD…": "KAART MAKEN…",
 };

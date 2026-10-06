@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "em {span}",
   "{span} ago": "há {span}",
   "{n} day|{n} days": {"one": "{n} dia", "other": "{n} dias"},
+  "offline": "offline",
+  "STARTING GLOBE…": "INICIANDO O GLOBO…",
+  "LOADING CASE FILES…": "CARREGANDO OS CASOS…",
+  "ACQUIRING IMAGERY…": "OBTENDO IMAGENS…",
+  "■ STOP": "■ PARAR",
+  "✓ THAT DAY FROM ORBIT": "✓ AQUELE DIA DA ÓRBITA",
+  "MAKING CARD…": "CRIANDO O CARTÃO…",
 };

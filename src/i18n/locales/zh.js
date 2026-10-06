@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "{span}后",
   "{span} ago": "{span}前",
   "{n} day|{n} days": {"other": "{n} 天"},
+  "offline": "离线",
+  "STARTING GLOBE…": "正在启动地球…",
+  "LOADING CASE FILES…": "正在加载案件档案…",
+  "ACQUIRING IMAGERY…": "正在获取影像…",
+  "■ STOP": "■ 停止",
+  "✓ THAT DAY FROM ORBIT": "✓ 当天的轨道影像",
+  "MAKING CARD…": "正在生成卡片…",
 };

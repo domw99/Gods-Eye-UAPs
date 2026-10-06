@@ -26,6 +26,24 @@ export function decodeHashPart(part) {
   }
 }
 
+/**
+ * #/near/<lat>,<lon>[/<label>] as { lat, lon, label, text, ok }, or null for any other address. `ok` is false
+ * when the numbers are not a place on Earth: "1.2.3" fits the pattern but is NaN, and a camera sent to NaN
+ * leaves the globe blank for good.
+ */
+export function parseNearHash(hash) {
+  const m = /^#\/near\/(-?[\d.]+),(-?[\d.]+)(?:\/(.+))?$/.exec(hash);
+  if (!m) return null;
+  const [lat, lon] = [+m[1], +m[2]];
+  return {
+    lat,
+    lon,
+    text: `${m[1]},${m[2]}`,
+    label: m[3] ? decodeHashPart(m[3]) : `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
+    ok: Math.abs(lat) <= 90 && Math.abs(lon) <= 180,
+  };
+}
+
 /** The same address as an embed (?embed=1): the globe and the case file only, for an <iframe>. */
 export function embedUrl(href) {
   const u = new URL(href);

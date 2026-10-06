@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "dalam {span}",
   "{span} ago": "{span} yang lalu",
   "{n} day|{n} days": {"one": "{n} hari", "other": "{n} hari"},
+  "offline": "offline",
+  "STARTING GLOBE…": "MEMULAI GLOBE…",
+  "LOADING CASE FILES…": "MEMUAT BERKAS KASUS…",
+  "ACQUIRING IMAGERY…": "MENGAMBIL CITRA…",
+  "■ STOP": "■ BERHENTI",
+  "✓ THAT DAY FROM ORBIT": "✓ HARI ITU DARI ORBIT",
+  "MAKING CARD…": "MEMBUAT KARTU…",
 };

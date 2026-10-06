@@ -65,6 +65,17 @@ export function officialToItem(o) {
   };
 }
 
+/**
+ * Is this stored log entry one the app could have written? An entry with no date or id (an older or
+ * hand-edited log) would put NaN in the years bar and stop the app from starting, so it is left out.
+ */
+export function isLogEntry(u) {
+  return Boolean(
+    u && typeof u === 'object' && typeof u.id === 'string' && typeof u.date === 'string' && !Number.isNaN(Date.parse(u.date)) &&
+      Number.isFinite(u.lat) && Number.isFinite(u.lon) && Math.abs(u.lat) <= 90 && Math.abs(u.lon) <= 180,
+  );
+}
+
 export function userToItem(u) {
   const date = new Date(u.date);
   return {

@@ -6,7 +6,7 @@ import { createInstall, installSteps } from './app/install.js';
 import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale, upper } from './i18n/index.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
-import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
+import { CASE_ITEMS, loadOfficial, userToItem, isLogEntry } from './data/items.js';
 import { onThisDay } from './data/onthisday.js';
 import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
@@ -29,7 +29,7 @@ import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } f
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } from './ui/sharecard.js';
-import { shareLink, decodeHashPart, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
+import { shareLink, decodeHashPart, parseNearHash, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
 import { parseCoordinates, formatCoordinates } from './app/coords.js';
 import { toMgrs } from './util/mgrs.js';
 import { createZoomOut } from './app/zoom.js';
@@ -62,11 +62,11 @@ const GROUP_KEY = 'gods-eye-uap:group';
 /* ── Boot ──────────────────────────────────────────────── */
 await initLanguage(); // the saved language, else the browser's, before anything is drawn
 const loadingStep = (text, pct) => {
-  document.getElementById('loading-step').textContent = t(text);
+  document.getElementById('loading-step').textContent = text;
   document.getElementById('loading-fill').style.width = `${pct}%`;
   document.getElementById('loading').setAttribute('aria-valuenow', String(pct));
 };
-loadingStep('STARTING GLOBE…', 25);
+loadingStep(t('STARTING GLOBE…'), 25);
 // The catalogue downloads while the globe starts.
 const officialPromise = loadOfficial(BASE).catch((e) => e);
 const viewer = await createViewer(document.getElementById('globe'));
@@ -111,7 +111,7 @@ let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
 const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
-loadingStep('LOADING CASE FILES…', 45);
+loadingStep(t('LOADING CASE FILES…'), 45);
 try {
   const o = await officialPromise;
   if (o instanceof Error) throw o;
@@ -241,7 +241,7 @@ function refresh() {
   layerCounts.user = userItems.length;
   renderLayersNow();
   renderActiveFilters();
-  markSelected(state.selected);
+  markSelected(state.selected, { scroll: false });
   render.request();
 }
 
@@ -279,17 +279,19 @@ async function applyLayers() {
   airspaceLayer.show = L.airspace;
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
   // Each says so itself when it can't load; the others still load, and the counts still refresh.
+  // The layers may be switched again while a file loads, so each step reads what is on now, not what was on at the start.
   const quiet = () => {};
-  if (L.bluebook && !bluebook) await ensureBlueBook().catch(quiet);
-  if (L.mufon && !mufon) await ensureMufon().catch(quiet);
-  if (L.journals && !journals) await ensureJournals().catch(quiet);
-  if (L.geipan && !geipan) await ensureGeipan().catch(quiet);
-  if (L.nuforc && !nuforc) await ensureNuforc().catch(quiet);
-  timeline.setBlueBook(L.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
-  timeline.setMufon(L.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
-  timeline.setJournals(L.journals && journals ? countByYear(journals.records.map((r) => r.year)) : null);
-  timeline.setGeipan(L.geipan && geipan ? countByYear(geipan.records.map((r) => r.year)) : null);
-  timeline.setNuforc(L.nuforc && nuforc ? countByYear(Array.from(nuforc.date, (d) => Math.floor(d / 10000))) : null);
+  if (state.layers.bluebook && !bluebook) await ensureBlueBook().catch(quiet);
+  if (state.layers.mufon && !mufon) await ensureMufon().catch(quiet);
+  if (state.layers.journals && !journals) await ensureJournals().catch(quiet);
+  if (state.layers.geipan && !geipan) await ensureGeipan().catch(quiet);
+  if (state.layers.nuforc && !nuforc) await ensureNuforc().catch(quiet);
+  const now = state.layers;
+  timeline.setBlueBook(now.bluebook && bluebook ? countByYear(bluebook.records.map((r) => r.year)) : null);
+  timeline.setMufon(now.mufon && mufon ? countByYear(mufon.records.map((r) => r.year)) : null);
+  timeline.setJournals(now.journals && journals ? countByYear(journals.records.map((r) => r.year)) : null);
+  timeline.setGeipan(now.geipan && geipan ? countByYear(geipan.records.map((r) => r.year)) : null);
+  timeline.setNuforc(now.nuforc && nuforc ? countByYear(Array.from(nuforc.date, (d) => Math.floor(d / 10000))) : null);
   refresh();
 }
 
@@ -376,9 +378,11 @@ function ensureBlueBook() {
       jitter: (r, i, la, lo) => (r.prec === 3 ? [la, lo] : townJitter(r.id, la, lo, r.prec === 1 ? 25 : 2.5)),
     });
     layerCounts.bluebook = records.filter((r) => r.lat != null).length.toLocaleString();
+    renderLayersNow(); // a case file loads this too, with no refresh after it to replace "loading…"
     return bluebook;
   })().catch((e) => {
     bluebookPromise = null;
+    renderLayersNow({ bluebook: 'offline' }); // not "loading…" for good
     toast('Could not load Blue Book layer');
     throw e;
   });
@@ -397,9 +401,11 @@ function ensureMufon() {
       jitter: (r, i, la, lo) => townJitter(`m${i}`, la, lo, 2.5),
     });
     layerCounts.mufon = mufon.records.length.toLocaleString();
+    renderLayersNow();
     return mufon;
   })().catch((e) => {
     mufonPromise = null;
+    renderLayersNow({ mufon: 'offline' }); // not "loading…" for good
     toast('Could not load the MUFON files');
     throw e;
   });
@@ -420,9 +426,11 @@ function ensureGeipan() {
       jitter: (r, i, la, lo) => townJitter(`g${r.id}`, la, lo, r.prec === 1 ? 20 : 2),
     });
     layerCounts.geipan = geipan.records.filter((r) => r.lat != null).length.toLocaleString();
+    renderLayersNow();
     return geipan;
   })().catch((e) => {
     geipanPromise = null;
+    renderLayersNow({ geipan: 'offline' }); // not "loading…" for good
     toast('Could not load the GEIPAN files');
     throw e;
   });
@@ -478,9 +486,11 @@ function ensureJournals() {
       jitter: (r, i, la, lo) => townJitter(`j${i}`, la, lo, 2.5),
     });
     layerCounts.journals = journals.records.length.toLocaleString();
+    renderLayersNow();
     return journals;
   })().catch((e) => {
     journalsPromise = null;
+    renderLayersNow({ journals: 'offline' }); // not "loading…" for good
     toast('Could not load the research archives');
     throw e;
   });
@@ -505,9 +515,12 @@ function ensureNuforc() {
       year: (_, i) => Math.floor(nuforc.date[i] / 10000),
       jitter: (_, i, la, lo) => townJitter(String(i), la, lo, 4),
     });
+    layerCounts.nuforc = nuforc.lat.length.toLocaleString();
+    renderLayersNow();
     return nuforc;
   })().catch((e) => {
     nuforcPromise = null;
+    renderLayersNow({ nuforc: 'offline' }); // not "loading…" for good
     toast('Could not load civilian reports');
     throw e;
   });
@@ -782,11 +795,12 @@ async function selectBlueBook(id) {
   story.stop(true);
   const token = ++selectToken;
   hideHover();
-  const bb = await ensureBlueBook();
-  if (token !== selectToken) return;
+  const bb = await ensureBlueBook().catch(() => null); // it has already said it could not load
+  if (!bb || token !== selectToken) return;
   const rec = bb.byId.get(id);
   if (!rec) return toast('Blue Book file not found');
   if (!state.layers.bluebook) setLayer('bluebook', true);
+  setOrbitDay(null);
   state.selected = null;
   markSelected(null);
   itemLayer.setSelected(null);
@@ -810,11 +824,12 @@ async function selectGeipan(id) {
   story.stop(true);
   const token = ++selectToken;
   hideHover();
-  const g = await ensureGeipan();
-  if (token !== selectToken) return;
+  const g = await ensureGeipan().catch(() => null);
+  if (!g || token !== selectToken) return;
   const rec = g.byId.get(id);
   if (!rec) return toast('GEIPAN file not found');
   if (!state.layers.geipan) setLayer('geipan', true);
+  setOrbitDay(null);
   state.selected = null;
   markSelected(null);
   itemLayer.setSelected(null);
@@ -843,14 +858,15 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
   story.stop(true);
   const token = ++selectToken;
   hideHover();
-  const m = await (layer === 'mufon' ? ensureMufon() : ensureJournals());
-  if (token !== selectToken) return;
+  const m = await (layer === 'mufon' ? ensureMufon() : ensureJournals()).catch(() => null);
+  if (!m || token !== selectToken) return;
   const is = m.byIssueId.get(issueId);
   if (!is || !(leaf >= 0 && leaf < is.pages)) return toast('That journal page was not found');
   const inIssue = m.records.filter((r) => r.issue === is.index).sort((a, b) => a.leaf - b.leaf);
   const onPage = inIssue.filter((r) => r.leaf === leaf);
   const record = recordIndex != null && m.records[recordIndex]?.issue === is.index ? m.records[recordIndex] : onPage[0] || null;
   if (record && !state.layers[layer]) setLayer(layer, true);
+  setOrbitDay(null);
   state.selected = null;
   markSelected(null);
   itemLayer.setSelected(null);
@@ -910,9 +926,13 @@ function updateBackButton() {
 }
 
 function routeFromHash() {
-  const near = location.hash.match(/^#\/near\/(-?[\d.]+),(-?[\d.]+)(?:\/(.+))?$/);
+  const near = parseNearHash(location.hash);
   if (near) {
-    showNearby(+near[1], +near[2], near[3] ? decodeHashPart(near[3]) : `${(+near[1]).toFixed(2)}, ${(+near[2]).toFixed(2)}`);
+    if (!near.ok) {
+      toast(t('Nothing found for “{id}”', { id: near.text }));
+      return false;
+    }
+    showNearby(near.lat, near.lon, near.label);
     return true;
   }
   const mj = location.hash.match(/^#\/(mufon|journal)\/([^/]+)\/(\d+)$/);
@@ -1296,6 +1316,7 @@ function updatePlaybackUi() {
   const cur = trackLayer.current;
   if (!cur) return;
   pb.play.textContent = trackLayer.playing ? '❚❚' : '▶';
+  pb.play.setAttribute('aria-pressed', String(Boolean(trackLayer.playing))); // the label says "Play" either way; this says which it is now
   pb.scrub.value = String(Math.round(trackLayer.progress() * 1000));
   const t = Cesium.JulianDate.toDate(viewer.clock.currentTime);
   pb.time.textContent = `${t.toISOString().slice(0, 16).replace('T', ' ')}Z`;
@@ -1348,7 +1369,7 @@ bindDossierActions({
     setOrbitDay(on ? btn.dataset.day : null);
     btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('on', on);
-    btn.textContent = on ? '✓ THAT DAY FROM ORBIT' : '🛰 THAT DAY FROM ORBIT';
+    btn.textContent = on ? t('✓ THAT DAY FROM ORBIT') : t('🛰 THAT DAY FROM ORBIT');
     // Rise high enough to see the weather systems around the site.
     const item = itemByKey(state.selected);
     if (on && item && viewer.camera.positionCartographic.height < 900e3)
@@ -1376,9 +1397,12 @@ bindDossierActions({
   skycheck: () => {
     const item = itemByKey(state.selected) || nearPoint;
     if (!item) return;
+    const token = selectToken; // the answer is for this record: another one opened meanwhile has its own sky check
     if (!state.layers.satellites) setLayer('satellites', true);
     renderSkyCheck('loading');
-    satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null));
+    satLayer.ensureLoaded().then(() => {
+      if (token === selectToken) renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null);
+    });
   },
   'export-user': exportUserLog,
   compare: () => {
@@ -1401,7 +1425,7 @@ bindDossierActions({
     if (!item || btn.disabled) return;
     const label = btn.textContent;
     btn.disabled = true;
-    btn.textContent = 'MAKING CARD…';
+    btn.textContent = t('MAKING CARD…');
     try {
       const url = shareLink(`${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`);
       const blob = await cardBlob(await makeCard(item, url));
@@ -1462,7 +1486,7 @@ new ResizeObserver(([entry]) => {
 /* ── User sighting log ─────────────────────────────────── */
 function loadUserLog() {
   try {
-    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]').filter((u) => u && Number.isFinite(u.lat) && Number.isFinite(u.lon));
+    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]').filter(isLogEntry);
   } catch {
     return [];
   }
@@ -1613,33 +1637,43 @@ document.querySelector('.modes').addEventListener('click', (e) => {
 
 /* ── History sweep (timeline ▶) ────────────────────────── */
 let sweepTimer = null;
-function toggleHistorySweep() {
-  if (document.body.classList.contains('tl-hidden')) setTimelineHidden(false); // the sweep shows on the bar
-  if (sweepTimer) {
-    clearInterval(sweepTimer);
-    sweepTimer = null;
-    timeline.setPlaying(false);
-    return;
+let sweeping = false; // true while the sweep itself is moving the range
+function stopHistorySweep() {
+  if (!sweepTimer) return;
+  clearInterval(sweepTimer);
+  sweepTimer = null;
+  timeline.setPlaying(false);
+}
+function sweepTo(yearRange) {
+  sweeping = true;
+  try {
+    update({ yearRange }, 'yearRange');
+  } finally {
+    sweeping = false;
   }
+}
+// Anything else that sets the years (a chip's ✕, RESET ALL) takes over from the sweep, or it would put its range back.
+subscribe((s, reason) => {
+  if (!sweeping && (reason === 'yearRange' || reason === 'reset')) stopHistorySweep();
+});
+function toggleHistorySweep() {
+  if (sweepTimer) return stopHistorySweep();
+  if (document.body.classList.contains('tl-hidden')) setTimelineHidden(false); // the sweep shows on the bar
   let y = 1940;
   timeline.setPlaying(true);
   sweepTimer = setInterval(() => {
     if (y > YEAR_MAX) {
-      clearInterval(sweepTimer);
-      sweepTimer = null;
-      timeline.setPlaying(false);
-      update({ yearRange: null }, 'yearRange');
+      stopHistorySweep();
+      sweepTo(null);
       return;
     }
-    update({ yearRange: [Math.max(YEAR_MIN, y), Math.min(YEAR_MAX, y + 4)] }, 'yearRange');
+    sweepTo([Math.max(YEAR_MIN, y), Math.min(YEAR_MAX, y + 4)]);
     y += 1;
   }, 450);
 }
 
 // Brushing the histogram by hand takes over from the automatic sweep.
-document.getElementById('tl-canvas').addEventListener('pointerdown', () => {
-  if (sweepTimer) toggleHistorySweep();
-});
+document.getElementById('tl-canvas').addEventListener('pointerdown', stopHistorySweep);
 
 /* ── Guided tour ───────────────────────────────────────── */
 const TOUR = [
@@ -1671,7 +1705,7 @@ function startTour() {
   if (tourTimer) return stopTour();
   tourIndex = 0;
   tourTimer = true;
-  document.getElementById('btn-tour').textContent = '■ STOP';
+  document.getElementById('btn-tour').textContent = t('■ STOP');
   tourStep();
 }
 function stopTour() {
@@ -1679,7 +1713,7 @@ function stopTour() {
   clearTimeout(tourTimer);
   clearTimeout(tourPlayTimer);
   tourTimer = null;
-  document.getElementById('btn-tour').textContent = '▶ TOUR';
+  document.getElementById('btn-tour').textContent = t('▶ TOUR');
 }
 
 /* ── Map view: zoom about the screen centre, reset ─────── */
@@ -1935,7 +1969,7 @@ function openMoonNow(focus) {
   hideHover();
   stopTour();
   if (flycam.orbiting) setOrbit(false);
-  if (sweepTimer) toggleHistorySweep(); // the sweep through the years is the Earth's
+  stopHistorySweep(); // the sweep through the years is the Earth's
   deselect({ keepHash: true });
   viewer.useDefaultRenderLoop = false;
   if (!MOON_ROUTE.test(location.hash)) {
@@ -2070,6 +2104,9 @@ function neighbour(delta) {
 }
 
 const MODES = ['normal', 'nvg', 'flir', 'ironbow', 'crt', 'noir', 'snow'];
+// An embed hides the years bar and the clean view's way out (see the CSS), so their keys would change the page
+// with nothing on screen to say so or to undo it.
+const hiddenInEmbed = (e) => EMBED && ['y', 'f'].includes(e.key.toLowerCase());
 /** Keys on the Moon: it has its own for turning, zooming and its list (ui/moonview.js); these are the ones the two worlds share. */
 function moonKey(e, typing) {
   const dialog = document.getElementById('modal-root').children.length;
@@ -2078,7 +2115,7 @@ function moonKey(e, typing) {
     if (document.body.classList.contains('clean')) return setCleanView(false);
     return showWorld('earth');
   }
-  if (typing || dialog || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (typing || dialog || e.metaKey || e.ctrlKey || e.altKey || hiddenInEmbed(e)) return;
   const k = e.key.toLowerCase();
   if (/^[1-7]$/.test(e.key)) setMode(MODES[Number(e.key) - 1]);
   else if (k === 'u') showWorld('earth');
@@ -2105,6 +2142,12 @@ window.addEventListener('keydown', (e) => {
   if (isMoonOpen()) return moonKey(e, typing);
   if (e.key === 'Escape') {
     if (document.getElementById('modal-root').children.length) return backModal();
+    // In the search box Esc clears the words first (as on the Moon), and does not close the case file beside it.
+    const box = document.getElementById('search');
+    if (e.target === box && box.value) {
+      box.value = '';
+      return update({ search: '' }, 'search');
+    }
     if (story.active) return story.stop();
     if (trackLayer.witnessOn) return toggleWitnessView(false);
     if (tourTimer) return stopTour();
@@ -2115,6 +2158,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
   if (document.getElementById('modal-root').children.length) return; // a dialog is open
+  if (hiddenInEmbed(e)) return;
   // Arrow keys fly the camera unless a list or control has the focus.
   const onGlobe = e.target === document.body || e.target.closest?.('#globe');
   if (onGlobe && flycam.key(e, true)) {
@@ -2132,7 +2176,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key === ' ') {
     e.preventDefault();
     if (trackLayer.current) pb.play.click();
-    else toggleHistorySweep();
+    else if (!EMBED) toggleHistorySweep(); // the years bar it plays on is hidden in an embed
   } else if (e.key.toLowerCase() === 't') startTour();
   else if (e.key.toLowerCase() === 'g') openFiles();
   else if (e.key.toLowerCase() === 'l') openLog();
@@ -2215,7 +2259,8 @@ placeList.addEventListener('click', (e) => {
 let placeTimer = null;
 let placeAbort = null;
 subscribe((s, reason) => {
-  if (reason !== 'search') return;
+  // 'reset' clears the search too: a lookup still waiting or in flight must not answer for the old words.
+  if (reason !== 'search' && reason !== 'reset') return;
   clearTimeout(placeTimer);
   placeAbort?.abort();
   const q = s.search;
@@ -2355,10 +2400,10 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     }, 250);
     removeProgress();
   };
-  loadingStep('ACQUIRING IMAGERY…', 60);
+  loadingStep(t('ACQUIRING IMAGERY…'), 60);
   const removeProgress = viewer.scene.globe.tileLoadProgressEvent.addEventListener((pending) => {
     peak = Math.max(peak, pending);
-    if (peak) loadingStep('ACQUIRING IMAGERY…', Math.round(60 + 40 * (1 - pending / peak)));
+    if (peak) loadingStep(t('ACQUIRING IMAGERY…'), Math.round(60 + 40 * (1 - pending / peak)));
     if (peak && pending === 0) finish();
   });
   setTimeout(finish, 6000); // never hold the page for slow tiles

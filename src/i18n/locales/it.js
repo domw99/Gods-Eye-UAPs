@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "tra {span}",
   "{span} ago": "{span} fa",
   "{n} day|{n} days": {"one": "{n} giorno", "other": "{n} giorni"},
+  "offline": "offline",
+  "STARTING GLOBE…": "AVVIO DEL GLOBO…",
+  "LOADING CASE FILES…": "CARICAMENTO DEI FASCICOLI…",
+  "ACQUIRING IMAGERY…": "ACQUISIZIONE DELLE IMMAGINI…",
+  "■ STOP": "■ FERMA",
+  "✓ THAT DAY FROM ORBIT": "✓ QUEL GIORNO DALL’ORBITA",
+  "MAKING CARD…": "CREAZIONE DELLA CARD…",
 };

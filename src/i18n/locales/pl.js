@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "za {span}",
   "{span} ago": "{span} temu",
   "{n} day|{n} days": {"one": "{n} dzień", "few": "{n} dni", "many": "{n} dni", "other": "{n} dnia"},
+  "offline": "offline",
+  "STARTING GLOBE…": "URUCHAMIANIE GLOBUSA…",
+  "LOADING CASE FILES…": "ŁADOWANIE AKT SPRAW…",
+  "ACQUIRING IMAGERY…": "POBIERANIE OBRAZÓW…",
+  "■ STOP": "■ ZATRZYMAJ",
+  "✓ THAT DAY FROM ORBIT": "✓ TEN DZIEŃ Z ORBITY",
+  "MAKING CARD…": "TWORZENIE KARTY…",
 };

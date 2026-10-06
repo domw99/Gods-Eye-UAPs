@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "через {span}",
   "{span} ago": "{span} назад",
   "{n} day|{n} days": {"one": "{n} день", "few": "{n} дня", "many": "{n} дней", "other": "{n} дня"},
+  "offline": "офлайн",
+  "STARTING GLOBE…": "ЗАПУСК ГЛОБУСА…",
+  "LOADING CASE FILES…": "ЗАГРУЗКА ДЕЛ…",
+  "ACQUIRING IMAGERY…": "ПОЛУЧЕНИЕ СНИМКОВ…",
+  "■ STOP": "■ СТОП",
+  "✓ THAT DAY FROM ORBIT": "✓ ТОТ ДЕНЬ С ОРБИТЫ",
+  "MAKING CARD…": "СОЗДАНИЕ КАРТОЧКИ…",
 };

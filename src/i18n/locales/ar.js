@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "بعد {span}",
   "{span} ago": "منذ {span}",
   "{n} day|{n} days": {"zero": "{n} يوم", "one": "{n} يوم", "two": "{n} يومان", "few": "{n} أيام", "many": "{n} يومًا", "other": "{n} يوم"},
+  "offline": "غير متصل",
+  "STARTING GLOBE…": "جارٍ تشغيل الكرة الأرضية…",
+  "LOADING CASE FILES…": "جارٍ تحميل ملفات الحالات…",
+  "ACQUIRING IMAGERY…": "جارٍ استلام الصور…",
+  "■ STOP": "■ إيقاف",
+  "✓ THAT DAY FROM ORBIT": "✓ ذلك اليوم من المدار",
+  "MAKING CARD…": "جارٍ إنشاء البطاقة…",
 };

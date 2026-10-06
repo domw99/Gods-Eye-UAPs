@@ -170,7 +170,7 @@
 
   <!-- ── Timeline ────────────────────────────────────────── -->
   <footer id="timeline" class="glass" aria-label="Timeline">
-    <button id="tl-play" class="icon-btn" title="Sweep through history (Space)" aria-label="Play history">▶</button>
+    <button id="tl-play" class="icon-btn" title="Sweep through history (Space)" aria-label="Play history" aria-pressed="false">▶</button>
     <div class="tl-main">
       <div class="tl-labels mono"><span id="tl-range">ALL YEARS</span><span id="tl-hint" class="muted">drag on the histogram to filter by year · double-click to reset</span><button id="tl-hide" class="link-btn" type="button" title="Hide the years bar (Y)" aria-label="Hide the years bar">HIDE ⌄</button></div>
       <canvas id="tl-canvas" height="54" role="img" aria-label="Records by year. Drag across it to choose a range of years; double-click to clear."></canvas>
@@ -192,7 +192,7 @@
     </div>
   </div>
   <div id="playback" class="glass hidden" role="region" aria-label="Flight path playback">
-    <button id="pb-play" class="icon-btn" aria-label="Play">▶</button>
+    <button id="pb-play" class="icon-btn" aria-label="Play" aria-pressed="false">▶</button>
     <button id="pb-restart" class="icon-btn" aria-label="Restart" title="Restart">⟲</button>
     <input id="pb-scrub" type="range" min="0" max="1000" value="0" aria-label="Playback position" />
     <span id="pb-time" class="mono"></span>

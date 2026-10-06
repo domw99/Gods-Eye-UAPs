@@ -25,11 +25,20 @@ export const DEFAULT_LAYERS = {
 
 // Cases the viewer starred, kept in this browser.
 const STAR_KEY = 'gods-eye-uap:starred';
-function loadStars() {
+/** The saved stars as a Set of keys; a value that is not a list of keys (a damaged or hand-edited one) is no stars. */
+export function parseStars(raw) {
   try {
-    return new Set(JSON.parse(localStorage.getItem(STAR_KEY) || '[]'));
+    const list = JSON.parse(raw || '[]');
+    return new Set(Array.isArray(list) ? list.filter((key) => typeof key === 'string') : []);
   } catch {
     return new Set();
+  }
+}
+function loadStars() {
+  try {
+    return parseStars(localStorage.getItem(STAR_KEY));
+  } catch {
+    return new Set(); // storage itself is blocked
   }
 }
 

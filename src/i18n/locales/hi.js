@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "{span} में",
   "{span} ago": "{span} पहले",
   "{n} day|{n} days": {"one": "{n} दिन", "other": "{n} दिन"},
+  "offline": "ऑफ़लाइन",
+  "STARTING GLOBE…": "ग्लोब शुरू हो रहा है…",
+  "LOADING CASE FILES…": "केस फ़ाइलें लोड हो रही हैं…",
+  "ACQUIRING IMAGERY…": "इमेजरी प्राप्त हो रही है…",
+  "■ STOP": "■ रोकें",
+  "✓ THAT DAY FROM ORBIT": "✓ उस दिन की कक्षा से तस्वीर",
+  "MAKING CARD…": "कार्ड बनाया जा रहा है…",
 };

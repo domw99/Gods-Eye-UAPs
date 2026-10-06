@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "{span} sonra",
   "{span} ago": "{span} önce",
   "{n} day|{n} days": {"one": "{n} gün", "other": "{n} gün"},
+  "offline": "çevrimdışı",
+  "STARTING GLOBE…": "KÜRE BAŞLATILIYOR…",
+  "LOADING CASE FILES…": "VAKA DOSYALARI YÜKLENİYOR…",
+  "ACQUIRING IMAGERY…": "GÖRÜNTÜLER ALINIYOR…",
+  "■ STOP": "■ DURDUR",
+  "✓ THAT DAY FROM ORBIT": "✓ O GÜN YÖRÜNGEDEN",
+  "MAKING CARD…": "KART OLUŞTURULUYOR…",
 };

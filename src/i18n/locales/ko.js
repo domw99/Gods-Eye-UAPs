@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "{span} 후",
   "{span} ago": "{span} 전",
   "{n} day|{n} days": {"other": "{n}일"},
+  "offline": "오프라인",
+  "STARTING GLOBE…": "지구본 시작 중…",
+  "LOADING CASE FILES…": "사건 파일 로딩 중…",
+  "ACQUIRING IMAGERY…": "영상 가져오는 중…",
+  "■ STOP": "■ 정지",
+  "✓ THAT DAY FROM ORBIT": "✓ 그날의 궤도 영상",
+  "MAKING CARD…": "카드 만드는 중…",
 };

@@ -1116,4 +1116,11 @@ export default {
   "in {span}": "{span}後",
   "{span} ago": "{span}前",
   "{n} day|{n} days": {"other": "{n}日"},
+  "offline": "オフライン",
+  "STARTING GLOBE…": "地球儀を起動中…",
+  "LOADING CASE FILES…": "事案ファイルを読み込み中…",
+  "ACQUIRING IMAGERY…": "衛星画像を取得中…",
+  "■ STOP": "■ 停止",
+  "✓ THAT DAY FROM ORBIT": "✓ その日を軌道から",
+  "MAKING CARD…": "カードを作成中…",
 };
