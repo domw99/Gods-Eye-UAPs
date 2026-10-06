@@ -43,3 +43,12 @@ test('with a flight path playing, the readout and the credit stay clear of the p
   // The controls slide clear of the dossier; wait for that to finish before measuring.
   await expect.poll(() => page.evaluate(OVERLAPS), { timeout: 15_000 }).toEqual([]);
 });
+
+test('a long search stays inside the box of active filters', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#search').fill('kenneth arnold flying saucers mount rainier washington state');
+  const chip = page.locator('#active-filters .chip', { hasText: 'kenneth arnold' });
+  await expect(chip).toBeVisible();
+  const [chipBox, box] = await Promise.all([chip.boundingBox(), page.locator('#active-filters').boundingBox()]);
+  expect(chipBox.x + chipBox.width).toBeLessThanOrEqual(box.x + box.width + 1);
+});

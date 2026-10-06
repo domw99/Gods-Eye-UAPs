@@ -401,6 +401,9 @@ export function createTrackLayer(viewer) {
       const dir = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(to, eye, new Cesium.Cartesian3()), new Cesium.Cartesian3());
       Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(dir, upAtEye, scratchRight), scratchRight);
       const up = Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(scratchRight, dir, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+      // Witness and object in the same spot (a path that ends where the other begins), or the object straight
+      // overhead, leave no direction to look: keep the last view rather than send the camera to NaN.
+      if (![eye, dir, up].every((v) => Number.isFinite(v.x + v.y + v.z))) return;
       viewer.camera.setView({ destination: eye, orientation: { direction: dir, up } });
     };
     const remove = viewer.scene.preRender.addEventListener(update);

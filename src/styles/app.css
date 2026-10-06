@@ -753,6 +753,7 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .active-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 8px; border: 1px solid rgba(0, 212, 255, 0.25); border-radius: 10px; background: rgba(0, 212, 255, 0.05); }
 .active-filters .af-label { font: 10px var(--font-mono); letter-spacing: 0.14em; color: var(--text-dim); margin-right: 2px; }
 .active-filters .af-reset { margin-left: auto; }
+.active-filters .chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; } /* a long search stays inside the box */
 .layers-label { display: flex; justify-content: space-between; align-items: center; }
 .link-btn { background: none; border: 0; padding: 0; font: 10px var(--font-mono); letter-spacing: 0.14em; color: var(--accent); cursor: pointer; }
 @media (hover: hover) { .link-btn:hover { text-decoration: underline; } }
