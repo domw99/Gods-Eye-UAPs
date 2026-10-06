@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as Cesium from 'cesium';
 import { createTrackLayer } from '../src/layers/tracks.js';
 import { createBuildingLayer } from '../src/layers/buildings.js';
+import { createItemLayer } from '../src/layers/items.js';
 import { createPhotoreal } from '../src/app/viewer.js';
 import { createBasemap } from '../src/app/basemap.js';
 import { createEffects } from '../src/app/effects.js';
@@ -67,6 +68,28 @@ describe('flight path playback', () => {
     layer.play(); // from the end: starts again from the beginning
     expect(layer.playing).toBe(true);
     expect(layer.progress()).toBeCloseTo(0, 6);
+  });
+
+  it('puts every moving contact of every case at a real place at every moment of the playback', () => {
+    // A NaN position would stop Cesium drawing altogether, so check the lot.
+    const viewer = fakeViewer();
+    const layer = createTrackLayer(viewer);
+    let checked = 0;
+    for (const c of CASES.filter((c) => c.tracks?.length)) {
+      const cur = layer.load(c);
+      expect(cur, c.id).toBeTruthy();
+      expect(cur.duration, c.id).toBeGreaterThan(0);
+      for (const f of [0, 0.01, 0.25, 0.5, 0.75, 0.99, 1]) {
+        layer.seek(f);
+        for (const m of cur.movers) {
+          const at = Cesium.JulianDate.lessThan(viewer.clock.currentTime, m.first) ? m.first : Cesium.JulianDate.greaterThan(viewer.clock.currentTime, m.last) ? m.last : viewer.clock.currentTime;
+          const p = m.sampled.getValue(at);
+          expect(p && Number.isFinite(p.x + p.y + p.z), `${c.id} ${m.track.label} at ${f}`).toBe(true);
+          checked++;
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(300);
   });
 
   it('keeps running when it has not reached the end', () => {
@@ -257,5 +280,36 @@ describe('sensor looks', () => {
     expect(effects.set('nvg')).toBe('nvg');
     expect(stages.filter((s) => s.enabled)).toHaveLength(1);
     vi.unstubAllGlobals();
+  });
+});
+
+describe('case markers', () => {
+  beforeEach(() => {
+    const ctx = new Proxy({}, { get: (t, k) => (k === 'createRadialGradient' || k === 'createLinearGradient' ? () => ({ addColorStop() {} }) : t[k] ?? (() => {})), set: () => true });
+    vi.stubGlobal('document', { createElement: () => ({ getContext: () => ctx, toDataURL: () => 'data:image/png;base64,AA==' }) });
+    vi.stubGlobal('window', { addEventListener() {} });
+    vi.spyOn(Cesium.SceneTransforms, 'worldToWindowCoordinates').mockReturnValue(new Cesium.Cartesian2(10, 10));
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+  const item = (key, lat = 10) => ({ key, kind: 'case', title: key, lat, lon: 20, status: 'unresolved', evidence: [], hasTrack: false });
+
+  it('survives a repeated key without leaving the markers frozen', () => {
+    const viewer = fakeViewer();
+    viewer.camera.frustum = { fovy: 1 };
+    viewer.scene.camera = viewer.camera;
+    viewer.canvas = { clientHeight: 600 };
+    const layer = createItemLayer(viewer);
+    expect(() => layer.setItems([item('case:a'), item('case:b'), item('case:a', 30)])).not.toThrow();
+    expect([...layer.entities.keys()]).toEqual(['case:a', 'case:b']);
+    expect(layer.positionOf('case:a').lat).toBe(10); // the first one stays
+    // The collection takes changes again (its events were not left suspended).
+    let changes = 0;
+    layer.source.entities.collectionChanged.addEventListener(() => changes++);
+    layer.setItems([item('case:c')]);
+    expect(changes).toBeGreaterThan(0);
+    expect([...layer.entities.keys()]).toEqual(['case:c']);
   });
 });

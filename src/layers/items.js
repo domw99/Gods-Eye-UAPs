@@ -260,7 +260,7 @@ export function createItemLayer(viewer) {
   });
 
   function add(item, index = 0) {
-    if (item.lat == null || item.lon == null) return;
+    if (item.lat == null || item.lon == null || entities.has(item.key)) return; // a repeated key (a hand-edited log) is skipped: Cesium would throw
     let { lat, lon } = item;
     // Spread co-located region-level releases so each pin stays clickable.
     if (item.kind === 'official' && item.precision === 'region') {
@@ -307,19 +307,22 @@ export function createItemLayer(viewer) {
 
   function setItems(items) {
     source.entities.suspendEvents();
-    source.entities.removeAll();
-    entities.clear();
-    const regionCounters = new Map();
-    for (const item of items) {
-      let index = 0;
-      if (item.kind === 'official' && item.precision === 'region') {
-        const k = `${item.lat},${item.lon}`;
-        index = regionCounters.get(k) || 0;
-        regionCounters.set(k, index + 1);
+    try {
+      source.entities.removeAll();
+      entities.clear();
+      const regionCounters = new Map();
+      for (const item of items) {
+        let index = 0;
+        if (item.kind === 'official' && item.precision === 'region') {
+          const k = `${item.lat},${item.lon}`;
+          index = regionCounters.get(k) || 0;
+          regionCounters.set(k, index + 1);
+        }
+        add(item, index);
       }
-      add(item, index);
+    } finally {
+      source.entities.resumeEvents(); // left suspended, no marker would ever reach the globe again
     }
-    source.entities.resumeEvents();
     version++;
     recluster();
   }
