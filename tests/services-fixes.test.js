@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 
 // Regression tests for the live-data services: each case here once gave a wrong answer.
 const store = new Map();
@@ -19,6 +20,7 @@ afterEach(() => vi.unstubAllGlobals());
 const { weatherAt } = await import('../src/services/weather.js');
 const { slimLaunch } = await import('../src/services/launches.js');
 const { fetchWithTimeout, isTimeout } = await import('../src/util/net.js');
+const { toArea, nearUS } = await import('../src/services/airspace.js');
 const { searchJournals } = await import('../src/services/textsearch.js');
 const { fold, decodeGeipan } = await import('../src/services/geipan.js');
 
@@ -117,5 +119,13 @@ describe('GEIPAN search folding', () => {
     expect(fold('Évry')).toBe('evry');
     const [r] = decodeGeipan({ records: [['id1', 49, 2, 0, 'Sallebœuf', '', '33', 1999, 1, 1, null, null, 'D', 1, 'short', 'summary']] }).records;
     expect(r.search).toContain(fold('salleboeuf'));
+  });
+});
+
+describe('airspace pre-check', () => {
+  it('covers every area in the bundled data (the Arctic warning areas reach 82°N)', () => {
+    const areas = JSON.parse(readFileSync('public/data/airspace.json', 'utf8')).features.map(toArea);
+    const outside = areas.filter((a) => !nearUS((a.bbox[1] + a.bbox[3]) / 2, (a.bbox[0] + a.bbox[2]) / 2));
+    expect(outside.map((a) => a.name)).toEqual([]);
   });
 });

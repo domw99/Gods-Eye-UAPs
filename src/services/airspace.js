@@ -70,4 +70,4 @@ export function loadAirspace(base = '/') {
 export const formatFt = (ft) => (ft >= 99999 ? 'unlimited' : ft === 0 ? 'surface' : ft >= 18000 ? `FL${Math.round(ft / 100)}` : `${ft.toLocaleString()} ft`);
 
 /** Is this point anywhere near the dataset (U.S. and territories)? Cheap pre-check. */
-export const nearUS = (lat, lon) => (lon > -180 && lon < -60 && lat > 12 && lat < 72) || (lon > 140 && lon < 180 && lat > 10 && lat < 30);
+export const nearUS = (lat, lon) => (lon > -180 && lon < -60 && lat > 12 && lat < 83) || (lon > 140 && lon < 180 && lat > 10 && lat < 30); // up to 83°N: the warning areas off the Arctic coast reach 82°N
