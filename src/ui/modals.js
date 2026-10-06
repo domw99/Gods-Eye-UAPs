@@ -348,7 +348,7 @@ export function openLogForm({ lat, lon, onSave, prefill = {} }) {
  * post on X, Reddit, Bluesky and the rest, the link to copy, and the image to
  * save. Used where the browser can't hand the card to the phone's own share sheet.
  */
-export function openShare({ title, url, text, image, onSaveImage }) {
+export function openShare({ title, url, text, image, onSaveImage, embed }) {
   const backdrop = modal(
     'SHARE',
     html`<h2>${title}</h2>
@@ -356,7 +356,9 @@ export function openShare({ title, url, text, image, onSaveImage }) {
       <div class="section-label">${t('POST IT')}</div>
       ${shareRow({ url, text, title })}
       <div class="section-label">${t('OR COPY THE LINK')}</div>
-      <div class="share-link"><input type="text" readonly value="${url}" aria-label="${t('The link')}" /><button type="button" class="chip" data-share="copy">⧉ COPY LINK</button>${image ? html`<button type="button" class="chip" data-share="save">⤓ SAVE IMAGE</button>` : ''}</div>`,
+      <div class="share-link"><input type="text" readonly value="${url}" aria-label="${t('The link')}" /><button type="button" class="chip" data-share="copy">⧉ COPY LINK</button>${image ? html`<button type="button" class="chip" data-share="save">⤓ SAVE IMAGE</button>` : ''}</div>
+      ${embed ? html`<div class="section-label">${t('EMBED IT ON YOUR SITE')}</div>
+      <div class="share-embed"><textarea readonly rows="3" aria-label="${t('The embed code')}">${embed}</textarea><button type="button" class="chip" data-share="copy-embed">⧉ COPY CODE</button></div>` : ''}`,
     { wide: false },
   );
   const input = backdrop.querySelector('.share-link input');
@@ -365,11 +367,13 @@ export function openShare({ title, url, text, image, onSaveImage }) {
     const b = e.target.closest('[data-share]');
     if (!b) return;
     if (b.dataset.share === 'save') return onSaveImage?.();
-    // Clipboard access needs a secure context; otherwise select the link for copying by hand.
-    input.select();
+    // Clipboard access needs a secure context; otherwise select the text for copying by hand.
+    const code = b.dataset.share === 'copy-embed';
+    const field = code ? backdrop.querySelector('.share-embed textarea') : input;
+    field.select();
     if (!navigator.clipboard?.writeText) return toast(t('Press Ctrl+C (⌘C) to copy the link'), 3500);
-    navigator.clipboard.writeText(url).then(
-      () => toast('Link copied'),
+    navigator.clipboard.writeText(code ? embed : url).then(
+      () => toast(code ? 'Embed code copied' : 'Link copied'),
       () => toast(t('Press Ctrl+C (⌘C) to copy the link'), 3500),
     );
   });
@@ -539,6 +543,7 @@ export function openExplain(o) {
   const content = html`
     <h2>What did I see?</h2>
     <p class="lead">Describe the sighting and the app checks the ordinary explanations it can: planets, bright stars and the Moon, satellites (for the last three weeks), rocket launches, and the wind for lanterns and balloons.</p>
+    <p class="lead">It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.</p>
     <form id="ex-form" class="form-grid">
       <label>DATE &amp; TIME <span class="dim">(your time zone)</span><input name="date" type="datetime-local" required value="${local}" /></label>
       <label>WHAT IT DID<select name="motion">${Object.entries(o.motions).map(([k, v]) => html`<option value="${k}" ${p.motion === k ? 'selected' : ''}>${v}</option>`)}</select></label>

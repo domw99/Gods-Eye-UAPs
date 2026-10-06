@@ -7,6 +7,7 @@ import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, pl
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem } from './data/items.js';
+import { onThisDay } from './data/onthisday.js';
 import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
@@ -28,7 +29,8 @@ import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } f
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } from './ui/sharecard.js';
-import { shareLink, decodeHashPart } from './app/links.js';
+import { shareLink, decodeHashPart, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
+import { parseCoordinates, formatCoordinates } from './app/coords.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
@@ -38,6 +40,8 @@ import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
+import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
+import { loadAirfields, nearestAirfields } from './services/airfields.js';
 import { launchesNear } from './services/launches.js';
 import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
@@ -48,6 +52,9 @@ import { classInfo as geipanClassInfo } from './services/geipan.js';
 import { RELEASE } from './config.js';
 
 const BASE = import.meta.env.BASE_URL;
+// ?embed=1: shown inside another page (an <iframe>), with the globe and the case file and a way out to the full app.
+const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+document.body.classList.toggle('embed', EMBED);
 const LOG_KEY = 'gods-eye-uap:log';
 const GROUP_KEY = 'gods-eye-uap:group';
 
@@ -1404,7 +1411,8 @@ bindDossierActions({
       if ((await shareCardNatively(blob, { title, text, url, filename })) === 'unsupported') {
         URL.revokeObjectURL(shareImage);
         shareImage = URL.createObjectURL(blob);
-        openShare({ title, url, text, image: shareImage, onSaveImage: () => downloadBlob(blob, filename) });
+        const embed = embedSnippet(embedUrl(`${location.origin}${location.pathname}#/${item.kind}/${encodeURIComponent(item.id)}`), title);
+        openShare({ title, url, text, image: shareImage, onSaveImage: () => downloadBlob(blob, filename), embed });
       }
     } catch (e) {
       console.warn('[share card]', e);
@@ -1523,7 +1531,7 @@ async function explainSighting({ date, lat, lon, report }) {
   const notes = [];
   const sky = skyAt(lat, lon, when, { minAlt: 0 });
   const recent = Math.abs(Date.now() - when.getTime()) < 21 * 86400e3;
-  const [satellites, launches, weather] = await Promise.all([
+  const [satellites, launches, weather, airfields, aurora] = await Promise.all([
     recent
       ? satLayer
           .ensureLoaded()
@@ -1545,13 +1553,23 @@ async function explainSighting({ date, lat, lon, report }) {
           })
       : Promise.resolve(null),
     weatherAt(lat, lon, when).catch(() => null),
+    // Both are bundled with the app, so they work offline once loaded.
+    loadAirfields(BASE).then((data) => nearestAirfields(data, lat, lon, { maxKm: 80 })).catch(() => null),
+    loadKp(BASE)
+      .then((data) => {
+        const thirds = kpThirds(data, when);
+        return thirds == null ? null : { thirds, ...auroraChance(thirds, lat, lon), south: lat < 0 };
+      })
+      .catch(() => null),
   ]);
   if (satellites) checked.push(t('{n} satellites above the horizon', { n: satellites.length.toLocaleString(locale()) }));
   else if (!recent) notes.push(t('Satellites were skipped: current orbital data only covers the last three weeks.'));
   if (launches) checked.push(t('rocket launches ±12 h'));
   if (weather) checked.push(t('wind and cloud'));
-  checked.push(t('aircraft: not checkable'));
-  return { candidates: rankCandidates({ report, sky, satellites, launches, weather }), checked, notes };
+  checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
+  if (aurora) checked.push(t('geomagnetic activity (Kp)'));
+  else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
+  return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora }), checked, notes };
 }
 
 function openExplainNow(prefill) {
@@ -1790,7 +1808,7 @@ function maybeWelcome() {
     release = localStorage.getItem(RELEASE_KEY);
     localStorage.setItem(RELEASE_KEY, RELEASE);
   } catch {}
-  if (navigator.webdriver) return;
+  if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
     toast('New: share any case to X, Reddit, Bluesky and more in one click, and download every case file as open data', 7000);
@@ -1974,6 +1992,10 @@ document.getElementById('btn-explain').addEventListener('click', () => openExpla
 const openAboutModal = () =>
   openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated });
 document.getElementById('btn-about').addEventListener('click', openAboutModal);
+// In an embed, the way out: the full app at the same place, in a new tab.
+document.getElementById('embed-open').addEventListener('click', (e) => {
+  e.currentTarget.href = withoutEmbed(location.href);
+});
 
 /* ── Map settings: OSM buildings and the user's own Google key ── */
 function openMapSettingsNow() {
@@ -2163,6 +2185,22 @@ renderFilters();
 renderLayersNow();
 refresh();
 
+/* On this day: the cases that happened on today's date, above the list. */
+{
+  const el = document.getElementById('on-this-day');
+  const today = new Date();
+  const cases = onThisDay(CASE_ITEMS.map((i) => i.ref), today);
+  if (cases.length) {
+    const day = today.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }).toUpperCase();
+    mount(el, html`<div class="otd-head"><span class="section-label">ON THIS DAY</span><span class="mono dim">${day}</span></div><ul>${cases.slice(0, 4).map((c) => html`<li><button type="button" class="link-btn" data-otd="${c.id}"><span class="mono">${c.date.slice(0, 4)}</span> ${c.title}</button></li>`)}</ul>`);
+    el.classList.remove('hidden');
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-otd]');
+      if (b) select(`case:${b.dataset.otd}`, 'list');
+    });
+  }
+}
+
 /* ── Place search (Photon, keyless) ────────────────────── */
 const placeList = document.getElementById('place-results');
 // The "search inside the journals" row works whether or not place search answered.
@@ -2177,6 +2215,20 @@ subscribe((s, reason) => {
   placeAbort?.abort();
   const q = s.search;
   if (!q || q.length < 3 || q.startsWith('#')) return mount(placeList, html``);
+  // Typed or pasted coordinates are a place already: no lookup, and the row works offline.
+  const where = parseCoordinates(q);
+  if (where) {
+    const coords = formatCoordinates(where.lat, where.lon);
+    mount(placeList, html`<li><button type="button" data-coords><span aria-hidden="true">⌖</span> <span>${coords} <span class="dim">· ${t('Everything reported near here')}</span></span><span class="go">FLY</span></button></li>`);
+    placeList.onclick = (e) => {
+      if (!e.target.closest('[data-coords]')) return;
+      hideHover();
+      document.getElementById('search').value = '';
+      update({ search: '' }, 'search');
+      showNearby(where.lat, where.lon, coords);
+    };
+    return;
+  }
   // Searching the journals' full text is always offered for a real word.
   const journalRow = q.length >= 4 ? html`<li><button type="button" data-journals>⌕ <span>${t('Search inside the journals for “{q}”', { q })}</span><span class="go">TEXT</span></button></li>` : '';
   mount(placeList, journalRow);

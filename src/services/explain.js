@@ -7,6 +7,8 @@
 import { compass } from './sky.js';
 import { driftToward } from './weather.js';
 import { angleDiff } from '../util/geo.js';
+import { airfieldProximity } from './airfields.js';
+import { kpLabel, stormScale, STORM_NAMES } from './geomagnetic.js';
 
 export const HEIGHTS = {
   horizon: { label: 'Near the horizon (0–10°)', alt: 5 },
@@ -48,9 +50,11 @@ const where = (az, alt) => `${compass(az)}, ${Math.round(alt)}° up`;
  * @param {Array}  [input.satellites]  output of visibleAt(), or null if not checked
  * @param {Array}  [input.launches]    slim launches with gapMin and km, or null
  * @param {object} [input.weather]     output of weatherAt(), or null
+ * @param {Array}  [input.airfields]   output of nearestAirfields(), nearest first, or null if not checked
+ * @param {object} [input.aurora]      { thirds, chance, edge, geomagLat } from auroraChance(), or null
  * @returns {Array<{kind:string, name:string, score:number, reason:string}>}
  */
-export function rankCandidates({ report, sky, satellites = null, launches = null, weather = null }) {
+export function rankCandidates({ report, sky, satellites = null, launches = null, weather = null, airfields = null, aurora = null }) {
   const out = [];
   const motion = report.motion || 'still';
   const dark = sky.sun.alt < -6;
@@ -148,14 +152,43 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
     });
   }
 
-  // 5. Aircraft: always possible, never checkable here.
+  // 5. Aircraft: always possible; an airfield close by makes it likelier. Live flights need a server, so they are not checked.
   const planeF = { still: 0.25, drift: 0.35, steady: 0.8, fast: 0.5, formation: 0.45 }[motion];
-  out.push({
-    kind: 'aircraft',
-    name: 'Aircraft or drone (not checked)',
-    score: clamp(planeF * (report.blinking ? 1.2 : 0.8) * 0.55),
-    reason: 'Planes with landing lights on can hang apparently still for minutes when flying toward you; drones hover and blink. Live flight data needs a server, so the app cannot check this.',
-  });
+  const field = airfields?.[0];
+  const reach = field ? airfieldProximity(field.km, field.size) : null;
+  if (reach) {
+    out.push({
+      kind: 'aircraft',
+      name: `Aircraft from ${field.name}`,
+      score: clamp(planeF * (report.blinking ? 1.2 : 0.8) * (reach === 'close' ? 1.15 : 0.85)),
+      reason: `${field.name} (${field.code}) is ${Math.round(field.km)} km ${compass(field.bearing)} of you${field.military ? ' and is a military field' : ''}. Aircraft arriving or leaving show landing lights, and one flying toward you can hang apparently still for minutes. The list shows airfields that exist today.`,
+    });
+  } else {
+    out.push({
+      kind: 'aircraft',
+      name: airfields ? 'Aircraft or drone' : 'Aircraft or drone (not checked)',
+      score: clamp(planeF * (report.blinking ? 1.2 : 0.8) * (airfields ? 0.5 : 0.55)),
+      reason: `${airfields ? 'No airport or airfield within 40 km, but aircraft cross every sky. ' : ''}Planes with landing lights on can hang apparently still for minutes when flying toward you; drones hover and blink. Live flight data needs a server, so the app cannot check this.`,
+    });
+  }
+
+  // 6. Aurora: only in a dark sky, from a latitude the auroral oval reaches at that Kp.
+  if (aurora && aurora.chance !== 'no' && sky.sun.alt < -12) {
+    const poleAz = aurora.south ? 180 : 0;
+    const moveF = { still: 1, drift: 0.9, steady: 0.25, fast: 0.2, formation: 0.3 }[motion];
+    let score = (aurora.chance === 'overhead' ? 0.7 : 0.35) * moveF * (report.colours ? 1.2 : 1) * (aurora.thirds >= 20 ? 1.15 : 1);
+    if (aurora.chance === 'horizon') {
+      if (report.az != null && angleDiff(report.az, poleAz) > 60) score *= 0.3;
+      if (report.alt != null && report.alt > 35) score *= 0.3;
+    }
+    const storm = stormScale(aurora.thirds);
+    out.push({
+      kind: 'aurora',
+      name: `Aurora (Kp ${kpLabel(aurora.thirds)})`,
+      score: clamp(score),
+      reason: `Geomagnetic activity was Kp ${kpLabel(aurora.thirds)}${storm ? `, a ${STORM_NAMES[storm]} (${storm})` : ''}. The aurora's edge reached about ${Math.round(aurora.edge)}° geomagnetic latitude and you were at about ${Math.round(aurora.geomagLat)}°, so it ${aurora.chance === 'overhead' ? 'could have been overhead' : `could have shown as a glow low on the ${aurora.south ? 'south' : 'north'} horizon`}. Red or green glows and slowly shifting rays at low latitudes are often reported as strange lights.`,
+    });
+  }
 
   return out.sort((a, b) => b.score - a.score);
 }

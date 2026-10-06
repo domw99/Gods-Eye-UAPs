@@ -764,6 +764,22 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 body.clean .topbar, body.clean #left, body.clean #dossier, body.clean #timeline, body.clean .tl-show, body.clean #playback,
 body.clean .map-controls, body.clean #active-filters, body.clean .moon-view .panel, body.clean .moon-credit { opacity: 0; pointer-events: none; transition: opacity 200ms; }
 body.clean .hud-br, body.clean .hud-tl { opacity: 0.7; }
+.on-this-day { margin: 10px 0 4px; padding: 8px 10px 6px; border: 1px solid var(--glass-border); border-radius: 10px; background: rgba(255, 255, 255, 0.03); }
+.otd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.otd-head .section-label { margin: 0; }
+.on-this-day ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.on-this-day .link-btn { display: block; width: 100%; text-align: start; padding: 3px 0; font: 500 12.5px/1.35 var(--font-sans); letter-spacing: 0; color: var(--text-primary); }
+@media (hover: hover) { .on-this-day .link-btn:hover { text-decoration: none; color: var(--accent); } }
+.on-this-day .mono { color: var(--accent); margin-right: 4px; }
+.on-this-day .otd-head .mono { margin: 0; color: var(--text-dim); }
+/* Embedded in another page (?embed=1): the globe and the case file, and a way out to the full app. */
+.embed-only { display: none; }
+body.embed .embed-only { display: inline-flex; text-decoration: none; }
+body.embed :is(#world-switch, .modes, #light-switch, .brand-sub, .top-actions > :not(.embed-only), #left, #timeline, .tl-show, #welcome, #skip-link, #clean-exit) { display: none !important; }
+body.embed .topbar { min-height: 0; padding: 5px 8px 5px 12px; }
+body.embed .top-actions { margin-left: auto; order: 0; width: auto; }
+.share-embed { display: flex; gap: 8px; align-items: flex-start; }
+.share-embed textarea { flex: 1; min-width: 0; resize: vertical; font: 11px/1.4 var(--font-mono); color: var(--text); background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border); border-radius: 8px; padding: 8px; }
 .clean-exit { position: fixed; top: calc(12px + var(--sat)); right: calc(12px + var(--sar)); z-index: 40; font-size: 10px; opacity: 0.75; }
 .clean-exit:hover { opacity: 1; }
 

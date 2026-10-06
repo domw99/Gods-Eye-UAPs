@@ -47,7 +47,8 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 74 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
-- **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports.
+- **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports. **Coordinates work in the same box**, with no lookup: `33.3943, -104.5230`, `33.39°N 104.52°W`, `33°23'39"N 104°31'23"W`, or a pasted Google Maps, OpenStreetMap, Apple Maps or `geo:` link.
+- **On this day**: when a case happened on today's date (in any year), a small block above the list says so and opens it.
 - **Filters stay in view** as chips above the results, each removable, with **RESET ALL**. **Back and Forward** step through the records you opened, and every record has its own link.
 - **Group or ungroup** nearby markers (<kbd>C</kbd>). Labels that would overlap are hidden by priority, so the view stays readable.
 - **Share any view**: the address bar keeps the camera position.
@@ -120,15 +121,19 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
   - planets, bright stars and the Moon;
   - sunlit satellites, Starlink trains and the ISS;
   - rocket launches;
-  - lanterns or balloons on the wind.
+  - lanterns or balloons on the wind;
+  - aircraft from an airfield near you (about 11,000 airports and military fields, from OurAirports);
+  - the aurora, when the geomagnetic Kp index was high enough for it to reach your latitude in a dark sky.
 
-  Aircraft are listed as not checkable. Above, a bright, still light low in the WSW at dusk comes back as **Venus**.
+  Live flights need a server, so aircraft elsewhere are listed as not checkable. Above, a bright, still light low in the WSW at dusk comes back as **Venus**; a coloured glow over North Dakota at midnight on 14 March 1989 comes back as the **aurora** of the great storm (Kp 8-).
 - **The sky at that moment**, for every case: Sun, Moon phase, planets and bright stars. Objects named in the official explanation are circled. For the Hills in 1961, Jupiter sits low in the SSW beside the Moon, just as the Air Force file says.
 - **Historical weather** since 1940 (ERA5): cloud layers, wind at 10 m and 100 m, and whether a slow object moved with the wind.
 - **That day from orbit**, for cases since 2000: NASA's true-colour picture of the whole Earth that day (MODIS on the Terra satellite) laid over the globe. Below, O'Hare on 7 November 2006 under the solid overcast the witnesses described.
 
   <img src="docs/media/orbit-day.jpg" alt="The O'Hare case: NASA's satellite picture of 7 November 2006 over the globe shows Chicago under solid cloud; the dossier shows 100% overcast and the THAT DAY FROM ORBIT button" width="100%" />
 - **Military airspace**: which FAA restricted or warning areas a case falls in.
+- **Geomagnetic activity**, for every case since 1932: the Kp index for the three hours of the case (GFZ Potsdam), NOAA's storm scale, and whether an aurora could have been seen from there (it needs a dark sky and a latitude the auroral oval reaches at that Kp). It is a classic cause of strange lights at low latitudes.
+- **Nearest airfields**: the closest airports and military fields, with the distance and direction, and a note that aircraft on approach (landing lights, apparently hanging still) are a common cause of reports near them. The list is of airfields as they are today, and says so.
 
 <table>
 <tr>
@@ -202,7 +207,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 </tr>
 <tr>
 <td><sub><b>Statistics</b> (<kbd>S</kbd>): what every archive holds, year by year, each on its own scale; the curated cases by status, evidence and country; and GEIPAN's findings, where 4% remain unexplained after investigation.</sub></td>
-<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet; on a computer it opens a share dialog with the card, one-click posts to X, Reddit, Bluesky, Facebook, WhatsApp, Telegram, LinkedIn and email, and the link to copy. Every case also has its own page, like <a href="https://domw99.github.io/Gods-Eye-UAPs/case/phoenix-lights-1997/"><code>…/case/phoenix-lights-1997/</code></a>, that shows the case's card when posted and opens it on the globe.</sub></td>
+<td><sub><b>Share cards</b>: ⇪ SHARE on any case makes an image of the globe at the case with its status, evidence score and link. On a phone it opens the share sheet; on a computer it opens a share dialog with the card, one-click posts to X, Reddit, Bluesky, Facebook, WhatsApp, Telegram, LinkedIn and email, and the link to copy. On a computer the dialog also gives an **embed code**: an `<iframe>` that shows the globe and that case on any page (`?embed=1` hides the panels and adds an *Open full app* link). Every case also has its own page, like <a href="https://domw99.github.io/Gods-Eye-UAPs/case/phoenix-lights-1997/"><code>…/case/phoenix-lights-1997/</code></a>, that shows the case's card when posted and opens it on the globe.</sub></td>
 </tr>
 </table>
 
@@ -351,6 +356,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | [`?mode=nvg`](https://domw99.github.io/Gods-Eye-UAPs/?mode=nvg) | Start in a sensor mode |
 | [`?layers=bluebook,geipan,mufon`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,geipan,mufon) | Start with extra layers on |
 | [`?view=-104.5,33.7,25000,0,-35`](https://domw99.github.io/Gods-Eye-UAPs/?view=-104.5,33.7,25000,0,-35) | Start at a camera position (lon, lat, height m, heading°, pitch°) |
+| [`?embed=1#/case/nimitz-tic-tac-2004`](https://domw99.github.io/Gods-Eye-UAPs/?embed=1#/case/nimitz-tic-tac-2004) | The embeddable view: the globe and the case file only, with an *Open full app* link. Put it in an `<iframe>` |
 | [`?open=explain`](https://domw99.github.io/Gods-Eye-UAPs/?open=explain) | Open a screen on load: `explain` (WHAT DID I SEE?), `files`, `stats`, `space`, `log`, `about`, `tour` or `random`. The installed app's shortcuts use these |
 
 </details>
@@ -367,6 +373,8 @@ flowchart LR
     IA["Internet Archive<br/>Blue Book scans"] --> S2["build-bluebook.mjs"]
     FAA["FAA special-use<br/>airspace"] --> S3["build-airspace.mjs"]
     NUF["NUFORC<br/>(geocoded)"] --> S4["build-nuforc.mjs"]
+    KP["GFZ Potsdam<br/>Kp index"] --> S8["build-kp.mjs"]
+    OA["OurAirports<br/>airfields"] --> S9["build-airfields.mjs"]
     MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
     GEI["GEIPAN<br/>published CSV"] --> S6["build-geipan.mjs"]
     ARC["APRO · NICAP · CUFOS<br/>OCR (Internet Archive)"] --> S7["build-journals.mjs"]
@@ -408,12 +416,14 @@ src/
               airspace.js (military airspace volumes) · declutter.js (label overlap)
   services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
+              geomagnetic.js (Kp, aurora) · airfields.js (nearest airfields)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
               geipan.js (GEIPAN classes, dates, links) · journals.js (APRO, NICAP, CUFOS)
               textsearch.js (journal full-text search)
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
               stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
+              build-kp.mjs · build-airfields.mjs
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
               build-cards.mjs (case preview images) · indexnow.mjs (search engines) · archive-pages.mjs (Wayback Machine)
               build-skybox.py (NASA star map → sky box)
@@ -449,6 +459,8 @@ All datasets ship in `public/data/` and are rebuilt by scripts:
 | `npm run sync:official` | [DVIDS](https://www.dvidshub.net/unit/AARO) search, then each asset page (title, date, description, duration, thumbnail). Regions are resolved by `src/data/regions.js`. Runs weekly in CI. | `official-uap-media.json` |
 | `npm run build:bluebook` | Internet Archive collection [`project-blue-book`](https://archive.org/details/project-blue-book), geocoded offline with [GeoNames](https://www.geonames.org/) cities1000 | `bluebook.json` |
 | `npm run build:airspace` | FAA special-use airspace (ArcGIS open data), simplified | `airspace.json` |
+| `npm run build:kp` | The Kp geomagnetic index every three hours since 1932 from [GFZ Potsdam](https://kp.gfz.de/en/data) (CC BY 4.0), packed one character per interval | `kp.json` |
+| `npm run build:airfields` | [OurAirports](https://ourairports.com/data/) (public domain): large and medium airports, small ones with an ICAO code or flights, and military fields by name | `airfields.json` |
 | `npm run build:nuforc` | [planetsig/ufo-reports](https://github.com/planetsig/ufo-reports) (geocoded NUFORC), facts only with the narratives removed | `nuforc.json` |
 | `npm run build:mufon` | The MUFON Archive on the Internet Archive ([`MUFON_UFO_Journal_-_Skylook`](https://archive.org/details/MUFON_UFO_Journal_-_Skylook)). It reads each issue's OCR text page by page, finds "Town, State" places in sighting reports (skipping addresses, meetings and hometowns), geocodes them with GeoNames and matches pages to curated cases. Only places, page numbers and short quotes are stored. | `mufon.json` |
 | `npm run build:geipan` | GEIPAN's published case and testimony files ([cnes-geipan.fr](https://www.cnes-geipan.fr/fr/recherche/cas), CSV; the current export dates from February 2019). It joins them, restores the accents lost in the case file from the testimony file's vocabulary, geocodes each commune with the GeoNames France dump and converts observation times to UTC. | `geipan.json` |

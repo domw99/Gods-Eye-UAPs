@@ -6,9 +6,11 @@ import { EVIDENCE, STATUS, CATEGORY, TRACK_KINDS, TRACK_BASIS, PRECISION, eviden
 import { formatDMS, formatDuration, haversineKm } from '../util/geo.js';
 import { trackStats } from '../layers/tracks.js';
 import { wikiSummary, commonsFiles, commonsPage } from '../services/wiki.js';
-import { skyAt, bodiesNamedIn, compass } from '../services/sky.js';
+import { skyAt, bodiesNamedIn, compass, sunAltitude } from '../services/sky.js';
 import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsWind } from '../services/weather.js';
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
+import { loadKp, kpThirds, kpLabel, stormScale, STORM_NAMES, auroraChance } from '../services/geomagnetic.js';
+import { loadAirfields, nearestAirfields, airfieldProximity, SIZES } from '../services/airfields.js';
 import { skySection } from './skychart.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
@@ -149,6 +151,75 @@ async function fillWeather(token, lat, lon, when, uapTrack, approx = false) {
       </div>
       ${verdict ? html`<p class="d-text wx-verdict">${verdict}</p>` : ''}
       <p class="caveat">${t('{source}, hour of {hour}:00 UTC, on a ~25 km grid.', { source: t(wx.source), hour: wx.hour.slice(0, 13).replace('T', ' ') })}${approx ? ' ' + t('The time of day for this case is approximate, so conditions at the real moment may differ.') : ''} ${t('Local conditions can differ, and winds aloft are often stronger and from a different direction.')}</p>`,
+  );
+}
+
+/* ── Geomagnetic activity and airfields: both are bundled with the app ── */
+const DATA = import.meta.env.BASE_URL;
+
+function geomagBlock(when) {
+  if (new Date(when).getUTCFullYear() < 1932) return '';
+  return section('GEOMAGNETIC ACTIVITY', html`<div id="d-geomag"><div class="loading-line">Loading the geomagnetic record…</div></div>`);
+}
+
+const kpState = (thirds) => (thirds < 9 ? 'quiet' : thirds < 12 ? 'unsettled' : thirds < 14 ? 'active' : STORM_NAMES[stormScale(thirds)]);
+
+async function fillGeomag(token, lat, lon, when, approx = false) {
+  const el = document.getElementById('d-geomag');
+  if (!el) return;
+  let data;
+  try {
+    data = await loadKp(DATA);
+  } catch (error) {
+    console.warn('[kp]', error);
+  }
+  if (token !== renderToken || !document.getElementById('d-geomag')) return;
+  if (!data) return mount(el, html`<p class="caveat">The geomagnetic record could not be loaded.</p>`);
+  const thirds = kpThirds(data, when);
+  if (thirds == null) return mount(el, html`<p class="caveat">No geomagnetic record for this time.</p>`);
+  const storm = stormScale(thirds);
+  const aurora = auroraChance(thirds, lat, lon);
+  const at = new Date(when);
+  const hour = String(Math.floor(at.getUTCHours() / 3) * 3).padStart(2, '0');
+  const figures = { edge: Math.round(aurora.edge), here: Math.round(aurora.geomagLat) };
+  let verdict = '';
+  if (aurora.chance !== 'no' && sunAltitude(lat, lon, at) >= -12) verdict = t('It was not dark enough for an aurora to be seen.');
+  else if (aurora.chance === 'overhead') verdict = t('The aurora could have been overhead: its edge reached about {edge}° geomagnetic latitude, and this site is at about {here}°.', figures);
+  else if (aurora.chance === 'horizon') verdict = t('The aurora could have shown as a glow low on the {dir} horizon: its edge reached about {edge}° geomagnetic latitude, and this site is at about {here}°.', { ...figures, dir: compass(lat < 0 ? 180 : 0) });
+  else if (storm) verdict = t('The aurora was unlikely to have been visible from here: its edge reached about {edge}° geomagnetic latitude, and this site is at about {here}°.', figures);
+  mount(
+    el,
+    html`<dl class="d-kv"><dt>KP INDEX</dt><dd>${kpLabel(thirds)} · ${t(kpState(thirds))}${storm ? ` (${storm})` : ''} <span class="dim">· ${t('three-hour interval from {hour}:00 UT', { hour })}</span></dd></dl>
+      ${verdict ? html`<p class="d-text">${verdict}</p>` : ''}
+      <p class="caveat">${t('Kp is the planetary index of geomagnetic disturbance, given every three hours (GFZ Potsdam, CC BY 4.0). The aurora limits come from a simple model of the auroral oval, and the geomagnetic latitude is approximate.')}${approx ? ' ' + t('The time of day for this case is approximate, so conditions at the real moment may differ.') : ''}</p>`,
+  );
+}
+
+const airfieldBlock = () => section('NEAREST AIRFIELDS', html`<div id="d-airfields"><div class="loading-line">Loading airfields…</div></div>`);
+
+async function fillAirfields(token, lat, lon) {
+  const el = document.getElementById('d-airfields');
+  if (!el) return;
+  let data;
+  try {
+    data = await loadAirfields(DATA);
+  } catch (error) {
+    console.warn('[airfields]', error);
+  }
+  if (token !== renderToken || !document.getElementById('d-airfields')) return;
+  if (!data) return mount(el, html`<p class="caveat">The airfields could not be loaded.</p>`);
+  const list = nearestAirfields(data, lat, lon, { limit: 4, maxKm: 80 });
+  const near = list[0] && airfieldProximity(list[0].km, list[0].size);
+  mount(
+    el,
+    html`${list.length
+      ? html`<ul class="source-list airfield-list">${list.map(
+          (a) => html`<li><span class="badge ${a.military ? 'official' : ''}">${a.military ? 'MILITARY' : a.code}</span>
+            <span><b>${a.name}</b>${a.military ? html` <span class="dim">${a.code}</span>` : ''}<br /><span class="dim">${t('{km} km {dir}', { km: a.km < 10 ? a.km.toFixed(1) : Math.round(a.km), dir: compass(a.bearing) })} · ${t(SIZES[a.size])}</span></span></li>`,
+        )}</ul>`
+      : html`<p class="d-text">No airport or airfield within 80 km.</p>`}
+      ${near ? html`<p class="d-text">Aircraft arriving or leaving an airfield show bright landing lights, and one flying toward you can seem to hang still. It is a common cause of reports near airfields.</p>` : ''}
+      <p class="caveat">Airfields as they are today (OurAirports, public domain); one may not have existed, or been where it is now, when the case happened.</p>`,
   );
 }
 
@@ -526,6 +597,8 @@ export function renderCase(item, ctx) {
     ${section('SKY AT THE TIME', skyBlock(c.lat, c.lon, c.date, c.explanation, c.timeApprox))}
     ${weatherBlock(c.date)}
     ${launchBlock(c.lat, c.lon, c.date)}
+    ${geomagBlock(c.date)}
+    ${c.precision === 'region' ? '' : airfieldBlock()}
     ${nearUS(c.lat, c.lon) ? section('MILITARY AIRSPACE', html`<div id="d-airspace"><div class="loading-line">Checking FAA special-use airspace…</div></div>`) : ''}
 
     ${section('EVIDENCE & MEDIA', html`<div id="d-media"><div class="loading-line">Loading archived images and video…</div></div>`)}
@@ -557,6 +630,8 @@ export function renderCase(item, ctx) {
 
   autoFillLaunches();
   fillWeather(token, c.lat, c.lon, c.date, tracks.find((t) => t.kind === 'uap'), c.timeApprox);
+  fillGeomag(token, c.lat, c.lon, c.date, c.timeApprox);
+  if (c.precision !== 'region') fillAirfields(token, c.lat, c.lon);
   if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
   if (c.wiki) fillWiki(token, document.getElementById('d-wiki'), c.wiki);
@@ -704,6 +779,8 @@ export function renderGeipan(r) {
     ${r.utc && r.lat != null ? section('SKY AT THE TIME', skyBlock(r.lat, r.lon, r.utc, bodiesNamed(`${r.short} ${r.summary}`))) : ''}
     ${r.utc && r.lat != null ? weatherBlock(r.utc) : ''}
     ${r.utc && r.lat != null ? launchBlock(r.lat, r.lon, r.utc) : ''}
+    ${r.utc && r.lat != null ? geomagBlock(r.utc) : ''}
+    ${r.lat != null && r.prec === 2 ? airfieldBlock() : ''}
     ${r.lat != null && r.prec === 2 ? section('THE LOCATION', html`${siteLinks(r.lat, r.lon)}<p class="caveat">The pin marks the commune named in the file, not the exact spot.</p>`) : ''}
     ${section(
       'SOURCE',
@@ -717,7 +794,9 @@ export function renderGeipan(r) {
   if (r.utc && r.lat != null) {
     autoFillLaunches();
     fillWeather(token, r.lat, r.lon, r.utc, null);
+    fillGeomag(token, r.lat, r.lon, r.utc);
   }
+  if (r.lat != null && r.prec === 2) fillAirfields(token, r.lat, r.lon);
   return token;
 }
 
@@ -894,6 +973,8 @@ export function renderUser(item, { onDelete }) {
     ${section('SKY AT THE TIME', skyBlock(u.lat, u.lon, u.date))}
     ${weatherBlock(u.date)}
     ${launchBlock(u.lat, u.lon, u.date)}
+    ${geomagBlock(u.date)}
+    ${airfieldBlock()}
     ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
     ${section('REPORT IT OFFICIALLY', html`<div class="btn-row"><a class="chip" href="https://nuforc.org/" target="_blank" rel="noopener">NUFORC ↗</a><a class="chip" href="https://www.mufoncms.com/" target="_blank" rel="noopener">MUFON ↗</a><a class="chip" href="https://www.aaro.mil/" target="_blank" rel="noopener">AARO (gov/mil personnel) ↗</a><a class="chip" href="https://www.cnes-geipan.fr/" target="_blank" rel="noopener">GEIPAN (France) ↗</a></div>`)}
@@ -902,6 +983,8 @@ export function renderUser(item, { onDelete }) {
   );
   autoFillLaunches();
   fillWeather(token, u.lat, u.lon, u.date, null);
+  fillGeomag(token, u.lat, u.lon, u.date);
+  fillAirfields(token, u.lat, u.lon);
   // Two presses to delete: the first asks, the second deletes. Pressing anywhere
   // else, or waiting a few seconds, takes the question back.
   const del = body().querySelector('[data-action="delete-user"]');
