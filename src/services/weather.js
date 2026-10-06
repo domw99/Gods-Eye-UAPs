@@ -6,6 +6,7 @@
  */
 import { bearingDeg, angleDiff, trackLengthKm } from '../util/geo.js';
 import { setCached } from '../util/storage.js';
+import { fetchWithTimeout, isTimeout } from '../util/net.js';
 
 const ARCHIVE = 'https://archive-api.open-meteo.com/v1/archive';
 const FORECAST = 'https://api.open-meteo.com/v1/forecast';
@@ -104,11 +105,12 @@ export async function weatherAt(lat, lon, when) {
   }
   let res;
   try {
-    res = await fetch(url);
-  } catch {
+    res = await fetchWithTimeout(url);
+  } catch (error) {
+    if (isTimeout(error)) throw error; // it has already waited; a second try would double that
     // Busy moments return errors without CORS headers; one retry usually works.
     await new Promise((r) => setTimeout(r, 1500));
-    res = await fetch(url);
+    res = await fetchWithTimeout(url);
   }
   if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
   const wx = pickHour(await res.json(), when);

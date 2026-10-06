@@ -3,13 +3,15 @@
  * Results are cached for the session; requests identify the app via
  * Api-User-Agent as Wikimedia asks.
  */
+import { fetchWithTimeout } from '../util/net.js';
+
 const HEADERS = { 'Api-User-Agent': 'GodsEyeUAP/0.1 (https://github.com/domw99/Gods-Eye-UAPs)' };
 const cache = new Map();
 
 async function cachedJson(url) {
   if (cache.has(url)) return cache.get(url);
   const attempt = async (n) => {
-    const r = await fetch(url, { headers: HEADERS });
+    const r = await fetchWithTimeout(url, { headers: HEADERS });
     if (r.status === 429 && n < 3) {
       const wait = (Number(r.headers.get('Retry-After')) || 2 ** n) * 1000;
       await new Promise((res) => setTimeout(res, Math.min(wait, 8000)));

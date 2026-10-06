@@ -8,6 +8,7 @@
  * cached in localStorage.
  */
 import { setCached } from '../util/storage.js';
+import { fetchWithTimeout } from '../util/net.js';
 
 const API = 'https://ll.thespacedevs.com/2.3.0/launches/';
 const HOUR = 3600e3;
@@ -57,7 +58,7 @@ export function slimLaunch(r) {
 async function query(params, cacheKey, ttl) {
   const cached = readCache(cacheKey, ttl);
   if (cached) return cached;
-  const res = await fetch(`${API}?${new URLSearchParams({ limit: '100', ordering: 'net', ...params })}`);
+  const res = await fetchWithTimeout(`${API}?${new URLSearchParams({ limit: '100', ordering: 'net', ...params })}`);
   if (res.status === 429) throw new RateLimitError('Launch Library rate limit reached');
   if (!res.ok) throw new Error(`Launch Library HTTP ${res.status}`);
   const json = await res.json();

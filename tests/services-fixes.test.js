@@ -18,6 +18,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 const { weatherAt } = await import('../src/services/weather.js');
 const { slimLaunch } = await import('../src/services/launches.js');
+const { fetchWithTimeout, isTimeout } = await import('../src/util/net.js');
 const { searchJournals } = await import('../src/services/textsearch.js');
 const { fold, decodeGeipan } = await import('../src/services/geipan.js');
 
@@ -61,6 +62,25 @@ describe('weather at the time of a sighting', () => {
     const wx = await weatherAt(48.8, 2.3, new Date('1940-01-01T00:30:00Z'));
     expect(new URL(calls[0]).searchParams.get('start_date')).toBe('1940-01-01');
     expect(wx.temperature_2m).toBe(3);
+  });
+});
+
+describe('live requests', () => {
+  it('give up on a stalled connection instead of waiting for ever', async () => {
+    vi.stubGlobal('fetch', (url, { signal }) => new Promise((_, reject) => signal.addEventListener('abort', () => reject(signal.reason))));
+    const error = await fetchWithTimeout('https://example.test/', {}, 20).catch((e) => e);
+    expect(isTimeout(error)).toBe(true);
+  });
+
+  it('are made with a time limit, and a timed-out weather request is not asked twice', async () => {
+    const signals = [];
+    vi.stubGlobal('fetch', async (url, options) => {
+      signals.push(options?.signal);
+      throw new DOMException('The operation timed out.', 'TimeoutError');
+    });
+    await expect(weatherAt(48.8, 2.3, new Date('1965-07-05T12:00:00Z'))).rejects.toMatchObject({ name: 'TimeoutError' });
+    expect(signals).toHaveLength(1);
+    expect(signals[0]).toBeInstanceOf(AbortSignal);
   });
 });
 
