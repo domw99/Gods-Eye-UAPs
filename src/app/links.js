@@ -44,6 +44,20 @@ export function parseNearHash(hash) {
   };
 }
 
+/** The highest camera a ?view= link may ask for: past the Moon's distance, and low enough for Cesium to draw. */
+const MAX_VIEW_HEIGHT = 1e9;
+
+/**
+ * ?view=lon,lat,height[,heading,pitch] (degrees, metres): the camera it names, or null when it is
+ * not a place in view of the Earth. A height like 1e300 makes Cesium throw while the app starts,
+ * which would leave the loading screen up for good.
+ */
+export function parseView(value) {
+  const [lon, lat, h, heading, pitch] = (value || '').split(',').map(Number);
+  if (![lon, lat, h].every(Number.isFinite) || Math.abs(lat) > 90 || Math.abs(lon) > 180 || h <= 0 || h > MAX_VIEW_HEIGHT) return null;
+  return { lon, lat, h, heading: Number.isFinite(heading) ? heading : 0, pitch: Number.isFinite(pitch) ? pitch : -90 };
+}
+
 /** The same address as an embed (?embed=1): the globe and the case file only, for an <iframe>. */
 export function embedUrl(href) {
   const u = new URL(href);

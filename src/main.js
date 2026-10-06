@@ -29,7 +29,7 @@ import { loadGeipan, classInfo, geipanDate, fold, CLASS_COLORS, GEIPAN_COLOR } f
 import { loadJournals, JOURNALS_COLOR, SERIES_SHORT } from './services/journals.js';
 import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } from './ui/sharecard.js';
-import { shareLink, decodeHashPart, parseNearHash, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
+import { shareLink, decodeHashPart, parseNearHash, parseView, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
 import { parseCoordinates, formatCoordinates } from './app/coords.js';
 import { toMgrs } from './util/mgrs.js';
 import { createZoomOut } from './app/zoom.js';
@@ -2345,15 +2345,11 @@ viewer.camera.moveEnd.addEventListener(() => {
   }, 700);
 });
 function viewFromParam(value) {
-  const [lon, lat, h, heading, pitch] = (value || '').split(',').map(Number);
-  if (![lon, lat, h].every(Number.isFinite) || Math.abs(lat) > 90 || Math.abs(lon) > 180 || h <= 0) return false;
+  const v = parseView(value);
+  if (!v) return false;
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(lon, lat, h),
-    orientation: {
-      heading: Cesium.Math.toRadians(Number.isFinite(heading) ? heading : 0),
-      pitch: Cesium.Math.toRadians(Number.isFinite(pitch) ? pitch : -90),
-      roll: 0,
-    },
+    destination: Cesium.Cartesian3.fromDegrees(v.lon, v.lat, v.h),
+    orientation: { heading: Cesium.Math.toRadians(v.heading), pitch: Cesium.Math.toRadians(v.pitch), roll: 0 },
   });
   return true;
 }
