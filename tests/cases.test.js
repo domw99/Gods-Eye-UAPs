@@ -211,6 +211,27 @@ describe('case data, across all cases', () => {
   });
 });
 
+describe('numbers the docs quote about the cases', () => {
+  const doc = (name) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
+  const UNITS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const spelled = (words) => {
+    const parts = words.toLowerCase().split('-');
+    return parts.reduce((sum, w) => sum + (UNITS.indexOf(w) >= 0 ? UNITS.indexOf(w) : TENS.indexOf(w) * 10), 0);
+  };
+
+  it('quote the number of cases in AGENTS.md and DATA_SOURCES.md', () => {
+    expect(+/a CesiumJS 3D globe of (\d+) documented/.exec(doc('AGENTS.md'))[1]).toBe(CASES.length);
+    expect(+/The (\d+) curated case files/.exec(doc('DATA_SOURCES.md'))[1]).toBe(CASES.length);
+  });
+
+  it('quote how many cases have a flight path and how many have an approximate time in docs/KNOWN-ISSUES.md', () => {
+    const text = doc('docs/KNOWN-ISSUES.md');
+    expect(spelled(/([A-Za-z-]+) cases draw one/.exec(text)[1])).toBe(CASES.filter((c) => c.tracks?.length).length);
+    expect(spelled(/([A-Za-z-]+) cases record only a date or part of a day/.exec(text)[1])).toBe(CASES.filter((c) => c.timeApprox).length);
+  });
+});
+
 describe('track heights are above sea level', () => {
   // The globe plots a height as metres above sea level, so a point on the ground at 0 is buried wherever the land is
   // higher. Each of these is the ground at that place, in metres (a public elevation model, to within about 20 m).
