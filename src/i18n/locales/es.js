@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Vista de radar: {n} registros a menos de {range} km, con el norte arriba",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Novedad: escribe coordenadas en el buscador y mira la aurora y los aeródromos más cercanos de cada caso",
   "less than 1 km away": "a menos de 1 km",
+  "in {span}": "en {span}",
+  "{span} ago": "hace {span}",
+  "{n} day|{n} days": {"one": "{n} día", "other": "{n} días"},
 };

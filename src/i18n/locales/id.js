@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Tampilan radar: {n} catatan dalam radius {range} km, utara di atas",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Baru: ketik koordinat di kotak pencarian, dan lihat aurora serta landasan terdekat untuk setiap kasus",
   "less than 1 km away": "kurang dari 1 km",
+  "in {span}": "dalam {span}",
+  "{span} ago": "{span} yang lalu",
+  "{n} day|{n} days": {"one": "{n} hari", "other": "{n} hari"},
 };

@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "Radarbeeld: {n} meldingen binnen {range} km, noorden boven",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nieuw: typ coördinaten in het zoekvak en zie voor elk geval het poollicht en de dichtstbijzijnde vliegvelden",
   "less than 1 km away": "minder dan 1 km verderop",
+  "in {span}": "over {span}",
+  "{span} ago": "{span} geleden",
+  "{n} day|{n} days": {"one": "{n} dag", "other": "{n} dagen"},
 };

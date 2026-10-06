@@ -887,4 +887,7 @@ export default {
   "Radar view: {n} records within {range} km, north at the top": "عرض الرادار: {n} سجلًا ضمن {range} كم، والشمال في الأعلى",
   "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "جديد: اكتب الإحداثيات في مربع البحث، وشاهد الشفق القطبي وأقرب المطارات لكل حالة",
   "less than 1 km away": "على بعد أقل من 1 كم",
+  "in {span}": "بعد {span}",
+  "{span} ago": "منذ {span}",
+  "{n} day|{n} days": {"zero": "{n} يوم", "one": "{n} يوم", "two": "{n} يومان", "few": "{n} أيام", "many": "{n} يومًا", "other": "{n} يوم"},
 };

@@ -313,3 +313,26 @@ describe('case markers', () => {
     expect([...layer.entities.keys()]).toEqual(['case:c']);
   });
 });
+
+describe('relative times', () => {
+  beforeEach(() => {
+    // The i18n module only touches the document to set <html lang/dir>.
+    vi.stubGlobal('document', { documentElement: { dataset: {} }, body: null });
+    vi.stubGlobal('localStorage', { setItem() {}, getItem: () => null });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('are written in the language of the interface (launches, quakes, the sky check)', async () => {
+    const { setLanguage } = await import('../src/i18n/index.js');
+    const { relativeTime } = await import('../src/layers/launches.js');
+    const now = Date.parse('2023-02-03T00:00:00Z');
+    const times = ['2023-02-03T02:00:00Z', '2023-01-30T00:00:00Z', '2023-02-02T23:30:00Z'];
+    await setLanguage('en', { save: false });
+    expect(times.map((x) => relativeTime(x, now))).toEqual(['in 2 h', '4 days ago', '30 min ago']);
+    await setLanguage('fr', { save: false });
+    expect(times.map((x) => relativeTime(x, now))).toEqual(['dans 2 h', 'il y a 4 jours', 'il y a 30 min']);
+    await setLanguage('ru', { save: false });
+    expect(relativeTime('2023-01-29T00:00:00Z', now)).toBe('5 дней назад');
+    await setLanguage('en', { save: false });
+  });
+});

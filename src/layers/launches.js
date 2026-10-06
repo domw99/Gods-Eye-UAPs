@@ -1,5 +1,6 @@
 import * as Cesium from 'cesium';
 import { horizonOf } from '../app/horizon.js';
+import { t, plural } from '../i18n/index.js';
 
 /**
  * Launch pads with recent and upcoming launches (Launch Library 2). One glyph
@@ -40,8 +41,8 @@ function rocketGlyph(color) {
 export function relativeTime(iso, now = Date.now()) {
   const d = (new Date(iso).getTime() - now) / 1000;
   const a = Math.abs(d);
-  const s = a < 3600 ? `${Math.round(a / 60)} min` : a < 172800 ? `${Math.round(a / 3600)} h` : `${Math.round(a / 86400)} days`;
-  return d >= 0 ? `in ${s}` : `${s} ago`;
+  const span = a < 3600 ? t('{n} min', { n: Math.round(a / 60) }) : a < 172800 ? t('{n} h', { n: Math.round(a / 3600) }) : plural(Math.round(a / 86400), '{n} day', '{n} days');
+  return d >= 0 ? t('in {span}', { span }) : t('{span} ago', { span });
 }
 
 /** Group launches by pad, soonest upcoming first. */
