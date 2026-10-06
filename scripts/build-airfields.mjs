@@ -16,6 +16,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = 'https://davidmegginson.github.io/ourairports-data/airports.csv';
@@ -95,4 +96,4 @@ async function main() {
   console.log(`public/data/airfields.json: ${airfields.length} airfields`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
+if (isMain(import.meta.url)) await main();

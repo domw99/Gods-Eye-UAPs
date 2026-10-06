@@ -14,6 +14,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = 'https://kp.gfz.de/app/files/Kp_ap_since_1932.txt';
@@ -52,4 +53,4 @@ async function main() {
   console.log(`public/data/kp.json: ${values.length} intervals, ${START} to ${new Date(Date.parse(START) + (values.length / 8) * 864e5).toISOString().slice(0, 10)}`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
+if (isMain(import.meta.url)) await main();

@@ -22,9 +22,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ROOT, UA, cached, norm, loadGazetteer, resolveRegionToken, inRegion } from './lib/geonames.mjs';
 import { joinBrokenWords } from '../src/services/mufon.js';
+import { isMain } from './lib/is-main.mjs';
 
 export const ITEM = 'MUFON_UFO_Journal_-_Skylook';
 const OUT = path.join(ROOT, 'public/data/mufon.json');
@@ -442,7 +442,7 @@ async function main() {
   console.log(`Wrote ${OUT} (${(JSON.stringify(payload).length / 1e6).toFixed(2)} MB)`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

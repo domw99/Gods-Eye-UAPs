@@ -20,6 +20,7 @@ import { writeFile, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { resolveRegion } from '../src/data/regions.js';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUT = path.join(ROOT, 'public/data/official-uap-media.json');
@@ -262,7 +263,7 @@ async function main() {
   console.log(`\nWrote ${items.length} items to ${path.relative(ROOT, OUT)}`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (p) => readFileSync(path.join(ROOT, p), 'utf8');
@@ -103,7 +104,7 @@ export function buildNotices() {
   return `${lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd()}\n`;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const out = buildNotices();
   writeFileSync(path.join(ROOT, 'THIRD_PARTY_NOTICES.md'), out);
   console.log(`THIRD_PARTY_NOTICES.md: ${out.split('\n').length} lines`);

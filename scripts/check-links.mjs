@@ -11,6 +11,7 @@
 import { writeFile } from 'node:fs/promises';
 import { CASES } from '../src/data/cases/index.js';
 import { GOV_FILES } from '../src/data/govFiles.js';
+import { isMain } from './lib/is-main.mjs';
 
 const UA = 'Mozilla/5.0 (compatible; GodsEyeUAP-linkcheck/1.0; +https://github.com/domw99/Gods-Eye-UAPs)';
 const TIMEOUT = 25_000;
@@ -94,7 +95,7 @@ async function main() {
   process.exit(broken.length ? 1 : 0);
 }
 
-if (process.argv[1]?.endsWith('check-links.mjs'))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

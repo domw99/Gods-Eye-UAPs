@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdtempSync, symlinkSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { addStrings, entry, fileText, languageCodes } from '../scripts/add-strings.mjs';
+import { isMain } from '../scripts/lib/is-main.mjs';
 import { productionPackages, repoUrl } from '../scripts/build-notices.mjs';
-import { byVersionDesc, noteBody } from '../scripts/build-changelog.mjs';
+import { byVersionDesc, noteBody, addedOn } from '../scripts/build-changelog.mjs';
 import { RELEASE } from '../src/config.js';
 
 const CODES = languageCodes();
@@ -97,9 +100,35 @@ describe('the notices and the changelog', () => {
     expect(headings).toEqual(versions);
   });
 
+  it('dates a release note that is not committed yet as today, not "undated" for good', () => {
+    // The release steps run build:changelog before committing the new note.
+    expect(addedOn('v99.99.md', new Date(2031, 0, 5))).toBe('2031-01-05');
+    expect(addedOn('v1.0.md')).toMatch(/^\d{4}-\d{2}-\d{2}$/); // committed: the date of its commit
+  });
+
   it('orders versions as numbers and drops the lines meant only for the release page', () => {
     expect(['1.10', '1.2', '1.9', '2.0'].sort(byVersionDesc)).toEqual(['2.0', '1.10', '1.9', '1.2']);
     const body = noteBody('**Summary**\r\n\r\n### ▶ [Open the live app](https://x.test/)\r\n\r\nText\r\n\r\n\r\n<sub>made by [me](https://x.test)</sub>\r\n');
     expect(body).toBe('**Summary**\n\nText');
+  });
+});
+
+describe('running a script', () => {
+  it('knows a script was started even when its folder is reached through a symlink', () => {
+    const real = path.resolve('scripts/lib/is-main.mjs');
+    const dir = mkdtempSync(path.join(tmpdir(), 'uap-link-'));
+    try {
+      const link = path.join(dir, 'scripts');
+      symlinkSync(path.resolve('scripts'), link, 'junction');
+      const url = pathToFileURL(real).href; // node reports the real path for a module
+      expect(isMain(url, real)).toBe(true);
+      expect(isMain(url, path.join(link, 'lib/is-main.mjs'))).toBe(true);
+      expect(isMain(url, path.resolve('scripts/add-strings.mjs'))).toBe(false);
+      expect(isMain(url, undefined)).toBe(false);
+      // The real thing: a script run through the link still runs (add-strings with no file prints its usage and exits 2).
+      expect(spawnSync(process.execPath, [path.join(link, 'add-strings.mjs')], { encoding: 'utf8' })).toMatchObject({ status: 2, stderr: expect.stringContaining('Usage') });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

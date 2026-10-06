@@ -21,9 +21,9 @@
 import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ROOT, CACHE, UA, cached, loadGazetteer } from './lib/geonames.mjs';
 import { makeResolvers, extractPlaces, matchCases } from './build-mufon.mjs';
+import { isMain } from './lib/is-main.mjs';
 
 const OUT = path.join(ROOT, 'public/data/journals.json');
 const IUR_ITEM = 'iur-vol.-31-no.-4';
@@ -307,7 +307,7 @@ async function main() {
   console.log(`Wrote ${OUT} (${(JSON.stringify(payload).length / 1e6).toFixed(2)} MB)`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url))
+if (isMain(import.meta.url))
   main().catch((e) => {
     console.error(e);
     process.exit(1);

@@ -13,6 +13,7 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './lib/is-main.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SERVICE = 'https://services6.arcgis.com/ssFJjBXIUyZDrSYZ/arcgis/rest/services/Special_Use_Airspace/FeatureServer/0/query';
@@ -93,7 +94,7 @@ async function main() {
   console.log(`\nWrote ${features.length} areas to ${path.relative(ROOT, file)}`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main().catch((e) => {
+if (isMain(import.meta.url)) main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
