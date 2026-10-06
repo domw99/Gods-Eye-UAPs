@@ -90,7 +90,7 @@ select option { background: var(--menu-bg); color: var(--text-primary); }
 /* ── Globe ─────────────────────────────────────── */
 #globe { position: fixed; inset: 0; }
 #globe .cesium-viewer-bottom,
-#globe .cesium-widget-credits { left: auto !important; right: calc(14px + var(--sar)) !important; bottom: calc(var(--bottom-gap) - 4px) !important; opacity: 0.55; font-size: 10px; text-align: right; }
+#globe .cesium-widget-credits { left: auto !important; right: calc(14px + var(--sar)) !important; bottom: calc(var(--bottom-gap) - 4px + var(--pb-lift)) !important; opacity: 0.55; font-size: 10px; text-align: right; }
 body.dossier-open #globe .cesium-viewer-bottom,
 body.dossier-open #globe .cesium-widget-credits { right: calc(var(--right-w) + 24px) !important; }
 #globe .cesium-credit-logoContainer { display: none !important; }
@@ -388,7 +388,10 @@ blockquote.mufon-quote.big { margin: 0; padding: 8px 10px; border-left: 2px soli
 .hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; font-size: 10.5px; letter-spacing: 0.06em; text-shadow: 0 1px 2px #000; }
 .hud-tl { position: absolute; top: calc(var(--top-off) + 24px); left: calc(var(--left-w) + 26px); display: grid; gap: 3px; transition: left var(--smooth); }
 body.left-collapsed .hud-tl { left: 72px; }
-.hud-br { position: absolute; bottom: calc(var(--bottom-gap) + 8px); right: calc(16px + var(--sar)); display: grid; gap: 3px; text-align: right; }
+/* The readout, the map controls and the Cesium credit share the globe's lower-right corner, and a flight path's playback bar runs along its foot (below 721px the readout is hidden and the controls sit at the top). */
+:root { --hud-h: 76px; --pb-lift: 0px; }
+@media (min-width: 721px) { body:has(#playback:not(.hidden)) { --pb-lift: 52px; } }
+.hud-br { position: absolute; bottom: calc(var(--bottom-gap) + 8px + var(--pb-lift)); right: calc(16px + var(--sar)); display: grid; gap: 3px; text-align: right; }
 body.dossier-open .hud-br { right: calc(var(--right-w) + 26px + var(--sar)); }
 .hud .muted { color: rgba(0, 212, 255, 0.65); }
 .crosshair { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; transform: translate(-50%, -50%); opacity: 0.35; }
@@ -398,7 +401,7 @@ body.dossier-open .hud-br { right: calc(var(--right-w) + 26px + var(--sar)); }
 body.hud-off .hud { display: none; }
 
 /* ── Map view controls (zoom about the centre, reset) ── */
-.map-controls { position: fixed; right: calc(16px + var(--sar)); bottom: calc(var(--bottom-gap) + 68px); z-index: 14; display: grid; padding: 3px; border-radius: 12px; width: 46px; transform: translateX(0); transition: transform var(--smooth); }
+.map-controls { position: fixed; right: calc(16px + var(--sar)); bottom: calc(var(--bottom-gap) + 16px + var(--hud-h) + var(--pb-lift)); z-index: 14; display: grid; padding: 3px; border-radius: 12px; width: 46px; transform: translateX(0); transition: transform var(--smooth); }
 /* Clear of the dossier while it is open, back at the edge when it is not. */
 body.dossier-open .map-controls { transform: translateX(calc(-1 * (var(--right-w) + 10px))); } /* the dossier's width plus its gap; both sides carry the same inset */
 .map-controls button { display: grid; place-items: center; gap: 2px; height: 36px; border: 0; border-radius: 9px; background: none; color: var(--text-secondary); cursor: pointer; }
