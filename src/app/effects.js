@@ -189,7 +189,7 @@ export function createEffects(viewer) {
       return current;
     },
     set(mode) {
-      if (!(mode in MODE_LABELS)) mode = 'normal';
+      if (!Object.hasOwn(MODE_LABELS, mode)) mode = 'normal'; // not `in`: ?mode=constructor would pass
       for (const [name, stage] of Object.entries(stages))
         stage.enabled = name === mode;
       current = mode;

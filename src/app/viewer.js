@@ -89,6 +89,11 @@ async function createTerrain() {
 export function createPhotoreal(viewer, { onChange = () => {} } = {}) {
   let tileset = null;
   let source = null;
+  // Loads overlap when someone acts while one is still running (the one at start-up, a key pasted in, the
+  // switch pressed twice, 3D turned off). The newest wins: an older one that finishes later drops its tiles
+  // (it could not be taken off the globe afterwards) and reports what the newest found.
+  let latest = 0;
+  let newest = Promise.resolve({ ok: false, error: null });
 
   function remove() {
     if (tileset) viewer.scene.primitives.remove(tileset);
@@ -105,8 +110,14 @@ export function createPhotoreal(viewer, { onChange = () => {} } = {}) {
   }
 
   /** Resolves to { ok, source, error }. */
-  async function load({ key } = {}) {
+  function load(options) {
     remove();
+    const mine = ++latest;
+    newest = attempt(options, mine);
+    return newest;
+  }
+
+  async function attempt({ key } = {}, mine) {
     const candidates = [];
     if (key) candidates.push(['your Google key', () => tryGoogle(key)]);
     else {
@@ -126,6 +137,10 @@ export function createPhotoreal(viewer, { onChange = () => {} } = {}) {
     for (const [label, make] of candidates) {
       try {
         const ts = await make();
+        if (mine !== latest) {
+          ts.destroy?.();
+          return newest;
+        }
         tileset = viewer.scene.primitives.add(ts);
         source = label;
         viewer.__mapName = 'GOOGLE PHOTOREAL 3D';
@@ -136,6 +151,7 @@ export function createPhotoreal(viewer, { onChange = () => {} } = {}) {
         error = e;
       }
     }
+    if (mine !== latest) return newest;
     onChange({ active: false, source: null, error });
     return { ok: false, error };
   }
@@ -143,6 +159,8 @@ export function createPhotoreal(viewer, { onChange = () => {} } = {}) {
   return {
     load,
     unload() {
+      latest++;
+      newest = Promise.resolve({ ok: false, error: null });
       remove();
       onChange({ active: false, source: null });
     },
