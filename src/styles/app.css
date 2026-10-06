@@ -725,6 +725,9 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 .stats-body { position: relative; }
 .stats-tiles { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
 .stats-svg { width: 100%; height: auto; display: block; margin-top: 8px; overflow: visible; }
+/* The chart is drawn 640 units wide, so on a phone its 12px labels shrink to about 6px: keep it wide enough to read and let it scroll sideways. */
+.stats-chart { overflow-x: auto; }
+@media (max-width: 720px) { .stats-svg { min-width: 560px; } }
 .stats-svg .sv-label { fill: var(--text-primary); font: 500 12px var(--font-sans); }
 .stats-svg .sv-sub { fill: var(--text-dim); font: 10px var(--font-mono); }
 .stats-svg .sv-base { stroke: rgba(255, 255, 255, 0.1); stroke-width: 1; }

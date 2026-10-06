@@ -71,7 +71,7 @@ export function yearMultiples(rows, from, to) {
   parts.push(`<line class="sv-rule" x1="0" x2="0" y1="0" y2="${axisY}" visibility="hidden"/>`);
   parts.push(`<rect class="sv-hit" x="${left}" y="0" width="${plotW}" height="${axisY}" fill="transparent"/>`);
   return {
-    svg: html`<svg class="stats-svg" viewBox="0 0 ${W} ${height}" role="img" aria-label="${t('Records per year in each archive, {from} to {to}', { from, to })}">${raw(parts.join(''))}</svg>`,
+    svg: html`<div class="stats-chart"><svg class="stats-svg" viewBox="0 0 ${W} ${height}" role="img" aria-label="${t('Records per year in each archive, {from} to {to}', { from, to })}">${raw(parts.join(''))}</svg></div>`,
     bind(root, tooltip) {
       const svg = root.querySelector('.stats-svg');
       // A name that is still wider than the gap after breaking (a Japanese one has no space to break at) is squeezed to fit; measured, because textLength also stretches a shorter one.
