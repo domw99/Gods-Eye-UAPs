@@ -14,12 +14,13 @@ A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 
 | `npm run dev` | Dev server at http://localhost:5173 |
 | `npm run build` | Production build into `dist/` (also writes a page per case, the case index, the open data and `sitemap.xml`) |
 | `npm run preview` | Serve `dist/` at http://localhost:4173 (what the browser tests use) |
-| `npm test` | Vitest, about 800 tests, a few seconds. Run it before every commit |
+| `npm test` | Vitest, about 900 tests, a few seconds. Run it before every commit |
 | `npm run e2e` | Playwright browser tests (desktop and phone), about 15 minutes. Needs `npx playwright install chromium` once, and a build first |
 | `npm run verify:media` | Checks the Commons files, Wikipedia titles, DVIDS ids and Blue Book ids the case files cite. Run it after editing a case |
 | `npm run data` | Rebuilds every dataset in `public/data/` from its source (slow, network) |
 | `npm run build:changelog` / `build:notices` | Regenerate `CHANGELOG.md` / `THIRD_PARTY_NOTICES.md`. Tests fail when they are stale |
 | `npm run i18n:add strings.json` | Add interface strings to all 15 language files (see below) |
+| `npm run mcp` | Start the MCP server for AI assistants ([docs/MCP.md](docs/MCP.md)); `scripts/lib/mcp.mjs` holds the tools |
 
 ## Where things are
 
@@ -58,7 +59,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-case). Then `npm run verify:media
 
 ## Workflows (`.github/workflows/`)
 
-`ci.yml` (tests, build, browser tests on every push), `pages.yml` (deploy), `sync-official.yml` (weekly DVIDS sync), `links.yml` (weekly check of every cited link; opens an issue), `indexnow.yml` (tells Bing and others about the sitemap and asks the Wayback Machine for a copy after each deploy), `cards.yml` (share cards), `release.yml`, `codeql.yml`.
+`ci.yml` (tests, build, browser tests on every push), `pages.yml` (deploy), `sync-official.yml` (weekly DVIDS sync, and the Kp series monthly), `links.yml` (weekly check of every cited link; opens an issue), `indexnow.yml` (tells Bing and others about the sitemap and asks the Wayback Machine for a copy after each deploy), `cards.yml` (share cards), `release.yml`, `codeql.yml`.
 
 ## Things that have bitten before
 

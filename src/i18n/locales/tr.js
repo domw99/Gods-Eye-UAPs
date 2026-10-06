@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "jeomanyetik etkinlik (Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "Bu tarih için jeomanyetik etkinlik, uygulamayla gelen kayıtta yok.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Ayrıca yakınınızdaki havaalanlarına, uçakların sık görülen bir neden olduğu yerlere, ve bir kutup ışığı oluşturmuş olabilecek jeomanyetik etkinliğe bakar.",
+  "Radar view: {n} records within {range} km, north at the top": "Radar görünümü: {range} km içinde {n} kayıt, kuzey yukarıda",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Yeni: arama kutusuna koordinat yazın ve her vaka için kutup ışığını ve en yakın havaalanlarını görün",
+  "less than 1 km away": "1 km'den yakın",
 };

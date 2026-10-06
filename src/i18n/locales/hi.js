@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "भू-चुंबकीय गतिविधि (Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "इस तारीख़ के लिए भू-चुंबकीय गतिविधि शामिल रिकॉर्ड में नहीं है।",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "यह आपके पास के हवाई अड्डे भी देखता है, जहाँ विमान आम कारण हैं, और भू-चुंबकीय गतिविधि भी, जिसने अरोरा जगाया हो सकता है।",
+  "Radar view: {n} records within {range} km, north at the top": "रडार दृश्य: {range} किमी के भीतर {n} रिकॉर्ड, उत्तर ऊपर",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "नया: खोज बॉक्स में निर्देशांक लिखें, और हर मामले के लिए अरोरा और सबसे पास के हवाई अड्डे देखें",
+  "less than 1 km away": "1 किमी से भी कम दूरी पर",
 };

@@ -146,6 +146,27 @@ export function bindList({ onSelect }) {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => update({ search: search.value.trim().toLowerCase() }, 'search'), 120);
   });
+  // Places are reachable from the keyboard: Down from the box enters the rows, Up and Down move between them
+  // (Up from the first goes back to the box, as Esc does), and Enter in the box goes to the first place.
+  const places = document.getElementById('place-results');
+  const rows = () => [...places.querySelectorAll('button')];
+  search.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' && rows().length) {
+      e.preventDefault();
+      rows()[0].focus();
+    } else if (e.key === 'Enter') places.querySelector('[data-coords], [data-place]')?.click();
+  });
+  places.addEventListener('keydown', (e) => {
+    const list = rows();
+    const at = list.indexOf(document.activeElement);
+    if (at < 0) return;
+    if (e.key === 'ArrowDown') list[Math.min(list.length - 1, at + 1)].focus();
+    else if (e.key === 'ArrowUp') (at ? list[at - 1] : search).focus();
+    else if (e.key === 'Escape') search.focus();
+    else return;
+    e.preventDefault();
+    e.stopPropagation();
+  });
   document.getElementById('sort').addEventListener('change', (e) => update({ sort: e.target.value }, 'sort'));
   document.getElementById('layers').addEventListener('click', (e) => {
     const b = e.target.closest('[data-layer]');

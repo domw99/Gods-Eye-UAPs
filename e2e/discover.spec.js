@@ -28,9 +28,25 @@ test.describe('Finding things', () => {
     await row.click();
     await expect(page.locator('#dossier-body')).toContainText('33.3943° N', { timeout: 30_000 });
     expect(page.url()).toMatch(/#\/near\/33\.3943,-104\.5230\//);
+    // The radar scope: every record near the place as a link, at its bearing and distance.
+    const radar = page.locator('#dossier-body svg.radar');
+    await expect(radar).toBeVisible();
+    await expect(radar).toHaveAttribute('aria-label', /^Radar view: \d+ records within 250 km, north at the top$/);
+    expect(await radar.locator('a').count()).toBeGreaterThan(0);
+    await expect(page.locator('#loading')).toBeHidden({ timeout: 30_000 });
+    expect((await audit(page)).violations.map((v) => v.id)).toEqual([]);
+    const first = radar.locator('a').first();
+    const href = await first.getAttribute('href');
+    await first.click({ force: true });
+    await expect.poll(() => page.url(), { timeout: 15_000 }).toContain(decodeURIComponent(href.slice(1)).split('/').slice(0, 2).join('/'));
+    await page.goBack();
     // Degrees, minutes and seconds with hemispheres, as in a report or a map link.
     await search.fill(`33°23'39"N 104°31'23"W`);
     await expect(page.locator('#place-results [data-coords]')).toContainText('33.3942° N, 104.5231° W');
+    // A military grid reference is a place too, and the HUD reads the grid under the camera.
+    await search.fill('13S ES 44360 95102');
+    await expect(page.locator('#place-results [data-coords]')).toContainText('33.3943° N, 104.5230° W');
+    await expect(page.locator('#hud-mgrs')).toHaveText(/^\d{1,2}[C-X]( [A-Z]{2}( \d{1,5} \d{1,5})?)?$/);
     // Words are still a search, not a place.
     await search.fill('Roswell');
     await expect(page.locator('#place-results [data-coords]')).toHaveCount(0);
@@ -76,10 +92,28 @@ test.describe('What did I see?: airfields and the aurora', () => {
     const fields = page.locator('#d-airfields');
     await expect(fields.locator('.airfield-list li').first()).toContainText('Minot Air Force Base', { timeout: 30_000 });
     await expect(fields.locator('.airfield-list li').first()).toContainText('MILITARY');
+    await expect(fields.locator('.airfield-list li').first()).toContainText('less than 1 km away');
     // At sea there is none within 80 km.
     await page.goto('about:blank');
     await openApp(page, '/#/case/nimitz-tic-tac-2004');
     await expect(page.locator('#d-airfields')).toContainText('No airport or airfield within 80 km.', { timeout: 30_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Place search from the keyboard', () => {
+  test('Down enters the rows and Up leaves them; Enter in the box goes to the first place', async ({ page }) => {
+    const errors = await openApp(page);
+    const search = page.locator('#search');
+    await search.fill('48.4150, -101.3570');
+    await expect(page.locator('#place-results [data-coords]')).toBeVisible();
+    await search.press('ArrowDown');
+    await expect(page.locator('#place-results [data-coords]')).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(search).toBeFocused();
+    await search.press('Enter');
+    await expect(page.locator('#dossier-body')).toContainText('48.4150° N', { timeout: 30_000 });
+    expect(page.url()).toMatch(/#\/near\/48\.4150,-101\.3570\//);
     expect(errors).toEqual([]);
   });
 });

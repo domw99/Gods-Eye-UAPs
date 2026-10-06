@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "지자기 활동(Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "이 날짜의 지자기 활동은 내장 기록에 없습니다.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "근처 비행장(항공기가 흔한 원인입니다)과 오로라를 일으켰을 수 있는 지자기 활동도 찾아봅니다.",
+  "Radar view: {n} records within {range} km, north at the top": "레이더 보기: {range}km 이내 기록 {n}건, 북쪽이 위",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "새 기능: 검색창에 좌표를 입력하고, 각 사례의 오로라와 가장 가까운 비행장을 확인하세요",
+  "less than 1 km away": "1km 미만",
 };

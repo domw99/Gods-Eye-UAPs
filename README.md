@@ -6,6 +6,8 @@
 
 It runs in your browser with nothing to install and no sign-up or API keys.
 
+<sub>Open it in your language: <a href="https://domw99.github.io/Gods-Eye-UAPs/">English</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=es">Español</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=fr">Français</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=de">Deutsch</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=pt">Português</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=it">Italiano</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=nl">Nederlands</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=pl">Polski</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=tr">Türkçe</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=ru">Русский</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=ar">العربية</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=hi">हिन्दी</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=id">Bahasa Indonesia</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=ja">日本語</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=ko">한국어</a> · <a href="https://domw99.github.io/Gods-Eye-UAPs/?lang=zh">中文</a></sub>
+
 <sub>made by <a href="https://github.com/domw99">domw99</a></sub>
 
 [![Live app](https://img.shields.io/badge/live%20app-domw99.github.io-00d4ff?style=flat-square&logo=githubpages&logoColor=white)](https://domw99.github.io/Gods-Eye-UAPs/)
@@ -47,7 +49,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 74 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
-- **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports. **Coordinates work in the same box**, with no lookup: `33.3943, -104.5230`, `33.39°N 104.52°W`, `33°23'39"N 104°31'23"W`, or a pasted Google Maps, OpenStreetMap, Apple Maps or `geo:` link.
+- **Search a place** to see everything reported near it, or press **Near me** (<kbd>N</kbd>) for your own location: cases, Blue Book and GEIPAN files, journal pages and a count of civilian reports. **Coordinates work in the same box**, with no lookup: `33.3943, -104.5230`, `33.39°N 104.52°W`, `33°23'39"N 104°31'23"W`, a military grid reference (`13S ES 44360 95102`), or a pasted Google Maps, OpenStreetMap, Apple Maps or `geo:` link. The HUD shows the MGRS grid under the camera, as fine as the height makes sense.
 - **On this day**: when a case happened on today's date (in any year), a small block above the list says so and opens it.
 - **Filters stay in view** as chips above the results, each removable, with **RESET ALL**. **Back and Forward** step through the records you opened, and every record has its own link.
 - **Group or ungroup** nearby markers (<kbd>C</kbd>). Labels that would overlap are hidden by priority, so the view stays readable.
@@ -126,6 +128,19 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
   - the aurora, when the geomagnetic Kp index was high enough for it to reach your latitude in a dark sky.
 
   Live flights need a server, so aircraft elsewhere are listed as not checkable. Above, a bright, still light low in the WSW at dusk comes back as **Venus**; a coloured glow over North Dakota at midnight on 14 March 1989 comes back as the **aurora** of the great storm (Kp 8-).
+<table>
+<tr>
+<td width="42%"><img src="docs/media/aurora-check.jpg" alt="What did I see? for a coloured, still glow over Minot, North Dakota at midnight on 14 March 1989: Aurora (Kp 8-) is a strong match, ahead of Jupiter, Sirius and the Moon" /></td>
+<td width="29%"><img src="docs/media/context-kp-airfields.jpg" alt="The Gorman dogfight (1948): Kp 6+, a moderate storm, the aurora could have been overhead, and the nearest airfields, Hector International at under 1 km" /></td>
+<td width="29%"><img src="docs/media/radar.jpg" alt="Near Roswell: a radar scope with north up and rings at 50, 100 and 250 km, each record a blip at its bearing and distance, above the list of case files" /></td>
+</tr>
+<tr>
+<td><sub><b>Aurora or aircraft?</b> The same still, coloured glow over North Dakota on 14 March 1989, the night of the great geomagnetic storm, ranks the aurora first. Change it to a steady, blinking light and it becomes an aircraft out of Minot Air Force Base.</sub></td>
+<td><sub><b>Kp and airfields</b> in every case file. The Gorman dogfight (Fargo, 1948) happened in a moderate storm, when the aurora could have been overhead; the airport was under a kilometre away. The file says what could have been, not what was.</sub></td>
+<td><sub><b>The radar scope</b> in <i>Near me</i> and place search: you at the centre, rings at 50, 100 and 250 km, and each record at its bearing and distance. The blips are links.</sub></td>
+</tr>
+</table>
+
 - **The sky at that moment**, for every case: Sun, Moon phase, planets and bright stars. Objects named in the official explanation are circled. For the Hills in 1961, Jupiter sits low in the SSW beside the Moon, just as the Air Force file says.
 - **Historical weather** since 1940 (ERA5): cloud layers, wind at 10 m and 100 m, and whether a slow object moved with the wind.
 - **That day from orbit**, for cases since 2000: NASA's true-colour picture of the whole Earth that day (MODIS on the Terra satellite) laid over the globe. Below, O'Hare on 7 November 2006 under the solid overcast the witnesses described.
@@ -423,7 +438,7 @@ src/
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
               stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
-              build-kp.mjs · build-airfields.mjs
+              build-kp.mjs · build-airfields.mjs · mcp-server.mjs (MCP server for AI assistants)
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
               build-cards.mjs (case preview images) · indexnow.mjs (search engines) · archive-pages.mjs (Wayback Machine)
               build-skybox.py (NASA star map → sky box)
@@ -431,7 +446,7 @@ scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-
               lib/ (GeoNames gazetteer · page-shell.mjs: the frame the static pages share · case-pages.mjs: a page per case, the case index + sitemap · browse-pages.mjs: the pages by country, decade, status and more · open-data.mjs: JSON, CSV, GeoJSON · llms.mjs: robots.txt, llms.txt, llms-full.txt; all made at build)
 public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
-docs/         SPEC.md (the full product spec) · KNOWN-ISSUES.md (limits of the app and the data) · media/ (README pictures and videos)
+docs/         SPEC.md (the full product spec) · KNOWN-ISSUES.md (limits of the app and the data) · MCP.md (the AI-assistant server) · media/ (README pictures and videos)
 AGENTS.md     the developer guide (commands, conventions, releases); CLAUDE.md points to it
 CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · CHANGELOG.md · DATA_SOURCES.md · THIRD_PARTY_NOTICES.md
 ```
@@ -448,7 +463,9 @@ The 161 case files are free to reuse, under the same MIT licence as the code, fr
 | [`cases.csv`](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.csv) | One row per case, for spreadsheets |
 | [`cases.geojson`](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.geojson) | A point per case and a 3D line per flight path, for GIS tools and web maps |
 
-They are made from `src/data/cases/` on every build, with the page describing them as a schema.org Dataset so dataset search engines can find it. There is also a plain **[list of all case files](https://domw99.github.io/Gods-Eye-UAPs/case/)**, with no 3D globe needed.
+They are made from `src/data/cases/` on every build, with the page describing them as a schema.org Dataset so dataset search engines can find it. There is also a plain **[list of all case files](https://domw99.github.io/Gods-Eye-UAPs/case/)**, with no 3D globe needed, and pages that **[browse them](https://domw99.github.io/Gods-Eye-UAPs/browse/)** by country, decade, status, kind of encounter, evidence and shape.
+
+**For AI assistants:** [`llms.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms.txt) and [`llms-full.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt) describe the site and give every case as plain text, and `npm run mcp` starts a local [Model Context Protocol server](docs/MCP.md) (no network, no dependencies) with tools to search the cases, read one, find the cases near a place and list a date's. See [docs/MCP.md](docs/MCP.md) for Claude Code and Claude Desktop.
 
 ## Where the data comes from
 
@@ -505,7 +522,7 @@ It then appears on the globe.
 
 **Any other static host works too.** Run `SITE_URL=https://your.site/ npm run build` (`SITE_URL` goes into the link previews and the sitemap; add `BASE_PATH=/subpath/` when it is not served from the root), then upload `dist/`. To try it in a container: `docker run --rm -p 8080:80 -v "$PWD/dist:/usr/share/nginx/html:ro" nginx:alpine`.
 
-`ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
+`ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday (and the geomagnetic Kp series on the first Monday of the month), commits any change and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
 The build writes a page per case (`case/<id>/`), an index of them (`case/`), pages that group the cases by country, decade, status, kind of encounter, evidence and shape (`browse/`; a group needs two cases), the open data (`open-data/`), a `sitemap.xml`, and `robots.txt`, `llms.txt` and `llms-full.txt` (the cases as plain text for AI assistants; crawlers read these at the root of a host, so on a `github.io/<repo>/` address they matter only on a custom domain). A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 

@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "geomagnetische activiteit (Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "De geomagnetische activiteit staat niet in de meegeleverde gegevens voor deze datum.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Ook zoekt de app vliegvelden in je buurt, waar vliegtuigen een veelvoorkomende oorzaak zijn, en geomagnetische activiteit die een poollicht kan hebben veroorzaakt.",
+  "Radar view: {n} records within {range} km, north at the top": "Radarbeeld: {n} meldingen binnen {range} km, noorden boven",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nieuw: typ coördinaten in het zoekvak en zie voor elk geval het poollicht en de dichtstbijzijnde vliegvelden",
+  "less than 1 km away": "minder dan 1 km verderop",
 };

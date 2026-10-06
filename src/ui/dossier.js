@@ -12,6 +12,8 @@ import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/la
 import { loadKp, kpThirds, kpLabel, stormScale, STORM_NAMES, auroraChance } from '../services/geomagnetic.js';
 import { loadAirfields, nearestAirfields, airfieldProximity, SIZES } from '../services/airfields.js';
 import { skySection } from './skychart.js';
+import { radarScope } from './radar.js';
+import { JOURNALS_COLOR } from '../services/journals.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
 import { shareLink } from '../app/links.js';
@@ -215,7 +217,7 @@ async function fillAirfields(token, lat, lon) {
     html`${list.length
       ? html`<ul class="source-list airfield-list">${list.map(
           (a) => html`<li><span class="badge ${a.military ? 'official' : ''}">${a.military ? 'MILITARY' : a.code}</span>
-            <span><b>${a.name}</b>${a.military ? html` <span class="dim">${a.code}</span>` : ''}<br /><span class="dim">${t('{km} km {dir}', { km: a.km < 10 ? a.km.toFixed(1) : Math.round(a.km), dir: compass(a.bearing) })} · ${t(SIZES[a.size])}</span></span></li>`,
+            <span><b>${a.name}</b>${a.military ? html` <span class="dim">${a.code}</span>` : ''}<br /><span class="dim">${a.km < 1 ? t('less than 1 km away') : t('{km} km {dir}', { km: a.km < 10 ? a.km.toFixed(1) : Math.round(a.km), dir: compass(a.bearing) })} · ${t(SIZES[a.size])}</span></span></li>`,
         )}</ul>`
       : html`<p class="d-text">No airport or airfield within 80 km.</p>`}
       ${near ? html`<p class="d-text">Aircraft arriving or leaving an airfield show bright landing lights, and one flying toward you can seem to hang still. It is a common cause of reports near airfields.</p>` : ''}
@@ -922,10 +924,19 @@ export function renderNearby({ label, lat, lon, data }) {
   const block = (rows, row, note) => (rows == null ? pending : html`${list(rows, row)}${note ? html`<p class="caveat">${note}</p>` : ''}`);
   const d = data;
   const total = ['cases', 'bluebook', 'geipan', 'mufon', 'journals'].reduce((n, k) => n + (d[k]?.length || 0), 0);
+  // A radar view of all of it: you at the centre, each record at its bearing and distance.
+  const blips = [
+    ...(d.cases || []).map((c) => ({ href: `#/${c.kind}/${encodeURIComponent(c.id)}`, label: `${c.title}, ${c.year}`, distKm: c.distKm, bearing: c.bearing, color: STATUS[c.status]?.color || '#00d4ff' })),
+    ...(d.bluebook || []).map((r) => ({ href: `#/bluebook/${encodeURIComponent(r.id)}`, label: `Project Blue Book, ${r.place}, ${r.year}`, distKm: r.distKm, bearing: r.bearing, color: '#ffb547' })),
+    ...(d.geipan || []).map((r) => ({ href: `#/geipan/${encodeURIComponent(r.id)}`, label: `GEIPAN, ${r.place}, ${geipanDate(r)}`, distKm: r.distKm, bearing: r.bearing, color: CLASS_COLORS[r.cls] || '#5f8bff' })),
+    ...(d.mufon || []).map((h) => ({ href: pageHref(h.is, h.leaf), label: `MUFON Journal, ${h.place}, ${issueDate(h.is)}`, distKm: h.distKm, bearing: h.bearing, color: '#b58cff' })),
+    ...(d.journals || []).map((h) => ({ href: pageHref(h.is, h.leaf), label: `${h.place}, ${issueDate(h.is)}`, distKm: h.distKm, bearing: h.bearing, color: JOURNALS_COLOR })),
+  ];
   mount(
     body(),
     html`<div class="d-title">${label === 'you' ? t('Reported near you') : t('Reported near {place}', { place: label })}</div>
     <div class="d-sub">${formatDMS(lat, lon)}${d.done ? html`<br />${t('{n} records within range', { n: total.toLocaleString(locale()) })}${d.nuforc != null ? ` · ${t('{n} civilian reports within 50 km', { n: d.nuforc.toLocaleString(locale()) })}` : ''}` : ''}</div>
+    ${radarScope(blips)}
     ${section('CASE FILES WITHIN 250 KM', block(d.cases, (c) => html`<li>${statusBadge(c.status)}<span><a href="#/${c.kind}/${encodeURIComponent(c.id)}">${c.title}</a> · ${c.year} · ${km(c.distKm)} km</span></li>`))}
     ${section('PROJECT BLUE BOOK WITHIN 100 KM', block(d.bluebook, (r) => html`<li><span class="badge">USAF</span><span><a href="#/bluebook/${encodeURIComponent(r.id)}">${r.place}</a> · ${r.year}${r.month ? `-${String(r.month).padStart(2, '0')}` : ''} · ${km(r.distKm)} km</span></li>`, 'Air Force case files placed at the town in their file name.'))}
     ${d.geipan !== undefined ? section('GEIPAN (FRANCE) WITHIN 50 KM', block(d.geipan, (r) => html`<li>${classBadge(r.cls)}<span><a href="#/geipan/${encodeURIComponent(r.id)}">${r.place}</a> · ${geipanDate(r)} · ${km(r.distKm)} km<span class="mufon-quote" lang="fr">${r.short}</span></span></li>`)) : ''}

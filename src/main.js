@@ -31,6 +31,7 @@ import { searchJournals } from './services/textsearch.js';
 import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } from './ui/sharecard.js';
 import { shareLink, decodeHashPart, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
 import { parseCoordinates, formatCoordinates } from './app/coords.js';
+import { toMgrs } from './util/mgrs.js';
 import { createZoomOut } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
@@ -46,7 +47,7 @@ import { launchesNear } from './services/launches.js';
 import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
-import { formatDMS, haversineKm } from './util/geo.js';
+import { formatDMS, haversineKm, bearingDeg } from './util/geo.js';
 import { shapeClasses, evidenceScore, STATUS, EVIDENCE } from './data/taxonomy.js';
 import { classInfo as geipanClassInfo } from './services/geipan.js';
 import { RELEASE } from './config.js';
@@ -1058,13 +1059,13 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
     list
       .map((x) => ({ x, p: pos(x) }))
       .filter(({ p }) => p && p.lat != null)
-      .map(({ x, p }) => ({ ...x, distKm: haversineKm(lat, lon, p.lat, p.lon) }))
+      .map(({ x, p }) => ({ ...x, distKm: haversineKm(lat, lon, p.lat, p.lon), bearing: bearingDeg(lat, lon, p.lat, p.lon) }))
       .filter((x) => x.distKm <= r)
       .sort((a, b) => a.distKm - b.distKm);
   const pagesNear = (m) =>
     within(m.records, 60)
       .slice(0, 25)
-      .map((r) => ({ is: m.issues[r.issue], leaf: r.leaf, place: r.place, quote: r.quote, distKm: r.distKm }));
+      .map((r) => ({ is: m.issues[r.issue], leaf: r.leaf, place: r.place, quote: r.quote, distKm: r.distKm, bearing: r.bearing }));
   // GEIPAN only covers France and its territories.
   const inFrance = (lat > 41 && lat < 51.5 && lon > -5.5 && lon < 10) || geipan;
   const data = {
@@ -1811,7 +1812,7 @@ function maybeWelcome() {
   if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('New: share any case to X, Reddit, Bluesky and more in one click, and download every case file as open data', 7000);
+    toast('New: type coordinates into the search box, and see the aurora and the nearest airfields for every case', 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
@@ -2162,6 +2163,7 @@ window.addEventListener('keydown', (e) => {
 const hud = {
   utc: document.getElementById('hud-utc'),
   cam: document.getElementById('hud-cam'),
+  mgrs: document.getElementById('hud-mgrs'),
   alt: document.getElementById('hud-alt'),
   map: document.getElementById('hud-map'),
 };
@@ -2175,6 +2177,9 @@ setInterval(() => {
       : new Date().toISOString().slice(0, 19).replace('T', ' ');
   const c = viewer.camera.positionCartographic;
   hud.cam.textContent = formatDMS(Cesium.Math.toDegrees(c.latitude), Cesium.Math.toDegrees(c.longitude));
+  // The military grid under the camera, as fine as the height makes sense: the square from far out, the metre from close in.
+  const digits = c.height > 2e6 ? 0 : c.height > 3e5 ? 1 : c.height > 3e4 ? 2 : c.height > 3e3 ? 3 : c.height > 300 ? 4 : 5;
+  hud.mgrs.textContent = toMgrs(Cesium.Math.toDegrees(c.latitude), Cesium.Math.toDegrees(c.longitude), digits) || '—';
   hud.alt.textContent = c.height > 1e4 ? `${(c.height / 1000).toFixed(0)} KM` : `${Math.round(c.height)} M`;
   hud.map.textContent = `${viewer.__mapName || ''}${lightMode !== 'auto' ? ` · ${lightMode.toUpperCase()}` : ''}`;
 }, 250);

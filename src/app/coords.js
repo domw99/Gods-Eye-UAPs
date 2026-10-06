@@ -2,10 +2,12 @@
  * Coordinates typed or pasted into the search box, read without the network:
  * decimal degrees ("51.5, -0.12"), degrees with a hemisphere ("51.5N 0.12W",
  * "N 51.5 W 0.12"), degrees-minutes-seconds (51°30'26"N 0°7'39"W) or degrees
- * and decimal minutes, and the links map sites and phones share (geo: links,
- * Google Maps, OpenStreetMap, Apple Maps). Latitude comes first unless it
- * cannot be one ("-122.4, 37.8" is read as longitude, latitude).
+ * and decimal minutes, military grid references ("13S ES 44360 95102"), and the
+ * links map sites and phones share (geo: links, Google Maps, OpenStreetMap,
+ * Apple Maps). Latitude comes first unless it cannot be one ("-122.4, 37.8" is
+ * read as longitude, latitude).
  */
+import { fromMgrs } from '../util/mgrs.js';
 
 const NUM = String.raw`\d+(?:\.\d+)?`;
 const TOKEN = new RegExp(`([NSEW])(?![a-z])|(-?${NUM})|([°'"])`, 'gi');
@@ -53,8 +55,11 @@ function group(tokens) {
 
 /** { lat, lon } for text that is a coordinate pair, or null. */
 export function parseCoordinates(input) {
-  const text = normalise(String(input ?? '').trim());
+  const raw = String(input ?? '').trim();
+  const text = normalise(raw);
   if (!text || text.length > 200) return null;
+  const grid = fromMgrs(raw);
+  if (grid) return grid;
   const link = fromLink(text);
   let pair;
   if (link) pair = [{ value: Number(link[0]), axis: null }, { value: Number(link[1]), axis: null }];

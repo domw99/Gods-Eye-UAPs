@@ -764,6 +764,24 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 body.clean .topbar, body.clean #left, body.clean #dossier, body.clean #timeline, body.clean .tl-show, body.clean #playback,
 body.clean .map-controls, body.clean #active-filters, body.clean .moon-view .panel, body.clean .moon-credit { opacity: 0; pointer-events: none; transition: opacity 200ms; }
 body.clean .hud-br, body.clean .hud-tl { opacity: 0.7; }
+/* The radar scope in the Near me panel. */
+.radar { display: block; width: min(100%, 270px); height: auto; margin: 14px auto 2px; }
+.radar-disc { fill: rgba(0, 212, 255, 0.045); stroke: rgba(0, 212, 255, 0.5); stroke-width: 1; }
+.radar-ring { fill: none; stroke: rgba(0, 212, 255, 0.22); stroke-width: 0.7; }
+.radar-axis { stroke: rgba(0, 212, 255, 0.16); stroke-width: 0.6; }
+.radar-scale { fill: var(--text-secondary); font: 7px var(--font-mono); }
+.radar-cardinal { fill: var(--text-secondary); font: 600 8px var(--font-mono); }
+.radar-beam { stroke: rgba(0, 212, 255, 0.85); stroke-width: 1; }
+.radar-you { fill: var(--accent); }
+.radar-hit { fill: transparent; }
+.radar a { cursor: pointer; }
+.radar-blip { stroke: rgba(5, 7, 12, 0.85); stroke-width: 0.8; }
+.radar a:hover .radar-blip, .radar a:focus-visible .radar-blip { stroke: #fff; stroke-width: 1.4; }
+.radar a:focus-visible { outline: none; }
+.radar a:focus-visible .radar-hit { stroke: var(--accent); stroke-width: 1; }
+.radar-sweep { transform-origin: 0 0; }
+@media (prefers-reduced-motion: no-preference) { .radar-sweep { animation: radar-sweep 6s linear infinite; } }
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
 .on-this-day { margin: 10px 0 4px; padding: 8px 10px 6px; border: 1px solid var(--glass-border); border-radius: 10px; background: rgba(255, 255, 255, 0.03); }
 .otd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .otd-head .section-label { margin: 0; }

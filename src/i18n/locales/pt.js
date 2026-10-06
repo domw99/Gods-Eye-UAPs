@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "atividade geomagnética (Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "A atividade geomagnética não está no registro incluído para esta data.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Também procura aeródromos perto de você, onde as aeronaves são uma causa comum, e atividade geomagnética que possa ter acendido uma aurora.",
+  "Radar view: {n} records within {range} km, north at the top": "Visão de radar: {n} registros em um raio de {range} km, norte para cima",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Novidade: digite coordenadas na busca e veja a aurora e os aeródromos mais próximos de cada caso",
+  "less than 1 km away": "a menos de 1 km",
 };

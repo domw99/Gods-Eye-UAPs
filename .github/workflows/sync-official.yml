@@ -2,6 +2,7 @@ name: Sync official UAP releases
 
 # Weekly: re-scrape the Department of War / AARO releases on DVIDS, and if
 # anything new appeared, commit the updated catalogue and redeploy the site.
+# On the first Monday of the month the geomagnetic Kp series is refreshed too.
 on:
   schedule:
     - cron: '17 6 * * 1' # Mondays 06:17 UTC
@@ -40,6 +41,13 @@ jobs:
               console.log('No new or changed releases.');
             } else console.log('Catalogue changed:', before.count, '->', after.count);
           "
+      - name: Refresh the Kp index (on the first Monday of the month, so the file's history stays small)
+        run: |
+          if [ "$(date -u +%d)" -le 7 ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            npm run build:kp
+          else
+            echo "Not the first Monday; keeping the Kp series."
+          fi
       - run: npm test
       - name: Commit if changed
         id: commit
@@ -51,7 +59,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data
-          git commit -m "Sync official UAP releases from DVIDS"
+          git commit -m "Sync official UAP releases from DVIDS and the Kp index"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Redeploy the site

@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "地磁気の活動(Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "この日付の地磁気の活動は同梱の記録にありません。",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "近くの飛行場(航空機がよくある原因です)と、オーロラを生んだ可能性のある地磁気の活動も調べます。",
+  "Radar view: {n} records within {range} km, north at the top": "レーダー表示:{range} km 以内の記録 {n} 件(上が北)",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新機能:検索ボックスに座標を入力でき、各事例のオーロラと最寄りの飛行場も見られます",
+  "less than 1 km away": "1 km 未満",
 };

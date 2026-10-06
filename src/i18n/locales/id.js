@@ -884,4 +884,7 @@ export default {
   "geomagnetic activity (Kp)": "aktivitas geomagnetik (Kp)",
   "Geomagnetic activity is not in the bundled record for this date.": "Aktivitas geomagnetik tidak ada dalam catatan bawaan untuk tanggal ini.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Juga mencari landasan di dekat Anda, tempat pesawat sering jadi penyebab, dan aktivitas geomagnetik yang mungkin memunculkan aurora.",
+  "Radar view: {n} records within {range} km, north at the top": "Tampilan radar: {n} catatan dalam radius {range} km, utara di atas",
+  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Baru: ketik koordinat di kotak pencarian, dan lihat aurora serta landasan terdekat untuk setiap kasus",
+  "less than 1 km away": "kurang dari 1 km",
 };
