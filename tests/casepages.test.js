@@ -43,9 +43,10 @@ describe('case pages', () => {
     expect(page).not.toContain('<img');
   });
 
-  it('lists the app, the case index, the open data and every case in the sitemap', () => {
+  it('lists the app, the case index, the browse index, the open data and every case in the sitemap', () => {
     const xml = sitemap(SITE, ['a', 'b'], '2026-01-02');
-    expect(xml.match(/<url>/g)).toHaveLength(5);
+    expect(xml.match(/<url>/g)).toHaveLength(6);
+    expect(xml).toContain(`<loc>${SITE}browse/</loc>`);
     expect(xml).toContain(`<loc>${SITE}case/</loc>`);
     expect(xml).toContain(`<loc>${SITE}open-data/</loc>`);
     expect(xml).toContain(`<loc>${SITE}case/b/</loc><lastmod>2026-01-02</lastmod>`);

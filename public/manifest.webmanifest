@@ -33,6 +33,60 @@
       "purpose": "maskable"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Random case",
+      "short_name": "Random",
+      "description": "Open a random case with a flight path or strong evidence",
+      "url": "./?open=random",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "What did I see?",
+      "short_name": "What did I see?",
+      "description": "Check a sighting against planets, satellites, launches and wind",
+      "url": "./?open=explain",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Official files",
+      "short_name": "Files",
+      "description": "The U.S. and French government files, Blue Book and the MUFON archives",
+      "url": "./?open=files",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "The Moon",
+      "short_name": "Moon",
+      "description": "The Moon globe, with landing sites and reports",
+      "url": "./#/moon",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "screenshots": [
     {
       "src": "screenshots/wide.jpg",

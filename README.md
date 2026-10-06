@@ -34,7 +34,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **161** curated case files<br><sub>1561 → 2024, 34 countries</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **161** curated case files<br><sub>1561 → 2024, 33 countries and territories</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
 | **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **873** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
@@ -43,7 +43,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <img src="docs/media/globe.jpg" alt="The globe with curated case files (cyan and amber) and official U.S. releases (magenta)" width="100%" />
 
-- **161 curated case files** from 1561 to 2024, in 34 countries. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. Latest additions: the 1913 Great Meteor Procession, Clyde Tombaugh's 1949 sighting, the Kirtland AFB tower (1957), the Antarctic sightings of 1965, the Paulding Light, Wurtsmith AFB and its tanker chase (1975), Alitalia over Kent (1991), Air France 3532 (1994), British Airways 5061 (1995), Bariloche (1995), the Colorado drones (2019), Langley AFB (2023) and the 2024 drones over the U.S. bases in England. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
+- **161 curated case files** from 1561 to 2024, in 33 countries and territories. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. Latest additions: the 1913 Great Meteor Procession, Clyde Tombaugh's 1949 sighting, the Kirtland AFB tower (1957), the Antarctic sightings of 1965, the Paulding Light, Wurtsmith AFB and its tanker chase (1975), Alitalia over Kent (1991), Air France 3532 (1994), British Airways 5061 (1995), Bariloche (1995), the Colorado drones (2019), Langley AFB (2023) and the 2024 drones over the U.S. bases in England. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 74 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram, or press ▶ to sweep through history.
@@ -266,7 +266,7 @@ The pins are placed by a mapping fitted to known craters on the photograph (Greg
 
 <img src="docs/media/phones.jpg" alt="The app on a phone: globe and layers, a case dossier, and the sky chart" width="100%" />
 
-**Save it as an app**: on a phone, **⤓ INSTALL APP** in the top bar installs it in one tap where the browser allows it, and otherwise shows the exact steps for your browser (Share → Add to Home Screen on iPhone, the ⋮ menu on Android). It opens full screen, respects the notch and the home bar, reopens quickly, and works offline for what you have already looked at. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
+**Save it as an app**: on a phone, **⤓ INSTALL APP** in the top bar installs it in one tap where the browser allows it, and otherwise shows the exact steps for your browser (Share → Add to Home Screen on iPhone, the ⋮ menu on Android). It opens full screen, respects the notch and the home bar, reopens quickly, and works offline for what you have already looked at. Press and hold the icon for shortcuts: a random case, WHAT DID I SEE?, the official files and the Moon. The globe only draws when something changes and matches its sharpness to the device, so it stays smooth and easy on the battery. Phones get a lighter copy of the star sky. If your system is set to reduce motion, the camera cuts instead of flying.
 
 <img src="docs/media/languages.jpg" alt="The same case file in German, Japanese, Arabic (right to left) and Russian" width="100%" />
 
@@ -351,6 +351,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | [`?mode=nvg`](https://domw99.github.io/Gods-Eye-UAPs/?mode=nvg) | Start in a sensor mode |
 | [`?layers=bluebook,geipan,mufon`](https://domw99.github.io/Gods-Eye-UAPs/?layers=bluebook,geipan,mufon) | Start with extra layers on |
 | [`?view=-104.5,33.7,25000,0,-35`](https://domw99.github.io/Gods-Eye-UAPs/?view=-104.5,33.7,25000,0,-35) | Start at a camera position (lon, lat, height m, heading°, pitch°) |
+| [`?open=explain`](https://domw99.github.io/Gods-Eye-UAPs/?open=explain) | Open a screen on load: `explain` (WHAT DID I SEE?), `files`, `stats`, `space`, `log`, `about`, `tour` or `random`. The installed app's shortcuts use these |
 
 </details>
 
@@ -417,7 +418,7 @@ scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-
               build-cards.mjs (case preview images) · indexnow.mjs (search engines) · archive-pages.mjs (Wayback Machine)
               build-skybox.py (NASA star map → sky box)
               verify-media.mjs · check-links.mjs · fix-cesium-base.mjs
-              lib/ (GeoNames gazetteer · case-pages.mjs: a page per case, the case index + sitemap · open-data.mjs: JSON, CSV, GeoJSON; made at build)
+              lib/ (GeoNames gazetteer · page-shell.mjs: the frame the static pages share · case-pages.mjs: a page per case, the case index + sitemap · browse-pages.mjs: the pages by country, decade, status and more · open-data.mjs: JSON, CSV, GeoJSON · llms.mjs: robots.txt, llms.txt, llms-full.txt; all made at build)
 public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
 docs/         SPEC.md (the full product spec) · KNOWN-ISSUES.md (limits of the app and the data) · media/ (README pictures and videos)
@@ -494,7 +495,7 @@ It then appears on the globe.
 
 `ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
-The build writes a page per case (`case/<id>/`), an index of them (`case/`), the open data (`open-data/`) and a `sitemap.xml`. A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
+The build writes a page per case (`case/<id>/`), an index of them (`case/`), pages that group the cases by country, decade, status, kind of encounter, evidence and shape (`browse/`; a group needs two cases), the open data (`open-data/`), a `sitemap.xml`, and `robots.txt`, `llms.txt` and `llms-full.txt` (the cases as plain text for AI assistants; crawlers read these at the root of a host, so on a `github.io/<repo>/` address they matter only on a custom domain). A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 
 ## Contributing
 

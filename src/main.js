@@ -1791,7 +1791,7 @@ function maybeWelcome() {
     localStorage.setItem(RELEASE_KEY, RELEASE);
   } catch {}
   if (navigator.webdriver) return;
-  if (!seen && !location.hash && !state.selected) welcome.hidden = false;
+  if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
     toast('New: share any case to X, Reddit, Bluesky and more in one click, and download every case file as open data', 7000);
 }
@@ -2252,6 +2252,22 @@ function viewFromParam(value) {
 }
 
 const params = new URLSearchParams(location.search);
+/**
+ * ?open=<what> opens one of the app's screens on load: the targets of the
+ * installed app's shortcuts and of links that say "check your sighting here".
+ */
+const OPEN_TARGETS = {
+  explain: () => openExplainNow(),
+  stats: () => openStatsNow(),
+  files: () => openFiles(),
+  space: () => openSpaceNow(),
+  log: () => openLog(),
+  about: () => openAboutModal(),
+  tour: () => startTour(),
+  random: () => surpriseMe(),
+  surprise: () => surpriseMe(),
+};
+const openTarget = Object.keys(OPEN_TARGETS).includes(params.get('open')) ? OPEN_TARGETS[params.get('open')] : null;
 if (params.get('mode')) setMode(params.get('mode'));
 if (params.get('layers'))
   for (const l of params.get('layers').split(',')) if (l in state.layers) setLayer(l, true);
@@ -2274,6 +2290,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
       loading.classList.add('done');
       if (!routeToMoon()) routeToSpace();
       maybeWelcome();
+      openTarget?.();
       // Compile the picking shaders while idle, so the first hover doesn't stall.
       const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
       (window.requestIdleCallback || setTimeout)(warm, { timeout: 3000 });

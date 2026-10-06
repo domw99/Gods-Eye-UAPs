@@ -11,23 +11,12 @@
  */
 import { STATUS, CATEGORY } from '../../src/data/taxonomy.js';
 import { AUTHOR, AUTHOR_URL, REPO_URL } from '../../src/config.js';
+import { esc, ldJson, caseDate } from './page-shell.mjs';
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-export const esc = (s) =>
-  String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
-
-/** JSON for a <script type="application/ld+json"> block: `<` escaped so no text can close the script. */
-export const ldJson = (data) => JSON.stringify(data).replace(/</g, '\\u003c');
+export { esc, ldJson, caseDate };
 
 /** The fragment that marks a link shared from the app: the page then opens the case on the globe at once. */
 export const GLOBE_HASH = '#globe';
-
-/** The case's local calendar date, as written in its record ("14 April 1561"). */
-export function caseDate(iso) {
-  const m = /^(-?\d{1,4})-(\d{2})-(\d{2})/.exec(iso || '');
-  return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${Number(m[1])}` : '';
-}
 
 /** Cut text at a word boundary to at most `max` characters. */
 export function clip(text, max) {
@@ -38,7 +27,7 @@ export function clip(text, max) {
 }
 
 /** The page for one case. `site` is the app's absolute URL, ending in '/'. */
-export function casePage(c, { site, card = false, similar = [] }) {
+export function casePage(c, { site, card = false, similar = [], groups = [] }) {
   const url = `${site}case/${c.id}/`;
   const app = `../../#/case/${encodeURIComponent(c.id)}`;
   const year = (c.date || '').slice(0, 4).replace(/^0+/, '');
@@ -121,6 +110,8 @@ h2{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:#9aa4b2;mar
 .crumbs{font:13px "JetBrains Mono",ui-monospace,monospace;color:#8a93a1}
 .crumbs a:not(.brand){color:#9aa4b2}
 ul{padding-left:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.chips a{display:inline-block;padding:4px 10px;border:1px solid #1d2633;border-radius:999px;text-decoration:none;font-size:14px}
 img{max-width:100%;height:auto;border-radius:8px;margin-top:22px}
 footer{margin-top:40px;font-size:12px;color:#8a93a1}
 footer a{color:inherit}
@@ -138,9 +129,10 @@ ${card ? `<img src="../../cards/${esc(c.id)}.jpg" width="1200" height="630" alt=
 ${c.explanation ? `<h2>Explanation</h2>\n<p>${esc(c.explanation)}</p>` : ''}
 ${facts.length ? `<h2>What was seen</h2>\n<p>${facts.map(([k, v]) => `${k}: ${esc(v)}`).join('<br>\n')}</p>` : ''}
 ${sources.length ? `<h2>Sources</h2>\n<ul>\n${sources.map((s) => `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.label || s.url)}</a></li>`).join('\n')}\n</ul>` : ''}
+${groups.length ? `<h2>Browse</h2>\n<ul class="chips">\n${groups.map((g) => `<li><a href="../../browse/${esc(g.kind)}/${esc(g.slug)}/">${esc(g.name)}</a></li>`).join('\n')}\n</ul>` : ''}
 ${similar.length ? `<h2>Similar cases</h2>\n<ul>\n${similar.map((d) => `<li><a href="../${esc(d.id)}/">${esc(d.title)}</a> <span class="meta">${esc(caseDate(d.date))}</span></li>`).join('\n')}\n</ul>` : ''}
 <a class="open" href="${esc(app)}">Open on the 3D globe →</a>
-<footer>God's Eye // UAP · <a href="../">All case files</a> · <a href="../../open-data/">Open data</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
+<footer>God's Eye // UAP · <a href="../">All case files</a> · <a href="../../browse/">Browse</a> · <a href="../../open-data/">Open data</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
 </main>
 </body>
 </html>
@@ -214,10 +206,10 @@ export function caseIndex(cases, { site }) {
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push(c);
   }
-  const countries = new Set(cases.map((c) => c.cc).filter(Boolean)).size;
+  const countries = new Set(cases.map((c) => c.cc).filter((c) => c && c !== 'XX')).size;
   const first = sorted[0]?.date.slice(0, 4);
   const last = sorted.at(-1)?.date.slice(0, 4);
-  const description = `${cases.length} well-documented UFO/UAP encounters from ${first} to ${last}, in ${countries} countries: each with its sources, its timeline and the official or best explanation.`;
+  const description = `${cases.length} well-documented UFO/UAP encounters from ${first} to ${last}, in ${countries} countries and territories: each with its sources, its timeline and the official or best explanation.`;
   const structured = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -276,18 +268,18 @@ footer a{color:inherit}
 <a class="brand" href="../">GOD'S EYE // UAP</a>
 <h1>All ${cases.length} case files</h1>
 <p>${esc(description)} Each link opens the case file; from there it opens on the 3D globe with its flight path, the footage and the files.</p>
-<a class="open" href="../">Open the 3D globe →</a><a class="open" href="../open-data/">Download the data</a>
+<a class="open" href="../">Open the 3D globe →</a><a class="open" href="../browse/">Browse by country, status and more</a><a class="open" href="../open-data/">Download the data</a>
 ${[...groups].map(([k, list]) => `<h2>${esc(k)} · ${list.length}</h2>\n<ul>\n${list.map(row).join('\n')}\n</ul>`).join('\n')}
-<footer>God's Eye // UAP · <a href="../open-data/">Open data</a> · <a href="${esc(REPO_URL)}">Source code</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
+<footer>God's Eye // UAP · <a href="../browse/">Browse</a> · <a href="../open-data/">Open data</a> · <a href="${esc(REPO_URL)}">Source code</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
 </main>
 </body>
 </html>
 `;
 }
 
-/** sitemap.xml for the app, the case index, the open data and every case page. */
-export function sitemap(site, ids, lastmod) {
-  const urls = [site, `${site}case/`, `${site}open-data/`, ...ids.map((id) => `${site}case/${id}/`)];
+/** sitemap.xml for the app, the case index, the browse pages (`extra`: their paths under the site), the open data and every case page. */
+export function sitemap(site, ids, lastmod, extra = []) {
+  const urls = [site, `${site}case/`, `${site}browse/`, `${site}open-data/`, ...extra.map((path) => `${site}${path}`), ...ids.map((id) => `${site}case/${id}/`)];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `  <url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}

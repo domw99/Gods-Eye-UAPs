@@ -104,7 +104,7 @@ export function openData(cases, { site, version, date }) {
   const records = [...cases].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).map((c) => caseRecord(c, { site }));
   const url = `${site}open-data/`;
   const years = records.map((r) => r.year);
-  const countries = new Set(records.map((r) => r.countryCode).filter(Boolean)).size;
+  const countries = new Set(records.map((r) => r.countryCode).filter((c) => c && c !== 'XX')).size;
   const withTracks = records.filter((r) => r.tracks.length).length;
   const meta = {
     name: "God's Eye // UAP case files",
@@ -118,7 +118,7 @@ export function openData(cases, { site, version, date }) {
   const json = `${JSON.stringify({ ...meta, records }, null, 1)}\n`;
   const csv = toCsv(records);
   const geojson = `${JSON.stringify({ ...toGeoJson(records), metadata: meta })}\n`;
-  const description = `${records.length} well-documented UFO/UAP encounters from ${Math.min(...years)} to ${Math.max(...years)} in ${countries} countries. For each: the date and place with coordinates, the kind of encounter, the evidence, the official or best explanation and its status, a short summary and timeline, and the sources. ${withTracks} cases have reconstructed flight paths, each marked with what it is based on (radar, an official report, witness reports or an approximate reconstruction). Made for the God's Eye // UAP 3D globe.`;
+  const description = `${records.length} well-documented UFO/UAP encounters from ${Math.min(...years)} to ${Math.max(...years)} in ${countries} countries and territories. For each: the date and place with coordinates, the kind of encounter, the evidence, the official or best explanation and its status, a short summary and timeline, and the sources. ${withTracks} cases have reconstructed flight paths, each marked with what it is based on (radar, an official report, witness reports or an approximate reconstruction). Made for the God's Eye // UAP 3D globe.`;
   const files = [
     { name: 'cases.json', format: 'application/json', what: 'Every field, with the flight paths and timelines.' },
     { name: 'cases.csv', format: 'text/csv', what: 'One row per case, for spreadsheets. Lists are joined with “ | ”; flight paths are counted, not included.' },
@@ -216,7 +216,7 @@ ${fields.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('
   .then(({ records }) => records.filter((c) => c.status === 'unresolved'));</pre>
 <h2>Accuracy</h2>
 <p>Positions follow the sources and are only as exact as <code>locationPrecision</code> says. Flight paths are reconstructions; each says what it is based on, and “approximate” ones are drawn from descriptions. A status says what the evidence supports, not what anyone believes. Corrections are welcome as <a href="${esc(REPO_URL)}/issues">issues on GitHub</a>.</p>
-<footer>God's Eye // UAP · <a href="../case/">All case files</a> · <a href="../">The 3D globe</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
+<footer>God's Eye // UAP · <a href="../case/">All case files</a> · <a href="../browse/">Browse</a> · <a href="../">The 3D globe</a> · made by <a href="${AUTHOR_URL}">${AUTHOR}</a></footer>
 </main>
 </body>
 </html>

@@ -60,6 +60,40 @@ test.describe('Sharing and the pages search engines read', () => {
     expect(sitemap).toContain('/open-data/</loc>');
   });
 
+  test('the browse pages list the cases by country, status and more, and link both ways', async ({ page, request }) => {
+    await page.goto('/browse/');
+    await expect(page.locator('h1')).toHaveText('Browse the case files');
+    for (const h of ['By country', 'By decade', 'By status', 'By kind of encounter', 'By evidence', 'By shape']) await expect(page.locator('h2', { hasText: h })).toBeVisible();
+    expect((await audit(page)).violations.map((v) => v.id)).toEqual([]);
+    await page.locator('.chips a', { hasText: 'France' }).first().click();
+    await page.waitForURL(/\/browse\/country\/fr\/$/);
+    await expect(page.locator('h1')).toHaveText('UFO and UAP cases from France');
+    const links = await page.locator('main ul:not(.chips) li a').count();
+    expect(links).toBeGreaterThanOrEqual(2);
+    expect((await audit(page)).violations.map((v) => v.id)).toEqual([]);
+    // A case in the group links back to the group.
+    await page.locator('main ul:not(.chips) li a').first().click();
+    await expect(page.locator('h2', { hasText: 'Browse' })).toBeVisible();
+    await expect(page.locator('a[href$="/browse/country/fr/"]')).toBeVisible();
+    for (const file of ['robots.txt', 'llms.txt', 'llms-full.txt']) expect((await request.get(`/${file}`)).ok(), file).toBe(true);
+    expect(await (await request.get('/sitemap.xml')).text()).toContain('/browse/country/fr/</loc>');
+  });
+
+  test('?open= opens one of the screens on load (the installed app\'s shortcuts); an unknown value does nothing', async ({ page }) => {
+    await openApp(page, '/?open=explain');
+    await expect(page.locator('.modal[aria-label="WHAT DID I SEE?"]')).toBeVisible({ timeout: 30_000 });
+    await page.goto('about:blank');
+    await openApp(page, '/?open=files');
+    await expect(page.locator('.modal[aria-label="FILES"]')).toBeVisible({ timeout: 30_000 });
+    await page.goto('about:blank');
+    await openApp(page, '/?open=random');
+    await expect.poll(() => page.evaluate(() => window.__uap.state.selected), { timeout: 30_000 }).toBeTruthy();
+    await page.goto('about:blank');
+    await openApp(page, '/?open=constructor');
+    await page.waitForTimeout(1500);
+    await expect(page.locator('.modal')).toHaveCount(0);
+  });
+
   test('the front page links to the case index and the open data, and describes itself to search engines', async ({ page }) => {
     await openApp(page);
     await expect(page.locator('#left .made-by a[href="./case/"]')).toBeVisible();
