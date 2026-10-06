@@ -241,7 +241,7 @@ export function openStats({ load }) {
           <p class="caveat">Cases with each kind of evidence; most cases have several.</p></section>
         <section><div class="section-label">CURATED CASES BY COUNTRY (TOP 10)</div>${barList(d.countries, { color: '#00d4ff' })}</section>
       </div>
-      <p class="made-by stats-by">God’s Eye // UAP · made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p>`,
+      <p class="made-by stats-by">God’s Eye // UAP · <span>made by</span> <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p>`,
     );
     years.bind(body, tip);
     body.querySelector('[data-stats-nuforc]')?.addEventListener('click', (e) => {
@@ -281,7 +281,7 @@ export function openAbout(meta) {
     <div class="section-label">CREDITS</div>
     <div class="d-text"><p>Visual language after <a href="https://github.com/bilawalsidhu/gods-eye-view" target="_blank" rel="noopener">God’s Eye View</a> by Bilawal Sidhu (MIT). Globe: CesiumJS. Imagery: Esri World Imagery (Powered by Esri). Night-side city lights: NASA Black Marble (VIIRS, 2016 — today’s lights, not those of the case year). Stars: NASA Deep Star Maps 2020 (NASA/Goddard SVS; Hipparcos-2, Tycho-2, Gaia DR2). Map styles and place names: Esri. Terrain: Re:Earth / Mapterhorn (CC BY 4.0). Geocoding: GeoNames (CC BY 4.0). Media: Wikimedia Commons (licences shown per file), DVIDS (public domain), Internet Archive. Summaries: Wikipedia (CC BY-SA). Satellites: CelesTrak.</p>
     <p class="caveat">This console presents evidence and official assessments; it does not claim any case is extraterrestrial. Many famous cases have mundane explanations, and those are shown alongside the reports.</p>
-    <p class="made-by">God’s Eye // UAP · made by <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p></div>`;
+    <p class="made-by">God’s Eye // UAP · <span>made by</span> <a href="${AUTHOR_URL}" target="_blank" rel="noopener">${AUTHOR}</a></p></div>`;
   modal('ABOUT', content, { wide: false });
 }
 

@@ -50,10 +50,10 @@ export function renderActiveFilters() {
   const chips = [];
   if (state.search) chips.push(html`<button class="chip small on" data-clear="search" title="Clear the search">“${state.search}” ✕</button>`);
   if (state.yearRange) chips.push(html`<button class="chip small on" data-clear="years" title="${t('All years')}">${state.yearRange[0]}–${state.yearRange[1]} ✕</button>`);
-  for (const e of state.evidence) chips.push(html`<button class="chip small on" data-clear-evidence="${e}">${EVIDENCE[e]?.label || e} ✕</button>`);
-  for (const k of state.shape) chips.push(html`<button class="chip small on" data-clear-shape="${k}">${SHAPES[k]?.label || k} ✕</button>`);
-  for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${STATUS[k]?.label || k} ✕</button>`);
-  if (state.starredOnly) chips.push(html`<button class="chip small on" data-clear="starred">★ STARRED ✕</button>`);
+  for (const e of state.evidence) chips.push(html`<button class="chip small on" data-clear-evidence="${e}">${t(EVIDENCE[e]?.label || e)} ✕</button>`);
+  for (const k of state.shape) chips.push(html`<button class="chip small on" data-clear-shape="${k}">${t(SHAPES[k]?.label || k)} ✕</button>`);
+  for (const k of state.status) chips.push(html`<button class="chip small on" data-clear-status="${k}">${t(STATUS[k]?.label || k)} ✕</button>`);
+  if (state.starredOnly) chips.push(html`<button class="chip small on" data-clear="starred">${t('★ STARRED')} ✕</button>`);
   el.classList.toggle('hidden', !chips.length);
   mount(el, chips.length ? html`<span class="af-label">FILTERED BY</span>${chips}<button class="chip small af-reset" data-clear="all">RESET ALL</button>` : html``);
 }
@@ -63,9 +63,9 @@ export function renderFilters() {
   const stars = state.starred.size;
   mount(
     document.getElementById('starred-filter'),
-    html`<button class="chip small ${state.starredOnly ? 'on' : ''}" data-starred-only aria-pressed="${state.starredOnly ? 'true' : 'false'}" ${stars || state.starredOnly ? '' : 'disabled'} title="${stars ? 'Show only the cases you starred' : 'Star a case (☆ in its file) to save it here'}">★ STARRED ONLY · ${stars}</button>`,
+    html`<button class="chip small ${state.starredOnly ? 'on' : ''}" data-starred-only aria-pressed="${state.starredOnly ? 'true' : 'false'}" ${stars || state.starredOnly ? '' : 'disabled'} title="${stars ? 'Show only the cases you starred' : 'Star a case (☆ in its file) to save it here'}">${t('★ STARRED ONLY · {n}', { n: stars })}</button>`,
   );
-  document.getElementById('filter-count').textContent = n ? `· ${n} ACTIVE` : '';
+  document.getElementById('filter-count').textContent = n ? t('· {n} ACTIVE', { n }) : '';
   mount(
     document.getElementById('evidence-filters'),
     html`${EVIDENCE_FILTERS.map(

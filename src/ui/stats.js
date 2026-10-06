@@ -16,6 +16,20 @@ export const tiles = (items) =>
 
 const compact = (n) => (n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}K` : n.toLocaleString());
 
+const LABEL_W = 144; // user units between the row names and the plot
+/** Rough width of a 12px label: Chinese, Japanese and Korean letters are square, the rest about half that. */
+const labelWidth = (s) => [...s].reduce((w, c) => w + (c.charCodeAt(0) >= 0x2e80 ? 12 : 6.3), 0);
+/**
+ * An SVG label does not wrap and a translated name can be twice the English
+ * length: break one that is too wide at the space nearest its middle.
+ */
+function labelLines(text) {
+  if (labelWidth(text) <= LABEL_W) return [text];
+  let cut = -1;
+  for (let i = 0; i < text.length; i++) if (text[i] === ' ' && (cut < 0 || Math.abs(i - text.length / 2) < Math.abs(cut - text.length / 2))) cut = i;
+  return cut < 0 ? [text] : [text.slice(0, cut), text.slice(cut + 1)];
+}
+
 /**
  * Records per year, one small multiple per archive, each on its own scale
  * (their sizes differ a hundredfold). `rows`: [{ label, color, counts, from }]
@@ -37,14 +51,20 @@ export function yearMultiples(rows, from, to) {
     const peak = vals.indexOf(max);
     const y = (v) => top + H - (v / max) * H;
     const pts = vals.map((v, k) => `${x(from + k).toFixed(1)},${y(v).toFixed(1)}`);
+    const lines = labelLines(t(r.label));
+    // A line wider than the gap is squeezed to fit (a Japanese name has no space to break at).
+    const nameText = lines.map((line, k) => {
+      const squeeze = labelWidth(line) > LABEL_W ? ` textLength="${LABEL_W}" lengthAdjust="spacingAndGlyphs"` : '';
+      return `<text x="0" y="${top + (lines.length > 1 ? 9 + k * 12 : H / 2 - 2)}" class="sv-label"${squeeze}>${esc(line)}</text>`;
+    });
     parts.push(
-      `<text x="0" y="${top + H / 2 - 2}" class="sv-label">${esc(r.label)}</text>`,
-      `<text x="0" y="${top + H / 2 + 12}" class="sv-sub">${r.total.toLocaleString()} total</text>`,
+      ...nameText,
+      `<text x="0" y="${top + (lines.length > 1 ? 34 : H / 2 + 12)}" class="sv-sub">${esc(t('{n} total', { n: r.total.toLocaleString() }))}</text>`,
       `<line x1="${left}" x2="${W - right}" y1="${top + H}" y2="${top + H}" class="sv-base"/>`,
       `<path d="M${x(from)},${top + H} L${pts.join(' L')} L${x(to)},${top + H} Z" fill="${r.color}" fill-opacity="0.12"/>`,
       `<polyline points="${pts.join(' ')}" fill="none" stroke="${r.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`,
       `<circle cx="${x(from + peak)}" cy="${y(max)}" r="4" fill="${r.color}" stroke="#0a0f17" stroke-width="2"/>`,
-      `<text x="${W - right + 8}" y="${top + 12}" class="sv-sub">peak ${compact(max)}</text>`,
+      `<text x="${W - right + 8}" y="${top + 12}" class="sv-sub">${esc(t('peak {n}', { n: compact(max) }))}</text>`,
       `<text x="${W - right + 8}" y="${top + 25}" class="sv-sub">${from + peak}</text>`,
     );
   });
@@ -70,7 +90,7 @@ export function yearMultiples(rows, from, to) {
         rule.setAttribute('visibility', 'visible');
         tooltip.show(
           e,
-          `<b>${year}</b>${rows.map((r) => `<br><i style="background:${r.color}"></i>${esc(r.label)}: ${(r.counts[year - r.from] || 0).toLocaleString()}`).join('')}`,
+          `<b>${year}</b>${rows.map((r) => `<br><i style="background:${r.color}"></i>${esc(t(r.label))}: ${(r.counts[year - r.from] || 0).toLocaleString()}`).join('')}`,
         );
       });
       hit.addEventListener('pointerleave', () => {
