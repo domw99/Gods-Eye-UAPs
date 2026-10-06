@@ -80,6 +80,14 @@ test.describe('panels', () => {
     await expect(page.locator('#d-sky')).toHaveText('');
   });
 
+  test('the scrolling summary of a GEIPAN file can be scrolled from the keyboard', async ({ page }) => {
+    await openApp(page);
+    await page.evaluate(() => window.__uap.selectGeipan('1952-09-08193'));
+    await expect(page.locator('#dossier-body .geipan-text')).toBeVisible({ timeout: 30_000 });
+    const results = await new AxeBuilder({ page }).withRules(['scrollable-region-focusable']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
   test('the files dialog has its headings in order', async ({ page }) => {
     await openApp(page);
     await page.keyboard.press('g');

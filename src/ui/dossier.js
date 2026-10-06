@@ -726,7 +726,7 @@ export async function showOcr(id) {
     const res = await fetch(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`);
     if (!res.ok) throw new Error(res.status);
     const text = joinBrokenWords(await res.text()).replace(/\n{3,}/g, '\n\n').slice(0, 6000);
-    mount(el, html`<pre class="mono" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);
+    mount(el, html`<pre class="mono" tabindex="0" role="region" aria-label="READ OCR TEXT" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">OCR text unavailable for this file.</div>`);
   }
@@ -754,7 +754,7 @@ export function renderGeipan(r) {
       <blockquote class="mufon-quote big" lang="fr">${r.short}</blockquote>`)}
     ${section(
       'CASE SUMMARY (FRENCH)',
-      html`<div class="d-text geipan-text" lang="fr">${r.summary.split(/\n+/).map((p) => html`<p>${p}</p>`)}${cut ? html`<p class="dim">… continued in the full file.</p>` : ''}</div>
+      html`<div class="d-text geipan-text" lang="fr" tabindex="0" role="region" aria-label="CASE SUMMARY (FRENCH)">${r.summary.split(/\n+/).map((p) => html`<p>${p}</p>`)}${cut ? html`<p class="dim">… continued in the full file.</p>` : ''}</div>
       <div class="btn-row">
         <a class="chip on" target="_blank" rel="noopener" href="${caseUrl(r)}">Full file on cnes-geipan.fr ↗</a>
         <a class="chip" target="_blank" rel="noopener" href="${translateUrl(`${r.short}\n\n${r.summary}`)}">Translate to English ↗</a>
@@ -887,7 +887,7 @@ export async function showMufonText(is, leaf) {
   try {
     const text = await pageText(is, leaf);
     if (!document.body.contains(el)) return;
-    mount(el, html`<pre class="mono ocr-text">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
+    mount(el, html`<pre class="mono ocr-text" tabindex="0" role="region" aria-label="READ OCR TEXT">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">Page text unavailable. Try the Internet Archive reader.</div>`);
   }
