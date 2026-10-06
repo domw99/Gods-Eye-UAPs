@@ -1,1 +1,11 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/domw99/Gods-Eye-UAPs/security/advisories/new
+    about: Report anything exploitable privately. Please do not open a public issue for it.
+  - name: Known issues and limits
+    url: https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/docs/KNOWN-ISSUES.md
+    about: Check here before filing. Some things are limits of the data, not bugs.
+  - name: Where the data comes from
+    url: https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/DATA_SOURCES.md
+    about: Every source, its terms and how fresh it is.

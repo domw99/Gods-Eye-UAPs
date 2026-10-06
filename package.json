@@ -24,7 +24,10 @@
     "build:mufon": "node scripts/build-mufon.mjs",
     "build:geipan": "node scripts/build-geipan.mjs",
     "build:journals": "node scripts/build-journals.mjs",
-    "build:textindex": "node scripts/build-textindex.mjs"
+    "build:textindex": "node scripts/build-textindex.mjs",
+    "build:notices": "node scripts/build-notices.mjs",
+    "build:changelog": "node scripts/build-changelog.mjs",
+    "i18n:add": "node scripts/add-strings.mjs"
   },
   "dependencies": {
     "@mapbox/vector-tile": "^3.0.0",

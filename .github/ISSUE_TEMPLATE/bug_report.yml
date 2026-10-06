@@ -1,0 +1,57 @@
+name: Bug report
+description: Something in the app is broken, looks wrong or does not load.
+title: 'Bug: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks. Please check [known issues and limits](https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/docs/KNOWN-ISSUES.md) first; some things there are limits of the data, not bugs. A wrong fact in a case is a correction, not a bug: use **Suggest a correction** in the app.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead. A screenshot helps.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the app
+        2. Press N (near me) and allow location
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: A link that shows it
+      description: Copy the address from the browser bar (it holds the case and the camera).
+      placeholder: https://domw99.github.io/Gods-Eye-UAPs/#/case/...
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options: [Desktop or laptop, Phone, Tablet, Installed app (home screen)]
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 140, Safari 19, Firefox 142 ...
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Interface language
+      placeholder: English
+  - type: textarea
+    id: console
+    attributes:
+      label: Anything in the browser console
+      description: Press F12, open Console, and paste any red errors. Leave out personal information.
+      render: text

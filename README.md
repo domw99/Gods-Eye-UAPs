@@ -11,11 +11,12 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 [![Live app](https://img.shields.io/badge/live%20app-domw99.github.io-00d4ff?style=flat-square&logo=githubpages&logoColor=white)](https://domw99.github.io/Gods-Eye-UAPs/)
 [![CI](https://img.shields.io/github/actions/workflow/status/domw99/Gods-Eye-UAPs/ci.yml?style=flat-square&label=tests)](https://github.com/domw99/Gods-Eye-UAPs/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/github/actions/workflow/status/domw99/Gods-Eye-UAPs/pages.yml?style=flat-square&label=deploy)](https://github.com/domw99/Gods-Eye-UAPs/actions/workflows/pages.yml)
+[![Release](https://img.shields.io/github/v/release/domw99/Gods-Eye-UAPs?style=flat-square&color=00d4ff)](https://github.com/domw99/Gods-Eye-UAPs/releases/latest)
 [![No API keys](https://img.shields.io/badge/API%20keys-none%20needed-7dffb2?style=flat-square)](#quick-start)
 [![CesiumJS](https://img.shields.io/badge/CesiumJS-1.145-6caddf?style=flat-square)](https://cesium.com/platform/cesiumjs/)
 [![MIT](https://img.shields.io/badge/license-MIT-ffb547?style=flat-square)](LICENSE)
 
-**[Features](#features)** · **[Quick start](#quick-start)** · **[How it works](#how-it-works)** · **[Data](#where-the-data-comes-from)** · **[Reading it honestly](#how-to-read-the-map-honestly)** · **[Contributing](#contributing)**
+**[Features](#features)** · **[Quick start](#quick-start)** · **[How it works](#how-it-works)** · **[Open data](#open-data)** · **[Data sources](DATA_SOURCES.md)** · **[Reading it honestly](#how-to-read-the-map-honestly)** · **[Contributing](#contributing)**
 
 </div>
 
@@ -419,7 +420,9 @@ scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-
               lib/ (GeoNames gazetteer · case-pages.mjs: a page per case, the case index + sitemap · open-data.mjs: JSON, CSV, GeoJSON; made at build)
 public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
-docs/SPEC.md  the full product spec (the improved prompt this was built from)
+docs/         SPEC.md (the full product spec) · KNOWN-ISSUES.md (limits of the app and the data) · media/ (README pictures and videos)
+AGENTS.md     the developer guide (commands, conventions, releases); CLAUDE.md points to it
+CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · CHANGELOG.md · DATA_SOURCES.md · THIRD_PARTY_NOTICES.md
 ```
 
 </details>
@@ -487,16 +490,21 @@ It then appears on the globe.
 3. Go to **Settings → Pages → Deploy from a branch** and pick `gh-pages` / `(root)`.
 4. Your copy appears at `https://<user>.github.io/<repository>/`.
 
-`ci.yml` runs the tests and a build on every push and pull request. `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
+**Any other static host works too.** Run `SITE_URL=https://your.site/ npm run build` (`SITE_URL` goes into the link previews and the sitemap; add `BASE_PATH=/subpath/` when it is not served from the root), then upload `dist/`. To try it in a container: `docker run --rm -p 8080:80 -v "$PWD/dist:/usr/share/nginx/html:ro" nginx:alpine`.
+
+`ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday, commits any new ones and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
 The build writes a page per case (`case/<id>/`), an index of them (`case/`), the open data (`open-data/`) and a `sitemap.xml`. A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 
 ## Contributing
 
-Corrections and new cases are welcome, especially with sources.
+Corrections and new cases are welcome, especially with sources. [CONTRIBUTING.md](CONTRIBUTING.md) has the details, and [AGENTS.md](AGENTS.md) is the developer guide.
 
 - In the app, every case has **Suggest a correction** and **Suggest a case** buttons. They open pre-filled [issue forms](https://github.com/domw99/Gods-Eye-UAPs/issues/new/choose).
-- For code changes, open a pull request. Run `npm test` first, and `npm run verify:media` if you touched case files.
+- For code changes, open a pull request. Run `npm test` first, and `npm run verify:media` if you touched case files. Interface text goes in all 15 languages (`npm run i18n:add`).
+- Something not working? Check [known issues and limits](docs/KNOWN-ISSUES.md), then [file a bug](https://github.com/domw99/Gods-Eye-UAPs/issues/new?template=bug_report.yml).
+- Security reports go to the private form described in [SECURITY.md](SECURITY.md). Please follow the [code of conduct](CODE_OF_CONDUCT.md).
+- What changed in each release: [CHANGELOG.md](CHANGELOG.md).
 
 ## Credits & licences
 

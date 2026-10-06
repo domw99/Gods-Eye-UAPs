@@ -1,0 +1,28 @@
+name: Feature request
+description: An idea for the app, the open data or the tools.
+title: 'Idea: '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to be able to do
+      description: Describe what you are trying to do, not only the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it helps
+      description: Who benefits, and what is awkward today.
+  - type: textarea
+    id: sources
+    attributes:
+      label: Data or services that could do it
+      description: Public sources that need no key are the best fit (see DATA_SOURCES.md). Links welcome.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Help
+      options:
+        - label: I could help build or test it

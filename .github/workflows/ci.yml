@@ -4,6 +4,14 @@ on:
   push:
   pull_request:
 
+# Read-only token, and a newer push to the same branch replaces a run still going.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-build:
     runs-on: ubuntu-latest

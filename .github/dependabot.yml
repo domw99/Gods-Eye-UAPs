@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # The libraries the app ships with, and the tools that build and test it.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      cesium:
+        patterns: ['cesium', '@cesium/*', 'vite-plugin-cesium']
+      test-tools:
+        patterns: ['vitest', '@playwright/*', '@axe-core/*']
+    labels: ['dependencies']
+  # The versions of the actions the workflows use.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels: ['dependencies']
