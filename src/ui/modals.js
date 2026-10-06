@@ -1,4 +1,4 @@
-import { html, mount, safeUrl, toast } from '../util/dom.js';
+import { html, raw, esc, th, mount, safeUrl, toast } from '../util/dom.js';
 import { t, plural, locale, upper } from '../i18n/index.js';
 import { GOV_FILES } from '../data/govFiles.js';
 import { shareRow } from './sharelinks.js';
@@ -253,6 +253,11 @@ export function openStats({ load }) {
   draw(false);
 }
 
+/** A layer's name in its own colour, translated like the layer list's. */
+const aboutName = (color, name) => raw(`<b style="color:${color}">${esc(t(name))}</b>`);
+/** One paragraph of "what you are looking at". The name goes in as a value, so a language can put it where its sentence reads best. */
+const aboutLine = (key, vars) => html`<p>${th(key, vars)}</p>`;
+
 export function openAbout(meta) {
   const content = html`
     <h2>About God’s Eye // UAP</h2>
@@ -262,17 +267,17 @@ export function openAbout(meta) {
     ${shareRow({ url: new URL(import.meta.env.BASE_URL, location.origin).href, title: "God's Eye // UAP", text: t('Every well-documented UFO/UAP case on a 3D globe, with the evidence and the best explanation') })}
     <div class="section-label">WHAT YOU ARE LOOKING AT</div>
     <div class="d-text">
-      <p><b style="color:#00d4ff">Case files</b> — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).</p>
-      <p><b style="color:#ff5ce1">Official U.S. footage</b> — every UAP video and image the Department of War / AARO has published on DVIDS (PURSUE, war.gov/UFO). Most releases give only a region, shown as a ring.</p>
-      <p><b style="color:#ffb547">Project Blue Book</b> — scanned U.S. Air Force case files (1947–1969), geocoded from their file names.</p>
-      <p><b style="color:#5f8bff">GEIPAN (France)</b> — every case in the published files of GEIPAN, the French space agency’s UAP office (1937–2018), placed at its commune, with GEIPAN’s A–D finding and its French summary. Unexplained (D) cases are brightest.</p>
-      <p><b style="color:#b58cff">MUFON files</b> — the Mutual UFO Network’s journal (Skylook and the MUFON UFO Journal, 1967–2008), released free by MUFON and The Black Vault. Towns named in its sighting reports are on the map, found automatically in the OCR text, and each links to its page. Case dossiers list the journal pages that discuss them.</p>
-      <p><b style="color:#3fd4b0">Research archives</b> — the journals of the other big civilian UFO groups: the APRO Bulletin (1952–1988), NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON’s chapter newsletters, read from their scans on the Internet Archive. Places named in their reports are on the map, and case dossiers list the pages about each case.</p>
-      <p><b style="color:#ff7a45">Civilian reports</b> — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.</p>
-      <p><b style="color:#ffcf5c">Rocket launches</b> and <b style="color:#ff9f1c">military airspace</b> — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.</p>
-      <p><b style="color:#7dd3ff">Live satellites</b> — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.</p>
-      <p><b style="color:#e6c37a">Earthquakes</b> — the last 24 hours from the USGS, sized by magnitude. Strong quakes are sometimes reported as booms or odd lights.</p>
-      <p><b style="color:#8fd3ff">Space &amp; Moon</b> — reports from beyond the atmosphere: what astronauts saw from orbit, what astronomers have seen on the Moon, and a few distant objects, each with its explanation and sources. The NASA files that were part of the 2026 PURSUE releases are linked from it. Press <b>K</b>. <b>EARTH | MOON</b> in the top bar (or <b>U</b>) switches to the Moon itself: a globe of the Moon laid out like the Earth, with the craters and seas named, every landing site from Luna 2 to Chandrayaan-3, and the lunar reports as pins, lit as the Sun stood at the landing or the report.</p>
+      ${aboutLine('{name} — curated encounters with evidence (radar, sensor video, photos, official documents, physical traces or many credible witnesses). Each lists the official or best-supported explanation, including when a case has been solved. Flight paths are reconstructions from the reports; every track states its basis (radar, official report, witness reports, flight plan, or approximate).', { name: aboutName('#00d4ff', 'Case files') })}
+      ${aboutLine('{name} — every UAP video and image the Department of War / AARO has published on DVIDS (PURSUE, war.gov/UFO). Most releases give only a region, shown as a ring.', { name: aboutName('#ff5ce1', 'Official U.S. footage') })}
+      ${aboutLine('{name} — scanned U.S. Air Force case files (1947–1969), geocoded from their file names.', { name: aboutName('#ffb547', 'Project Blue Book') })}
+      ${aboutLine('{name} — every case in the published files of GEIPAN, the French space agency’s UAP office (1937–2018), placed at its commune, with GEIPAN’s A–D finding and its French summary. Unexplained (D) cases are brightest.', { name: aboutName('#5f8bff', 'GEIPAN (France)') })}
+      ${aboutLine('{name} — the Mutual UFO Network’s journal (Skylook and the MUFON UFO Journal, 1967–2008), released free by MUFON and The Black Vault. Towns named in its sighting reports are on the map, found automatically in the OCR text, and each links to its page. Case dossiers list the journal pages that discuss them.', { name: aboutName('#b58cff', 'MUFON files') })}
+      ${aboutLine('{name} — the journals of the other big civilian UFO groups: the APRO Bulletin (1952–1988), NICAP’s U.F.O. Investigator, CUFOS’s International UFO Reporter and MUFON’s chapter newsletters, read from their scans on the Internet Archive. Places named in their reports are on the map, and case dossiers list the pages about each case.', { name: aboutName('#3fd4b0', 'Research archives') })}
+      ${aboutLine('{name} — ~80,000 NUFORC reports (1906–2014), unverified, narratives removed.', { name: aboutName('#ff7a45', 'Civilian reports') })}
+      ${aboutLine('{name} and {name2} — context layers from Launch Library 2 and the FAA. Every case also shows the sky, the weather and any military areas at that time and place.', { name: aboutName('#ffcf5c', 'Rocket launches'), name2: aboutName('#ff9f1c', 'military airspace') })}
+      ${aboutLine('{name} — current Starlink, ISS and bright-satellite positions from CelesTrak, to check what is overhead now.', { name: aboutName('#7dd3ff', 'Live satellites') })}
+      ${aboutLine('{name} — the last 24 hours from the USGS, sized by magnitude. Strong quakes are sometimes reported as booms or odd lights.', { name: aboutName('#e6c37a', 'Earthquakes') })}
+      ${aboutLine('{name} — reports from beyond the atmosphere: what astronauts saw from orbit, what astronomers have seen on the Moon, and a few distant objects, each with its explanation and sources. The NASA files that were part of the 2026 PURSUE releases are linked from it. Press <b>K</b>. {worlds} in the top bar (or <b>U</b>) switches to the Moon itself: a globe of the Moon laid out like the Earth, with the craters and seas named, every landing site from Luna 2 to Chandrayaan-3, and the lunar reports as pins, lit as the Sun stood at the landing or the report.', { name: aboutName('#8fd3ff', 'Space & Moon'), worlds: raw(`<b>${esc(t('EARTH'))} | ${esc(t('MOON'))}</b>`) })}
     </div>
     <div class="section-label">DATA SNAPSHOT</div>
     <div class="d-text"><p>${t('Official catalogue synced {date}', { date: meta.officialGenerated?.slice(0, 10) || '—' })} · ${t('Blue Book layer built {date}', { date: meta.bluebookGenerated?.slice(0, 10) || t('(loads on demand)') })}. Refresh with <code>npm run sync:official</code>, <code>npm run build:bluebook</code>, <code>npm run build:geipan</code> and <code>npm run build:nuforc</code>.</p></div>
@@ -444,7 +449,7 @@ export function openMapSettings(o) {
     <div class="btn-row"><button type="button" class="chip ${o.buildingsOn ? 'on' : ''}" id="ms-osm" aria-pressed="${o.buildingsOn ? 'true' : 'false'}">${o.buildingsOn ? t('✓ OSM BUILDINGS ON') : t('OSM BUILDINGS OFF')}</button></div>
 
     <div class="section-label">GOOGLE PHOTOREALISTIC 3D — YOUR OWN KEY</div>
-    <div class="d-text"><p>Paste a Google Maps Platform API key with the <b>Map Tiles API</b> enabled, and the globe switches to Google's photorealistic 3D cities and terrain. OSM buildings are hidden while it is on.</p></div>
+    <div class="d-text"><p>${th('Paste a Google Maps Platform API key with the <b>Map Tiles API</b> enabled, and the globe switches to Google’s photorealistic 3D cities and terrain. OSM buildings are hidden while it is on.')}</p></div>
     <form id="ms-form" class="form-grid" autocomplete="off">
       <label class="full">GOOGLE MAPS API KEY
         <input name="key" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="${o.hasStoredKey ? 'Saved in this browser — paste a new key to replace it' : 'AIza…'}" />
@@ -463,12 +468,12 @@ export function openMapSettings(o) {
 
     <div class="section-label">GETTING A KEY</div>
     <ol class="d-text steps">
-      <li>Open the <a href="https://console.cloud.google.com/google/maps-apis/" target="_blank" rel="noopener">Google Maps Platform console</a> and create or pick a project. Google asks for a billing account.</li>
-      <li>Enable the <a href="https://console.cloud.google.com/apis/library/tile.googleapis.com" target="_blank" rel="noopener">Map Tiles API</a>.</li>
-      <li>Create an API key under <b>Keys &amp; Credentials</b>. Restrict it to the Map Tiles API and to this site's address (HTTP referrer).</li>
-      <li>Paste it above. Check Google's <a href="https://developers.google.com/maps/documentation/tile/usage-and-billing" target="_blank" rel="noopener">current pricing and free usage limits</a>.</li>
+      <li>${th('Open the {console} and create or pick a project. Google asks for a billing account.', { console: raw('<a href="https://console.cloud.google.com/google/maps-apis/" target="_blank" rel="noopener">Google Maps Platform console</a>') })}</li>
+      <li>${th('Enable the {api}.', { api: raw('<a href="https://console.cloud.google.com/apis/library/tile.googleapis.com" target="_blank" rel="noopener">Map Tiles API</a>') })}</li>
+      <li>${th('Create an API key under <b>Keys &amp; Credentials</b>. Restrict it to the Map Tiles API and to this site’s address (HTTP referrer).')}</li>
+      <li>${th('Paste it above. Check Google’s {pricing}.', { pricing: raw(`<a href="https://developers.google.com/maps/documentation/tile/usage-and-billing" target="_blank" rel="noopener">${esc(t('current pricing and free usage limits'))}</a>`) })}</li>
     </ol>
-    <p class="caveat">Your key is stored only in this browser (localStorage) and sent only to Google's tile server (tile.googleapis.com). It is never uploaded anywhere else. Anyone who uses this browser profile could read it, so remove it on shared computers. If you host your own copy, you can set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> instead.</p>`;
+    <p class="caveat">${th('Your key is stored only in this browser (localStorage) and sent only to Google’s tile server (tile.googleapis.com). It is never uploaded anywhere else. Anyone who uses this browser profile could read it, so remove it on shared computers. If you host your own copy, you can set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> instead.')}</p>`;
   const el = modal('MAP', content, { wide: false });
   const status = el.querySelector('#ms-status');
   const busy = (msg) => {

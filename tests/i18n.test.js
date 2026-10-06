@@ -53,11 +53,13 @@ describe('interface languages', () => {
     const missing = [];
     for (const file of files) {
       const text = readFileSync(file, 'utf8');
-      // t('…') / th('…') / toast('…') with a plain string, and plural(n, '…', '…')
-      for (const m of text.matchAll(/\b(?:t|th|toast)\(\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1/g)) {
+      // t('…') / th('…') / toast('…') / aboutLine('…') with a plain string, aboutName(colour, '…'), and plural(n, '…', '…')
+      for (const m of text.matchAll(/\b(?:t|th|toast|aboutLine)\(\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1/g)) {
         const key = m[2].replace(/\\(['"])/g, '$1');
         if (!(key in locales.es)) missing.push(`${file}: ${key}`);
       }
+      for (const m of text.matchAll(/\baboutName\(\s*'#[0-9a-f]{6}',\s*'([^']+)'/g))
+        if (!(m[1] in locales.es)) missing.push(`${file}: ${m[1]}`);
       for (const m of text.matchAll(/\bplural\([^,]+,\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1\s*,\s*(['"])((?:\\.|(?!\3)[^\\\n])*)\3/g))
         if (!(`${m[2]}|${m[4]}` in locales.es)) missing.push(`${file}: ${m[2]}|${m[4]}`);
     }
@@ -274,5 +276,43 @@ describe('t() and friends', () => {
 
   it('fill() leaves unknown placeholders alone', () => {
     expect(fill('{a} and {b}', { a: 1 })).toBe('1 and {b}');
+  });
+});
+
+describe('label tables', () => {
+  // The data modules hold English labels that the interface shows through t() or the DOM pass:
+  // a label added without its dictionary entry would stay English in every language.
+  const wanted = async () => {
+    const tax = await import('../src/data/taxonomy.js');
+    const air = await import('../src/services/airspace.js');
+    const fields = await import('../src/services/airfields.js');
+    const geipan = await import('../src/services/geipan.js');
+    const keys = new Map();
+    const need = (text, where) => text && keys.set(text, where);
+    for (const [k, v] of Object.entries(tax.EVIDENCE)) {
+      need(v.label, `EVIDENCE.${k}.label`);
+      need(v.long, `EVIDENCE.${k}.long`);
+    }
+    for (const [k, v] of Object.entries(tax.STATUS)) {
+      need(v.label, `STATUS.${k}.label`);
+      need(v.long, `STATUS.${k}.long`);
+    }
+    for (const [k, v] of Object.entries(tax.SHAPES)) need(v.label, `SHAPES.${k}`);
+    for (const [k, v] of Object.entries(tax.PRECISION)) need(v, `PRECISION.${k}`);
+    for (const [k, v] of Object.entries(tax.TRACK_BASIS)) need(v.toUpperCase(), `TRACK_BASIS.${k} (shown in capitals)`);
+    for (const [k, v] of Object.entries(air.AIRSPACE_TYPES)) need(v.label, `AIRSPACE_TYPES.${k}`);
+    for (const size of fields.SIZES) need(size, 'airfield size');
+    for (const [k, v] of Object.entries(geipan.GEIPAN_CLASSES)) {
+      need(v.label, `GEIPAN_CLASSES.${k}.label`);
+      need(v.long, `GEIPAN_CLASSES.${k}.long`);
+    }
+    return keys;
+  };
+
+  it('has an entry for every label the data modules define', async () => {
+    const all = await wanted();
+    expect(all.size).toBeGreaterThan(60); // the tables were found, not silently empty
+    const missing = [...all].filter(([text]) => !(text in locales.es)).map(([text, where]) => `${where}: ${text}`);
+    expect(missing).toEqual([]);
   });
 });
