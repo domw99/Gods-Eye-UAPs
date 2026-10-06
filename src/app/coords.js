@@ -28,7 +28,11 @@ function normalise(text) {
 /** The latitude and longitude in a map link, or null. */
 function fromLink(text) {
   let m = /^geo:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i.exec(text);
-  if (m) return [m[1], m[2]];
+  if (m) {
+    // "geo:0,0?q=34.99,-106.61(label)", the form Android and Google Maps share, keeps the place in q; 0,0 only stands in for it.
+    const q = /[?&]q=(-?\d+(?:\.\d+)?)(?:,|%2C)(-?\d+(?:\.\d+)?)/i.exec(text);
+    return q && !Number(m[1]) && !Number(m[2]) ? [q[1], q[2]] : [m[1], m[2]];
+  }
   if (!/^https?:\/\//i.test(text)) return null;
   m = /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/.exec(text) // Google Maps place
     || /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(text) // Google Maps view
