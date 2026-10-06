@@ -1,5 +1,5 @@
 import { html, raw, esc } from '../util/dom.js';
-import { t } from '../i18n/index.js';
+import { t, upper } from '../i18n/index.js';
 import { compass } from '../services/sky.js';
 
 /**
@@ -78,15 +78,15 @@ export function skySection(sky, named = new Set(), { note = '' } = {}) {
   return html`<div class="sky-wrap">
       ${skyChartSvg(sky, named)}
       <div class="sky-side">
-        <div class="sky-light">${sky.light.toUpperCase()} · Sun ${sky.sun.alt >= 0 ? `${Math.round(sky.sun.alt)}° up` : `${Math.round(-sky.sun.alt)}° below the horizon`}</div>
+        <div class="sky-light">${upper(t(sky.light))} · ${t(sky.sun.alt >= 0 ? 'Sun {n}° up' : 'Sun {n}° below the horizon', { n: Math.round(Math.abs(sky.sun.alt)) })}</div>
         <table class="sky-table">
           <thead><tr><th>OBJECT</th><th>WHERE</th><th title="Magnitude: lower is brighter">MAG</th></tr></thead>
           <tbody>${rows.map(
             (b) => html`<tr class="${named.has(b.name) ? 'named' : ''}">
               <td><span class="sky-dot" style="background:${KIND_COLOR[b.kind]}"></span>${b.name}</td>
-              <td>${b.alt > 0 ? `${compass(b.az)} ${Math.round(b.alt)}°` : 'set'}</td>
+              <td>${b.alt > 0 ? `${compass(b.az)} ${Math.round(b.alt)}°` : t('set')}</td>
               <td class="dim">${b.mag.toFixed(1).replace('-', '−')}</td>
-            </tr>${b.note ? html`<tr class="sub"><td colspan="3">${b.note}</td></tr>` : ''}`,
+            </tr>${b.note ? html`<tr class="sub"><td colspan="3">${b.phaseName ? t('{phase}, {n}% lit', { phase: t(b.phaseName), n: b.lit }) : b.note}</td></tr>` : ''}`,
           )}</tbody>
         </table>
       </div>

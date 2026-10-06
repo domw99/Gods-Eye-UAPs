@@ -84,6 +84,8 @@ export function skyAt(lat, lon, when, { elevation = 0, minAlt = -1 } = {}) {
   const moonH = horizonOf(A.Body.Moon, t, observer);
   const phase = A.MoonPhase(t);
   const illum = A.Illumination(A.Body.Moon, t);
+  const phaseName = moonPhaseName(phase);
+  const lit = Math.round(illum.phase_fraction * 100);
   bodies.push({
     name: 'Moon',
     kind: 'moon',
@@ -91,7 +93,9 @@ export function skyAt(lat, lon, when, { elevation = 0, minAlt = -1 } = {}) {
     az: moonH.azimuth,
     mag: illum.mag,
     phase,
-    note: `${moonPhaseName(phase)}, ${Math.round(illum.phase_fraction * 100)}% lit`,
+    phaseName, // the pieces of `note`, so the sky table can translate the phase name
+    lit,
+    note: `${phaseName}, ${lit}% lit`,
   });
 
   for (const name of PLANETS) {

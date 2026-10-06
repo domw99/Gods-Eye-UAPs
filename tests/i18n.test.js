@@ -306,6 +306,7 @@ describe('label tables', () => {
     const air = await import('../src/services/airspace.js');
     const fields = await import('../src/services/airfields.js');
     const geipan = await import('../src/services/geipan.js');
+    const sky = await import('../src/services/sky.js');
     const keys = new Map();
     const need = (text, where) => text && keys.set(text, where);
     for (const [k, v] of Object.entries(tax.EVIDENCE)) {
@@ -324,6 +325,12 @@ describe('label tables', () => {
     for (const [k, v] of Object.entries(geipan.GEIPAN_CLASSES)) {
       need(v.label, `GEIPAN_CLASSES.${k}.label`);
       need(v.long, `GEIPAN_CLASSES.${k}.long`);
+    }
+    for (const alt of [10, -3, -9, -15, -30]) need(sky.daylight(alt), `daylight(${alt})`);
+    // Every phase of one lunation: the sky table translates the phase name it is given.
+    for (let day = 0; day < 30; day++) {
+      const moon = sky.skyAt(40, -100, new Date(Date.UTC(2020, 0, 1 + day, 12)), { minAlt: -90 }).bodies.find((b) => b.kind === 'moon');
+      need(moon.phaseName, `moon phase on day ${day}`);
     }
     return keys;
   };
