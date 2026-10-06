@@ -1,4 +1,5 @@
 import * as A from 'astronomy-engine';
+import { t } from '../i18n/index.js';
 
 /**
  * What was in the sky at a place and moment: the Sun (for daylight or
@@ -42,7 +43,7 @@ export function daylight(sunAlt) {
 }
 
 function moonPhaseName(deg) {
-  const names = ['New Moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full Moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'];
+  const names = [t('New Moon'), t('Waxing crescent'), t('First quarter'), t('Waxing gibbous'), t('Full Moon'), t('Waning gibbous'), t('Last quarter'), t('Waning crescent')];
   return names[Math.round(deg / 45) % 8];
 }
 
@@ -76,14 +77,14 @@ export function nightDim(sunAlt) {
  */
 export function skyAt(lat, lon, when, { elevation = 0, minAlt = -1 } = {}) {
   const time = new Date(when);
-  const t = A.MakeTime(time);
+  const ts = A.MakeTime(time);
   const observer = new A.Observer(lat, lon, elevation);
-  const sunH = horizonOf(A.Body.Sun, t, observer);
+  const sunH = horizonOf(A.Body.Sun, ts, observer);
   const bodies = [];
 
-  const moonH = horizonOf(A.Body.Moon, t, observer);
-  const phase = A.MoonPhase(t);
-  const illum = A.Illumination(A.Body.Moon, t);
+  const moonH = horizonOf(A.Body.Moon, ts, observer);
+  const phase = A.MoonPhase(ts);
+  const illum = A.Illumination(A.Body.Moon, ts);
   bodies.push({
     name: 'Moon',
     kind: 'moon',
@@ -91,21 +92,21 @@ export function skyAt(lat, lon, when, { elevation = 0, minAlt = -1 } = {}) {
     az: moonH.azimuth,
     mag: illum.mag,
     phase,
-    note: `${moonPhaseName(phase)}, ${Math.round(illum.phase_fraction * 100)}% lit`,
+    note: t('{phase}, {pct}% lit', { phase: moonPhaseName(phase), pct: Math.round(illum.phase_fraction * 100) }),
   });
 
   for (const name of PLANETS) {
-    const h = horizonOf(A.Body[name], t, observer);
-    const mag = A.Illumination(A.Body[name], t).mag;
+    const h = horizonOf(A.Body[name], ts, observer);
+    const mag = A.Illumination(A.Body[name], ts).mag;
     bodies.push({ name, kind: 'planet', alt: h.altitude, az: h.azimuth, mag });
   }
 
   // Stars: precess J2000 coordinates to the date, then to the horizon.
-  const rot = A.Rotation_EQJ_EQD(t);
+  const rot = A.Rotation_EQJ_EQD(ts);
   for (const [name, ra, dec, mag] of BRIGHT_STARS) {
-    const vec = A.RotateVector(rot, A.VectorFromSphere(new A.Spherical(dec, ra * 15, 1), t));
+    const vec = A.RotateVector(rot, A.VectorFromSphere(new A.Spherical(dec, ra * 15, 1), ts));
     const eq = A.EquatorFromVector(vec);
-    const h = A.Horizon(t, observer, eq.ra, eq.dec, 'normal');
+    const h = A.Horizon(ts, observer, eq.ra, eq.dec, 'normal');
     bodies.push({ name, kind: 'star', alt: h.altitude, az: h.azimuth, mag });
   }
 

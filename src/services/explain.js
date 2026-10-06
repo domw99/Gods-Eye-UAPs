@@ -5,10 +5,11 @@
  * scoring is testable; the UI gathers the inputs.
  */
 import { compass } from './sky.js';
+import { t, locale } from '../i18n/index.js';
 import { driftToward } from './weather.js';
 import { angleDiff } from '../util/geo.js';
 import { airfieldProximity } from './airfields.js';
-import { kpLabel, stormScale, STORM_NAMES } from './geomagnetic.js';
+import { kpLabel, stormScale } from './geomagnetic.js';
 
 export const HEIGHTS = {
   horizon: { label: 'Near the horizon (0–10°)', alt: 5 },
@@ -41,7 +42,15 @@ function positionFactor(report, az, alt) {
 }
 
 const clamp = (x) => Math.max(0, Math.min(1, x));
-const where = (az, alt) => `${compass(az)}, ${Math.round(alt)}° up`;
+const fieldVars = (f) => ({ name: f.name, code: f.code, km: Math.round(f.km), dir: compass(f.bearing) }); // the placeholders of the airfield sentences
+// Each with its article, which is "an" for the extreme one and varies in other languages.
+const stormPhrase = (scale) => ({ G1: t('a minor storm'), G2: t('a moderate storm'), G3: t('a strong storm'), G4: t('a severe storm'), G5: t('an extreme storm') })[scale];
+// Clauses and sentences are joined the way each language writes them: the Chinese and Japanese comma and full stop, the Hindi danda, no space between Chinese sentences.
+const comma = (a, b) => t('{a}, {b}', { a, b });
+const semicolon = (a, b) => t('{a}; {b}', { a, b });
+const full = (text) => t('{text}.', { text });
+const then = (...sentences) => sentences.reduce((a, b) => t('{a} {b}', { a, b }));
+const where = (az, alt) => t('{dir}, {alt}° up', { dir: compass(az), alt: Math.round(alt) });
 
 /**
  * @param {object} input
@@ -73,13 +82,13 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
     if (report.blinking && b.kind !== 'moon') score *= b.alt < 15 ? 1 : 0.6;
     if (overcast) score *= 0.35;
     if (b.kind === 'moon' && report.bright) score *= 1.1;
-    const bits = [`${b.name} was ${where(b.az, b.alt)}`];
-    if (sep != null) bits.push(sep < 8 ? 'right where you looked' : `${Math.round(sep)}° from where you looked`);
-    if (b.kind === 'planet' && b.mag < -2) bits.push(`very bright (mag ${b.mag.toFixed(1)}), often reported as a hovering light`);
-    if (b.kind === 'star' && b.alt < 15) bits.push('low stars twinkle and flash colours through thick air');
+    const bits = [t('{name} was {where}', { name: t(b.name), where: where(b.az, b.alt) })];
+    if (sep != null) bits.push(sep < 8 ? t('right where you looked') : t('{n}° from where you looked', { n: Math.round(sep) }));
+    if (b.kind === 'planet' && b.mag < -2) bits.push(t('very bright (mag {mag}), often reported as a hovering light', { mag: b.mag.toFixed(1) }));
+    if (b.kind === 'star' && b.alt < 15) bits.push(t('low stars twinkle and flash colours through thick air'));
     if (b.kind === 'moon') bits.push(b.note || '');
-    if (overcast) bits.push('but the sky was overcast');
-    out.push({ kind: b.kind, name: b.name, score: clamp(score), reason: `${bits.filter(Boolean).join('; ')}.` });
+    if (overcast) bits.push(t('but the sky was overcast'));
+    out.push({ kind: b.kind, name: t(b.name), score: clamp(score), reason: full(bits.filter(Boolean).reduce(semicolon)) });
   }
 
   // 2. Satellites (only for recent dates, only sunlit ones in a dark sky).
@@ -93,7 +102,10 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
         kind: 'satellite',
         name: iss.name,
         score: clamp(0.95 * moving * f),
-        reason: `A space station was ${where(iss.azimuth, iss.elevation)} and lit by the Sun${sep != null ? ` (${Math.round(sep)}° from where you looked)` : ''}. It looks like a very bright, steady light gliding across the sky in a few minutes.`,
+        reason: then(
+          full(`${t('A space station was {where} and lit by the Sun', { where: where(iss.azimuth, iss.elevation) })}${sep != null ? ` (${t('{n}° from where you looked', { n: Math.round(sep) })})` : ''}`),
+          t('It looks like a very bright, steady light gliding across the sky in a few minutes.'),
+        ),
       });
     }
     const starlink = lit.filter((s) => /STARLINK/i.test(s.name));
@@ -101,9 +113,9 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
     if (dark && near.length >= 5) {
       out.push({
         kind: 'satellite',
-        name: 'Starlink train',
+        name: t('Starlink train'),
         score: clamp((motion === 'formation' ? 1 : 0.55) * moving * (near.length >= 15 ? 1 : 0.8)),
-        reason: `${near.length} sunlit Starlink satellites were in that part of the sky. Freshly launched batches look like a line of lights moving together.`,
+        reason: then(t('{n} sunlit Starlink satellites were in that part of the sky.', { n: near.length }), t('Freshly launched batches look like a line of lights moving together.')),
       });
     }
     const bright = lit.filter((s) => s.group === 'Brightest satellites' && !/STARLINK/i.test(s.name));
@@ -115,7 +127,7 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
         kind: 'satellite',
         name: best.s.name,
         score: clamp(0.6 * moving * best.f),
-        reason: `A bright satellite was ${where(best.s.azimuth, best.s.elevation)} and sunlit. Satellites move steadily and can flare or fade out as they enter Earth's shadow.`,
+        reason: then(t('A bright satellite was {where} and sunlit.', { where: where(best.s.azimuth, best.s.elevation) }), t("Satellites move steadily and can flare or fade out as they enter Earth's shadow.")),
       });
     }
   }
@@ -128,11 +140,13 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
     const timeF = soon <= 30 ? 1 : soon <= 120 ? 0.7 : soon <= 360 ? 0.35 : 0.15;
     const distF = l.km < 600 ? 1 : l.km < 1500 ? 0.8 : 0.5;
     const score = timeF * distF * (twilight ? 1 : 0.7) * (motion === 'still' ? 0.7 : 1);
+    const vars = { gap: soon < 90 ? t('{n} min', { n: Math.round(soon) }) : t('{n} h', { n: (soon / 60).toFixed(1) }), km: Math.round(l.km).toLocaleString(locale()) };
+    const lead = l.gapMin < 0 ? t('Launched {gap} before your sighting, {km} km away', vars) : t('Launched {gap} after your sighting, {km} km away', vars);
     out.push({
       kind: 'launch',
       name: l.name,
       score: clamp(score),
-      reason: `Launched ${soon < 90 ? `${Math.round(soon)} min` : `${(soon / 60).toFixed(1)} h`} ${l.gapMin < 0 ? 'before' : 'after'} your sighting, ${Math.round(l.km).toLocaleString()} km away${twilight ? ', in twilight, when exhaust plumes glow in sunlight high above a dark sky' : ''}.`,
+      reason: full(twilight ? comma(lead, t('in twilight, when exhaust plumes glow in sunlight high above a dark sky')) : lead),
     });
   }
 
@@ -144,11 +158,13 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
     const matches = report.towardAz != null ? angleDiff(report.towardAz, toward) <= 45 : null;
     const moveF = { still: 0.3, drift: 1, steady: 0.6, fast: 0.1, formation: 0.8 }[motion];
     let score = 0.45 * moveF * (report.orange ? 1.5 : 1) * (matches === true ? 1.5 : matches === false ? 0.35 : 1);
+    const blows = t('The wind was blowing toward the {dir} at about {speed} km/h', { dir: compass(toward), speed: Math.round(speed) });
+    const way = matches === true ? t('the way you saw it move') : matches === false ? t('not the way you saw it move') : null;
     out.push({
       kind: 'drift',
-      name: report.orange ? 'Sky lanterns (flickering orange)' : 'Balloon or lantern',
+      name: report.orange ? t('Sky lanterns (flickering orange)') : t('Balloon or lantern'),
       score: clamp(score),
-      reason: `The wind was blowing toward the ${compass(toward)} at about ${Math.round(speed)} km/h${matches === true ? ', the way you saw it move' : matches === false ? ', not the way you saw it move' : ''}. Lanterns glow orange and flicker; party balloons catch sunlight.`,
+      reason: then(full(way ? comma(blows, way) : blows), t('Lanterns glow orange and flicker; party balloons catch sunlight.')),
     });
   }
 
@@ -159,16 +175,24 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
   if (reach) {
     out.push({
       kind: 'aircraft',
-      name: `Aircraft from ${field.name}`,
+      name: t('Aircraft from {name}', { name: field.name }),
       score: clamp(planeF * (report.blinking ? 1.2 : 0.8) * (reach === 'close' ? 1.15 : 0.85)),
-      reason: `${field.name} (${field.code}) is ${Math.round(field.km)} km ${compass(field.bearing)} of you${field.military ? ' and is a military field' : ''}. Aircraft arriving or leaving show landing lights, and one flying toward you can hang apparently still for minutes. The list shows airfields that exist today.`,
+      reason: then(
+        full(field.military ? t('{name} ({code}) is {km} km {dir} of you and is a military field', fieldVars(field)) : t('{name} ({code}) is {km} km {dir} of you', fieldVars(field))),
+        t('Aircraft arriving or leaving show landing lights, and one flying toward you can hang apparently still for minutes.'),
+        t('The list shows airfields that exist today.'),
+      ),
     });
   } else {
     out.push({
       kind: 'aircraft',
-      name: airfields ? 'Aircraft or drone' : 'Aircraft or drone (not checked)',
+      name: airfields ? t('Aircraft or drone') : t('Aircraft or drone (not checked)'),
       score: clamp(planeF * (report.blinking ? 1.2 : 0.8) * (airfields ? 0.5 : 0.55)),
-      reason: `${airfields ? 'No airport or airfield within 40 km, but aircraft cross every sky. ' : ''}Planes with landing lights on can hang apparently still for minutes when flying toward you; drones hover and blink. Live flight data needs a server, so the app cannot check this.`,
+      reason: then(
+        ...(airfields ? [t('No airport or airfield within 40 km, but aircraft cross every sky.')] : []),
+        t('Planes with landing lights on can hang apparently still for minutes when flying toward you; drones hover and blink.'),
+        t('Live flight data needs a server, so the app cannot check this.'),
+      ),
     });
   }
 
@@ -182,11 +206,22 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
       if (report.alt != null && report.alt > 35) score *= 0.3;
     }
     const storm = stormScale(aurora.thirds);
+    const kp = kpLabel(aurora.thirds);
+    const edge = { edge: Math.round(aurora.edge), here: Math.round(aurora.geomagLat) };
+    const edgeText = aurora.chance === 'overhead'
+      ? t("The aurora's edge reached about {edge}° geomagnetic latitude and you were at about {here}°, so it could have been overhead.", edge)
+      : aurora.south
+        ? t("The aurora's edge reached about {edge}° geomagnetic latitude and you were at about {here}°, so it could have shown as a glow low on the south horizon.", edge)
+        : t("The aurora's edge reached about {edge}° geomagnetic latitude and you were at about {here}°, so it could have shown as a glow low on the north horizon.", edge);
     out.push({
       kind: 'aurora',
-      name: `Aurora (Kp ${kpLabel(aurora.thirds)})`,
+      name: t('Aurora (Kp {kp})', { kp }),
       score: clamp(score),
-      reason: `Geomagnetic activity was Kp ${kpLabel(aurora.thirds)}${storm ? `, a ${STORM_NAMES[storm]} (${storm})` : ''}. The aurora's edge reached about ${Math.round(aurora.edge)}° geomagnetic latitude and you were at about ${Math.round(aurora.geomagLat)}°, so it ${aurora.chance === 'overhead' ? 'could have been overhead' : `could have shown as a glow low on the ${aurora.south ? 'south' : 'north'} horizon`}. Red or green glows and slowly shifting rays at low latitudes are often reported as strange lights.`,
+      reason: then(
+        full(storm ? comma(t('Geomagnetic activity was Kp {kp}', { kp }), `${stormPhrase(storm)} (${storm})`) : t('Geomagnetic activity was Kp {kp}', { kp })),
+        edgeText,
+        t('Red or green glows and slowly shifting rays at low latitudes are often reported as strange lights.'),
+      ),
     });
   }
 
