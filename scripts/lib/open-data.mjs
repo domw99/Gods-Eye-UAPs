@@ -213,11 +213,11 @@ footer a{color:inherit}
 ${files.map((f) => `<li><a href="${f.name}" download>${f.name}</a> <span>· ${esc(f.what)}</span></li>`).join('\n')}
 </ul>
 <h2>Fields</h2>
-<div class="table"><table>
+<div class="table" role="region" aria-label="The fields" tabindex="0"><table>
 ${fields.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('\n')}
 </table></div>
 <h2>Example</h2>
-<pre>fetch('${esc(url)}cases.json')
+<pre role="region" aria-label="Example code" tabindex="0">fetch('${esc(url)}cases.json')
   .then((r) => r.json())
   .then(({ records }) => records.filter((c) => c.status === 'unresolved'));</pre>
 <h2>Accuracy</h2>

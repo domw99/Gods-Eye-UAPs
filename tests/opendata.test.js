@@ -92,6 +92,13 @@ describe('open data', () => {
     }
   });
 
+  it('lets a keyboard reach the parts of the page that scroll sideways on a phone', () => {
+    // axe: scrollable-region-focusable. The fields table and the code sample overflow at phone width.
+    const scrollers = data.page.match(/<(?:pre|div class="table")[^>]*>/g);
+    expect(scrollers).toHaveLength(2);
+    for (const tag of scrollers) expect(tag).toMatch(/ role="region" aria-label="[^"]+" tabindex="0">$/);
+  });
+
   it('describes itself as a Dataset with the three downloads', () => {
     const ld = ldOf(data.page);
     expect(ld['@type']).toBe('Dataset');
