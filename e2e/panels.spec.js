@@ -27,6 +27,15 @@ test.describe('panels', () => {
     expect(await fits('#left .panel-body')).toBe(true);
   });
 
+  test('a button made of a case name wraps on a phone instead of widening the case file', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await openApp(page);
+    await page.evaluate(() => window.__uap.select('case:rendlesham-1980', 'list'));
+    const button = page.locator('#dossier-body [data-action="journal-search"]');
+    await expect(button).toBeAttached({ timeout: 30_000 }); // "search all journals for “Rendlesham Forest”"
+    expect(await page.evaluate(() => document.getElementById('dossier-body').scrollWidth <= document.getElementById('dossier-body').clientWidth)).toBe(true);
+  });
+
   test('the star button keeps the keyboard focus when it flips', async ({ page }) => {
     await openApp(page);
     await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004', 'list'));

@@ -893,7 +893,7 @@ html[data-text-dir='rtl'] :is(.d-text, .d-title, .d-sub, .explain, .caveat, .muf
 .sc-sources a:hover { text-decoration: underline; }
 .sc-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .sc-actions .chip { white-space: normal; text-align: start; line-height: 1.4; }
-.modal .chip { white-space: normal; }
+.modal .chip, .panel-body .chip { white-space: normal; } /* a chip made of data (a case name in "search all journals for") wraps instead of widening the panel */
 .moon-map { margin: 0 0 14px; }
 .moon-frame { position: relative; width: min(100%, 460px); aspect-ratio: 1; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--glass-border); }
 .moon-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
