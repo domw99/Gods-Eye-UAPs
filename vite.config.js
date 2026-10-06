@@ -76,5 +76,8 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.js'],
     environment: 'node',
+    // The tests that import the 15 dictionaries or all the case files take several seconds when the machine is busy
+    // (a second suite running, a small CI runner), and failed on the default 5 s with nothing wrong.
+    testTimeout: 20_000,
   },
 });
