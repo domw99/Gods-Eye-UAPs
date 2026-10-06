@@ -99,7 +99,7 @@ export function openGovFiles(stats, officialUnplaced = [], mufonPromise = null, 
       (group) => html`<div class="section-label" style="margin-top:16px">${group.toUpperCase()}</div>
       <div class="files-grid">${GOV_FILES.filter((f) => f.group === group).map(
         (f) => html`<article class="file-card">
-          <h4>${f.title}</h4>
+          <h3>${f.title}</h3>
           <div class="meta">${f.agency} · ${f.years}</div>
           <p>${f.text}</p>
           <div class="links">

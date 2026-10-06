@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { openApp } from './helpers.js';
 
 // Keyboard and layout details of the panels (dossier, lists, timeline, Moon list).
@@ -77,6 +78,14 @@ test.describe('panels', () => {
     await expect(page.locator('#dossier-body .d-title')).toContainText('Light b');
     await page.waitForTimeout(8000); // the first check has answered by now
     await expect(page.locator('#d-sky')).toHaveText('');
+  });
+
+  test('the files dialog has its headings in order', async ({ page }) => {
+    await openApp(page);
+    await page.keyboard.press('g');
+    await expect(page.locator('.file-card').first()).toBeVisible();
+    const results = await new AxeBuilder({ page }).withRules(['heading-order']).analyze();
+    expect(results.violations).toEqual([]);
   });
 
   test('the timeline play button is named for what it does now', async ({ page }) => {

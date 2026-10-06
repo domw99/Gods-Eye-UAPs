@@ -482,7 +482,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
 .modal .lead { color: var(--text-secondary); font-size: 13px; line-height: 1.55; margin-bottom: 14px; }
 .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
 .file-card { border: 1px solid var(--glass-border); border-radius: 11px; padding: 11px 12px; background: rgba(255, 255, 255, 0.025); display: flex; flex-direction: column; gap: 5px; }
-.file-card h4 { font-size: 13px; line-height: 1.3; }
+.file-card h3 { font-size: 13px; line-height: 1.3; }
 .file-card p { font-size: 12px; line-height: 1.5; color: var(--text-secondary); flex: 1; }
 .file-card .meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.05em; }
 .file-card .links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
