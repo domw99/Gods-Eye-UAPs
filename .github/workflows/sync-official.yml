@@ -66,6 +66,7 @@ jobs:
         if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          REF: ${{ github.ref_name }} # through the environment, not pasted into the script: a branch name can hold shell syntax
         # Pushes made with the workflow token don't trigger other workflows, so
         # start the Pages deploy explicitly. Harmless if Pages isn't enabled.
-        run: gh workflow run pages.yml --ref "${{ github.ref_name }}" || echo "Pages deploy not started (is Pages enabled?)"
+        run: gh workflow run pages.yml --ref "$REF" || echo "Pages deploy not started (is Pages enabled?)"

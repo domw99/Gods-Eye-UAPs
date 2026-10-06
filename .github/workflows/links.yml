@@ -25,6 +25,8 @@ jobs:
       - name: Media and article references (Commons, Wikipedia, DVIDS, Blue Book)
         id: media
         continue-on-error: true
+        # An explicit shell runs with pipefail; without it the step's status is tee's, so a failing check read as a pass.
+        shell: bash
         run: npm run verify:media 2>&1 | tee media-report.txt
       - name: Outside links in case sources and the files library
         id: links
