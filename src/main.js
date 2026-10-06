@@ -1377,8 +1377,9 @@ bindDossierActions({
     const item = itemByKey(state.selected) || nearPoint;
     if (!item) return;
     if (!state.layers.satellites) setLayer('satellites', true);
-    renderSkyCheck('loading');
-    satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null));
+    const box = document.getElementById('d-sky'); // the answer belongs in this record's box, even if another is open by then
+    renderSkyCheck('loading', box);
+    satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null, box));
   },
   'export-user': exportUserLog,
   compare: () => {

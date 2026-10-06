@@ -1021,8 +1021,8 @@ export function renderSatellite(info) {
   );
 }
 
-export function renderSkyCheck(list) {
-  const el = document.getElementById('d-sky');
+/** `el`: the box the check was started in, so a late answer never lands in another record's box. */
+export function renderSkyCheck(list, el = document.getElementById('d-sky')) {
   if (!el) return;
   if (list === 'loading') {
     mount(el, html`<div class="loading-line">Loading satellite orbits from CelesTrak…</div>`);

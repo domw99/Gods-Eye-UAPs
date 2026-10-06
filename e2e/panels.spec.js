@@ -62,6 +62,23 @@ test.describe('panels', () => {
     await expect(page.locator('#ms-light [data-light="day"]')).toBeFocused();
   });
 
+  test('a sky check that finishes after another record was opened does not write into it', async ({ page }) => {
+    const entry = (id, lat) => ({ id, title: `Light ${id}`, date: '2024-05-01T03:00:00.000Z', lat, lon: -105.2, shape: 'light', duration: '', witnesses: '', description: '', media: '' });
+    await page.addInitScript((list) => localStorage.setItem('gods-eye-uap:log', JSON.stringify(list)), [entry('a', 40), entry('b', -30)]);
+    await openApp(page);
+    await page.route(/celestrak/, async (route) => {
+      await new Promise((r) => setTimeout(r, 600)); // each element set takes a while to arrive
+      route.abort();
+    });
+    await page.evaluate(() => window.__uap.select('user:a', 'list'));
+    await page.locator('#dossier-body [data-action="skycheck"]').click();
+    await expect(page.locator('#d-sky')).toContainText('Loading satellite orbits');
+    await page.evaluate(() => window.__uap.select('user:b', 'list'));
+    await expect(page.locator('#dossier-body .d-title')).toContainText('Light b');
+    await page.waitForTimeout(8000); // the first check has answered by now
+    await expect(page.locator('#d-sky')).toHaveText('');
+  });
+
   test('the timeline play button is named for what it does now', async ({ page }) => {
     await openApp(page);
     const play = page.locator('#tl-play');
