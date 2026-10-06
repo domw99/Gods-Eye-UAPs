@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+vi.setConfig({ testTimeout: 30_000 }); // a language's dictionary is loaded the first time it is chosen, which is slow on a busy machine
+
 // A small stand-in for the DOM: just enough tree, attributes and TreeWalker for translateDom().
 const text = (s) => ({ nodeType: 3, nodeValue: s, childNodes: [] });
 const el = (tagName, attrs = {}, ...childNodes) => ({

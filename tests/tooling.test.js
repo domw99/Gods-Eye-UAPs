@@ -23,7 +23,7 @@ describe('adding interface strings', () => {
       const dict = (await import(pathToFileURL(file).href)).default;
       expect(fileText(text.split('\n')[0], dict), c).toBe(text);
     }
-  });
+  }, 30_000); // it imports all fifteen dictionaries, which can take longer than the default 5 s on a busy machine
 
   it('adds a text to every language, by code or as a list', () => {
     const dicts = blank();

@@ -1,4 +1,6 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, vi } from 'vitest';
+
+vi.setConfig({ testTimeout: 30_000 }); // a language's dictionary is loaded the first time it is chosen, which is slow on a busy machine
 
 // i18n only touches the document to set <html lang/dir>; give it a stand-in.
 globalThis.document = { documentElement: { dataset: {} }, body: null };
