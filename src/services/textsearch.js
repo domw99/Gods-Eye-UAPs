@@ -102,7 +102,8 @@ export async function searchJournals(base, query) {
       shards.set(k, p);
     }
     const shard = await shards.get(k);
-    if (shard[t]) found.push({ term: t, pages: decodePostings(shard[t]) });
+    const postings = Object.hasOwn(shard, t) ? shard[t] : null; // "constructor" is a word, and shard.constructor is Object
+    if (postings) found.push({ term: t, pages: decodePostings(postings) });
     else if (meta.common?.includes(t)) common.push(t);
     else missing.push(t);
   }

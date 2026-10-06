@@ -8,6 +8,7 @@
  * cached in localStorage.
  */
 import { setCached } from '../util/storage.js';
+import { fetchWithTimeout } from '../util/net.js';
 
 const API = 'https://ll.thespacedevs.com/2.3.0/launches/';
 const HOUR = 3600e3;
@@ -27,9 +28,13 @@ function writeCache(key, data) {
   setCached(key, JSON.stringify({ t: Date.now(), data })); // fine if it can't be kept
 }
 
+// A pad without coordinates has none; Number(null) would put it at 0°, 0°.
+const coordinate = (v) => (v == null || v === '' ? NaN : Number(v));
+
 export function slimLaunch(r) {
-  const lat = Number(r.pad?.latitude);
-  const lon = Number(r.pad?.longitude);
+  const lat = coordinate(r.pad?.latitude);
+  const lon = coordinate(r.pad?.longitude);
+  const placed = Number.isFinite(lat) && Number.isFinite(lon);
   return {
     id: r.id,
     name: r.name,
@@ -44,8 +49,8 @@ export function slimLaunch(r) {
     description: r.mission?.description || '',
     pad: r.pad?.name || '',
     location: r.pad?.location?.name || '',
-    lat: Number.isFinite(lat) ? lat : null,
-    lon: Number.isFinite(lon) ? lon : null,
+    lat: placed ? lat : null,
+    lon: placed ? lon : null,
     image: r.image?.thumbnail_url || null,
   };
 }
@@ -53,7 +58,7 @@ export function slimLaunch(r) {
 async function query(params, cacheKey, ttl) {
   const cached = readCache(cacheKey, ttl);
   if (cached) return cached;
-  const res = await fetch(`${API}?${new URLSearchParams({ limit: '100', ordering: 'net', ...params })}`);
+  const res = await fetchWithTimeout(`${API}?${new URLSearchParams({ limit: '100', ordering: 'net', ...params })}`);
   if (res.status === 429) throw new RateLimitError('Launch Library rate limit reached');
   if (!res.ok) throw new Error(`Launch Library HTTP ${res.status}`);
   const json = await res.json();

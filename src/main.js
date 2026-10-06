@@ -1589,7 +1589,7 @@ function openExplainNow(prefill) {
         onSave: addUser,
         prefill: {
           date: input.date,
-          description: best ? `Checker's top match: ${best.name} (${confidenceLabel(best.score).toLowerCase()}). ${best.reason}` : '',
+          description: best ? t("Checker's top match: {name} ({confidence}). {reason}", { name: best.name, confidence: t(confidenceLabel(best.score)).toLowerCase(), reason: best.reason }) : '',
         },
       }),
   });

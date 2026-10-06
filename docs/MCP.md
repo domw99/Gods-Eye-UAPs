@@ -42,7 +42,7 @@ To try it by hand, run `npm run mcp` and type one JSON message per line, for exa
 | `on_this_day` | Cases that happened on a day of the year, in any year (default: today). |
 | `describe_dataset` | How many cases, the years, the allowed filter values with counts, and where the open data is. |
 
-A wrong argument comes back as a message the assistant can read and correct ("status must be one of: unresolved, disputed, …"), not as a failure.
+A wrong argument comes back as a message the assistant can read and correct ("status must be one of: unresolved, disputed, …", "Unknown argument "keyword"", "limit must be a whole number"), not as a failure. An argument a tool does not take is an error too, so a misspelt filter never quietly returns every case.
 
 ## Reading it honestly
 

@@ -6,6 +6,7 @@
  */
 import { bearingDeg, angleDiff, trackLengthKm } from '../util/geo.js';
 import { setCached } from '../util/storage.js';
+import { fetchWithTimeout, isTimeout } from '../util/net.js';
 
 const ARCHIVE = 'https://archive-api.open-meteo.com/v1/archive';
 const FORECAST = 'https://api.open-meteo.com/v1/forecast';
@@ -23,6 +24,7 @@ const VARS = [
   'wind_speed_100m',
   'wind_direction_100m',
 ];
+const HOUR = 3600e3;
 const DAY = 86400e3;
 
 // WMO weather interpretation codes (Open-Meteo).
@@ -64,14 +66,22 @@ export function pickHour(json, when) {
 
 export const weatherAvailable = (when) => new Date(when).getUTCFullYear() >= 1940 && new Date(when).getTime() < Date.now() + 10 * DAY;
 
+const ARCHIVE_START = '1940-01-01'; // the archive rejects a request that starts any earlier
+
+/** The hour (as the ISO text up to the hour) that pickHour() will choose for `ms`: the nearest, the earlier one when halfway. */
+const nearestHourKey = (ms) => new Date(Math.ceil(ms / HOUR - 0.5) * HOUR).toISOString().slice(0, 13);
+
 /** Fetch the hour nearest `when` at a place. Resolves to null when no data exists. */
 export async function weatherAt(lat, lon, when) {
   if (!weatherAvailable(when)) return null;
   const t = new Date(when);
-  const key = `wx:${lat.toFixed(2)},${lon.toFixed(2)},${t.toISOString().slice(0, 13)}`;
+  // Keyed by the hour that is read, so 12:10 and 12:40 (which read 12:00 and 13:00) do not share an entry.
+  const hour = nearestHourKey(t.getTime());
+  const key = `wx:${lat.toFixed(2)},${lon.toFixed(2)},${hour}`;
   try {
     const hit = JSON.parse(localStorage.getItem(key) || 'null');
-    if (hit) return hit;
+    // Entries kept by earlier versions were filed under the clock hour, and may hold the next one.
+    if (hit?.hour?.startsWith(hour)) return hit;
   } catch {
     /* ignore */
   }
@@ -90,17 +100,19 @@ export async function weatherAt(lat, lon, when) {
     params.set('forecast_days', '10');
     url = `${FORECAST}?${params}`;
   } else {
-    params.set('start_date', day(t.getTime() - DAY));
+    const start = day(t.getTime() - DAY);
+    params.set('start_date', start < ARCHIVE_START ? ARCHIVE_START : start);
     params.set('end_date', day(t.getTime() + DAY));
     url = `${ARCHIVE}?${params}`;
   }
   let res;
   try {
-    res = await fetch(url);
-  } catch {
+    res = await fetchWithTimeout(url);
+  } catch (error) {
+    if (isTimeout(error)) throw error; // it has already waited; a second try would double that
     // Busy moments return errors without CORS headers; one retry usually works.
     await new Promise((r) => setTimeout(r, 1500));
-    res = await fetch(url);
+    res = await fetchWithTimeout(url);
   }
   if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
   const wx = pickHour(await res.json(), when);

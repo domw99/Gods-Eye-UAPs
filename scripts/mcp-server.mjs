@@ -32,4 +32,6 @@ rl.on('line', (line) => {
   }
   if (response) send(response);
 });
-rl.on('close', () => process.exit(0));
+// Input ended: exit once every answer has been written. A pipe holds about 64 kB, so a client that sends its
+// requests and closes stdin would otherwise lose whatever the reader had not yet taken when we exited.
+rl.on('close', () => process.stdout.write('', () => process.exit(0)));

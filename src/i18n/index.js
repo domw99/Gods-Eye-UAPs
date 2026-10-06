@@ -144,25 +144,29 @@ export const onLanguageChange = (fn) => (listeners.add(fn), () => listeners.dele
 /** The best supported language for a list of browser language tags. */
 export function pickLanguage(tags) {
   for (const tag of tags || []) {
-    const base = String(tag).toLowerCase().split('-')[0];
+    const base = String(tag).toLowerCase().split(/[-_]/)[0]; // "es-MX", or "es_MX" written with an underscore
     if (LANGUAGES.some((l) => l.code === base)) return base;
   }
   return 'en';
 }
 
+let newest = 0; // the latest setLanguage() call: a dictionary that arrives after a newer choice must not replace it
+
 export async function setLanguage(code, { save = true } = {}) {
+  const mine = ++newest;
   if (!LANGUAGES.some((l) => l.code === code)) code = 'en';
-  if (code === 'en') dict = {};
-  else {
+  let next = {};
+  if (code !== 'en') {
     const load = loaders[`./locales/${code}.js`];
     try {
-      dict = load ? (await load()).default : {};
+      next = load ? (await load()).default : {};
     } catch (e) {
       console.warn('[i18n] could not load', code, e);
-      dict = {};
       code = 'en';
     }
   }
+  if (mine !== newest) return lang;
+  dict = next;
   lang = code;
   const root = document.documentElement;
   root.lang = code;

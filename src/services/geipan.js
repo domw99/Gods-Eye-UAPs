@@ -73,8 +73,9 @@ const FRENCH_BODIES = [
 ];
 export const bodiesNamed = (text) => FRENCH_BODIES.filter(([re]) => re.test(text)).map(([, name]) => name).join(' ');
 
-/** Lower case without accents, so "evry" finds "Évry". */
-export const fold = (s) => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+/** Lower case without accents, so "evry" finds "Évry" and "coeur" finds "cœur" (œ and æ are letters, not accents, so they are spelled out). */
+export const fold = (s) =>
+  String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\u0153/g, 'oe').replace(/\u00e6/g, 'ae');
 
 /** Unpack the compact JSON written by the build script. */
 export function decodeGeipan(data) {

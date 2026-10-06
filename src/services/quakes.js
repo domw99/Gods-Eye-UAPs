@@ -4,6 +4,8 @@
  * ground or odd lights in the sky, so the layer helps check a sighting made
  * the same day.
  */
+import { fetchWithTimeout } from '../util/net.js';
+
 export const QUAKE_FEED = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson';
 
 /** The feed's features as plain rows, strongest first. */
@@ -36,7 +38,7 @@ export const quakeColor = (mag) => (mag >= 6 ? '#ff4d4d' : mag >= 5 ? '#ff7a45' 
 
 let cache = { at: 0, rows: null };
 /** The last day's quakes, kept for ten minutes. */
-export async function loadQuakes(fetchImpl = globalThis.fetch, now = Date.now()) {
+export async function loadQuakes(fetchImpl = fetchWithTimeout, now = Date.now()) {
   if (cache.rows && now - cache.at < 10 * 60e3) return cache.rows;
   const res = await fetchImpl(QUAKE_FEED);
   if (!res.ok) throw new Error(`USGS HTTP ${res.status}`);
