@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "Геомагнитной активности за эту дату нет во встроенных данных.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Также проверяются ближайшие аэродромы, где самолёты — частая причина, и геомагнитная активность, которая могла вызвать полярное сияние.",
   "Radar view: {n} records within {range} km, north at the top": "Радарный вид: {n} записей в радиусе {range} км, север вверху",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Новое: вводите координаты в строку поиска и смотрите полярное сияние и ближайшие аэродромы для каждого случая",
   "less than 1 km away": "менее 1 км",
   "FILM": "КИНОПЛЁНКА",
   "Motion-picture film": "Киноплёнка",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ ТОТ ДЕНЬ С ОРБИТЫ",
   "MAKING CARD…": "СОЗДАНИЕ КАРТОЧКИ…",
   "Enlarge picture: {caption}": "Увеличить изображение: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Много исправлений: больше текстов приложения переведено, и оно лучше справляется со сбоем сервиса или соединения",
 };

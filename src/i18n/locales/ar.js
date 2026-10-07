@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "النشاط الجيومغناطيسي غير موجود في السجل المرفق لهذا التاريخ.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "كما يبحث عن المطارات القريبة منك، حيث تكون الطائرات سببًا شائعًا، وعن النشاط الجيومغناطيسي الذي ربما أضاء الشفق القطبي.",
   "Radar view: {n} records within {range} km, north at the top": "عرض الرادار: {n} سجلًا ضمن {range} كم، والشمال في الأعلى",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "جديد: اكتب الإحداثيات في مربع البحث، وشاهد الشفق القطبي وأقرب المطارات لكل حالة",
   "less than 1 km away": "على بعد أقل من 1 كم",
   "FILM": "فيلم",
   "Motion-picture film": "فيلم سينمائي",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ ذلك اليوم من المدار",
   "MAKING CARD…": "جارٍ إنشاء البطاقة…",
   "Enlarge picture: {caption}": "تكبير الصورة: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "إصلاحات كثيرة: ترجمة جزء أكبر من التطبيق، وصمود أفضل عند تعطّل خدمة أو انقطاع اتصالك",
 };

@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "この日付の地磁気の活動は同梱の記録にありません。",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "近くの飛行場(航空機がよくある原因です)と、オーロラを生んだ可能性のある地磁気の活動も調べます。",
   "Radar view: {n} records within {range} km, north at the top": "レーダー表示：{range} km 以内の記録 {n} 件(上が北)",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新機能：検索ボックスに座標を入力でき、各事案のオーロラと最寄りの飛行場も見られます",
   "less than 1 km away": "1 km 未満",
   "FILM": "フィルム",
   "Motion-picture film": "映画フィルム",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ その日を軌道から",
   "MAKING CARD…": "カードを作成中…",
   "Enlarge picture: {caption}": "画像を拡大: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "多数の修正:翻訳された部分が増え、サービスや接続の障害にも強くなりました",
 };

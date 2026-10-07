@@ -40,7 +40,7 @@ globalThis.document = {
   },
 };
 globalThis.localStorage = { getItem: () => null, setItem: (k, v) => stored.push([k, v]) };
-const { setLanguage, onLanguageChange, language, t, plural, fill, pickLanguage, translateDom } = await import('../src/i18n/index.js');
+const { setLanguage, onLanguageChange, language, t, plural, fill, pickLanguage, languageOf, translateDom } = await import('../src/i18n/index.js');
 
 beforeEach(async () => {
   await setLanguage('en', { save: false });
@@ -71,6 +71,11 @@ describe('choosing a language', () => {
   it('reads language tags written with an underscore too', () => {
     expect(pickLanguage(['es_MX'])).toBe('es');
     expect(pickLanguage(['xx_YY', 'pt_BR'])).toBe('pt');
+  });
+
+  it('reads the language a ?lang= tag names, with a region or in capitals', () => {
+    expect(['pt-BR', 'zh-TW', 'ES', 'de_AT', 'ja'].map(languageOf)).toEqual(['pt', 'zh', 'es', 'de', 'ja']);
+    for (const odd of ['xx', 'toString', 'constructor', '', null, undefined, '-US']) expect(languageOf(odd), String(odd)).toBeNull();
   });
 });
 

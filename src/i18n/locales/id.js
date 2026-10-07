@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "Aktivitas geomagnetik tidak ada dalam catatan bawaan untuk tanggal ini.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Juga mencari landasan di dekat Anda, tempat pesawat sering jadi penyebab, dan aktivitas geomagnetik yang mungkin memunculkan aurora.",
   "Radar view: {n} records within {range} km, north at the top": "Tampilan radar: {n} catatan dalam radius {range} km, utara di atas",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Baru: ketik koordinat di kotak pencarian, dan lihat aurora serta landasan terdekat untuk setiap kasus",
   "less than 1 km away": "kurang dari 1 km",
   "FILM": "FILM",
   "Motion-picture film": "Film sinema",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ HARI ITU DARI ORBIT",
   "MAKING CARD…": "MEMBUAT KARTU…",
   "Enlarge picture: {caption}": "Perbesar gambar: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Banyak perbaikan: lebih banyak bagian aplikasi yang diterjemahkan, dan lebih tangguh saat layanan atau koneksi Anda gagal",
 };

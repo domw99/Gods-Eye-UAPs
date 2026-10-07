@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "内置记录中没有这一日期的地磁活动。",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "它还会查看你附近的机场（飞机是常见原因），以及可能引发极光的地磁活动。",
   "Radar view: {n} records within {range} km, north at the top": "雷达视图：{range} 公里内 {n} 条记录，上方为北",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "新功能：在搜索框输入坐标，并查看每个案件的极光和最近的机场",
   "less than 1 km away": "不到 1 公里",
   "FILM": "胶片",
   "Motion-picture film": "电影胶片",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ 当天的轨道影像",
   "MAKING CARD…": "正在生成卡片…",
   "Enlarge picture: {caption}": "放大图片：{caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "大量修复:更多内容已翻译,服务或网络出问题时也更稳",
 };

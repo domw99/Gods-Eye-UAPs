@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "이 날짜의 지자기 활동은 내장 기록에 없습니다.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "근처 비행장(항공기가 흔한 원인입니다)과 오로라를 일으켰을 수 있는 지자기 활동도 찾아봅니다.",
   "Radar view: {n} records within {range} km, north at the top": "레이더 보기: {range}km 이내 기록 {n}건, 북쪽이 위",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "새 기능: 검색창에 좌표를 입력하고, 각 사건의 오로라와 가장 가까운 비행장을 확인하세요",
   "less than 1 km away": "1km 미만",
   "FILM": "필름",
   "Motion-picture film": "영화 필름",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ 그날의 궤도 영상",
   "MAKING CARD…": "카드 만드는 중…",
   "Enlarge picture: {caption}": "이미지 확대: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "많은 수정: 번역된 부분이 늘었고, 서비스나 연결이 끊겨도 더 잘 버팁니다",
 };

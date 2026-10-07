@@ -864,7 +864,6 @@ export default {
   "Geomagnetic activity is not in the bundled record for this date.": "Aktywności geomagnetycznej nie ma w dołączonych danych dla tej daty.",
   "It also looks for airfields near you, where aircraft are a common cause, and for geomagnetic activity that could have lit an aurora.": "Sprawdza też lotniska w pobliżu, gdzie samoloty są częstą przyczyną, oraz aktywność geomagnetyczną, która mogła wywołać zorzę.",
   "Radar view: {n} records within {range} km, north at the top": "Widok radarowy: {n} wpisów w promieniu {range} km, północ u góry",
-  "New: type coordinates into the search box, and see the aurora and the nearest airfields for every case": "Nowość: wpisz współrzędne w wyszukiwarce i zobacz zorzę oraz najbliższe lotniska dla każdego przypadku",
   "less than 1 km away": "mniej niż 1 km stąd",
   "FILM": "FILM",
   "Motion-picture film": "Taśma filmowa",
@@ -1124,4 +1123,5 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ TEN DZIEŃ Z ORBITY",
   "MAKING CARD…": "TWORZENIE KARTY…",
   "Enlarge picture: {caption}": "Powiększ obraz: {caption}",
+  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Wiele poprawek: więcej aplikacji jest przetłumaczone i lepiej radzi sobie, gdy zawiedzie usługa lub połączenie",
 };

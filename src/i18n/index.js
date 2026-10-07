@@ -141,11 +141,17 @@ export function translateDom(root = document.body) {
 /** Call `fn(code)` after the language changes (to redraw anything built in code). */
 export const onLanguageChange = (fn) => (listeners.add(fn), () => listeners.delete(fn));
 
+/** The supported language a tag names ("es-MX", "pt_BR", "ZH-tw" → es, pt, zh), or null. */
+export function languageOf(tag) {
+  const base = String(tag ?? '').toLowerCase().split(/[-_]/)[0];
+  return LANGUAGES.some((l) => l.code === base) ? base : null;
+}
+
 /** The best supported language for a list of browser language tags. */
 export function pickLanguage(tags) {
   for (const tag of tags || []) {
-    const base = String(tag).toLowerCase().split(/[-_]/)[0]; // "es-MX", or "es_MX" written with an underscore
-    if (LANGUAGES.some((l) => l.code === base)) return base;
+    const code = languageOf(tag);
+    if (code) return code;
   }
   return 'en';
 }
@@ -188,7 +194,7 @@ export async function initLanguage() {
   try {
     asked = new URLSearchParams(globalThis.location?.search || '').get('lang');
   } catch {}
-  if (asked && LANGUAGES.some((l) => l.code === asked.toLowerCase())) return setLanguage(asked.toLowerCase());
+  if (languageOf(asked)) return setLanguage(languageOf(asked)); // ?lang=pt-BR works as ?lang=pt
   let saved = null;
   try {
     saved = localStorage.getItem(KEY);

@@ -554,7 +554,9 @@ body:not(.tl-hidden) .tl-show { display: none; }
   .modes { margin-left: 0; order: 3; width: 100%; justify-content: space-between; }
   .modes button { flex: 1; padding: 6px 4px; font-size: 10px; }
   /* One row of actions that scrolls sideways rather than wrapping into a tall bar. */
-  .top-actions { order: 4; width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 1px; }
+  /* The right edge fades out over a strip of padding, so a chip cut off by it says there is more to swipe to (the language and About are at the end). */
+  .top-actions { order: 4; width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 1px; padding-inline-end: 28px; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+  body.embed .top-actions { -webkit-mask-image: none; mask-image: none; padding-inline-end: 0; }
   .top-actions::-webkit-scrollbar { display: none; }
   .top-actions .chip { flex: none; }
   .hud-tl { display: none; }

@@ -2,7 +2,56 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
-## [1.8] — undated
+## [1.9] — 2026-10-07
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.9)
+
+**A bug-fix release: eight parallel audits of the data, the interface, the map layers, the services, the build and the translations, and about 150 fixes, each with a test.**
+
+**The case files**
+- **Times and timelines corrected.** Los Angeles 1942 (the shooting began at 02:15, not 03:15), Coyne 1973 (take-off at 22:30), the Washington 1952 timeline (the F-94s arrived on 26 July) and the year of Ängelholm's memorial.
+- **Impossible flight-path speeds fixed** for the Chiles-Whitted DC-3, the Nash-Fortenberry DC-4 and the Fort Monmouth T-33; two tracks that ran past their case's end time; and **21 points that sat underneath the terrain** (Mantell, Kecksburg, Minot, Loring and others) now sit at their ground height.
+- **Shape and region lookups:** "atmospheric" matched "spher", which made the 2023 MQ-9 South Asia case a sphere; "Indo-Pacific" resolved to the mid-Pacific; "West Virginia" to Virginia.
+- **Nuremberg 1561 and Basel 1566** are marked as having no exact time. The docs said 36 cases were; it is 54, and a test now keeps the number honest.
+- **New data-wide tests:** valid dates and UTC offsets, ids against years, unique track ids, no duplicate sources, heights above sea level, physically plausible speeds.
+- **Privacy:** the MUFON Journal and research-archive quotes sometimes carried members' e-mail addresses and phone numbers. They are removed in the builders and from the data we ship (42 quotes).
+
+**Checks and services**
+- **Weather** for a sighting at 12:10 used the 13:00 reading; sightings in the first hours of 1940 asked the archive for a date it does not have.
+- **Launches:** a pad with no coordinates was placed at 0°, 0° and scored as if it were there.
+- **Military airspace** stopped at 72°N, but twelve bundled areas reach 82°N.
+- **MGRS:** squares of 100 km, 10 km and 1 km near the south edge of a latitude band decoded 2,000 km north (found by fuzzing 40,000 round trips against the reference library); so did references in zone 31 near 56°N; 32X, 34X and 36X do not exist and now say so. `geo:0,0?q=…` links read the place in `q`.
+- **No live request waited for ever**: weather, launches, Wikipedia and earthquakes now give up after 20 seconds and say so.
+- Wikipedia credits showed `&amp;`; searching the word "constructor" in the journals crashed; "œ" and "æ" now fold in GEIPAN searches.
+- **WHAT DID I SEE?** was English in every language (its form, its match labels and every reason sentence); it is now translated, with "an extreme storm" instead of "a extreme storm".
+
+**Language**
+- A slow dictionary download could overwrite a newer choice (switch to German then English and end up in German). The newest choice now wins.
+- A text that read "constructor" turned into JavaScript source in other languages; `?lang=pt-BR` and `es_MX` are read as Portuguese and Spanish.
+- About 270 texts that were English in every language are translated (the statistics dialog, filter chips, the Blue Book, GEIPAN, MUFON, NUFORC and sighting pages, About, the sky chart, story captions), 113 wrong or awkward translations are corrected, 21 unused ones are gone, upper case follows each language's own rules (Turkish OTOMATİK), and Arabic sentences that open with a Latin name read in the right direction.
+- Text no longer overflows in 11 languages (GEIPAN labels, the journal-search button, German compounds). An open case is rewritten when you switch language.
+
+**The map and the layers**
+- At the end of a flight path the play button stayed on pause; 3D buildings sat on "loading…" and never retried a failed tile; a second 3D tileset could be left that nothing removed; a failed map style fell back to the wrong style; a repeated key in the sighting log stopped every marker drawing; a damaged satellite element set put a NaN point on the globe and stopped rendering; tilting up with Shift+arrows ran past the horizon.
+- The witness view went to NaN when the witness and the object coincide (the end of Kinross); `?view=0,0,1e300` stopped the app starting.
+- The camera readout ran under the map controls and the playback bar (the MGRS line made it taller); on a phone the records-per-year chart was unreadable and now scrolls; the top bar fades at its edge to show there is more to swipe to.
+
+**The interface**
+- **Bad addresses and saved data:** `#/near/1.2.3,4.5.6` left the globe blank for good; a saved sighting with no date stopped the app starting; stored stars that were not a list became a set of letters; `?layers=constructor` and saved lighting modes are checked properly.
+- **Races:** a layer switched off while it loaded still drew its line on the years bar; RESET ALL left a place lookup running; a slow satellite check wrote into the next case; a cancelled voice showed the next story caption twice; the MAP dialog reopened after being closed during a slow request.
+- **Keyboard and screen readers:** filter chips, layer switches, the star button and map choices keep the focus when they redraw; pictures in a case file open from the keyboard; scrollable boxes can be focused; the play buttons say whether they are playing; closing the Moon case returns to its row; faded panels in clean view can no longer be tabbed to; a held key no longer flickers the toggles; Esc in the search box clears the words before it closes the case.
+- **Contrast and layout:** dim text on the panels measured 3.1:1 and is lifted; long unbroken text (a URL in a logged sighting) no longer widens the dossier; long searched-for names wrap.
+- A failed archive load fails quietly and the layer says "offline" instead of "loading…"; the embed's "Open full app" link carries the place when middle-clicked.
+
+**The build and the data pipeline**
+- **Open data** now says when a time of day is approximate (`timeApproximate` in the JSON, CSV and GeoJSON); CSV cells that start with `=`, `+`, `-` or `@` are quoted so a spreadsheet will not run them; the open-data page scrolls and is focusable on a phone.
+- A DVIDS outage could write an empty catalogue, and the Kp and airfield builders wrote an error page over their data; both now check first. The scripts ran as silent no-ops through a symlinked checkout; a `SITE_URL` without a trailing slash built broken addresses; the changelog left an uncommitted release "undated".
+- **Workflows:** the weekly link check ignored a failing media check; new share cards were committed but not published; a branch name was pasted into a shell script. The three labels the issue forms and Dependabot use now exist.
+- **MCP server:** it lost queued answers when its input closed, answered empty batches with silence and bad arguments with everything, and echoed odd request ids; all of those now follow JSON-RPC.
+
+**Tests:** 159 new unit tests (1,100 in all) and 32 new browser tests (88 in all, desktop and phone).
+
+## [1.8] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.8)
 

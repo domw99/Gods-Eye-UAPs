@@ -1845,7 +1845,7 @@ function maybeWelcome() {
   if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('New: type coordinates into the search box, and see the aurora and the nearest airfields for every case', 7000);
+    toast('Many fixes: more of the app is translated, and it holds up better when a service or your connection fails', 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
