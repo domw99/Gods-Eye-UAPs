@@ -1,0 +1,6 @@
+# Everything on this site may be crawled.
+# (Crawlers read this file at the root of a host; elsewhere the sitemap is found through links and search consoles.)
+User-agent: *
+Allow: /
+
+Sitemap: https://domw99.github.io/Gods-Eye-UAPs/sitemap.xml
