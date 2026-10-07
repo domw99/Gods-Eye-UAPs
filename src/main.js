@@ -1451,7 +1451,7 @@ bindDossierActions({
   'near-nuforc': async () => {
     if (!nearPoint) return;
     const at = nearPoint;
-    await ensureNuforc();
+    if (!(await ensureNuforc().catch(() => null))) return; // it says so itself when it can't load
     if (nearPoint === at) toast(t('{n} civilian reports within 50 km', { n: countNuforc(at.lat, at.lon).toLocaleString(locale()) }), 4000);
     if (nearPoint === at) showNearby(at.lat, at.lon, at.label, { fly: false });
   },
