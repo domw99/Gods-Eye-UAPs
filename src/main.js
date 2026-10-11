@@ -1887,7 +1887,7 @@ function maybeWelcome() {
   if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('Many fixes: more of the app is translated, and it holds up better when a service or your connection fails', 7000);
+    toast('New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view', 7000);
 }
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');

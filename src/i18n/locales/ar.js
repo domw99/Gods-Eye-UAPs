@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ ذلك اليوم من المدار",
   "MAKING CARD…": "جارٍ إنشاء البطاقة…",
   "Enlarge picture: {caption}": "تكبير الصورة: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "إصلاحات كثيرة: ترجمة جزء أكبر من التطبيق، وصمود أفضل عند تعطّل خدمة أو انقطاع اتصالك",
   "Fireballs": "كرات نارية",
   "NASA, bright meteors since 1988 · bundled": "ناسا، شهب ساطعة منذ 1988 · مدمجة",
   "FIREBALL": "كرة نارية",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "قرّب أكثر لإمالة العرض",
   "North up: turn the view so north is at the top": "الشمال لأعلى: يدير العرض ليكون الشمال في الأعلى",
   "Tilt the view, or look straight down again": "إمالة العرض أو النظر مجددًا إلى الأسفل مباشرة",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "جديد: كرات ناسا النارية الساطعة على الكرة الأرضية وفي فحوص المشاهدات، مع زرّي البوصلة والإمالة للعرض",
 };

@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ 그날의 궤도 영상",
   "MAKING CARD…": "카드 만드는 중…",
   "Enlarge picture: {caption}": "이미지 확대: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "많은 수정: 번역된 부분이 늘었고, 서비스나 연결이 끊겨도 더 잘 버팁니다",
   "Fireballs": "화구",
   "NASA, bright meteors since 1988 · bundled": "NASA, 1988년 이후의 밝은 유성 · 내장",
   "FIREBALL": "화구",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "화면을 기울이려면 더 확대하세요",
   "North up: turn the view so north is at the top": "북쪽을 위로: 북쪽이 위로 오도록 화면을 돌립니다",
   "Tilt the view, or look straight down again": "화면을 기울이거나 다시 바로 아래를 봅니다",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "새 기능: NASA의 밝은 화구가 지구본과 목격 검사에 추가되었고, 화면용 나침반과 기울기 버튼도 생겼습니다",
 };

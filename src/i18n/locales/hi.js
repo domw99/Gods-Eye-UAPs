@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ उस दिन की कक्षा से तस्वीर",
   "MAKING CARD…": "कार्ड बनाया जा रहा है…",
   "Enlarge picture: {caption}": "तस्वीर बड़ी करें: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "कई सुधार: ऐप का और हिस्सा अनुवादित है, और किसी सेवा या आपके कनेक्शन के विफल होने पर यह बेहतर चलता है",
   "Fireballs": "आग के गोले",
   "NASA, bright meteors since 1988 · bundled": "NASA, 1988 से चमकीली उल्काएँ · साथ में शामिल",
   "FIREBALL": "आग का गोला",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "दृश्य झुकाने के लिए और ज़ूम करें",
   "North up: turn the view so north is at the top": "उत्तर ऊपर: दृश्य को इस तरह घुमाएँ कि उत्तर ऊपर रहे",
   "Tilt the view, or look straight down again": "दृश्य झुकाएँ, या फिर सीधे नीचे देखें",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "नया: ग्लोब और अवलोकन जाँच में NASA के चमकीले आग के गोले, और दृश्य के लिए कंपास व झुकाव बटन",
 };

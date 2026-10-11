@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ QUEL GIORNO DALL’ORBITA",
   "MAKING CARD…": "CREAZIONE DELLA CARD…",
   "Enlarge picture: {caption}": "Ingrandisci l’immagine: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Molte correzioni: più parti dell'app sono tradotte e regge meglio quando un servizio o la connessione si interrompe",
   "Fireballs": "Bolidi",
   "NASA, bright meteors since 1988 · bundled": "NASA, meteore luminose dal 1988 · incluso",
   "FIREBALL": "BOLIDE",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "Avvicinati di più per inclinare la vista",
   "North up: turn the view so north is at the top": "Nord in alto: ruota la vista in modo che il nord sia in alto",
   "Tilt the view, or look straight down again": "Inclina la vista, o torna a guardare dall’alto",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Novità: i bolidi luminosi della NASA sul globo e nei controlli degli avvistamenti, e pulsanti bussola e inclinazione per la vista",
 };

@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ DIE DAG VANUIT DE ORBIT",
   "MAKING CARD…": "KAART MAKEN…",
   "Enlarge picture: {caption}": "Afbeelding vergroten: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Veel verbeteringen: meer van de app is vertaald en hij houdt beter stand als een dienst of je verbinding uitvalt",
   "Fireballs": "Vuurbollen",
   "NASA, bright meteors since 1988 · bundled": "NASA, heldere meteoren sinds 1988 · ingebouwd",
   "FIREBALL": "VUURBOL",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "Zoom verder in om het beeld te kantelen",
   "North up: turn the view so north is at the top": "Noorden boven: draait het beeld zodat noord bovenaan ligt",
   "Tilt the view, or look straight down again": "Beeld kantelen, of weer recht naar beneden kijken",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Nieuw: de heldere vuurbollen van NASA op de globe en in de waarnemingschecks, plus kompas- en kantelknoppen voor het beeld",
 };

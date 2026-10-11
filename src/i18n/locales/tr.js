@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ O GÜN YÖRÜNGEDEN",
   "MAKING CARD…": "KART OLUŞTURULUYOR…",
   "Enlarge picture: {caption}": "Görseli büyüt: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Pek çok düzeltme: uygulamanın daha çoğu çevrildi ve bir hizmet ya da bağlantınız koptuğunda daha iyi dayanıyor",
   "Fireballs": "Ateş topları",
   "NASA, bright meteors since 1988 · bundled": "NASA, 1988'den beri parlak meteorlar · uygulamada",
   "FIREBALL": "ATEŞ TOPU",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "Görünümü eğmek için daha fazla yakınlaştırın",
   "North up: turn the view so north is at the top": "Kuzey yukarı: görünümü kuzey üstte olacak şekilde çevirir",
   "Tilt the view, or look straight down again": "Görünümü eğ ya da yeniden dik aşağı bak",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Yeni: NASA’nın parlak ateş topları küre üzerinde ve gözlem denetimlerinde, ayrıca görünüm için pusula ve eğme düğmeleri",
 };

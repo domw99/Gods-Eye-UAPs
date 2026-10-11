@@ -113,6 +113,8 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
 - **Earthquakes** (new in 1.2): the last 24 hours from the USGS, sized and coloured by magnitude. Strong quakes are sometimes reported as booms or odd lights, so it helps check a same-day sighting.
 <img src="docs/media/earthquakes.jpg" alt="The Earthquakes layer over Japan and the western Pacific: pentagon markers sized and coloured by magnitude, listed in the layers panel with their own symbol" width="100%" />
 
+- **Fireballs** (new in 2.0): the 888 bright meteors that U.S. government sensors have recorded since 1988 (NASA CNEOS), drawn as comets sized by energy, with the year bar filtering them. A fireball outshines the Moon for a few seconds, so it is a familiar cause of "a light that crossed the sky and went out". Press <kbd>B</kbd> to turn the view north up and <kbd>P</kbd> to tilt it; the compass turns with the view.
+
 - **A symbol for every layer**: rings for cases, diamonds for official releases, triangles for your own sightings, and a file, shield, hexagon, open book, spark and seismograph for Blue Book, GEIPAN, MUFON, the research archives, civilian reports and earthquakes, so you can tell the dots apart at a glance.
 
 ### 🔭 Check it yourself
@@ -125,7 +127,8 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
   - rocket launches;
   - lanterns or balloons on the wind;
   - aircraft from an airfield near you (about 11,000 airports and military fields, from OurAirports);
-  - the aurora, when the geomagnetic Kp index was high enough for it to reach your latitude in a dark sky.
+  - the aurora, when the geomagnetic Kp index was high enough for it to reach your latitude in a dark sky;
+  - a bright fireball in NASA's record close to you in time and place (new in 2.0).
 
   Live flights need a server, so aircraft elsewhere are listed as not checkable. Above, a bright, still light low in the WSW at dusk comes back as **Venus**; a coloured glow over North Dakota at midnight on 14 March 1989 comes back as the **aurora** of the great storm (Kp 8-).
 <table>
@@ -148,6 +151,7 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
   <img src="docs/media/orbit-day.jpg" alt="The O'Hare case: NASA's satellite picture of 7 November 2006 over the globe shows Chicago under solid cloud; the dossier shows 100% overcast and the THAT DAY FROM ORBIT button" width="100%" />
 - **Military airspace**: which FAA restricted or warning areas a case falls in.
 - **Geomagnetic activity**, for every case since 1932: the Kp index for the three hours of the case (GFZ Potsdam), NOAA's storm scale, and whether an aurora could have been seen from there (it needs a dark sky and a latitude the auroral oval reaches at that Kp). It is a classic cause of strange lights at low latitudes.
+- **Bright fireballs nearby**, for every case since 1988: any fireball in NASA's record within 600 km and 3 hours, with how long before or after, how far and in which direction. The record holds only the bigger events, so an empty answer does not rule one out.
 - **Nearest airfields**: the closest airports and military fields, with the distance and direction, and a note that aircraft on approach (landing lights, apparently hanging still) are a common cause of reports near them. The list is of airfields as they are today, and says so.
 
 <table>
@@ -389,13 +393,14 @@ flowchart LR
     FAA["FAA special-use<br/>airspace"] --> S3["build-airspace.mjs"]
     NUF["NUFORC<br/>(geocoded)"] --> S4["build-nuforc.mjs"]
     KP["GFZ Potsdam<br/>Kp index"] --> S8["build-kp.mjs"]
+    FB["NASA CNEOS<br/>fireballs"] --> S10["build-fireballs.mjs"]
     OA["OurAirports<br/>airfields"] --> S9["build-airfields.mjs"]
     MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
     GEI["GEIPAN<br/>published CSV"] --> S6["build-geipan.mjs"]
     ARC["APRO · NICAP · CUFOS<br/>OCR (Internet Archive)"] --> S7["build-journals.mjs"]
     S5 & S7 --> S8["build-textindex.mjs"]
   end
-  S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 --> DATA[("public/data/*.json")]
+  S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 --> DATA[("public/data/*.json")]
   CASES["src/data/cases/*.js<br/>161 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
@@ -431,7 +436,7 @@ src/
               airspace.js (military airspace volumes) · declutter.js (label overlap)
   services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
-              geomagnetic.js (Kp, aurora) · airfields.js (nearest airfields)
+              geomagnetic.js (Kp, aurora) · airfields.js (nearest airfields) · fireballs.js (NASA fireballs)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
               geipan.js (GEIPAN classes, dates, links) · journals.js (APRO, NICAP, CUFOS)
               textsearch.js (journal full-text search)
@@ -477,6 +482,7 @@ All datasets ship in `public/data/` and are rebuilt by scripts:
 | `npm run build:bluebook` | Internet Archive collection [`project-blue-book`](https://archive.org/details/project-blue-book), geocoded offline with [GeoNames](https://www.geonames.org/) cities1000 | `bluebook.json` |
 | `npm run build:airspace` | FAA special-use airspace (ArcGIS open data), simplified | `airspace.json` |
 | `npm run build:kp` | The Kp geomagnetic index every three hours since 1932 from [GFZ Potsdam](https://kp.gfz.de/en/data) (CC BY 4.0), packed one character per interval | `kp.json` |
+| `npm run build:fireballs` | NASA/JPL [CNEOS](https://cneos.jpl.nasa.gov/fireballs/) fireball data API (U.S. government data, public domain): bright meteors since 1988 with a position, packed as compact events | `fireballs.json` |
 | `npm run build:airfields` | [OurAirports](https://ourairports.com/data/) (public domain): large and medium airports, small ones with an ICAO code or flights, and military fields by name | `airfields.json` |
 | `npm run build:nuforc` | [planetsig/ufo-reports](https://github.com/planetsig/ufo-reports) (geocoded NUFORC), facts only with the narratives removed | `nuforc.json` |
 | `npm run build:mufon` | The MUFON Archive on the Internet Archive ([`MUFON_UFO_Journal_-_Skylook`](https://archive.org/details/MUFON_UFO_Journal_-_Skylook)). It reads each issue's OCR text page by page, finds "Town, State" places in sighting reports (skipping addresses, meetings and hometowns), geocodes them with GeoNames and matches pages to curated cases. Only places, page numbers and short quotes are stored. | `mufon.json` |
@@ -522,7 +528,7 @@ It then appears on the globe.
 
 **Any other static host works too.** Run `SITE_URL=https://your.site/ npm run build` (`SITE_URL` goes into the link previews and the sitemap; add `BASE_PATH=/subpath/` when it is not served from the root), then upload `dist/`. To try it in a container: `docker run --rm -p 8080:80 -v "$PWD/dist:/usr/share/nginx/html:ro" nginx:alpine`.
 
-`ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday (and the geomagnetic Kp series on the first Monday of the month), commits any change and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
+`ci.yml` runs the tests and a build on every push and pull request (`codeql.yml` scans the code, and Dependabot proposes dependency updates weekly). `sync-official.yml` re-syncs the official DVIDS releases every Monday (and the geomagnetic Kp series and the fireball record on the first Monday of the month), commits any change and redeploys the site. After each deploy, `indexnow.yml` sends the sitemap to Bing and the other IndexNow search engines and asks the Wayback Machine to keep a copy of the main pages. `release.yml` publishes a GitHub release from `.github/release-notes/<tag>.md`.
 
 The build writes a page per case (`case/<id>/`), an index of them (`case/`), pages that group the cases by country, decade, status, kind of encounter, evidence and shape (`browse/`; a group needs two cases), the open data (`open-data/`), a `sitemap.xml`, and `robots.txt`, `llms.txt` and `llms-full.txt` (the cases as plain text for AI assistants; crawlers read these at the root of a host, so on a `github.io/<repo>/` address they matter only on a custom domain). A case page opens the case on the globe at once only when its link ends in `#globe`, as links shared from the app do; reached any other way (a search result) it stays a readable page, so search engines index it. They use the address in `SITE_URL`, which `pages.yml` sets to `https://<owner>.github.io/<repository>/`. After changing cases, refresh their preview images with `node scripts/build-cards.mjs` against a running build, or run `cards.yml` from the Actions tab, which draws them on GitHub (with the satellite imagery) and commits them. For IndexNow, replace `public/<key>.txt` with your own key.
 

@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ 当天的轨道影像",
   "MAKING CARD…": "正在生成卡片…",
   "Enlarge picture: {caption}": "放大图片：{caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "大量修复:更多内容已翻译,服务或网络出问题时也更稳",
   "Fireballs": "火球",
   "NASA, bright meteors since 1988 · bundled": "NASA，1988 年以来的明亮流星 · 已内置",
   "FIREBALL": "火球",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "请再放大一些以倾斜视图",
   "North up: turn the view so north is at the top": "正北朝上：旋转视图，使北方位于上方",
   "Tilt the view, or look straight down again": "倾斜视图，或再次垂直向下看",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新增：NASA 的明亮火球出现在地球仪和目击检查中，并为视图添加了指南针和倾斜按钮",
 };

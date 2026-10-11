@@ -14,7 +14,7 @@ A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 
 | `npm run dev` | Dev server at http://localhost:5173 |
 | `npm run build` | Production build into `dist/` (also writes a page per case, the case index, the open data and `sitemap.xml`) |
 | `npm run preview` | Serve `dist/` at http://localhost:4173 (what the browser tests use) |
-| `npm test` | Vitest, about 900 tests, a few seconds. Run it before every commit |
+| `npm test` | Vitest, about 1,100 tests, a few seconds. Run it before every commit |
 | `npm run e2e` | Playwright browser tests (desktop and phone), about 15 minutes. Needs `npx playwright install chromium` once, and a build first |
 | `npm run verify:media` | Checks the Commons files, Wikipedia titles, DVIDS ids and Blue Book ids the case files cite. Run it after editing a case |
 | `npm run data` | Rebuilds every dataset in `public/data/` from its source (slow, network) |

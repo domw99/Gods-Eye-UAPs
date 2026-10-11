@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ HARI ITU DARI ORBIT",
   "MAKING CARD…": "MEMBUAT KARTU…",
   "Enlarge picture: {caption}": "Perbesar gambar: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Banyak perbaikan: lebih banyak bagian aplikasi yang diterjemahkan, dan lebih tangguh saat layanan atau koneksi Anda gagal",
   "Fireballs": "Bola api",
   "NASA, bright meteors since 1988 · bundled": "NASA, meteor terang sejak 1988 · sudah termasuk",
   "FIREBALL": "BOLA API",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "Perbesar lebih dekat untuk memiringkan tampilan",
   "North up: turn the view so north is at the top": "Utara di atas: putar tampilan agar utara berada di atas",
   "Tilt the view, or look straight down again": "Miringkan tampilan, atau lihat lurus ke bawah lagi",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Baru: bola api terang NASA di globe dan dalam pemeriksaan pengamatan, plus tombol kompas dan kemiringan untuk tampilan",
 };

@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ その日を軌道から",
   "MAKING CARD…": "カードを作成中…",
   "Enlarge picture: {caption}": "画像を拡大: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "多数の修正:翻訳された部分が増え、サービスや接続の障害にも強くなりました",
   "Fireballs": "火球",
   "NASA, bright meteors since 1988 · bundled": "NASA、1988年以降の明るい流星 · 内蔵",
   "FIREBALL": "火球",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "視点を傾けるにはもっとズームインしてください",
   "North up: turn the view so north is at the top": "北を上に：北が上になるよう表示を回転します",
   "Tilt the view, or look straight down again": "視点を傾ける、または再び真下を見る",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新機能：NASAの明るい火球を地球儀と目撃チェックに追加し、表示用のコンパスと傾きボタンも加わりました",
 };

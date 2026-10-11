@@ -1123,7 +1123,6 @@ export default {
   "✓ THAT DAY FROM ORBIT": "✓ DER TAG AUS DEM ORBIT",
   "MAKING CARD…": "KARTE WIRD ERSTELLT…",
   "Enlarge picture: {caption}": "Bild vergrößern: {caption}",
-  "Many fixes: more of the app is translated, and it holds up better when a service or your connection fails": "Viele Korrekturen: mehr von der App ist übersetzt, und sie kommt besser damit zurecht, wenn ein Dienst oder Ihre Verbindung ausfällt",
   "Fireballs": "Feuerkugeln",
   "NASA, bright meteors since 1988 · bundled": "NASA, helle Meteore seit 1988 · eingebaut",
   "FIREBALL": "FEUERKUGEL",
@@ -1163,4 +1162,5 @@ export default {
   "Zoom in closer to tilt the view": "Näher heranzoomen, um die Ansicht zu kippen",
   "North up: turn the view so north is at the top": "Norden oben: dreht die Ansicht so, dass Norden oben liegt",
   "Tilt the view, or look straight down again": "Ansicht kippen oder wieder senkrecht nach unten schauen",
+  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Neu: die hellen Feuerkugeln der NASA auf dem Globus und in den Sichtungs-Checks sowie Kompass- und Kipp-Tasten für die Ansicht",
 };
