@@ -15,6 +15,7 @@ test.describe('Fireballs', () => {
     // Look down at the Chelyabinsk fireball (15 February 2013) and click the middle of the screen.
     await page.evaluate(() => {
       const { viewer } = window.__uap;
+      viewer.camera.cancelFlight();
       const p = viewer.scene.globe.ellipsoid.cartographicToCartesian({ longitude: (61.1 * Math.PI) / 180, latitude: (54.8 * Math.PI) / 180, height: 600_000 });
       viewer.camera.setView({ destination: p, orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 } });
     });
@@ -60,6 +61,7 @@ test.describe('Compass and tilt', () => {
     // Close to the ground, turned away from north.
     await page.evaluate(() => {
       const { viewer } = window.__uap;
+      viewer.camera.cancelFlight(); // the flight home from the start would otherwise turn the view back
       const p = viewer.scene.globe.ellipsoid.cartographicToCartesian({ longitude: (-104.5 * Math.PI) / 180, latitude: (33.4 * Math.PI) / 180, height: 400_000 });
       viewer.camera.setView({ destination: p, orientation: { heading: (50 * Math.PI) / 180, pitch: (-88 * Math.PI) / 180, roll: 0 } });
     });
@@ -77,7 +79,7 @@ test.describe('Compass and tilt', () => {
     await expect.poll(pitch, { timeout: 10_000 }).toBeLessThan(-85);
     // High above the Earth there is nothing to lean over: it says so.
     await page.evaluate(() => window.__uap.resetView());
-    await page.waitForTimeout(3500);
+    await expect.poll(() => page.evaluate(() => window.__uap.viewer.camera.positionCartographic.height), { timeout: 30_000 }).toBeGreaterThan(5_000_000);
     await tilt.click();
     await expect(page.locator('#toast')).toContainText('Zoom in closer to tilt the view');
     await expect(tilt).toHaveAttribute('aria-pressed', 'false');
