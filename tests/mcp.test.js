@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { spawn } from 'node:child_process';
-import { handle, callTool, toolList, searchCases, getCase, casesNear, onThisDayTool, describeDataset, PROTOCOLS } from '../scripts/lib/mcp.mjs';
+import { handle, callTool, toolList, searchCases, getCase, casesNear, onThisDayTool, describeDataset, fireballsNearTool, globeLink, LINK_LAYERS, PROTOCOLS } from '../scripts/lib/mcp.mjs';
+import { DEFAULT_LAYERS } from '../src/state.js';
 import { CASES } from '../src/data/cases/index.js';
 import { STATUS } from '../src/data/taxonomy.js';
 import { RELEASE } from '../src/config.js';
@@ -38,14 +39,14 @@ describe('the MCP protocol', () => {
 
   it('lists tools that each have a name, a description and an object schema, and no function', () => {
     const tools = ask('tools/list').result.tools;
-    expect(tools.map((t) => t.name)).toEqual(['search_cases', 'get_case', 'cases_near', 'on_this_day', 'describe_dataset']);
+    expect(tools.map((t) => t.name)).toEqual(['search_cases', 'get_case', 'cases_near', 'on_this_day', 'fireballs_near', 'globe_link', 'describe_dataset']);
     for (const t of tools) {
       expect(t.description.length, t.name).toBeGreaterThan(30);
       expect(t.inputSchema.type, t.name).toBe('object');
       expect(t.run).toBeUndefined();
       expect(t.annotations.readOnlyHint).toBe(true);
     }
-    expect(toolList()).toHaveLength(5);
+    expect(toolList()).toHaveLength(7);
   });
 });
 
@@ -132,6 +133,46 @@ describe('near a place and on a date', () => {
     expect(d.version).toBe(RELEASE);
     expect(d.links.open_data).toMatch(/open-data\/$/);
     expect(Object.values(d.status_counts).reduce((a, b) => a + b, 0)).toBe(CASES.length);
+  });
+});
+
+describe('fireballs and links to the globe', () => {
+  it('finds Chelyabinsk from a witness nearby, with its distance, bearing and energy', () => {
+    const r = fireballsNearTool({ lat: 55.2, lon: 61.4, when: '2013-02-15T03:30:00Z', hours: 1 });
+    expect(r.total).toBe(1);
+    expect(r.fireballs[0]).toMatchObject({ time: '2013-02-15T03:20:26.000Z', energy_kt_tnt: 441 });
+    expect(r.fireballs[0].distance_km).toBeLessThan(100);
+    expect(r.record).toMatch(/does not rule/);
+  });
+
+  it('says what is wrong with a missing place or time, through the protocol', () => {
+    expect(() => fireballsNearTool({ lat: 1, lon: 1 })).toThrow(/when is required/);
+    const reply = callTool('fireballs_near', { lat: 1, lon: 1, when: 'yesterday-ish' });
+    expect(reply.isError).toBe(true);
+    expect(reply.content[0].text).toMatch(/when is required/);
+    expect(callTool('fireballs_near', { lat: 200, lon: 1, when: '2020-01-01T00:00:00Z' }).isError).toBe(true);
+    expect(callTool('fireballs_near', { lat: 1, lon: 1, when: '2020-01-01T00:00:00Z', hours: 500 }).isError).toBe(true);
+  });
+
+  it('gives a link for a case, with its page, an embed address and the layers asked for', () => {
+    const r = globeLink({ case_id: CASES[0].id, layers: 'fireballs, quakes' });
+    expect(r.url).toMatch(new RegExp(`/case/${CASES[0].id}/#globe$`));
+    expect(r.globe).toContain('?layers=fireballs,quakes#/case/');
+    expect(r.embed).toContain('?embed=1&layers=fireballs,quakes#/case/');
+  });
+
+  it('gives a link for a place, naming it, and refuses a layer or case that is not there', () => {
+    const r = globeLink({ lat: 36.1, lon: -115.2, label: 'Las Vegas' });
+    expect(r.url).toMatch(/#\/near\/36\.1000,-115\.2000\/Las%20Vegas$/);
+    expect(() => globeLink({ lat: 36, lon: 200 })).toThrow(/case_id, or lat and lon/);
+    expect(() => globeLink({ case_id: 'nope' })).toThrow(/No case/);
+    expect(() => globeLink({ lat: 1, lon: 1, layers: 'fireballs,lasers' })).toThrow(/Unknown layer: lasers/);
+  });
+
+  it('knows exactly the layers the app can switch on from a link', () => {
+    const extra = Object.keys(DEFAULT_LAYERS).filter((k) => !DEFAULT_LAYERS[k] && !LINK_LAYERS.includes(k));
+    expect(extra).toEqual([]);
+    for (const l of LINK_LAYERS) expect(Object.keys(DEFAULT_LAYERS)).toContain(l);
   });
 });
 

@@ -4,7 +4,7 @@ import { LAYER_DEFS } from '../src/ui/list.js';
 
 describe('layer symbols', () => {
   it('gives every map-point layer a shape of its own', () => {
-    const archives = ['bluebook', 'geipan', 'mufon', 'journals', 'nuforc', 'quakes'];
+    const archives = ['bluebook', 'geipan', 'mufon', 'journals', 'nuforc', 'quakes', 'fireballs'];
     expect(Object.keys(GLYPHS).sort()).toEqual([...archives].sort());
     const paths = Object.values(GLYPHS).map((g) => g.path);
     expect(new Set(paths).size).toBe(paths.length);

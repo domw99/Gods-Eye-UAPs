@@ -17,6 +17,7 @@ export const LAYER_DEFS = [
   { id: 'satellites', name: 'Live satellites', sub: 'Starlink, ISS & bright satellites now', color: '#7dd3ff' },
   { id: 'launches', name: 'Rocket launches', sub: 'Last 14 days and next 30 · Launch Library 2', color: '#ffcf5c' },
   { id: 'quakes', name: 'Earthquakes', sub: 'USGS, the last 24 hours · live', color: '#e6c37a' },
+  { id: 'fireballs', name: 'Fireballs', sub: 'NASA, bright meteors since 1988 · bundled', color: '#fff3b0' },
   { id: 'airspace', name: 'Military airspace', sub: 'U.S. restricted, warning & training areas (FAA)', color: '#ff9f1c' },
   { id: 'buildings', name: '3D buildings', sub: 'OpenStreetMap, no key needed · zoom into a city', color: '#b7c2ce' },
   { id: 'user', name: 'My sightings', sub: 'Stored only in this browser', color: '#c6ff5c' },

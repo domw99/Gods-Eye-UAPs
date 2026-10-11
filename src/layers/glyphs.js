@@ -10,6 +10,7 @@
  *   Research archives  an open book
  *   Civilian reports a four-point spark
  *   Earthquakes      a pentagon with a seismograph trace
+ *   Fireballs        a comet: a bright head with its tail
  *
  * The outlines are SVG paths in a 16 × 16 box, so the same shapes draw on the
  * map (canvas) and in the layer list (inline SVG).
@@ -20,6 +21,7 @@ export const GLYPHS = {
   mufon: { path: 'M8 1.7l5.4 3.15v6.3L8 14.3l-5.4-3.15v-6.3z', detail: null, dot: [8, 8] },
   journals: { path: 'M1.8 4c2-.8 4.2-.8 6.2.7 2-1.5 4.2-1.5 6.2-.7v8.1c-2-.8-4.2-.8-6.2.7-2-1.5-4.2-1.5-6.2-.7z', detail: 'M8 4.7v8.1', dot: null },
   quakes: { path: 'M8 1.7l5.8 4.2-2.2 6.8H4.4L2.2 5.9z', detail: 'M4.7 8.7h1.4l1-2.6 1.7 4 1-1.4h1.6', dot: null },
+  fireballs: { path: 'M13.4 2.6c-3.7.1-6.7 1.6-8.7 4.3L2.2 13.8l6.9-2.5c2.7-2 4.2-5 4.3-8.7z', detail: 'M6.6 9.6 3.9 12.1', dot: [10.2, 5.8] },
   nuforc: { path: 'M8 1.4L9.7 6.3 14.6 8 9.7 9.7 8 14.6 6.3 9.7 1.4 8 6.3 6.3z', detail: null, dot: [8, 8] },
 };
 

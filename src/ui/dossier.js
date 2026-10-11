@@ -12,6 +12,7 @@ import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsW
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
 import { loadKp, kpThirds, kpLabel, stormScale, STORM_NAMES, auroraChance } from '../services/geomagnetic.js';
 import { loadAirfields, nearestAirfields, airfieldProximity, SIZES } from '../services/airfields.js';
+import { loadFireballs, fireballRows, fireballsNear, describeEnergy, FIREBALLS_FROM, SIGHT_KM } from '../services/fireballs.js';
 import { skySection } from './skychart.js';
 import { radarScope } from './radar.js';
 import { JOURNALS_COLOR } from '../services/journals.js';
@@ -195,6 +196,49 @@ async function fillGeomag(token, lat, lon, when, approx = false) {
     html`<dl class="d-kv"><dt>KP INDEX</dt><dd>${kpLabel(thirds)} · ${t(kpState(thirds))}${storm ? ` (${storm})` : ''} <span class="dim">· ${t('three-hour interval from {hour}:00 UT', { hour })}</span></dd></dl>
       ${verdict ? html`<p class="d-text">${verdict}</p>` : ''}
       <p class="caveat">${t('Kp is the planetary index of geomagnetic disturbance, given every three hours (GFZ Potsdam, CC BY 4.0). The aurora limits come from a simple model of the auroral oval, and the geomagnetic latitude is approximate.')}${approx ? ' ' + t('The time of day for this case is approximate, so conditions at the real moment may differ.') : ''}</p>`,
+  );
+}
+
+const fireballBlock = (when) =>
+  new Date(when).getUTCFullYear() < FIREBALLS_FROM ? '' : section('BRIGHT FIREBALLS NEARBY', html`<div id="d-fireballs"><div class="loading-line">Checking NASA’s fireball record…</div></div>`);
+
+/** "12 min before", "2.5 h after": how far a fireball was from the reported time. */
+function fireballGap(min) {
+  const n = Math.abs(min);
+  const early = min < 0;
+  if (n < 1) return t('at the same minute');
+  if (n < 90) return t(early ? '{n} min before' : '{n} min after', { n: Math.round(n) });
+  return t(early ? '{n} h before' : '{n} h after', { n: (n / 60).toFixed(1) });
+}
+
+export const fireballEnergy = (kt) => {
+  const e = describeEnergy(kt);
+  return e ? t(e.unit === 'kt' ? 'about {n} kt of TNT' : 'about {n} t of TNT', { n: e.value.toLocaleString(locale()) }) : null;
+};
+
+async function fillFireballs(token, lat, lon, when, approx = false) {
+  const el = document.getElementById('d-fireballs');
+  if (!el) return;
+  let data;
+  try {
+    data = await loadFireballs(DATA);
+  } catch (error) {
+    console.warn('[fireballs]', error);
+  }
+  if (token !== renderToken || !document.getElementById('d-fireballs')) return;
+  if (!data) return mount(el, html`<p class="caveat">The fireball record could not be loaded.</p>`);
+  const hours = approx ? 12 : 3;
+  const list = fireballsNear(fireballRows(data), when, lat, lon, { hours, maxKm: SIGHT_KM, limit: 3 });
+  mount(
+    el,
+    html`${list.length
+      ? html`<ul class="source-list airfield-list">${list.map(
+          (f) => html`<li><span class="badge">${fireballGap(f.gapMin)}</span>
+            <span><b>${t('{km} km {dir}', { km: Math.round(f.km), dir: compass(f.bearing) })}</b><br /><span class="dim">${[fireballEnergy(f.impactKt), f.heightKm != null ? t('{n} km up', { n: Math.round(f.heightKm) }) : null, f.speed != null ? t('{n} km/s', { n: Math.round(f.speed) }) : null].filter(Boolean).join(' · ')}</span></span></li>`,
+        )}</ul>
+        <p class="d-text">A fireball can outshine the Moon for a few seconds, cross the sky in silence or with a delayed rumble, and break into pieces. It is often reported as a bright light that streaked across the sky and went out.</p>`
+      : html`<p class="d-text">${t('No fireball in NASA’s record within {km} km and {hours} hours of this time.', { km: SIGHT_KM, hours })}</p>`}
+      <p class="caveat">${t('Fireballs seen by U.S. government sensors since 1988 (NASA CNEOS, public domain). Only the bigger events are in the record, so a fireball that is not listed may still have happened.')}${approx ? ' ' + t('The time of day for this case is approximate, so conditions at the real moment may differ.') : ''}</p>`,
   );
 }
 
@@ -382,6 +426,32 @@ export function renderQuake(q) {
         ${q.url ? html`<div class="btn-row"><a class="chip" target="_blank" rel="noopener" href="${safeUrl(q.url)}">${t('USGS EVENT PAGE')} ↗</a></div>` : ''}`,
     )}
     ${section('THE LOCATION', siteLinks(q.lat, q.lon))}`,
+  );
+}
+
+export function renderFireball(f) {
+  remember(renderFireball, arguments);
+  open('FIREBALL');
+  const when = new Date(f.time);
+  mount(
+    body(),
+    html`<div class="d-title">${t('Fireball · {when}', { when: `${fmtDate(when, { timeZone: 'UTC' })} UTC` })}</div>
+    <div class="d-sub">${fmtDate(when, { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' })} UTC<br />${formatDMS(f.lat, f.lon)}</div>
+    ${section(
+      'DETAILS',
+      html`<dl class="d-kv">
+        <dt>ENERGY</dt><dd>${fireballEnergy(f.impactKt) ?? '—'}</dd>
+        <dt>HEIGHT</dt><dd>${f.heightKm != null ? t('{n} km', { n: Math.round(f.heightKm) }) : '—'}</dd>
+        <dt>SPEED</dt><dd>${f.speed != null ? t('{n} km/s', { n: Math.round(f.speed) }) : '—'}</dd>
+      </dl>`,
+    )}
+    ${section(
+      'WHY IT MATTERS',
+      html`<div class="d-text"><p>${t('A fireball can outshine the Moon for a few seconds, cross the sky in silence or with a delayed rumble, and break into pieces. It is often reported as a bright light that streaked across the sky and went out. Compare its time and place with a sighting made the same night.')}</p></div>
+        <p class="caveat">${t('Fireballs seen by U.S. government sensors since 1988 (NASA CNEOS, public domain). Only the bigger events are in the record, so a fireball that is not listed may still have happened.')}</p>
+        <div class="btn-row"><a class="chip" target="_blank" rel="noopener" href="https://cneos.jpl.nasa.gov/fireballs/">${t('NASA FIREBALL PAGE')} ↗</a></div>`,
+    )}
+    ${section('THE LOCATION', siteLinks(f.lat, f.lon))}`,
   );
 }
 
@@ -606,6 +676,7 @@ export function renderCase(item, ctx) {
     ${weatherBlock(c.date)}
     ${launchBlock(c.lat, c.lon, c.date)}
     ${geomagBlock(c.date)}
+    ${c.precision === 'region' ? '' : fireballBlock(c.date)}
     ${c.precision === 'region' ? '' : airfieldBlock()}
     ${nearUS(c.lat, c.lon) ? section('MILITARY AIRSPACE', html`<div id="d-airspace"><div class="loading-line">Checking FAA special-use airspace…</div></div>`) : ''}
 
@@ -639,6 +710,7 @@ export function renderCase(item, ctx) {
   autoFillLaunches();
   fillWeather(token, c.lat, c.lon, c.date, tracks.find((t) => t.kind === 'uap'), c.timeApprox);
   fillGeomag(token, c.lat, c.lon, c.date, c.timeApprox);
+  if (c.precision !== 'region') fillFireballs(token, c.lat, c.lon, c.date, c.timeApprox);
   if (c.precision !== 'region') fillAirfields(token, c.lat, c.lon);
   if (nearUS(c.lat, c.lon) && ctx.airspaceFor) fillAirspace(token, ctx.airspaceFor(c));
   fillMedia(token, document.getElementById('d-media'), c.media || [], ctx.officialById);
@@ -791,6 +863,7 @@ export function renderGeipan(r) {
     ${r.utc && r.lat != null ? weatherBlock(r.utc) : ''}
     ${r.utc && r.lat != null ? launchBlock(r.lat, r.lon, r.utc) : ''}
     ${r.utc && r.lat != null ? geomagBlock(r.utc) : ''}
+    ${r.utc && r.lat != null && r.prec === 2 ? fireballBlock(r.utc) : ''}
     ${r.lat != null && r.prec === 2 ? airfieldBlock() : ''}
     ${r.lat != null && r.prec === 2 ? section('THE LOCATION', html`${siteLinks(r.lat, r.lon)}<p class="caveat">The pin marks the commune named in the file, not the exact spot.</p>`) : ''}
     ${section(
@@ -806,6 +879,7 @@ export function renderGeipan(r) {
     autoFillLaunches();
     fillWeather(token, r.lat, r.lon, r.utc, null);
     fillGeomag(token, r.lat, r.lon, r.utc);
+    if (r.prec === 2) fillFireballs(token, r.lat, r.lon, r.utc);
   }
   if (r.lat != null && r.prec === 2) fillAirfields(token, r.lat, r.lon);
   return token;
@@ -998,6 +1072,7 @@ export function renderUser(item, { onDelete }) {
     ${weatherBlock(u.date)}
     ${launchBlock(u.lat, u.lon, u.date)}
     ${geomagBlock(u.date)}
+    ${fireballBlock(u.date)}
     ${airfieldBlock()}
     ${section('SATELLITES OVERHEAD NOW', html`<p class="d-text">${th('Turn on <b>Live satellites</b> to see what is overhead right now — Starlink trains and flaring satellites explain many modern reports.')}</p>
       <div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button></div><div id="d-sky"></div>`)}
@@ -1008,6 +1083,7 @@ export function renderUser(item, { onDelete }) {
   autoFillLaunches();
   fillWeather(token, u.lat, u.lon, u.date, null);
   fillGeomag(token, u.lat, u.lon, u.date);
+  fillFireballs(token, u.lat, u.lon, u.date);
   fillAirfields(token, u.lat, u.lon);
   // Two presses to delete: the first asks, the second deletes. Pressing anywhere
   // else, or waiting a few seconds, takes the question back.

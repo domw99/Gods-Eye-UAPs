@@ -1,6 +1,6 @@
 # Use the case files from an AI assistant (MCP)
 
-`scripts/mcp-server.mjs` is a [Model Context Protocol](https://modelcontextprotocol.io/) server for the case files. It lets an assistant such as Claude search the cases, read a case's file, find the cases near a place and see what happened on a date, with each case's status, explanation and sources. It runs on your machine, reads the cases in this repository, needs **no network, no API key and no dependencies** (Node 20 or later), and talks over stdin and stdout.
+`scripts/mcp-server.mjs` is a [Model Context Protocol](https://modelcontextprotocol.io/) server for the case files. It lets an assistant such as Claude search the cases, read a case's file, find the cases near a place, see what happened on a date, check for a bright fireball close to a sighting in time and place, and get a link that opens the globe on a case or a place, with each case's status, explanation and sources. It runs on your machine, reads the cases in this repository, needs **no network, no API key and no dependencies** (Node 20 or later), and talks over stdin and stdout.
 
 ## Add it
 
@@ -40,6 +40,8 @@ To try it by hand, run `npm run mcp` and type one JSON message per line, for exa
 | `get_case` | The full file for one `id`: date, place and coordinates, status and explanation, evidence, summary, timeline, flight-path tracks (counted; `include_tracks` for every point) and sources. |
 | `cases_near` | Cases within `radius_km` (default 250) of `lat`, `lon`, nearest first. Cases whose position is only a region are left out. |
 | `on_this_day` | Cases that happened on a day of the year, in any year (default: today). |
+| `fireballs_near` | Bright fireballs (meteors) that U.S. government sensors recorded within `hours` (default 3) and `radius_km` (default 600) of `lat`, `lon` at `when`, nearest in time first, with distance, bearing, energy, height and speed (NASA CNEOS, 1988 to now; only the bigger events are in it). |
+| `globe_link` | A link that opens the globe on a case (`case_id`) or a place (`lat`, `lon`, `label`), with `layers` switched on; for a case also its page and an embed address. |
 | `describe_dataset` | How many cases, the years, the allowed filter values with counts, and where the open data is. |
 
 A wrong argument comes back as a message the assistant can read and correct ("status must be one of: unresolved, disputed, …", "Unknown argument "keyword"", "limit must be a whole number"), not as a failure. An argument a tool does not take is an error too, so a misspelt filter never quietly returns every case.

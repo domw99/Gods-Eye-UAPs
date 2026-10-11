@@ -61,9 +61,10 @@ const where = (az, alt) => t('{dir}, {alt}° up', { dir: compass(az), alt: Math.
  * @param {object} [input.weather]     output of weatherAt(), or null
  * @param {Array}  [input.airfields]   output of nearestAirfields(), nearest first, or null if not checked
  * @param {object} [input.aurora]      { thirds, chance, edge, geomagLat } from auroraChance(), or null
+ * @param {Array}  [input.fireballs]   output of fireballsNear(), closest in time first, or null if not checked
  * @returns {Array<{kind:string, name:string, score:number, reason:string}>}
  */
-export function rankCandidates({ report, sky, satellites = null, launches = null, weather = null, airfields = null, aurora = null }) {
+export function rankCandidates({ report, sky, satellites = null, launches = null, weather = null, airfields = null, aurora = null, fireballs = null }) {
   const out = [];
   const motion = report.motion || 'still';
   const dark = sky.sun.alt < -6;
@@ -221,6 +222,25 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
         full(storm ? comma(t('Geomagnetic activity was Kp {kp}', { kp }), `${stormPhrase(storm)} (${storm})`) : t('Geomagnetic activity was Kp {kp}', { kp })),
         edgeText,
         t('Red or green glows and slowly shifting rays at low latitudes are often reported as strange lights.'),
+      ),
+    });
+  }
+
+  // 7. A fireball in NASA's record: a meteor outshining the Moon for a few seconds, close in time and within sight.
+  const ball = fireballs?.[0];
+  if (ball) {
+    const gap = Math.abs(ball.gapMin);
+    const timeF = gap <= 10 ? 1 : gap <= 30 ? 0.7 : gap <= 90 ? 0.35 : 0.15;
+    const distF = ball.km <= 200 ? 1 : ball.km <= 400 ? 0.8 : 0.55;
+    const moveF = { still: 0.05, drift: 0.1, steady: 0.6, fast: 1, formation: 0.5 }[motion];
+    const vars = { gap: gap < 90 ? t('{n} min', { n: Math.max(1, Math.round(gap)) }) : t('{n} h', { n: (gap / 60).toFixed(1) }), km: Math.round(ball.km).toLocaleString(locale()), dir: compass(ball.bearing) };
+    out.push({
+      kind: 'fireball',
+      name: t('Fireball (NASA record)'),
+      score: clamp(0.9 * timeF * distF * moveF),
+      reason: then(
+        full(ball.gapMin < 0 ? t('A fireball was recorded {gap} before your sighting, {km} km {dir} of you', vars) : t('A fireball was recorded {gap} after your sighting, {km} km {dir} of you', vars)),
+        t('A fireball outshines the Moon for a few seconds and can break into pieces; people often report a bright light that streaked across the sky and went out.'),
       ),
     });
   }

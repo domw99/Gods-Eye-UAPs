@@ -48,6 +48,13 @@ jobs:
           else
             echo "Not the first Monday; keeping the Kp series."
           fi
+      - name: Refresh the NASA fireball record (monthly, with the Kp index)
+        run: |
+          if [ "$(date -u +%d)" -le 7 ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            npm run build:fireballs
+          else
+            echo "Not the first Monday; keeping the fireball record."
+          fi
       - run: npm test
       - name: Commit if changed
         id: commit

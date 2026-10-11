@@ -4,6 +4,7 @@ import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { createInstall, installSteps } from './app/install.js';
 import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale, upper } from './i18n/index.js';
+import { fmtDate } from './util/when.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
 import { CASE_ITEMS, loadOfficial, userToItem, isLogEntry } from './data/items.js';
@@ -21,7 +22,7 @@ import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList,
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
+  renderSkyCheck, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderFireball, fireballEnergy, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
@@ -43,6 +44,7 @@ import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
 import { loadAirfields, nearestAirfields } from './services/airfields.js';
+import { loadFireballs, fireballRows, fireballsNear, fireballSize, FIREBALLS_FROM, SIGHT_KM } from './services/fireballs.js';
 import { launchesNear } from './services/launches.js';
 import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
@@ -86,6 +88,7 @@ const mufonLayer = createPointLayer(viewer, { name: 'mufon', color: '#b58cff', s
 const journalsLayer = createPointLayer(viewer, { name: 'journals', color: JOURNALS_COLOR, size: 18 });
 const geipanLayer = createPointLayer(viewer, { name: 'geipan', color: GEIPAN_COLOR, size: 18, alpha: 0.95 });
 const quakeLayer = createPointLayer(viewer, { name: 'quakes', color: '#e6c37a', size: 16, alpha: 0.92, near: 1.35, far: 0.7 });
+const fireballLayer = createPointLayer(viewer, { name: 'fireballs', color: '#fff3b0', size: 16, alpha: 0.95, near: 1.35, far: 0.7 });
 const nuforcLayer = createPointLayer(viewer, { name: 'nuforc', color: '#ff7a45', size: 8, alpha: 0.5, near: 1.4, far: 0.8, underneath: true });
 const satLayer = createSatelliteLayer(viewer, (msg) => renderLayersNow({ satellites: msg.replace(/ \(CelesTrak, live\)/, '') }));
 const buildingLayer = createBuildingLayer(viewer, { onStatus: (s) => renderLayersNow({ buildings: s }) });
@@ -109,7 +112,7 @@ let mufon = null; // { issues, records, byIssueId, cases, chapters }
 let shareImage = ''; // the card last shown in the share dialog, released when the next is made
 let geipan = null; // { meta, records, byId }
 let journals = null; // { series, issues, records, byIssueId, cases }
-const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
+const layerCounts = { cases: CASE_ITEMS.length, official: '…', bluebook: '10k', geipan: '2.8k', mufon: '2.5k', journals: '2.5k', nuforc: '80k', satellites: 'live', launches: 'live', quakes: 'live', fireballs: '0.9k', airspace: '1.5k', buildings: 'zoom in', user: userItems.length };
 
 loadingStep(t('LOADING CASE FILES…'), 45);
 try {
@@ -238,6 +241,7 @@ function refresh() {
     const n = nuforcLayer.filter((i) => evOk && shapeOk(i) && inYearRange(Math.floor(nuforc.date[i] / 10000)) && (!state.search || nuforc.places[nuforc.place[i]].toLowerCase().includes(state.search) || nuforc.shapes[nuforc.shape[i]] === state.search));
     layerCounts.nuforc = n.toLocaleString();
   }
+  if (fireballRowsList.length && state.layers.fireballs) layerCounts.fireballs = fireballLayer.filter((i, year) => inYearRange(year)).toLocaleString();
   layerCounts.user = userItems.length;
   renderLayersNow();
   renderActiveFilters();
@@ -275,6 +279,8 @@ async function applyLayers() {
   launchLayer.show = L.launches;
   quakeLayer.show = L.quakes;
   if (L.quakes) ensureQuakes();
+  fireballLayer.show = L.fireballs;
+  if (L.fireballs) ensureFireballs();
   if (L.launches) ensureLaunches();
   airspaceLayer.show = L.airspace;
   if (L.airspace && !airspaceLayer.count) ensureAirspaceLayer();
@@ -318,6 +324,29 @@ async function airspaceFor(c) {
       for (const a of areasAt(areas, lon, lat, altM / 0.3048))
         if (!hits.has(a.index)) hits.set(a.index, { area: a, why: t.label });
   return [...hits.values()];
+}
+
+let fireballRowsList = [];
+let fireballsLoading = null;
+/** The bundled NASA fireballs: one request, no refresh (the file changes with a release). */
+function ensureFireballs() {
+  if (fireballRowsList.length) return Promise.resolve();
+  fireballsLoading ||= (async () => {
+    renderLayersNow({ fireballs: 'loading…' });
+    try {
+      fireballRowsList = fireballRows(await loadFireballs(BASE));
+      const years = fireballRowsList.map((f) => new Date(f.time).getUTCFullYear());
+      fireballLayer.setData(fireballRowsList, { lat: (f) => f.lat, lon: (f) => f.lon, year: (f, i) => years[i], size: (f) => fireballSize(f.impactKt) });
+      renderLayersNow({ fireballs: fireballLayer.filter((i, year) => inYearRange(year)).toLocaleString() });
+    } catch (e) {
+      console.warn('[fireballs]', e);
+      renderLayersNow({ fireballs: 'offline' });
+      toast('Fireball record unavailable');
+    } finally {
+      fireballsLoading = null;
+    }
+  })();
+  return fireballsLoading;
 }
 
 let quakeRows = [];
@@ -1219,6 +1248,12 @@ handler.setInputAction((click) => {
       deselect();
       renderQuake(q);
     }
+  } else if (hit.type === 'fireballs') {
+    const f = fireballRowsList[hit.index];
+    if (f) {
+      deselect();
+      renderFireball(f);
+    }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
@@ -1269,6 +1304,9 @@ handler.setInputAction((move) => {
     } else if (hit?.type === 'quakes') {
       const q = quakeRows[hit.index];
       if (q) lines = [`${q.mag != null ? `M ${q.mag.toFixed(1)}` : t('Earthquake')} · ${q.place}`, relativeTime(new Date(q.time).toISOString())];
+    } else if (hit?.type === 'fireballs') {
+      const f = fireballRowsList[hit.index];
+      if (f) lines = [t('Fireball · {when}', { when: `${fmtDate(new Date(f.time), { timeZone: 'UTC' })} UTC` }), fireballEnergy(f.impactKt) || ''];
     } else if (hit?.type === 'launch') {
       const p = launchLayer.info(hit.index);
       const l = p?.next || p?.last;
@@ -1555,7 +1593,7 @@ async function explainSighting({ date, lat, lon, report }) {
   const notes = [];
   const sky = skyAt(lat, lon, when, { minAlt: 0 });
   const recent = Math.abs(Date.now() - when.getTime()) < 21 * 86400e3;
-  const [satellites, launches, weather, airfields, aurora] = await Promise.all([
+  const [satellites, launches, weather, airfields, aurora, fireballs] = await Promise.all([
     recent
       ? satLayer
           .ensureLoaded()
@@ -1585,6 +1623,9 @@ async function explainSighting({ date, lat, lon, report }) {
         return thirds == null ? null : { thirds, ...auroraChance(thirds, lat, lon), south: lat < 0 };
       })
       .catch(() => null),
+    when.getUTCFullYear() >= FIREBALLS_FROM
+      ? loadFireballs(BASE).then((data) => fireballsNear(fireballRows(data), when, lat, lon, { hours: 3, maxKm: SIGHT_KM, limit: 1 })).catch(() => null)
+      : Promise.resolve(null),
   ]);
   if (satellites) checked.push(t('{n} satellites above the horizon', { n: satellites.length.toLocaleString(locale()) }));
   else if (!recent) notes.push(t('Satellites were skipped: current orbital data only covers the last three weeks.'));
@@ -1592,8 +1633,9 @@ async function explainSighting({ date, lat, lon, report }) {
   if (weather) checked.push(t('wind and cloud'));
   checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
   if (aurora) checked.push(t('geomagnetic activity (Kp)'));
+  if (fireballs) checked.push(t('fireballs in NASA’s record'));
   else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
-  return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora }), checked, notes };
+  return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora, fireballs }), checked, notes };
 }
 
 function openExplainNow(prefill) {

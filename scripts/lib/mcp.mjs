@@ -10,6 +10,8 @@ import { RELEASE, REPO_URL } from '../../src/config.js';
 import { siteUrl } from './site.mjs';
 import { haversineKm } from '../../src/util/geo.js';
 import { caseRecord } from './open-data.mjs';
+import { readFileSync } from 'node:fs';
+import { fireballRows, fireballsNear, describeEnergy, FIREBALLS_FROM } from '../../src/services/fireballs.js';
 
 export const PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
@@ -135,6 +137,66 @@ export function describeDataset(cases = CASES) {
   };
 }
 
+let fireballList = null;
+/** NASA's bright fireballs since 1988, read from the file the app bundles. */
+const fireballData = () => (fireballList ||= fireballRows(JSON.parse(readFileSync(new URL('../../public/data/fireballs.json', import.meta.url), 'utf8'))));
+
+/** The bright fireballs near a place and time: a common ordinary cause of "a light that streaked across the sky and went out". */
+export function fireballsNearTool(args = {}, rows = fireballData()) {
+  const lat = num(args.lat);
+  const lon = num(args.lon);
+  if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new ArgError('lat (-90 to 90) and lon (-180 to 180) are required');
+  const when = new Date(args.when);
+  if (!args.when || Number.isNaN(when.getTime())) throw new ArgError('when is required, as a date and time such as "2013-02-15T03:30:00Z"');
+  const hours = num(args.hours) ?? 3;
+  const radius = num(args.radius_km) ?? 600;
+  if (!Number.isFinite(hours) || hours <= 0 || hours > 72) throw new ArgError('hours must be a number from 0 to 72');
+  if (!Number.isFinite(radius) || radius <= 0) throw new ArgError('radius_km must be a positive number');
+  const found = fireballsNear(rows, when, lat, lon, { hours, maxKm: radius, limit: clampLimit(args.limit, 5) });
+  return {
+    when: when.toISOString(),
+    searched: { hours, radius_km: radius },
+    record: `NASA CNEOS, U.S. government sensors, ${FIREBALLS_FROM} to the present. Only the bigger events are in it, so no match does not rule a fireball out.`,
+    total: found.length,
+    fireballs: found.map((f) => ({
+      time: new Date(f.time).toISOString(),
+      minutes_from_when: Math.round(f.gapMin * 10) / 10,
+      distance_km: Math.round(f.km),
+      bearing_deg: Math.round(f.bearing),
+      lat: f.lat,
+      lon: f.lon,
+      energy_kt_tnt: f.impactKt,
+      energy: describeEnergy(f.impactKt),
+      height_km: f.heightKm,
+      speed_km_s: f.speed,
+    })),
+  };
+}
+
+// The layers a link can switch on (the keys of DEFAULT_LAYERS in src/state.js; a test keeps the two in step).
+export const LINK_LAYERS = ['bluebook', 'geipan', 'mufon', 'journals', 'nuforc', 'satellites', 'launches', 'quakes', 'fireballs', 'airspace', 'buildings'];
+
+/** A link that opens the globe on a case or a place, with layers on. Everywhere the text of a reply can carry a link, this is the way to "show" the globe. */
+export function globeLink(args = {}, cases = CASES) {
+  const layers = String(args.layers ?? '').split(',').map((l) => l.trim()).filter(Boolean);
+  const bad = layers.filter((l) => !LINK_LAYERS.includes(l));
+  if (bad.length) throw new ArgError(`Unknown layer: ${bad.join(', ')}. Layers: ${LINK_LAYERS.join(', ')}`);
+  const query = layers.length ? `?layers=${layers.join(',')}` : '';
+  const embedQuery = `?embed=1${layers.length ? `&layers=${layers.join(',')}` : ''}`;
+  if (args.case_id) {
+    const c = cases.find((x) => x.id === String(args.case_id).trim());
+    if (!c) throw new ArgError(`No case with id "${args.case_id}" (see search_cases)`);
+    return { title: c.title, url: `${site}case/${c.id}/#globe`, page: `${site}case/${c.id}/`, globe: `${site}${query}#/case/${c.id}`, embed: `${site}${embedQuery}#/case/${c.id}` };
+  }
+  const lat = num(args.lat);
+  const lon = num(args.lon);
+  if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new ArgError('Give a case_id, or lat and lon');
+  const label = String(args.label ?? '').trim().slice(0, 80);
+  const hash = `#/near/${lat.toFixed(4)},${lon.toFixed(4)}${label ? `/${encodeURIComponent(label)}` : ''}`;
+  const url = `${site}${query}${hash}`;
+  return { title: label || `${lat.toFixed(2)}, ${lon.toFixed(2)}`, url, globe: url, embed: `${site}${embedQuery}${hash}` };
+}
+
 const READ_ONLY = { readOnlyHint: true, idempotentHint: true, openWorldHint: false };
 
 export const TOOLS = [
@@ -183,6 +245,22 @@ export const TOOLS = [
     inputSchema: { type: 'object', properties: { month: { type: 'integer', minimum: 1, maximum: 12 }, day: { type: 'integer', minimum: 1, maximum: 31 } }, additionalProperties: false },
     annotations: { ...READ_ONLY, idempotentHint: false },
     run: (args) => onThisDayTool(args),
+  },
+  {
+    name: 'fireballs_near',
+    title: 'Bright fireballs near a place and time',
+    description: "Bright meteors (fireballs) that U.S. government sensors recorded close to a place and time (NASA CNEOS, 1988 to the present), nearest in time first. A fireball outshines the Moon for a few seconds and is a common ordinary cause of a light that streaked across the sky and went out. The record holds only the bigger events, so an empty answer does not rule one out.",
+    inputSchema: { type: 'object', properties: { lat: { type: 'number' }, lon: { type: 'number' }, when: { type: 'string', description: 'UTC date and time, e.g. "2013-02-15T03:30:00Z".' }, hours: { type: 'number', description: 'How many hours either side. Default 3.' }, radius_km: { type: 'number', description: 'Default 600, about as far as a high fireball can be seen.' }, limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Default 5.' } }, required: ['lat', 'lon', 'when'], additionalProperties: false },
+    annotations: READ_ONLY,
+    run: (args) => fireballsNearTool(args),
+  },
+  {
+    name: 'globe_link',
+    title: 'Link to the globe',
+    description: 'A link that opens the 3D globe on a case (case_id) or on a place (lat and lon), optionally with map layers switched on, to give the person to open. A case also has a page with its own link preview, and an embed address for an iframe.',
+    inputSchema: { type: 'object', properties: { case_id: { type: 'string', description: 'A case id from search_cases.' }, lat: { type: 'number' }, lon: { type: 'number' }, label: { type: 'string', description: 'A name for the place.' }, layers: { type: 'string', description: `Comma-separated layers to switch on: ${LINK_LAYERS.join(', ')}.` } }, additionalProperties: false },
+    annotations: READ_ONLY,
+    run: (args) => globeLink(args),
   },
   {
     name: 'describe_dataset',
