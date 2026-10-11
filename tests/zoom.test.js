@@ -38,3 +38,16 @@ describe('centred zoom-out', () => {
     expect(nextRange(30_000_000, 2)).toBe(40_000_000);
   });
 });
+
+describe('shortestTurn (the compass turns the short way round)', () => {
+  const deg = (d) => (d * Math.PI) / 180;
+  it('turns to north by the shorter way from either side', async () => {
+    const { shortestTurn } = await import('../src/app/zoom.js');
+    expect(shortestTurn(deg(10), 0)).toBeCloseTo(deg(-10));
+    expect(shortestTurn(deg(350), 0)).toBeCloseTo(deg(10));
+    expect(shortestTurn(deg(170), 0)).toBeCloseTo(deg(-170));
+    expect(shortestTurn(deg(190), 0)).toBeCloseTo(deg(170));
+    expect(shortestTurn(deg(-350), 0)).toBeCloseTo(deg(-10));
+    expect(shortestTurn(0, 0)).toBeCloseTo(0);
+  });
+});

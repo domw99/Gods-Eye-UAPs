@@ -22,6 +22,12 @@ export function levelledPitch(pitch, range) {
   return pitch + (-Math.PI / 2 - pitch) * smoothstep(LEVEL_FROM, LEVEL_AT, range);
 }
 
+/** The signed turn (radians, within half a circle) that takes heading a to heading b. */
+export function shortestTurn(a, b) {
+  const turn = (b - a) % (2 * Math.PI);
+  return turn > Math.PI ? turn - 2 * Math.PI : turn < -Math.PI ? turn + 2 * Math.PI : turn;
+}
+
 /** The next range for a zoom-out by `factor`, capped. */
 export const nextRange = (range, factor) => Math.min(MAX_RANGE, range * factor);
 
@@ -59,7 +65,8 @@ export function createZoomOut(viewer, { blocked = () => false } = {}) {
     const k = 1 - (1 - t) ** 3;
     const { from, to, target } = anim;
     const range = Math.exp(Math.log(from.range) + (Math.log(to.range) - Math.log(from.range)) * k);
-    camera.lookAt(target, new Cesium.HeadingPitchRange(from.heading, from.pitch + (to.pitch - from.pitch) * k, range));
+    const heading = from.heading + (to.heading - from.heading) * k;
+    camera.lookAt(target, new Cesium.HeadingPitchRange(heading, from.pitch + (to.pitch - from.pitch) * k, range));
     camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
     scene.requestRender();
     if (t < 1) requestAnimationFrame(step);
@@ -85,8 +92,28 @@ export function createZoomOut(viewer, { blocked = () => false } = {}) {
     const range = nextRange(anim ? anim.to.range : from.range, factor);
     if (range <= from.range * 1.001 && from.pitch <= -Math.PI / 2 + 1e-3) return true; // as far out as it goes
     const running = anim;
-    anim = { target, from, to: { range, pitch: levelledPitch(from.pitch, range) }, start: performance.now() };
+    anim = { target, from, to: { range, pitch: levelledPitch(from.pitch, range), heading: from.heading }, start: performance.now() };
     if (!running) requestAnimationFrame(step);
+    return true;
+  }
+
+  /**
+   * Turn the view to a heading and/or tilt about the point at the middle of the
+   * screen, keeping the distance to it: the compass and tilt buttons. Radians; a
+   * missing one is kept. Returns false when left alone (the camera belongs to something else).
+   */
+  function orient({ heading, pitch }) {
+    if (blocked()) return false;
+    camera.cancelFlight();
+    const target = anim?.target || centerPoint();
+    if (!target) {
+      camera.flyTo({ destination: camera.positionWC.clone(), orientation: { heading: heading ?? camera.heading, pitch: pitch ?? camera.pitch, roll: 0 }, duration: 0.6 });
+      return true;
+    }
+    const from = orbitOf(target);
+    const to = { range: from.range, pitch: pitch ?? from.pitch, heading: from.heading + (heading == null ? 0 : shortestTurn(from.heading, heading)) };
+    anim = { target, from, to, start: performance.now() };
+    requestAnimationFrame(step);
     return true;
   }
 
@@ -109,6 +136,7 @@ export function createZoomOut(viewer, { blocked = () => false } = {}) {
 
   return {
     zoomOut,
+    orient,
     levelIfHigh,
     /** Stop a zoom in progress (the user took the camera). */
     cancel() {

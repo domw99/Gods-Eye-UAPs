@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} 時間後",
   "about {n} kt of TNT": "TNT換算で約 {n} kt",
   "about {n} t of TNT": "TNT換算で約 {n} t",
+  "North up": "北を上に",
+  "North up: turn the view so north is at the top (B)": "北を上に：北が上になるよう表示を回転します (B)",
+  "Tilt the view": "視点を傾ける",
+  "Tilt the view: look at the ground from an angle (P)": "視点を傾ける：地面を斜めから見ます (P)",
+  "Tilted: look straight down again (P)": "傾斜中：もう一度真下を見ます (P)",
+  "Not while the camera follows something": "カメラが何かを追っている間は使えません",
+  "Zoom in closer to tilt the view": "視点を傾けるにはもっとズームインしてください",
+  "North up: turn the view so north is at the top": "北を上に：北が上になるよう表示を回転します",
+  "Tilt the view, or look straight down again": "視点を傾ける、または再び真下を見る",
 };

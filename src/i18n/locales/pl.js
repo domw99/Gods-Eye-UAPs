@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} godz. później",
   "about {n} kt of TNT": "około {n} kt TNT",
   "about {n} t of TNT": "około {n} t TNT",
+  "North up": "Północ u góry",
+  "North up: turn the view so north is at the top (B)": "Północ u góry: obraca widok tak, by północ była na górze (B)",
+  "Tilt the view": "Pochyl widok",
+  "Tilt the view: look at the ground from an angle (P)": "Pochyl widok: patrz na ziemię pod kątem (P)",
+  "Tilted: look straight down again (P)": "Pochylony: znów patrz prosto w dół (P)",
+  "Not while the camera follows something": "Nie, gdy kamera coś śledzi",
+  "Zoom in closer to tilt the view": "Przybliż bardziej, aby pochylić widok",
+  "North up: turn the view so north is at the top": "Północ u góry: obraca widok tak, by północ była na górze",
+  "Tilt the view, or look straight down again": "Pochyl widok lub znów patrz prosto w dół",
 };

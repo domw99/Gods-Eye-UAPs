@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "بعد {n} س",
   "about {n} kt of TNT": "نحو {n} كيلوطن من مكافئ TNT",
   "about {n} t of TNT": "نحو {n} طن من مكافئ TNT",
+  "North up": "الشمال لأعلى",
+  "North up: turn the view so north is at the top (B)": "الشمال لأعلى: يدير العرض ليكون الشمال في الأعلى (B)",
+  "Tilt the view": "إمالة العرض",
+  "Tilt the view: look at the ground from an angle (P)": "إمالة العرض: انظر إلى الأرض بزاوية (P)",
+  "Tilted: look straight down again (P)": "مائل: انظر مجددًا إلى الأسفل مباشرة (P)",
+  "Not while the camera follows something": "غير متاح بينما تتبع الكاميرا شيئًا",
+  "Zoom in closer to tilt the view": "قرّب أكثر لإمالة العرض",
+  "North up: turn the view so north is at the top": "الشمال لأعلى: يدير العرض ليكون الشمال في الأعلى",
+  "Tilt the view, or look straight down again": "إمالة العرض أو النظر مجددًا إلى الأسفل مباشرة",
 };

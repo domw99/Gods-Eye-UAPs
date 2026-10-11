@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} घंटे बाद",
   "about {n} kt of TNT": "लगभग {n} किलोटन TNT",
   "about {n} t of TNT": "लगभग {n} टन TNT",
+  "North up": "उत्तर ऊपर",
+  "North up: turn the view so north is at the top (B)": "उत्तर ऊपर: दृश्य को इस तरह घुमाएँ कि उत्तर ऊपर रहे (B)",
+  "Tilt the view": "दृश्य झुकाएँ",
+  "Tilt the view: look at the ground from an angle (P)": "दृश्य झुकाएँ: ज़मीन को तिरछा देखें (P)",
+  "Tilted: look straight down again (P)": "झुका हुआ: फिर सीधे नीचे देखें (P)",
+  "Not while the camera follows something": "कैमरा किसी चीज़ का पीछा कर रहा हो तब नहीं",
+  "Zoom in closer to tilt the view": "दृश्य झुकाने के लिए और ज़ूम करें",
+  "North up: turn the view so north is at the top": "उत्तर ऊपर: दृश्य को इस तरह घुमाएँ कि उत्तर ऊपर रहे",
+  "Tilt the view, or look straight down again": "दृश्य झुकाएँ, या फिर सीधे नीचे देखें",
 };

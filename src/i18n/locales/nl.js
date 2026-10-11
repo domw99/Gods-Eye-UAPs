@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} u later",
   "about {n} kt of TNT": "ongeveer {n} kt TNT",
   "about {n} t of TNT": "ongeveer {n} t TNT",
+  "North up": "Noorden boven",
+  "North up: turn the view so north is at the top (B)": "Noorden boven: draait het beeld zodat noord bovenaan ligt (B)",
+  "Tilt the view": "Beeld kantelen",
+  "Tilt the view: look at the ground from an angle (P)": "Beeld kantelen: de grond schuin bekijken (P)",
+  "Tilted: look straight down again (P)": "Gekanteld: weer recht naar beneden kijken (P)",
+  "Not while the camera follows something": "Niet terwijl de camera iets volgt",
+  "Zoom in closer to tilt the view": "Zoom verder in om het beeld te kantelen",
+  "North up: turn the view so north is at the top": "Noorden boven: draait het beeld zodat noord bovenaan ligt",
+  "Tilt the view, or look straight down again": "Beeld kantelen, of weer recht naar beneden kijken",
 };

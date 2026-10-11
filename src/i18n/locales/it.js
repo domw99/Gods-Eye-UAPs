@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} h dopo",
   "about {n} kt of TNT": "circa {n} kt di TNT",
   "about {n} t of TNT": "circa {n} t di TNT",
+  "North up": "Nord in alto",
+  "North up: turn the view so north is at the top (B)": "Nord in alto: ruota la vista in modo che il nord sia in alto (B)",
+  "Tilt the view": "Inclina la vista",
+  "Tilt the view: look at the ground from an angle (P)": "Inclina la vista: guarda il suolo di sbieco (P)",
+  "Tilted: look straight down again (P)": "Inclinata: torna a guardare dall’alto (P)",
+  "Not while the camera follows something": "Non mentre la camera segue qualcosa",
+  "Zoom in closer to tilt the view": "Avvicinati di più per inclinare la vista",
+  "North up: turn the view so north is at the top": "Nord in alto: ruota la vista in modo che il nord sia in alto",
+  "Tilt the view, or look straight down again": "Inclina la vista, o torna a guardare dall’alto",
 };

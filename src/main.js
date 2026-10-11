@@ -33,7 +33,7 @@ import { snapshotGlobe, drawCard, cardBlob, shareCardNatively, downloadBlob } fr
 import { shareLink, decodeHashPart, parseNearHash, parseView, embedUrl, embedSnippet, withoutEmbed } from './app/links.js';
 import { parseCoordinates, formatCoordinates } from './app/coords.js';
 import { toMgrs } from './util/mgrs.js';
-import { createZoomOut } from './app/zoom.js';
+import { createZoomOut, LEVEL_FROM } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
@@ -1921,6 +1921,41 @@ viewer.camera.moveEnd.addEventListener(() => {
   if (performance.now() - zoomGestureAt < 2500) zoomer.levelIfHigh();
 });
 
+/* ── Compass and tilt: the needle follows the heading, and the buttons turn or tilt the view about the middle of the screen ── */
+const TILT_PITCH = Cesium.Math.toRadians(-45);
+const compassButton = document.querySelector('#map-controls [data-view="north"]');
+const tiltButton = document.querySelector('#map-controls [data-view="tilt"]');
+const isTilted = () => viewer.camera.pitch > Cesium.Math.toRadians(-80);
+const cameraBusy = () => toast('Not while the camera follows something', 2200);
+
+function northUp() {
+  hideHover();
+  if (!zoomer.orient({ heading: 0 })) cameraBusy();
+}
+
+function toggleTilt() {
+  hideHover();
+  if (!isTilted() && viewer.camera.positionCartographic.height > LEVEL_FROM) return toast('Zoom in closer to tilt the view', 2200);
+  if (!zoomer.orient({ pitch: isTilted() ? -Math.PI / 2 : TILT_PITCH })) cameraBusy();
+}
+
+let shownHeading = null;
+let shownTilt = null;
+viewer.scene.postRender.addEventListener(() => {
+  const heading = Math.round(Cesium.Math.toDegrees(viewer.camera.heading) * 2) / 2;
+  if (heading !== shownHeading) {
+    shownHeading = heading;
+    compassButton.firstElementChild.style.transform = `rotate(${-heading}deg)`;
+    compassButton.classList.toggle('level', Math.min(heading, 360 - heading) < 1);
+  }
+  const tilted = isTilted();
+  if (tilted !== shownTilt) {
+    shownTilt = tilted;
+    tiltButton.setAttribute('aria-pressed', String(tilted));
+    tiltButton.title = tilted ? t('Tilted: look straight down again (P)') : t('Tilt the view: look at the ground from an angle (P)');
+  }
+});
+
 function zoomView(dir) {
   hideHover();
   const cam = viewer.camera;
@@ -1955,6 +1990,8 @@ document.getElementById('map-controls').addEventListener('click', (e) => {
   if (!b) return;
   if (b.dataset.view === 'home') resetView();
   else if (b.dataset.view === 'near') nearMe();
+  else if (b.dataset.view === 'north') northUp();
+  else if (b.dataset.view === 'tilt') toggleTilt();
   else if (b.dataset.view === 'group') {
     setGrouping(!itemLayer.grouping);
     toast(itemLayer.grouping ? 'Grouping nearby markers' : 'Showing every marker', 1800);
@@ -2234,6 +2271,8 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'v' && trackLayer.current && trackLayer.witnessLabel) toggleWitnessView();
   else if (e.key.toLowerCase() === 'r') resetView();
   else if (e.key.toLowerCase() === 'n') nearMe();
+  else if (e.key.toLowerCase() === 'b') northUp();
+  else if (e.key.toLowerCase() === 'p') toggleTilt();
   else if (e.key.toLowerCase() === 's') openStatsNow();
   else if (e.key.toLowerCase() === 'k') openSpaceNow();
   else if (e.key.toLowerCase() === 'u') openMoonNow();
@@ -2461,7 +2500,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 // Expose for debugging and automated screenshots.
-window.__uap = { viewer, moonGlobe, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
+window.__uap = { viewer, moonGlobe, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, northUp, toggleTilt, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
   // Used by scripts/build-cards.mjs to render the case pages' preview images.
   zoomer: () => zoomer,
   // Used by the demo and README capture scripts.

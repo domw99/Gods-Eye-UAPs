@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} sa sonra",
   "about {n} kt of TNT": "yaklaşık {n} kt TNT",
   "about {n} t of TNT": "yaklaşık {n} ton TNT",
+  "North up": "Kuzey yukarı",
+  "North up: turn the view so north is at the top (B)": "Kuzey yukarı: görünümü kuzey üstte olacak şekilde çevirir (B)",
+  "Tilt the view": "Görünümü eğ",
+  "Tilt the view: look at the ground from an angle (P)": "Görünümü eğ: yere açılı bakın (P)",
+  "Tilted: look straight down again (P)": "Eğik: yeniden dik aşağı bakın (P)",
+  "Not while the camera follows something": "Kamera bir şeyi takip ederken olmaz",
+  "Zoom in closer to tilt the view": "Görünümü eğmek için daha fazla yakınlaştırın",
+  "North up: turn the view so north is at the top": "Kuzey yukarı: görünümü kuzey üstte olacak şekilde çevirir",
+  "Tilt the view, or look straight down again": "Görünümü eğ ya da yeniden dik aşağı bak",
 };

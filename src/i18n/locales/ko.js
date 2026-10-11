@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n}시간 후",
   "about {n} kt of TNT": "TNT 환산 약 {n}kt",
   "about {n} t of TNT": "TNT 환산 약 {n}t",
+  "North up": "북쪽을 위로",
+  "North up: turn the view so north is at the top (B)": "북쪽을 위로: 북쪽이 위로 오도록 화면을 돌립니다 (B)",
+  "Tilt the view": "화면 기울이기",
+  "Tilt the view: look at the ground from an angle (P)": "화면 기울이기: 땅을 비스듬히 봅니다 (P)",
+  "Tilted: look straight down again (P)": "기울어짐: 다시 바로 아래를 봅니다 (P)",
+  "Not while the camera follows something": "카메라가 무언가를 따라가는 동안에는 사용할 수 없습니다",
+  "Zoom in closer to tilt the view": "화면을 기울이려면 더 확대하세요",
+  "North up: turn the view so north is at the top": "북쪽을 위로: 북쪽이 위로 오도록 화면을 돌립니다",
+  "Tilt the view, or look straight down again": "화면을 기울이거나 다시 바로 아래를 봅니다",
 };

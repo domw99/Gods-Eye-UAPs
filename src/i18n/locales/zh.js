@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "晚 {n} 小时",
   "about {n} kt of TNT": "约合 {n} 千吨 TNT",
   "about {n} t of TNT": "约合 {n} 吨 TNT",
+  "North up": "正北朝上",
+  "North up: turn the view so north is at the top (B)": "正北朝上：旋转视图，使北方位于上方 (B)",
+  "Tilt the view": "倾斜视图",
+  "Tilt the view: look at the ground from an angle (P)": "倾斜视图：从斜角观察地面 (P)",
+  "Tilted: look straight down again (P)": "已倾斜：再次垂直向下看 (P)",
+  "Not while the camera follows something": "镜头跟随目标时不可用",
+  "Zoom in closer to tilt the view": "请再放大一些以倾斜视图",
+  "North up: turn the view so north is at the top": "正北朝上：旋转视图，使北方位于上方",
+  "Tilt the view, or look straight down again": "倾斜视图，或再次垂直向下看",
 };

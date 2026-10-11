@@ -411,6 +411,7 @@ body.dossier-open .map-controls { transform: translateX(calc(-1 * (var(--right-w
 .map-controls button[data-view='group'][aria-pressed='false'] svg { opacity: 0.55; }
 .map-controls svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 .map-controls svg .dot { fill: currentColor; stroke: none; }
+.map-controls [data-view='north'].level svg { opacity: 0.6; } /* north is already at the top */
 .map-controls .reset { height: 44px; margin-top: 3px; border-top: 1px solid var(--glass-border); border-radius: 0 0 9px 9px; color: var(--accent); }
 .map-controls .reset span { font: 600 8px var(--font-mono); letter-spacing: 0.12em; }
 

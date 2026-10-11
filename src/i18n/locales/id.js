@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "{n} jam sesudah",
   "about {n} kt of TNT": "sekitar {n} kt TNT",
   "about {n} t of TNT": "sekitar {n} ton TNT",
+  "North up": "Utara di atas",
+  "North up: turn the view so north is at the top (B)": "Utara di atas: putar tampilan agar utara berada di atas (B)",
+  "Tilt the view": "Miringkan tampilan",
+  "Tilt the view: look at the ground from an angle (P)": "Miringkan tampilan: lihat tanah dari sudut (P)",
+  "Tilted: look straight down again (P)": "Miring: lihat lurus ke bawah lagi (P)",
+  "Not while the camera follows something": "Tidak saat kamera mengikuti sesuatu",
+  "Zoom in closer to tilt the view": "Perbesar lebih dekat untuk memiringkan tampilan",
+  "North up: turn the view so north is at the top": "Utara di atas: putar tampilan agar utara berada di atas",
+  "Tilt the view, or look straight down again": "Miringkan tampilan, atau lihat lurus ke bawah lagi",
 };

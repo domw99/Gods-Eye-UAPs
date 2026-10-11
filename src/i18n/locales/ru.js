@@ -1154,4 +1154,13 @@ export default {
   "{n} h after": "через {n} ч после",
   "about {n} kt of TNT": "около {n} кт в тротиловом эквиваленте",
   "about {n} t of TNT": "около {n} т в тротиловом эквиваленте",
+  "North up": "Север сверху",
+  "North up: turn the view so north is at the top (B)": "Север сверху: поворачивает вид так, чтобы север был вверху (B)",
+  "Tilt the view": "Наклонить вид",
+  "Tilt the view: look at the ground from an angle (P)": "Наклонить вид: смотреть на землю под углом (P)",
+  "Tilted: look straight down again (P)": "Наклон включён: снова смотреть прямо вниз (P)",
+  "Not while the camera follows something": "Недоступно, пока камера что-то сопровождает",
+  "Zoom in closer to tilt the view": "Приблизьте сильнее, чтобы наклонить вид",
+  "North up: turn the view so north is at the top": "Север сверху: поворачивает вид так, чтобы север был вверху",
+  "Tilt the view, or look straight down again": "Наклонить вид или снова смотреть прямо вниз",
 };
