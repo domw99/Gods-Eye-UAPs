@@ -71,7 +71,14 @@ const loadingStep = (text, pct) => {
 loadingStep(t('STARTING GLOBE…'), 25);
 // The catalogue downloads while the globe starts.
 const officialPromise = loadOfficial(BASE).catch((e) => e);
-const viewer = await createViewer(document.getElementById('globe'));
+const viewer = await createViewer(document.getElementById('globe')).catch((error) => {
+  // Without WebGL there is no globe: say so, instead of leaving the loading ring turning for ever.
+  const step = document.getElementById('loading-step');
+  if (step) step.textContent = t('The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.');
+  document.getElementById('loading')?.setAttribute('role', 'alert');
+  document.querySelector('#loading .loading-ring')?.remove();
+  throw error;
+});
 const render = createRenderLoop(viewer);
 // For visitors who ask for less motion, camera flights become cuts
 // (flyToBoundingSphere goes through flyTo too).

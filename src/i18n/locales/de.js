@@ -1163,4 +1163,5 @@ export default {
   "North up: turn the view so north is at the top": "Norden oben: dreht die Ansicht so, dass Norden oben liegt",
   "Tilt the view, or look straight down again": "Ansicht kippen oder wieder senkrecht nach unten schauen",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Neu: die hellen Feuerkugeln der NASA auf dem Globus und in den Sichtungs-Checks sowie Kompass- und Kipp-Tasten für die Ansicht",
+  "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Der Globus braucht WebGL, das dieser Browser oder dieses Gerät abgeschaltet hat oder nicht unterstützt. Probieren Sie einen anderen Browser oder aktivieren Sie die Hardwarebeschleunigung.",
 };

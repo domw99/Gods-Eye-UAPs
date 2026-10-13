@@ -1163,4 +1163,5 @@ export default {
   "North up: turn the view so north is at the top": "正北朝上：旋转视图，使北方位于上方",
   "Tilt the view, or look straight down again": "倾斜视图，或再次垂直向下看",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新增：NASA 的明亮火球出现在地球仪和目击检查中，并为视图添加了指南针和倾斜按钮",
+  "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "地球仪需要 WebGL，但此浏览器或设备已关闭或不支持它。请尝试其他浏览器，或开启硬件加速。",
 };

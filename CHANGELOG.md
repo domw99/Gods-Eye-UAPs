@@ -2,6 +2,16 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.1] — 2026-10-13
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.1)
+
+**A small follow-up to 2.0: a clear message when the globe cannot start, and the browser tests get the time they need in CI.**
+
+- **No WebGL, no endless spinner.** On a browser or device where WebGL is turned off or not supported, the loading screen used to keep turning for ever. It now says what is wrong and what to try (another browser, or hardware acceleration), in all 15 languages.
+- **CI:** the browser tests now take about 40 minutes, so the job's limit is 70 minutes instead of 30.
+- Everything from 2.0 stays: NASA's fireballs on the globe and in every case and sighting check, the compass and tilt, and the two MCP tools.
+
 ## [2.0] — 2026-10-11
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.0)

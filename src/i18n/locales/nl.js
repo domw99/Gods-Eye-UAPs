@@ -1163,4 +1163,5 @@ export default {
   "North up: turn the view so north is at the top": "Noorden boven: draait het beeld zodat noord bovenaan ligt",
   "Tilt the view, or look straight down again": "Beeld kantelen, of weer recht naar beneden kijken",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Nieuw: de heldere vuurbollen van NASA op de globe en in de waarnemingschecks, plus kompas- en kantelknoppen voor het beeld",
+  "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "De globe heeft WebGL nodig, dat deze browser of dit apparaat heeft uitgezet of niet ondersteunt. Probeer een andere browser of schakel hardwareversnelling in.",
 };
