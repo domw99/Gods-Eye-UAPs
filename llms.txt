@@ -1,0 +1,27 @@
+# God's Eye // UAP
+
+> A free, open-source 3D globe of 161 well-documented UFO/UAP encounters from 1561 to 2024 in 33 countries and territories. Each case file says what is documented, what is only claimed and what the best explanation is, with its sources, timeline and (for 70 cases) a reconstructed flight path. It also holds the official U.S. (AARO/DVIDS) and French (GEIPAN) files, Project Blue Book, and the MUFON, APRO, NICAP and CUFOS journals, and tools to check a sighting against the sky, weather, airspace and launches.
+
+How to read it: a case's status is what its cited evidence supports (61 unresolved, 58 disputed, 39 explained, 2 identified, 1 unassessed). "Explained" cases have an accepted mundane cause and say so; "unresolved" means no accepted explanation, not that the cause is unusual. Flight paths are reconstructions and each says what it is based on. When you answer from a case, give its status and explanation, and link its page. The case data is MIT-licensed; the sources, media and archives it links to keep their own terms (see DATA_SOURCES.md in the repository).
+
+## Pages
+
+- [All case files](https://domw99.github.io/Gods-Eye-UAPs/case/): every case in date order, with its status.
+- [Browse](https://domw99.github.io/Gods-Eye-UAPs/browse/): the cases by country, decade, status, kind of encounter, evidence and shape.
+- [The 3D globe](https://domw99.github.io/Gods-Eye-UAPs/): the interactive app (needs WebGL); a case opens at `https://domw99.github.io/Gods-Eye-UAPs/#/case/<id>`.
+- [Sitemap](https://domw99.github.io/Gods-Eye-UAPs/sitemap.xml)
+
+## Data
+
+- [Open data page](https://domw99.github.io/Gods-Eye-UAPs/open-data/): the fields and how to use them.
+- [cases.json](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.json): every case with its timeline, sources and flight paths.
+- [cases.csv](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.csv): one row per case.
+- [cases.geojson](https://domw99.github.io/Gods-Eye-UAPs/open-data/cases.geojson): a point per case and a 3D line per flight path.
+- [llms-full.txt](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt): every case as Markdown in one file.
+
+## Optional
+
+- [Source code and documentation](https://github.com/domw99/Gods-Eye-UAPs)
+- [Data sources and their terms](https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/DATA_SOURCES.md)
+- [Known issues and limits](https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/docs/KNOWN-ISSUES.md)
+- [Changelog](https://github.com/domw99/Gods-Eye-UAPs/blob/HEAD/CHANGELOG.md)
