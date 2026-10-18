@@ -2326,8 +2326,13 @@ refresh();
   const today = new Date();
   const cases = onThisDay(CASE_ITEMS.map((i) => i.ref), today);
   if (cases.length) {
-    const day = today.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }).toUpperCase();
-    mount(el, html`<div class="otd-head"><span class="section-label">ON THIS DAY</span><span class="mono dim">${day}</span></div><ul>${cases.slice(0, 4).map((c) => html`<li><button type="button" class="link-btn" data-otd="${c.id}"><span class="mono">${c.date.slice(0, 4)}</span> ${c.title}</button></li>`)}</ul>`);
+    // The date is written in the interface language, so it is drawn again when that changes.
+    const draw = () => {
+      const day = upper(today.toLocaleDateString(locale(), { day: 'numeric', month: 'short' }));
+      mount(el, html`<div class="otd-head"><span class="section-label">ON THIS DAY</span><span class="mono dim">${day}</span></div><ul>${cases.slice(0, 4).map((c) => html`<li><button type="button" class="link-btn" data-otd="${c.id}"><span class="mono">${c.date.slice(0, 4)}</span> ${c.title}</button></li>`)}</ul>`);
+    };
+    draw();
+    onLanguageChange(draw);
     el.classList.remove('hidden');
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-otd]');

@@ -79,3 +79,10 @@ describe('the elements the code looks up', () => {
     expect(missing).toEqual([]);
   });
 });
+
+describe('dates in the interface language', () => {
+  it('does not leave a date to the browser\'s own language (the interface may be set to another)', () => {
+    const main = readFileSync('src/main.js', 'utf8');
+    expect(main).not.toMatch(/toLocale(Date|Time)?String\(undefined/);
+  });
+});
