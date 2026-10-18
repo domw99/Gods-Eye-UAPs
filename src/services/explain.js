@@ -249,3 +249,19 @@ export function rankCandidates({ report, sky, satellites = null, launches = null
 }
 
 export const confidenceLabel = (score) => (score >= 0.6 ? 'Strong match' : score >= 0.35 ? 'Possible' : 'Unlikely');
+
+/**
+ * Fill `checked` (what the checker looked at) and `notes` (what it could not) from the answers it got;
+ * each source is null when it was skipped or failed. Each note belongs to its own source: the Kp record
+ * runs from 1932, and the fireball record from 1988, which has no note of its own.
+ */
+export function describeChecks({ checked, notes, year, recent, satellites, launches, weather, airfields, aurora, fireballs }) {
+  if (satellites) checked.push(t('{n} satellites above the horizon', { n: satellites.length.toLocaleString(locale()) }));
+  else if (!recent) notes.push(t('Satellites were skipped: current orbital data only covers the last three weeks.'));
+  if (launches) checked.push(t('rocket launches ±12 h'));
+  if (weather) checked.push(t('wind and cloud'));
+  checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
+  if (aurora) checked.push(t('geomagnetic activity (Kp)'));
+  else if (year >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
+  if (fireballs) checked.push(t('fireballs in NASA’s record'));
+}

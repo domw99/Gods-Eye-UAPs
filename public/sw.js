@@ -21,10 +21,11 @@ function keep(cache, req, res) {
 self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
+  // Only this worker's own caches: the satellite element sets (gods-eye-uap-tle) are kept for two hours so CelesTrak is not asked again.
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('gods-eye-') && k !== PAGES && k !== FILES).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => /^gods-eye-(pages|files)-/.test(k) && k !== PAGES && k !== FILES).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });

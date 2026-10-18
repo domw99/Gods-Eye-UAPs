@@ -46,7 +46,7 @@ import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
 import { loadAirfields, nearestAirfields } from './services/airfields.js';
 import { loadFireballs, fireballRows, fireballsNear, fireballSize, FIREBALLS_FROM, SIGHT_KM } from './services/fireballs.js';
 import { launchesNear } from './services/launches.js';
-import { rankCandidates, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
+import { rankCandidates, describeChecks, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm, bearingDeg } from './util/geo.js';
@@ -1634,14 +1634,7 @@ async function explainSighting({ date, lat, lon, report }) {
       ? loadFireballs(BASE).then((data) => fireballsNear(fireballRows(data), when, lat, lon, { hours: 3, maxKm: SIGHT_KM, limit: 1 })).catch(() => null)
       : Promise.resolve(null),
   ]);
-  if (satellites) checked.push(t('{n} satellites above the horizon', { n: satellites.length.toLocaleString(locale()) }));
-  else if (!recent) notes.push(t('Satellites were skipped: current orbital data only covers the last three weeks.'));
-  if (launches) checked.push(t('rocket launches ±12 h'));
-  if (weather) checked.push(t('wind and cloud'));
-  checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
-  if (aurora) checked.push(t('geomagnetic activity (Kp)'));
-  if (fireballs) checked.push(t('fireballs in NASA’s record'));
-  else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
+  describeChecks({ checked, notes, year: when.getUTCFullYear(), recent, satellites, launches, weather, airfields, aurora, fireballs });
   return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora, fireballs }), checked, notes };
 }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rankCandidates } from '../src/services/explain.js';
+import { rankCandidates, describeChecks } from '../src/services/explain.js';
 import { auroraChance } from '../src/services/geomagnetic.js';
 
 const dark = { sun: { alt: -25, az: 0 }, bodies: [] };
@@ -70,5 +70,29 @@ describe('aurora', () => {
     const still = best(rankCandidates({ report: { motion: 'still' }, sky: dark, aurora: { ...london, thirds: 27 } }), 'aurora').score;
     const fast = best(rankCandidates({ report: { motion: 'fast' }, sky: dark, aurora: { ...london, thirds: 27 } }), 'aurora').score;
     expect(fast).toBeLessThan(still / 2);
+  });
+});
+
+describe('what the checker reports it looked at', () => {
+  const run = (over) => {
+    const checked = [];
+    const notes = [];
+    describeChecks({ checked, notes, year: 1975, recent: false, satellites: null, launches: [], weather: null, airfields: [], aurora: { thirds: 9 }, fireballs: null, ...over });
+    return { checked, notes };
+  };
+
+  it('does not say the Kp record is missing when it was used, in years before the fireball record begins', () => {
+    const { checked, notes } = run({});
+    expect(checked).toContain('geomagnetic activity (Kp)');
+    expect(notes.join(' ')).not.toMatch(/Geomagnetic/);
+  });
+
+  it('says so when the Kp record has nothing for a date it should cover, whatever the fireballs did', () => {
+    for (const fireballs of [null, []]) expect(run({ aurora: null, year: 1990, fireballs }).notes.join(' ')).toMatch(/Geomagnetic/);
+    expect(run({ aurora: null, year: 1920 }).notes.join(' ')).not.toMatch(/Geomagnetic/);
+  });
+
+  it('lists the fireball record when it answered, even with nothing close', () => {
+    expect(run({ year: 2010, fireballs: [] }).checked).toContain('fireballs in NASA’s record');
   });
 });

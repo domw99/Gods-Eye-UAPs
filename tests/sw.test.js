@@ -6,15 +6,15 @@ const SOURCE = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8')
 const PAGE = 'https://example.test/app/';
 
 /** Run the service worker's script against a fake worker scope; returns what it registered. */
-function loadWorker({ fetchImpl, saved = null }) {
+function loadWorker({ fetchImpl, saved = null, cacheNames = [], deleted = [] }) {
   const handlers = {};
   const store = new Map(saved ? [[PAGE, saved]] : []);
   const at = (req) => (typeof req === 'string' ? new URL(req, PAGE).href : req.url);
   const caches = {
     match: async (req) => store.get(at(req)),
     open: async () => ({ put: async (req, res) => void store.set(at(req), res) }),
-    keys: async () => [],
-    delete: async () => true,
+    keys: async () => cacheNames,
+    delete: async (name) => deleted.push(name) > 0,
   };
   const scope = {
     self: { location: { origin: 'https://example.test', href: `${PAGE}sw.js` }, addEventListener: (type, fn) => (handlers[type] = fn), skipWaiting() {}, clients: { claim() {} } },
@@ -92,5 +92,20 @@ describe('service worker: opening the app', () => {
     navigate(handlers);
     await vi.advanceTimersByTimeAsync(9_500);
     expect(await store.get(PAGE).text()).toBe('fresh');
+  });
+});
+
+describe('service worker: cleaning up old caches', () => {
+  it('removes the caches of earlier versions but keeps the satellite element sets', async () => {
+    const deleted = [];
+    const { handlers } = loadWorker({
+      fetchImpl: async () => new Response(''),
+      cacheNames: ['gods-eye-pages-v0', 'gods-eye-files-v0', 'gods-eye-pages-v1', 'gods-eye-files-v1', 'gods-eye-uap-tle'],
+      deleted,
+    });
+    let done;
+    handlers.activate({ waitUntil: (p) => (done = p) });
+    await done;
+    expect(deleted.sort()).toEqual(['gods-eye-files-v0', 'gods-eye-pages-v0']);
   });
 });
