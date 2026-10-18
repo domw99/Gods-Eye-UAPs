@@ -1356,11 +1356,14 @@ function showPlayback() {
   pb.bar.classList.remove('hidden');
   pb.follow.setAttribute('aria-pressed', 'false');
   pb.pov.setAttribute('aria-pressed', 'false');
-  const who = trackLayer.witnessLabel;
-  pb.pov.classList.toggle('hidden', !who);
-  pb.pov.title = who ? t('See it from: {who} (V)', { who }) : '';
+  pb.pov.classList.toggle('hidden', !trackLayer.witnessLabel);
+  setPovTitle();
   pb.speed.value = '1';
   updatePlaybackUi();
+}
+function setPovTitle() {
+  const who = trackLayer.witnessLabel;
+  pb.pov.title = who ? t('See it from: {who} (V)', { who }) : '';
 }
 function hidePlayback() {
   pb.bar.classList.add('hidden');
@@ -2177,6 +2180,9 @@ document.getElementById('btn-map').addEventListener('click', () => {
     refresh();
     setGrouping(itemLayer.grouping, { save: false });
     if (targetPhrase) setTarget(targetPhrase);
+    if (!pb.bar.classList.contains('hidden')) setPovTitle();
+    shownTilt = null; // the tilt button's title is written again on the next frame
+    render.request();
     document.getElementById('btn-tour').textContent = tourTimer ? t('■ STOP') : t('▶ TOUR');
     redrawDossier(); // the open record's text was written in the old language
   });

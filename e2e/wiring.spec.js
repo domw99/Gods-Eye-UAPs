@@ -148,7 +148,7 @@ test.describe('wiring', () => {
     expect(await page.evaluate(() => window.__uap.state.yearRange)).toBeNull();
   });
 
-  test('the HUD target line follows a change of language', async ({ page }) => {
+  test('the HUD target line and the tilt button follow a change of language', async ({ page }) => {
     await openApp(page, '/?lang=de');
     await page.evaluate(() => window.__uap.select('case:roswell-1947'));
     await click(page, '#dossier-close');
@@ -159,6 +159,10 @@ test.describe('wiring', () => {
     await expect(page.locator('#hud-tgt')).toHaveText('PRÈS DE PARIS');
     await page.selectOption('#lang', 'de');
     await expect(page.locator('#hud-tgt')).toHaveText('IN DER NÄHE VON PARIS');
+    // The tilt button's title is written when the tilt changes, so a new language has to ask for it again.
+    await expect(page.locator('[data-view="tilt"]')).toHaveAttribute('title', /^(Ansicht kippen|Gekippt)/);
+    await page.selectOption('#lang', 'fr');
+    await expect(page.locator('[data-view="tilt"]')).toHaveAttribute('title', /^(Incliner la vue|Inclinée)/);
   });
 
   test('in an embed, Space with no flight path does not sweep the hidden years bar', async ({ page }) => {
