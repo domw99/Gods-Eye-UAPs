@@ -21,3 +21,16 @@ describe('the numbers the known-issues page quotes', () => {
     expect(text).toContain(`${words(CASES.filter((c) => c.timeApprox).length)} older cases record only a date or part of a day`);
   });
 });
+
+describe("the README's build diagram", () => {
+  it('gives each box its own id, so no script is drawn as another', () => {
+    const chart = /```mermaid\n([\s\S]*?)```/.exec(readFileSync('README.md', 'utf8'))[1];
+    const labels = new Map();
+    const clash = [];
+    for (const [, id, label] of chart.matchAll(/\b([A-Z]+\d*)\["([^"]+)"\]/g)) {
+      if (labels.has(id) && labels.get(id) !== label) clash.push(`${id}: "${labels.get(id)}" and "${label}"`);
+      labels.set(id, label);
+    }
+    expect(clash).toEqual([]);
+  });
+});

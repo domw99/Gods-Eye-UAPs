@@ -355,6 +355,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
 | <kbd>D</kbd> | Lighting: auto → day → night → off | <kbd>F</kbd> | Clean view: hide every panel |
 | <kbd>O</kbd> | Orbit around the middle of the screen | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
+| <kbd>B</kbd> | North up (the compass turns with the view) | <kbd>P</kbd> | Tilt the view / look straight down again |
 
 </details>
 
@@ -398,9 +399,9 @@ flowchart LR
     MUF["MUFON Journal<br/>OCR (Internet Archive)"] --> S5["build-mufon.mjs"]
     GEI["GEIPAN<br/>published CSV"] --> S6["build-geipan.mjs"]
     ARC["APRO · NICAP · CUFOS<br/>OCR (Internet Archive)"] --> S7["build-journals.mjs"]
-    S5 & S7 --> S8["build-textindex.mjs"]
+    S5 & S7 --> S11["build-textindex.mjs"]
   end
-  S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 --> DATA[("public/data/*.json")]
+  S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 & S11 --> DATA[("public/data/*.json")]
   CASES["src/data/cases/*.js<br/>161 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
@@ -443,7 +444,7 @@ src/
   ui/         list.js · dossier.js · timeline.js · modals.js · skychart.js · story.js
               stats.js (statistics charts) · sharecard.js (share images)
 scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-airspace.mjs
-              build-kp.mjs · build-airfields.mjs · mcp-server.mjs (MCP server for AI assistants)
+              build-kp.mjs · build-fireballs.mjs · build-airfields.mjs · mcp-server.mjs (MCP server for AI assistants)
               build-mufon.mjs · build-geipan.mjs · build-journals.mjs · build-textindex.mjs
               build-cards.mjs (case preview images) · indexnow.mjs (search engines) · archive-pages.mjs (Wayback Machine)
               build-skybox.py (NASA star map → sky box)
@@ -470,7 +471,7 @@ The 161 case files are free to reuse, under the same MIT licence as the code, fr
 
 They are made from `src/data/cases/` on every build, with the page describing them as a schema.org Dataset so dataset search engines can find it. There is also a plain **[list of all case files](https://domw99.github.io/Gods-Eye-UAPs/case/)**, with no 3D globe needed, and pages that **[browse them](https://domw99.github.io/Gods-Eye-UAPs/browse/)** by country, decade, status, kind of encounter, evidence and shape.
 
-**For AI assistants:** [`llms.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms.txt) and [`llms-full.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt) describe the site and give every case as plain text, and `npm run mcp` starts a local [Model Context Protocol server](docs/MCP.md) (no network, no dependencies) with tools to search the cases, read one, find the cases near a place and list a date's. See [docs/MCP.md](docs/MCP.md) for Claude Code and Claude Desktop.
+**For AI assistants:** [`llms.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms.txt) and [`llms-full.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt) describe the site and give every case as plain text, and `npm run mcp` starts a local [Model Context Protocol server](docs/MCP.md) (no network, no dependencies) with tools to search the cases, read one, find the cases near a place, list a date's, check for a bright fireball near a sighting and make a link to the globe. See [docs/MCP.md](docs/MCP.md) for Claude Code and Claude Desktop.
 
 ## Where the data comes from
 
