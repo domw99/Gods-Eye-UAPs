@@ -6,6 +6,8 @@
  * the places named in sighting reports and the pages about curated cases;
  * page text is fetched live from archive.org.
  */
+import { fetchWithTimeout } from '../util/net.js';
+
 export const MUFON_ITEM = 'MUFON_UFO_Journal_-_Skylook';
 export const MUFON_LICENSE = 'https://creativecommons.org/licenses/by-nc-nd/4.0/';
 
@@ -79,7 +81,7 @@ export async function pageText(is, leaf) {
       is.id,
       (async () => {
         const get = async (suffix) => {
-          const res = await fetch(download(is, suffix));
+          const res = await fetchWithTimeout(download(is, suffix), {}, 90_000); // the OCR files are megabytes: slow, not stuck
           if (!res.ok) throw new Error(`archive.org ${res.status}`);
           const buf = new Uint8Array(await res.arrayBuffer());
           // Gzip files arrive as raw bytes; some proxies decode them on the way.

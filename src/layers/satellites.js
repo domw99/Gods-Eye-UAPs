@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 import * as satellite from 'satellite.js';
 import * as Astro from 'astronomy-engine';
 import { t } from '../i18n/index.js';
+import { fetchWithTimeout } from '../util/net.js';
 
 /**
  * Live "sky check" layer: propagates CelesTrak element sets with satellite.js
@@ -27,7 +28,7 @@ async function fetchTle(url) {
   const hit = cache ? await cache.match(url) : null;
   if (hit && Date.now() - Number(hit.headers.get('x-fetched') || 0) < TLE_TTL) return hit.text();
   try {
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     if (!res.ok) throw new Error(`CelesTrak ${res.status}`);
     const text = await res.text();
     try {

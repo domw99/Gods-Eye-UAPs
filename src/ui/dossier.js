@@ -19,6 +19,7 @@ import { JOURNALS_COLOR } from '../services/journals.js';
 import { AIRSPACE_TYPES, formatFt, nearUS } from '../services/airspace.js';
 import { correctionUrl, REPO_URL } from '../config.js';
 import { shareLink } from '../app/links.js';
+import { fetchWithTimeout } from '../util/net.js';
 import { state, toggleStar } from '../state.js';
 import { relativeTime } from '../layers/launches.js';
 import { issueDate, issueLabel, pageNumber, readerUrl, embedUrl, pdfUrl, itemUrl, pageText, joinBrokenWords, MUFON_LICENSE } from '../services/mufon.js';
@@ -819,7 +820,7 @@ export async function showOcr(id) {
   if (!el) return;
   mount(el, html`<div class="loading-line">Fetching OCR text…</div>`);
   try {
-    const res = await fetch(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`);
+    const res = await fetchWithTimeout(`https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(id)}_djvu.txt`, {}, 60_000);
     if (!res.ok) throw new Error(res.status);
     const text = joinBrokenWords(await res.text()).replace(/\n{3,}/g, '\n\n').slice(0, 6000);
     mount(el, html`<pre class="mono" tabindex="0" role="region" aria-label="READ OCR TEXT" style="white-space:pre-wrap;font-size:11px;line-height:1.45;max-height:320px;overflow:auto;background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:9px;padding:10px;margin-top:8px">${text}</pre><p class="caveat">Machine OCR of 1950s–60s typescript — expect errors.</p>`);

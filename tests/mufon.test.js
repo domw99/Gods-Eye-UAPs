@@ -154,3 +154,23 @@ describe('OCR clean-up', () => {
     expect(joinBrokenWords(undefined)).toBe('');
   });
 });
+
+describe('the page text request', () => {
+  it('gives up on a stalled connection instead of showing "Fetching the page text…" for good', async () => {
+    const { pageText } = await import('../src/services/mufon.js');
+    const seen = [];
+    const real = globalThis.fetch;
+    globalThis.fetch = (url, init) => {
+      seen.push(init?.signal);
+      return new Promise(() => {}); // never answers
+    };
+    try {
+      pageText({ id: 'stalled-issue', item: 'x', file: 'y', text: 'hocr' }, 0);
+      await new Promise((r) => setTimeout(r, 10));
+    } finally {
+      globalThis.fetch = real;
+    }
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen[0]).toBeInstanceOf(AbortSignal);
+  });
+});
