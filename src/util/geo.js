@@ -100,3 +100,8 @@ export function angleDiff(a, b) {
   const d = Math.abs((((a - b) % 360) + 360) % 360);
   return d > 180 ? 360 - d : d;
 }
+
+/** The signed longitude difference b − a in degrees, the short way round (−180 to 180), so 179° and −179° are 2° apart. */
+export function lonDelta(a, b) {
+  return ((((b - a) % 360) + 540) % 360) - 180;
+}

@@ -5,6 +5,7 @@ import { sunOnMoon } from './moonsun.js';
 import { MOON_INK, moonGroup, moonGlyph } from '../data/moon.js';
 import { glyphUrl } from '../layers/glyphs.js';
 import { translateDom } from '../i18n/index.js';
+import { lonDelta } from '../util/geo.js';
 
 /**
  * The Moon as a globe you can turn and zoom, like the Earth one. Cesium draws
@@ -337,7 +338,7 @@ export async function createMoonGlobe(container, { base, creditContainer, profil
     const pins = reports.flatMap((r) => r.sites.map((site, i) => ({ r, site, id: i === 0 ? `report:${r.entry.id}` : `report:${r.entry.id}#${i}` })));
     const groups = [];
     for (const pin of pins) {
-      const near = (q) => Math.hypot(q.site.lat - pin.site.lat, (q.site.lon - pin.site.lon) * Math.cos(Cesium.Math.toRadians(pin.site.lat))) < 3;
+      const near = (q) => Math.hypot(q.site.lat - pin.site.lat, lonDelta(pin.site.lon, q.site.lon) * Math.cos(Cesium.Math.toRadians(pin.site.lat))) < 3;
       const g = groups.find((members) => near(members[0]));
       if (g) g.push(pin);
       else groups.push([pin]);

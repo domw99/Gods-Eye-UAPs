@@ -53,7 +53,8 @@ const MAX_VIEW_HEIGHT = 1e9;
  * which would leave the loading screen up for good.
  */
 export function parseView(value) {
-  const [lon, lat, h, heading, pitch] = (value || '').split(',').map(Number);
+  // A blank part is missing, not 0 (Number('') is 0, which put "10,,500" on the equator and a trailing comma at the horizon).
+  const [lon, lat, h, heading, pitch] = (value || '').split(',').map((part) => (part.trim() === '' ? NaN : Number(part)));
   if (![lon, lat, h].every(Number.isFinite) || Math.abs(lat) > 90 || Math.abs(lon) > 180 || h <= 0 || h > MAX_VIEW_HEIGHT) return null;
   return { lon, lat, h, heading: Number.isFinite(heading) ? heading : 0, pitch: Number.isFinite(pitch) ? pitch : -90 };
 }

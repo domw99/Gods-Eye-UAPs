@@ -32,6 +32,22 @@ export function lonLatToTile(lon, lat, z = Z) {
   return { x: Math.min(n - 1, Math.max(0, x)), y: Math.min(n - 1, Math.max(0, y)) };
 }
 
+/**
+ * The tiles to load around tile `c`, nearest first. The grid wraps at the antimeridian, so a view beside
+ * it asks for the tiles across the line (not x of −1 or 2^z, which the server does not have); rows past
+ * the poles do not exist.
+ */
+export function wantedTiles(c, r, z = Z) {
+  const n = 2 ** z;
+  const out = [];
+  for (let dy = -r; dy <= r; dy++)
+    for (let dx = -r; dx <= r; dx++) {
+      const y = c.y + dy;
+      if (y >= 0 && y < n) out.push({ x: (((c.x + dx) % n) + n) % n, y, d2: dx * dx + dy * dy });
+    }
+  return out.sort((a, b) => a.d2 - b.d2);
+}
+
 export function tileBounds(x, y, z = Z) {
   const n = 2 ** z;
   const lon = (i) => (i / n) * 360 - 180;
@@ -239,10 +255,7 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
     const { lon, lat } = viewCenter();
     const c = lonLatToTile(lon, lat);
     const r = h < 3500 ? 2 : 1;
-    const wanted = [];
-    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) wanted.push([c.x + dx, c.y + dy, dx * dx + dy * dy]);
-    wanted.sort((a, b) => a[2] - b[2]);
-    for (const [x, y] of wanted) {
+    for (const { x, y } of wantedTiles(c, r)) {
       const key = `${x}/${y}`;
       // A tile that failed (a dropped connection, a busy server) is asked for again, but not on every camera move.
       if (tiles.get(key)?.failedAt && Date.now() - tiles.get(key).failedAt > RETRY_MS) dropTile(key);
@@ -253,7 +266,8 @@ export function createBuildingLayer(viewer, { onStatus = () => {} } = {}) {
       const byDistance = [...tiles.keys()]
         .map((key) => {
           const [x, y] = key.split('/').map(Number);
-          return [key, (x - c.x) ** 2 + (y - c.y) ** 2];
+          const dx = Math.abs(x - c.x);
+          return [key, Math.min(dx, 2 ** Z - dx) ** 2 + (y - c.y) ** 2]; // the short way round the globe
         })
         .sort((a, b) => b[1] - a[1]);
       for (const [key] of byDistance.slice(0, tiles.size - MAX_TILES)) dropTile(key);

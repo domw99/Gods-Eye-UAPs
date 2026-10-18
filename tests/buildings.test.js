@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { lonLatToTile, tileBounds, buildingHeights } from '../src/layers/buildings.js';
+import { lonLatToTile, tileBounds, buildingHeights, wantedTiles } from '../src/layers/buildings.js';
 
 describe('OSM building tiles', () => {
   it('finds the z14 tile for a point and its bounds contain it', () => {
@@ -28,5 +28,21 @@ describe('OSM building tiles', () => {
     expect(buildingHeights({})).toEqual({ base: 0, top: 6 });
     expect(buildingHeights({ render_height: 5, render_min_height: 8 })).toEqual({ base: 8, top: 9 });
     expect(buildingHeights({ render_height: 5000 }).top).toBe(900);
+  });
+
+  it('wraps the tile columns at the antimeridian and skips rows past the poles', () => {
+    const n = 2 ** 14;
+    const east = wantedTiles({ x: n - 1, y: 100 }, 1);
+    expect(east.map((t) => t.x).sort((a, b) => a - b)).toEqual([0, 0, 0, n - 2, n - 2, n - 2, n - 1, n - 1, n - 1]);
+    const west = wantedTiles({ x: 0, y: 100 }, 1);
+    expect(west.every((t) => t.x >= 0 && t.x < n)).toBe(true);
+    expect(west.some((t) => t.x === n - 1)).toBe(true);
+    const pole = wantedTiles({ x: 5, y: 0 }, 2);
+    expect(pole.every((t) => t.y >= 0)).toBe(true);
+    expect(pole).toHaveLength(15);
+    expect(wantedTiles({ x: 5, y: 7 }, 1)[0]).toMatchObject({ x: 5, y: 7, d2: 0 });
+    // The tile across the line is the neighbour: its bounds start at the antimeridian.
+    expect(tileBounds(0).west).toBe(-180);
+    expect(tileBounds(n - 1).east).toBe(180);
   });
 });

@@ -13,6 +13,13 @@ describe('?view= links', () => {
       expect(parseView(v), v).toBeNull();
   });
 
+  it('reads a blank part as missing, not as 0', () => {
+    expect(parseView('10,,500')).toBeNull();
+    expect(parseView(',20,500')).toBeNull();
+    expect(parseView('10,20,')).toBeNull();
+    expect(parseView('10,20,500,,')).toEqual({ lon: 10, lat: 20, h: 500, heading: 0, pitch: -90 });
+  });
+
   it('refuses a height that makes Cesium throw while the app is starting', () => {
     expect(parseView('0,0,1e300')).toBeNull();
     expect(parseView('0,0,1e10')).toBeNull();
