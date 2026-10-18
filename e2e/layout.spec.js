@@ -52,3 +52,18 @@ test('a long search stays inside the box of active filters', async ({ page }) =>
   const [chipBox, box] = await Promise.all([chip.boundingBox(), page.locator('#active-filters').boundingBox()]);
   expect(chipBox.x + chipBox.width).toBeLessThanOrEqual(box.x + box.width + 1);
 });
+
+test('on a short window the map controls stay on screen and below the top bar', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 420 });
+  await openApp(page);
+  const box = await page.locator('#map-controls').boundingBox();
+  const bar = await page.locator('#left').boundingBox(); // starts under the top bar
+  expect(box.y).toBeGreaterThanOrEqual(bar.y - 1);
+  expect(box.y + box.height).toBeLessThanOrEqual(420);
+});
+
+test('in a long language the results row keeps its words on one line', async ({ page }) => {
+  await openApp(page, '/?lang=ru');
+  const heights = await page.evaluate(() => [...document.querySelector('.list-label').children].filter((c) => c.tagName !== 'SELECT').map((c) => c.getBoundingClientRect().height));
+  for (const h of heights) expect(h).toBeLessThan(18);
+});

@@ -520,7 +520,7 @@ function imageCard(info, caption, page = null) {
   const thumb = pdf && page ? info.thumb.replace(/\/page\d+-/, `/page${page}-`) : info.thumb;
   const big = pdf ? thumb.replace(/-\d+px-/, '-1280px-') : info.url;
   const href = pdf && page ? `${info.page}?page=${page}` : info.page;
-  return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || info.title.replace(/^File:/, '') })}" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}"data-credit="${credit}" data-href="${safeUrl(href)}">
+  return html`<figure class="media-card" tabindex="0" role="button" aria-label="${t('Enlarge picture: {caption}', { caption: caption || info.title.replace(/^File:/, '') })}" data-lightbox="${safeUrl(big)}" data-caption="${caption || info.description || info.title}" data-credit="${credit}" data-href="${safeUrl(href)}">
     <img src="${safeUrl(thumb)}" alt="${caption || info.title}" loading="lazy" />
     ${info.mime === 'application/pdf' ? html`<span class="badge kind">PDF</span>` : ''}
     <figcaption>${caption || info.title.replace(/^File:/, '')}</figcaption>
