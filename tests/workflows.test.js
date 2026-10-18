@@ -57,4 +57,10 @@ describe('the workflows', () => {
       expect(text, file).toMatch(/actions:\s*write/);
     }
   });
+
+  it('tell search engines about the address the site is deployed at, not the default one', () => {
+    const address = (name) => /SITE_URL:\s*(\S+)/.exec(workflows.find((w) => w.file === name).text)?.[1];
+    expect(address('pages.yml')).toBeTruthy();
+    expect(address('indexnow.yml')).toBe(address('pages.yml'));
+  });
 });
