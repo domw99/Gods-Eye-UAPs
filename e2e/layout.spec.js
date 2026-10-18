@@ -61,3 +61,9 @@ test('on a short window the map controls stay on screen and below the top bar', 
   expect(box.y).toBeGreaterThanOrEqual(bar.y - 1);
   expect(box.y + box.height).toBeLessThanOrEqual(420);
 });
+
+test('in a long language the results row keeps its words on one line', async ({ page }) => {
+  await openApp(page, '/?lang=ru');
+  const heights = await page.evaluate(() => [...document.querySelector('.list-label').children].filter((c) => c.tagName !== 'SELECT').map((c) => c.getBoundingClientRect().height));
+  for (const h of heights) expect(h).toBeLessThan(18);
+});

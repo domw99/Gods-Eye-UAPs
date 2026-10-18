@@ -217,6 +217,9 @@ body[data-mode='ironbow'] :is(#scope, .moon-scope) { opacity: 1; }
 }
 .list-label { display: flex; align-items: center; justify-content: space-between; }
 .list-label select { font-size: 11px; padding: 3px 6px; }
+.list-label { gap: 8px; }
+.list-label > span, .list-label .link-btn { white-space: nowrap; } /* a longer translation squeezes the sort box, not the words beside it */
+.list-label select { min-width: 0; flex: 0 1 auto; text-overflow: ellipsis; }
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 details.filters > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
 details.filters > summary::-webkit-details-marker { display: none; }
