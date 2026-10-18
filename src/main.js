@@ -1640,8 +1640,8 @@ async function explainSighting({ date, lat, lon, report }) {
   if (weather) checked.push(t('wind and cloud'));
   checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
   if (aurora) checked.push(t('geomagnetic activity (Kp)'));
-  if (fireballs) checked.push(t('fireballs in NASA’s record'));
   else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
+  if (fireballs) checked.push(t('fireballs in NASA’s record'));
   return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora, fireballs }), checked, notes };
 }
 
@@ -2174,6 +2174,8 @@ document.getElementById('btn-map').addEventListener('click', () => {
     refresh();
     setGrouping(itemLayer.grouping, { save: false });
     redrawDossier(); // the open record's text was written in the old language
+    shownTilt = null; // the tilt button's title was written in code, so write it again
+    viewer.scene.requestRender();
   });
 }
 

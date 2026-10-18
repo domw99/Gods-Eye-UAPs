@@ -112,8 +112,9 @@ export function createZoomOut(viewer, { blocked = () => false } = {}) {
     }
     const from = orbitOf(target);
     const to = { range: from.range, pitch: pitch ?? from.pitch, heading: from.heading + (heading == null ? 0 : shortestTurn(from.heading, heading)) };
+    const running = anim;
     anim = { target, from, to, start: performance.now() };
-    requestAnimationFrame(step);
+    if (!running) requestAnimationFrame(step); // a second loop would step twice a frame
     return true;
   }
 

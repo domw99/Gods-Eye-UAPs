@@ -146,7 +146,9 @@ export function fireballsNearTool(args = {}, rows = fireballData()) {
   const lat = num(args.lat);
   const lon = num(args.lon);
   if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new ArgError('lat (-90 to 90) and lon (-180 to 180) are required');
-  const when = new Date(args.when);
+  // A time with no zone is UTC, as the tool says; JavaScript would read it in the server's own zone.
+  const zoneless = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(String(args.when ?? '').trim());
+  const when = new Date(zoneless ? `${String(args.when).trim().replace(' ', 'T')}Z` : args.when);
   if (!args.when || Number.isNaN(when.getTime())) throw new ArgError('when is required, as a date and time such as "2013-02-15T03:30:00Z"');
   const hours = num(args.hours) ?? 3;
   const radius = num(args.radius_km) ?? 600;
