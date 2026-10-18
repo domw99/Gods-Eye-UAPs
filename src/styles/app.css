@@ -414,6 +414,17 @@ body.dossier-open .map-controls { transform: translateX(calc(-1 * (var(--right-w
 .map-controls [data-view='north'].level svg { opacity: 0.6; } /* north is already at the top */
 .map-controls .reset { height: 44px; margin-top: 3px; border-top: 1px solid var(--glass-border); border-radius: 0 0 9px 9px; color: var(--accent); }
 .map-controls .reset span { font: 600 8px var(--font-mono); letter-spacing: 0.12em; }
+/* Seven buttons stand 270px tall: on a phone or a short window that runs under the top bar, the case list or the dossier, so they lie in a row instead. */
+@media (max-width: 720px), (max-height: 580px) {
+  .map-controls { width: auto; grid-auto-flow: column; }
+  .map-controls button { width: 36px; }
+  .map-controls .reset { width: 52px; height: 36px; margin: 0 0 0 3px; border-top: 0; border-left: 1px solid var(--glass-border); border-radius: 0 9px 9px 0; }
+}
+/* With the dossier open on a short, wide window the room between it and the case list is under 220px: two rows. */
+@media (min-width: 721px) and (max-height: 580px) {
+  body.dossier-open .map-controls { grid-template-columns: repeat(4, 36px); grid-auto-flow: row; }
+  body.dossier-open .map-controls .reset { width: 36px; margin: 0; border-left: 0; border-radius: 9px; }
+}
 
 /* ── Timeline ──────────────────────────────────── */
 #timeline {
@@ -580,7 +591,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
   #timeline { left: calc(8px + var(--sal)); right: calc(8px + var(--sar)); bottom: calc(8px + var(--sab)); height: 70px; }
   .tl-labels #tl-hint { display: none; }
   .hud-br { display: none; }
-  .map-controls, body.dossier-open .map-controls { right: calc(10px + var(--sar)); bottom: auto; top: calc(var(--top-off) + 52px); transform: none; }
+  .map-controls, body.dossier-open .map-controls { right: calc(10px + var(--sar)); bottom: auto; top: calc(var(--top-off) + 14px); transform: none; }
   #playback { bottom: calc(var(--bottom-gap) - 2px); }
   .form-grid { grid-template-columns: 1fr; }
 }
