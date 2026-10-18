@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { fireballRows, fireballsNear, fireballSize, describeEnergy, FIREBALLS_FROM } from '../src/services/fireballs.js';
+import { fireballRows, fireballsNear, fireballSize, describeEnergy, FIREBALLS_FROM, fireballsCover } from '../src/services/fireballs.js';
 import { rankCandidates } from '../src/services/explain.js';
 import { skyAt } from '../src/services/sky.js';
 import { pack } from '../scripts/build-fireballs.mjs';
@@ -24,6 +24,15 @@ describe('the bundled fireball record', () => {
     expect(c.lon).toBeCloseTo(61.1, 0);
     expect(c.heightKm).toBeCloseTo(23.3, 0);
     expect(c.speed).toBeCloseTo(18.6, 0);
+  });
+});
+
+describe('what the record covers', () => {
+  it('starts on 15 April 1988, so earlier that year has nothing to check against', () => {
+    expect(fireballsCover('1988-01-20T12:00:00Z')).toBe(false);
+    expect(fireballsCover('1988-04-15T00:00:00Z')).toBe(true);
+    expect(fireballsCover('2013-02-15T03:30:00Z')).toBe(true);
+    expect(fireballsCover('nonsense')).toBe(false);
   });
 });
 

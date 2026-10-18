@@ -12,7 +12,7 @@ import { weatherAt, weatherAvailable, describeWeatherCode, driftToward, trackVsW
 import { launchesNear, cachedLaunchesNear, RateLimitError } from '../services/launches.js';
 import { loadKp, kpThirds, kpLabel, stormScale, STORM_NAMES, auroraChance } from '../services/geomagnetic.js';
 import { loadAirfields, nearestAirfields, airfieldProximity, SIZES } from '../services/airfields.js';
-import { loadFireballs, fireballRows, fireballsNear, describeEnergy, FIREBALLS_FROM, SIGHT_KM } from '../services/fireballs.js';
+import { loadFireballs, fireballRows, fireballsNear, describeEnergy, fireballsCover, SIGHT_KM } from '../services/fireballs.js';
 import { skySection } from './skychart.js';
 import { radarScope } from './radar.js';
 import { JOURNALS_COLOR } from '../services/journals.js';
@@ -201,7 +201,7 @@ async function fillGeomag(token, lat, lon, when, approx = false) {
 }
 
 const fireballBlock = (when) =>
-  new Date(when).getUTCFullYear() < FIREBALLS_FROM ? '' : section('BRIGHT FIREBALLS NEARBY', html`<div id="d-fireballs"><div class="loading-line">Checking NASA’s fireball record…</div></div>`);
+  !fireballsCover(when) ? '' : section('BRIGHT FIREBALLS NEARBY', html`<div id="d-fireballs"><div class="loading-line">Checking NASA’s fireball record…</div></div>`);
 
 /** "12 min before", "2.5 h after": how far a fireball was from the reported time. */
 function fireballGap(min) {

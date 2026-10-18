@@ -44,7 +44,7 @@ import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
 import { loadAirfields, nearestAirfields } from './services/airfields.js';
-import { loadFireballs, fireballRows, fireballsNear, fireballSize, FIREBALLS_FROM, SIGHT_KM } from './services/fireballs.js';
+import { loadFireballs, fireballRows, fireballsNear, fireballSize, fireballsCover, SIGHT_KM } from './services/fireballs.js';
 import { launchesNear } from './services/launches.js';
 import { rankCandidates, describeChecks, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
@@ -1643,7 +1643,7 @@ async function explainSighting({ date, lat, lon, report }) {
         return thirds == null ? null : { thirds, ...auroraChance(thirds, lat, lon), south: lat < 0 };
       })
       .catch(() => null),
-    when.getUTCFullYear() >= FIREBALLS_FROM
+    fireballsCover(when)
       ? loadFireballs(BASE).then((data) => fireballsNear(fireballRows(data), when, lat, lon, { hours: 3, maxKm: SIGHT_KM, limit: 1 })).catch(() => null)
       : Promise.resolve(null),
   ]);

@@ -2,6 +2,38 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.2] — 2026-10-18
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.2)
+
+**A bug-fix release: five parallel audits of the 2.0 additions, the map maths, the interface, the data and docs, and the services, with about 25 fixes, each with a test.**
+
+**Layout**
+- **The map controls fit.** With the compass and tilt, the column of buttons was too tall for a short window or a phone: it ran under the top bar at 1024×420 and covered the case sheet on a phone. It now lays out in a row where there is not room for a column.
+- In Russian the "Results" label and the random button broke in the middle of a word; the sort box now shrinks instead.
+
+**The checks**
+- **The sighting checker's note about geomagnetic activity** was wrongly tied to the new fireball line, so it showed for 1932–1987 even when Kp was used. It is now decided in one tested place.
+- **Fireballs** are only checked from 15 April 1988, when NASA's record begins (a case in January 1988 used to say "none found" for a time the record does not cover).
+- The MCP `fireballs_near` tool read a time with no zone in the server's own time zone although it says UTC; it now reads it as UTC. Its instructions name every status, including *unassessed*.
+
+**Maps and geometry**
+- **The antimeridian:** Moon report pins either side of ±180° were never grouped, and the 3D-buildings layer asked for tile columns that do not exist next to the line and never loaded the tiles across it.
+- `?view=10,,500` put the camera on the equator: a blank part of a view link is now read as missing, not as 0.
+
+**Language**
+- The tilt button, the HUD's target line, the tour and witness-view buttons, and the On this day heading did not follow a change of language. "Surface" and "unlimited" in airspace heights were never translated.
+
+**Services**
+- Each deploy emptied the cache of satellite element sets; only the old page and file caches are cleaned now.
+- The OCR text, journal page text and satellite requests had no time limit and could leave "Loading…" up for ever; the unpacked-issue cache is capped at four issues instead of growing without end.
+- The compass or tilt during a running zoom no longer starts a second animation loop.
+
+**Docs**
+- The README's diagram drew two build scripts as one box; the shortcut table lacked **B** and **P**; CONTRIBUTING listed a case status that does not exist; the search-engine workflow used the default address instead of the deployed one.
+
+**Not fixed** (needs a decision or a data rebuild): six Blue Book files named "N Carolina" or "S Carolina" are placed in Puerto Rico's Carolina; the year range can only be set by dragging; the sighting log of two open tabs overwrite each other.
+
 ## [2.1] — 2026-10-13
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.1)
@@ -20,7 +52,7 @@ What changed in each release of God's Eye // UAP, newest first. This file is gen
 
 **Fireballs**
 - **A new layer** with the 888 bright meteors that U.S. government sensors have recorded since 1988 (NASA's Center for Near Earth Object Studies, public domain), drawn as comets sized by their energy. Click one for its time, place, energy (as tons or kilotons of TNT), height and speed. The years bar filters them. Chelyabinsk, 15 February 2013, is the big one: about 440 kt.
-- **Every case since 1988** now has a *Bright fireballs nearby* section: any fireball in the record within 600 km and 3 hours (12 hours when the case's time of day is approximate), with how long before or after, how far and in which direction. A fireball outshines the Moon for a few seconds and is a familiar cause of "a light that crossed the sky and went out". None of the 40 cases since 1988 has one, and the section says so; it also says the record holds only the bigger events, so an empty answer does not rule one out.
+- **Every case since 1988** now has a *Bright fireballs nearby* section: any fireball in the record within 600 km and 3 hours (12 hours when the case's time of day is approximate), with how long before or after, how far and in which direction. A fireball outshines the Moon for a few seconds and is a familiar cause of "a light that crossed the sky and went out". None of the 46 cases since 1988 has one, and the section says so; it also says the record holds only the bigger events, so an empty answer does not rule one out.
 - **What did I see?** adds the fireball as a candidate: strong for a fast light seen minutes from one, weak for a light that stood still.
 - The data is built into the app (NASA's API does not allow requests from a web page), refreshed monthly by the same workflow as the Kp index, and works offline.
 

@@ -11,6 +11,10 @@ import { haversineKm, bearingDeg } from '../util/geo.js';
 export const FIREBALLS_FILE = 'data/fireballs.json';
 /** The first year of the record. */
 export const FIREBALLS_FROM = 1988;
+/** The first day of the record (15 April 1988): earlier in that year there is nothing to check against. */
+export const FIREBALLS_START = Date.UTC(1988, 3, 15);
+/** Does the record cover this moment? */
+export const fireballsCover = (when) => new Date(when).getTime() >= FIREBALLS_START;
 /** How far away a fireball high in the air can be seen from the ground (km), for a rough check. */
 export const SIGHT_KM = 600;
 
