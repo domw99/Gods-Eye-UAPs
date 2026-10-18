@@ -453,7 +453,7 @@ scripts/      sync-dvids.mjs · build-bluebook.mjs · build-nuforc.mjs · build-
               lib/ (GeoNames gazetteer · page-shell.mjs: the frame the static pages share · case-pages.mjs: a page per case, the case index + sitemap · browse-pages.mjs: the pages by country, decade, status and more · open-data.mjs: JSON, CSV, GeoJSON · llms.mjs: robots.txt, llms.txt, llms-full.txt; all made at build)
 public/cards/ the preview image for each case page
 tests/        Vitest suites · e2e/ Playwright browser tests
-docs/         SPEC.md (the full product spec) · KNOWN-ISSUES.md (limits of the app and the data) · MCP.md (the AI-assistant server) · media/ (README pictures and videos)
+docs/         KNOWN-ISSUES.md (limits of the app and the data) · MCP.md (the AI-assistant server) · media/ (README pictures and videos)
 AGENTS.md     the developer guide (commands, conventions, releases); CLAUDE.md points to it
 CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · CHANGELOG.md · DATA_SOURCES.md · THIRD_PARTY_NOTICES.md
 ```
