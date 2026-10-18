@@ -785,6 +785,16 @@ function flyToItem(item, { tracks } = {}) {
   );
 }
 
+/**
+ * The HUD's target line. A phrase ("NONE", "NEAR PARIS") is given as a function, so that it is written again
+ * when the interface language changes; a record's name is the same in every language.
+ */
+let targetPhrase = null;
+function setTarget(text) {
+  targetPhrase = typeof text === 'function' ? text : null;
+  document.getElementById('hud-tgt').textContent = targetPhrase ? targetPhrase() : text;
+}
+
 // Blue Book and MUFON selections wait for their data; a newer selection wins.
 let selectToken = 0;
 
@@ -821,7 +831,7 @@ function select(key, source = 'api') {
     flyToItem(item);
   }
   setHash(`#/${item.kind}/${encodeURIComponent(item.id)}`, { replace: source === 'tour' || source === 'hash' });
-  document.getElementById('hud-tgt').textContent = item.title.slice(0, 40).toUpperCase();
+  setTarget(item.title.slice(0, 40).toUpperCase());
   return true;
 }
 
@@ -851,7 +861,7 @@ async function selectBlueBook(id) {
       offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), rec.prec === 1 ? 900e3 : 60e3),
     });
   setHash(`#/bluebook/${encodeURIComponent(id)}`);
-  document.getElementById('hud-tgt').textContent = `BLUE BOOK ${rec.place}`.slice(0, 40).toUpperCase();
+  setTarget(`BLUE BOOK ${rec.place}`.slice(0, 40).toUpperCase());
 }
 
 async function selectGeipan(id) {
@@ -881,7 +891,7 @@ async function selectGeipan(id) {
       offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), rec.prec === 1 ? 400e3 : 45e3),
     });
   setHash(`#/geipan/${encodeURIComponent(id)}`);
-  document.getElementById('hud-tgt').textContent = `GEIPAN ${rec.place}`.slice(0, 40).toUpperCase();
+  setTarget(`GEIPAN ${rec.place}`.slice(0, 40).toUpperCase());
 }
 
 const selectMufonPage = (issueId, leaf, recordIndex = null) => selectArchivePage('mufon', issueId, leaf, recordIndex);
@@ -918,7 +928,7 @@ async function selectArchivePage(layer, issueId, leaf, recordIndex = null) {
     });
   setHash(`#/${layer === 'mufon' ? 'mufon' : 'journal'}/${encodeURIComponent(is.id)}/${leaf}`);
   const tag = layer === 'mufon' ? 'MUFON' : SERIES_SHORT[is.series] || 'ARCHIVE';
-  document.getElementById('hud-tgt').textContent = `${tag} ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase();
+  setTarget(`${tag} ${record ? record.place : issueDate(is)}`.slice(0, 40).toUpperCase());
 }
 
 function deselect({ keepHash = false } = {}) {
@@ -940,7 +950,7 @@ function deselect({ keepHash = false } = {}) {
   hidePlayback();
   itemLayer.showRegion(null);
   if (!keepHash) setHash('');
-  document.getElementById('hud-tgt').textContent = t('NONE');
+  setTarget(() => t('NONE'));
 }
 
 /*
@@ -1139,7 +1149,7 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
   };
   draw();
   setHash(`#/near/${lat.toFixed(4)},${lon.toFixed(4)}/${encodeURIComponent(label)}`);
-  document.getElementById('hud-tgt').textContent = upper((label === 'you' ? t('NEAR YOU') : t('NEAR {place}', { place: label })).slice(0, 40));
+  setTarget(() => upper((label === 'you' ? t('NEAR YOU') : t('NEAR {place}', { place: label })).slice(0, 40)));
   const fill = (key, promise, pick) =>
     promise.then(
       (d) => ((data[key] = pick(d)), draw()),
@@ -2166,6 +2176,8 @@ document.getElementById('btn-map').addEventListener('click', () => {
     renderActiveFilters();
     refresh();
     setGrouping(itemLayer.grouping, { save: false });
+    if (targetPhrase) setTarget(targetPhrase);
+    document.getElementById('btn-tour').textContent = tourTimer ? t('■ STOP') : t('▶ TOUR');
     redrawDossier(); // the open record's text was written in the old language
   });
 }

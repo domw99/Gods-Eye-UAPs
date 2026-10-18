@@ -148,6 +148,19 @@ test.describe('wiring', () => {
     expect(await page.evaluate(() => window.__uap.state.yearRange)).toBeNull();
   });
 
+  test('the HUD target line follows a change of language', async ({ page }) => {
+    await openApp(page, '/?lang=de');
+    await page.evaluate(() => window.__uap.select('case:roswell-1947'));
+    await click(page, '#dossier-close');
+    await expect(page.locator('#hud-tgt')).toHaveText('KEINE');
+    await page.selectOption('#lang', 'fr');
+    await expect(page.locator('#hud-tgt')).toHaveText('AUCUN');
+    await page.evaluate(() => window.__uap.showNearby(48.85, 2.35, 'Paris', { fly: false }));
+    await expect(page.locator('#hud-tgt')).toHaveText('PRÈS DE PARIS');
+    await page.selectOption('#lang', 'de');
+    await expect(page.locator('#hud-tgt')).toHaveText('IN DER NÄHE VON PARIS');
+  });
+
   test('in an embed, Space with no flight path does not sweep the hidden years bar', async ({ page }) => {
     await page.goto('/?embed=1#/case/utsuro-bune-1803'); // the case list is hidden here, so openApp would wait for it in vain
     await page.waitForFunction(() => Boolean(window.__uap?.viewer), null, { timeout: 60_000 });
