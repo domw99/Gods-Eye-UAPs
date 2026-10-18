@@ -14,7 +14,7 @@ A case needs evidence beyond a single anecdote: radar, video or photographs, off
 2. Fill in what the sources support and no more:
    - `id` (lower-case, with the year), `title`, `date` (ISO with the local UTC offset; add `timeApprox: true` when the time is a guess), `place`, `country`, `cc`, `lat`, `lon`, `precision` (`site`, `city`, `area` or `region`).
    - `category`, `evidence` (a list), `shape`, `witnesses`, `duration`.
-   - `status`, and an `explanation` for anything that is not `unresolved`: `explained` (an accepted cause), `disputed` (a proposed cause that is not settled), `unresolved` (no accepted explanation), `hoax`.
+   - `status`, and an `explanation` for anything that is not `unresolved`: `explained` (an accepted cause), `disputed` (a proposed cause that is not settled), `identified` (the object itself is known; a hoax is `explained` or `identified`, with the explanation saying so), `unassessed` (released without an official determination), `unresolved` (no accepted explanation).
    - `summary` (what happened, in plain prose), `timeline`, `sources` (at least one `official`, `primary` or `reference` link).
    - Optional: `tracks` (a reconstructed flight path; each says its `basis`, and `approximate` is honest when it is drawn from descriptions), `observers`, `media` (Commons files, DVIDS ids, Internet Archive items) and `wiki`.
 3. Run `npm run verify:media && npm test`. The tests check coordinates, dates, the taxonomy, plausible altitudes and track times.

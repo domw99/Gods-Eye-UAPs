@@ -15,7 +15,7 @@ import { fireballRows, fireballsNear, describeEnergy, FIREBALLS_FROM } from '../
 
 export const PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
-export const INSTRUCTIONS = `Documented UFO/UAP encounters, each with its sources and the official or best explanation. A case's "status" (unresolved, disputed, explained, identified) says what its cited evidence supports, not what anyone believes: when you answer from a case, give its status and explanation and link its page. Flight paths are reconstructions and say what they are based on. The data is MIT-licensed; the sources and media it links to keep their own terms (${REPO_URL}/blob/HEAD/DATA_SOURCES.md).`;
+export const INSTRUCTIONS = `Documented UFO/UAP encounters, each with its sources and the official or best explanation. A case's "status" (unresolved, disputed, explained, identified, or unassessed when it was released without an official determination) says what its cited evidence supports, not what anyone believes: when you answer from a case, give its status and explanation and link its page. Flight paths are reconstructions and say what they are based on. The data is MIT-licensed; the sources and media it links to keep their own terms (${REPO_URL}/blob/HEAD/DATA_SOURCES.md).`;
 
 const site = siteUrl();
 const brief = (c, extra = {}) => ({

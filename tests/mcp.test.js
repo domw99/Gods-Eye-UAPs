@@ -10,6 +10,11 @@ const ask = (method, params, id = 1) => handle({ jsonrpc: '2.0', id, method, par
 const text = (result) => JSON.parse(result.content[0].text);
 
 describe('the MCP protocol', () => {
+  it('names every status in the instructions it gives an assistant', () => {
+    const init = ask('initialize', { protocolVersion: PROTOCOLS[0] }).result.instructions;
+    for (const status of Object.keys(STATUS)) expect(init).toContain(status);
+  });
+
   it('starts with initialize: the version the client asked for when it is one we know, else the newest', () => {
     const r = ask('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'x', version: '1' } });
     expect(r.result.protocolVersion).toBe('2024-11-05');
