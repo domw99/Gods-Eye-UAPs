@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%"><stop offset="0" stop-color="#0d2236"/><stop offset="0.6" stop-color="#070d17"/><stop offset="1" stop-color="#03060b"/></radialGradient>
+    <radialGradient id="globe" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#12395a"/><stop offset="1" stop-color="#07131f"/></radialGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="0.7" stop-color="#00d4ff" stop-opacity="0"/><stop offset="1" stop-color="#00d4ff" stop-opacity="0.35"/></radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <clipPath id="c"><circle cx="512" cy="512" r="330"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g fill="#cfe9ff" opacity=".8"><circle cx="110" cy="140" r="3"/><circle cx="880" cy="110" r="2.5"/><circle cx="940" cy="400" r="2"/><circle cx="70" cy="560" r="2.5"/><circle cx="160" cy="880" r="3"/><circle cx="860" cy="900" r="2.5"/><circle cx="520" cy="60" r="2"/><circle cx="300" cy="70" r="2"/><circle cx="740" cy="960" r="2"/></g>
+  <circle cx="512" cy="512" r="372" fill="url(#halo)"/>
+  <circle cx="512" cy="512" r="330" fill="url(#globe)"/>
+  <g clip-path="url(#c)" fill="none" stroke="#00d4ff" stroke-opacity=".28" stroke-width="3">
+    <ellipse cx="512" cy="512" rx="330" ry="110"/><ellipse cx="512" cy="512" rx="330" ry="220"/>
+    <ellipse cx="512" cy="512" rx="110" ry="330"/><ellipse cx="512" cy="512" rx="220" ry="330"/>
+    <line x1="182" y1="512" x2="842" y2="512"/><line x1="512" y1="182" x2="512" y2="842"/>
+  </g>
+  <circle cx="512" cy="512" r="330" fill="none" stroke="#00d4ff" stroke-width="6" opacity=".7"/>
+  <!-- a reconstructed flight path across the globe -->
+  <path d="M215 640 C 330 520, 470 470, 610 420 S 760 330, 815 330" fill="none" stroke="#7dffb2" stroke-width="7" stroke-dasharray="4 18" stroke-linecap="round" opacity=".9" clip-path="url(#c)"/>
+  <circle cx="815" cy="330" r="13" fill="#7dffb2" filter="url(#glow)"/>
+  <!-- the eye-and-saucer mark -->
+  <g transform="translate(512 512) scale(7.3) translate(-32 -32)" filter="url(#glow)" fill="none" stroke="#00d4ff">
+    <path d="M6 32c7-11 16-17 26-17s19 6 26 17c-7 11-16 17-26 17S13 43 6 32Z" stroke-width="3"/>
+    <ellipse cx="32" cy="30" rx="12" ry="4.5" fill="#00d4ff" stroke="none"/>
+    <path d="M24 30c1.5-5 4.2-7.5 8-7.5s6.5 2.5 8 7.5" stroke-width="3"/>
+    <circle cx="32" cy="38" r="2.4" fill="#7dffb2" stroke="none"/>
+  </g>
+</svg>
