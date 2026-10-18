@@ -155,6 +155,32 @@ describe('OCR clean-up', () => {
   });
 });
 
+describe('the page text cache', () => {
+  it('keeps the last few issues read, not every issue ever opened', async () => {
+    const { pageText } = await import('../src/services/mufon.js');
+    const asked = [];
+    const real = globalThis.fetch;
+    globalThis.fetch = async (url) => {
+      asked.push(String(url));
+      return new Response(String(url).includes('pageindex') ? '[[0,5]]' : 'hello world');
+    };
+    const issue = (n) => ({ id: `cache-${n}`, item: `item${n}`, file: `file${n}`, text: 'hocr' });
+    try {
+      expect(await pageText(issue(0), 0)).toBe('hello');
+      await pageText(issue(0), 0);
+      expect(asked.length).toBe(2); // one issue is two files, read once
+      for (const n of [1, 2, 3, 4, 5]) await pageText(issue(n), 0);
+      const before = asked.length;
+      await pageText(issue(5), 0);
+      expect(asked.length).toBe(before); // the newest is still held
+      await pageText(issue(0), 0);
+      expect(asked.length).toBe(before + 2); // the oldest was let go, and is read again
+    } finally {
+      globalThis.fetch = real;
+    }
+  });
+});
+
 describe('the page text request', () => {
   it('gives up on a stalled connection instead of showing "Fetching the page text…" for good', async () => {
     const { pageText } = await import('../src/services/mufon.js');

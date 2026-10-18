@@ -75,8 +75,10 @@ export async function loadMufon(base) {
 
 /** Text of one page, from the issue's OCR search text and page index on archive.org. */
 const textCache = new Map();
+const KEEP_ISSUES = 4; // an issue's text is megabytes once unpacked: the last few read are kept, not every one ever opened
 export async function pageText(is, leaf) {
   if (!textCache.has(is.id)) {
+    while (textCache.size >= KEEP_ISSUES) textCache.delete(textCache.keys().next().value);
     textCache.set(
       is.id,
       (async () => {
