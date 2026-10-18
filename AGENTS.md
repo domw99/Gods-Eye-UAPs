@@ -20,6 +20,7 @@ A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 
 | `npm run data` | Rebuilds every dataset in `public/data/` from its source (slow, network) |
 | `npm run build:changelog` / `build:notices` | Regenerate `CHANGELOG.md` / `THIRD_PARTY_NOTICES.md`. Tests fail when they are stale |
 | `npm run i18n:add strings.json` | Add interface strings to all 15 language files (see below) |
+| `npm run build:kp` / `build:fireballs` / `build:airfields` | Rebuild those bundled datasets (Kp index, NASA fireballs, airfields) |
 | `npm run mcp` | Start the MCP server for AI assistants ([docs/MCP.md](docs/MCP.md)); `scripts/lib/mcp.mjs` holds the tools |
 
 ## Where things are
@@ -59,7 +60,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-case). Then `npm run verify:media
 
 ## Workflows (`.github/workflows/`)
 
-`ci.yml` (tests, build, browser tests on every push), `pages.yml` (deploy), `sync-official.yml` (weekly DVIDS sync, and the Kp series monthly), `links.yml` (weekly check of every cited link; opens an issue), `indexnow.yml` (tells Bing and others about the sitemap and asks the Wayback Machine for a copy after each deploy), `cards.yml` (share cards), `release.yml`, `codeql.yml`.
+`ci.yml` (tests, build, browser tests on every push), `pages.yml` (deploy), `sync-official.yml` (weekly DVIDS sync, and the Kp series and the fireball record monthly), `links.yml` (weekly check of every cited link; opens an issue), `indexnow.yml` (tells Bing and others about the sitemap and asks the Wayback Machine for a copy after each deploy), `cards.yml` (share cards), `release.yml`, `codeql.yml`.
 
 ## Things that have bitten before
 
