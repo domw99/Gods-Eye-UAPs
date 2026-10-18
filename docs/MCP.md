@@ -48,7 +48,7 @@ A wrong argument comes back as a message the assistant can read and correct ("st
 
 ## Reading it honestly
 
-The server's instructions tell the assistant what the data means, and it is worth repeating here. A case's **status** (*unresolved*, *disputed*, *explained*, *identified*) is what its cited evidence supports, not what anyone believes. *Unresolved* means no accepted explanation, not that the cause is unusual. Flight paths are reconstructions and each says what it is based on. When an answer draws on a case, it should give the status and the explanation and link the case's page.
+The server's instructions tell the assistant what the data means, and it is worth repeating here. A case's **status** (*unresolved*, *disputed*, *explained*, *identified*, or *unassessed* for a release with no official determination) is what its cited evidence supports, not what anyone believes. *Unresolved* means no accepted explanation, not that the cause is unusual. Flight paths are reconstructions and each says what it is based on. When an answer draws on a case, it should give the status and the explanation and link the case's page.
 
 ## The same data without the server
 
