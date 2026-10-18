@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "Tinjauan NASA sendiri atas topik ini ada di",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Berkas NASA di atas adalah yang dirilis dalam rilis PURSUE 2026; berkas itu diputar di aplikasi seperti catatan resmi lainnya.",
   "SIMILAR CASES": "KASUS SERUPA",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Catatan per tahun. Seret untuk memilih rentang tahun; klik dua kali untuk menghapus.",
   "Give the sighting a title": "Beri judul pada penampakan",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "Penampakan ditambahkan, tetapi peramban ini tidak dapat menyimpannya: akan hilang saat halaman ditutup",
   "Could not update the saved log in this browser": "Log tersimpan di peramban ini tidak dapat diperbarui",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Globe membutuhkan WebGL, yang dinonaktifkan atau tidak didukung oleh browser atau perangkat ini. Coba browser lain atau aktifkan akselerasi perangkat keras.",
   "unlimited": "tanpa batas",
   "surface": "permukaan",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Catatan per tahun. Seret di atasnya, atau gunakan tombol panah, untuk memilih rentang tahun; klik dua kali atau tekan Esc untuk menghapus.",
 };

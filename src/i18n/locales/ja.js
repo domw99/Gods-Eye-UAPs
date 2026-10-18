@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "NASA自身によるこの話題の検討は次にあります：",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "上記のNASAのファイルは2026年のPURSUE公開で公表されたものです。他の公式記録と同じくアプリ内で再生できます。",
   "SIMILAR CASES": "類似の事案",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "年ごとの記録。ドラッグして年の範囲を選択、ダブルクリックで解除。",
   "Give the sighting a title": "目撃に題名を付けてください",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "目撃を追加しましたが、このブラウザでは保存できませんでした。ページを閉じると消えます",
   "Could not update the saved log in this browser": "このブラウザに保存した記録を更新できませんでした",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "地球儀にはWebGLが必要ですが、このブラウザまたはデバイスでは無効か非対応です。別のブラウザを試すか、ハードウェアアクセラレーションを有効にしてください。",
   "unlimited": "上限なし",
   "surface": "地表",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "年ごとの記録。ドラッグするか矢印キーで年の範囲を選べます。ダブルクリックまたはEscで解除します。",
 };

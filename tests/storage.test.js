@@ -53,3 +53,18 @@ describe('storage helper', () => {
     expect(localStorage.getItem('ll2:window:14:30')).toBeNull();
   });
 });
+
+describe('the sighting log across tabs', () => {
+  it('saves what the browser holds now plus this tab’s unsaved entries, so another tab’s changes are not undone', async () => {
+    const { currentLog, isLogEntry } = await import('../src/data/items.js');
+    const e = (id) => ({ id, date: '2020-01-01T00:00:00Z', lat: 1, lon: 2 });
+    // Another tab added c and deleted b since this tab loaded [a, b].
+    expect(currentLog([e('a'), e('c')], [e('a'), e('b')], new Set()).map((u) => u.id)).toEqual(['a', 'c']);
+    // An entry this tab could not store stays, once.
+    expect(currentLog([e('a')], [e('a'), e('x')], new Set(['x'])).map((u) => u.id)).toEqual(['a', 'x']);
+    expect(currentLog([e('a'), e('x')], [e('x')], new Set(['x'])).map((u) => u.id)).toEqual(['a', 'x']);
+    expect(isLogEntry({ ...e('t'), title: 5 })).toBe(false);
+    expect(isLogEntry({ ...e('t'), title: 'My light' })).toBe(true);
+    expect(isLogEntry(e('t'))).toBe(true);
+  });
+});

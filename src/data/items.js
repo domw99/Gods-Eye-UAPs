@@ -72,8 +72,18 @@ export function officialToItem(o) {
 export function isLogEntry(u) {
   return Boolean(
     u && typeof u === 'object' && typeof u.id === 'string' && typeof u.date === 'string' && !Number.isNaN(Date.parse(u.date)) &&
-      Number.isFinite(u.lat) && Number.isFinite(u.lon) && Math.abs(u.lat) <= 90 && Math.abs(u.lon) <= 180,
+      Number.isFinite(u.lat) && Number.isFinite(u.lon) && Math.abs(u.lat) <= 90 && Math.abs(u.lon) <= 180 &&
+      (u.title === undefined || typeof u.title === 'string'), // a title that is not text would stop the app when the entry is opened
   );
+}
+
+/**
+ * The log as it should be saved: what the browser holds now (another tab may have added or deleted entries since this one loaded),
+ * plus the entries this tab could not store (`unsavedIds`), which are in no one's copy but this tab's memory.
+ */
+export function currentLog(stored, memory, unsavedIds) {
+  const have = new Set(stored.map((u) => u.id));
+  return [...stored, ...memory.filter((u) => unsavedIds.has(u.id) && !have.has(u.id))];
 }
 
 export function userToItem(u) {

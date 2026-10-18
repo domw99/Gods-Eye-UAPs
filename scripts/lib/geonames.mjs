@@ -143,8 +143,11 @@ export function regionCentroid(gz, key) {
 
 /** Map a region token ("Florida", "Calif", "N-M", "Japan") to a key. */
 export function resolveRegionToken(gz, token) {
-  const n = norm(token).replace(/(area|vicinity|region)$/, '');
+  let n = norm(token).replace(/(area|vicinity|region)$/, '');
   if (!n) return null;
+  // "N-Carolina", "S-Carolina" and "EOfSouthCarolina": the name of the state, with a direction or an "east of" in front of it, not the town of Carolina in Puerto Rico.
+  const carolina = n.match(/(north|south|n|s)carolina$/);
+  if (carolina) n = `${carolina[1].startsWith('n') ? 'north' : 'south'}carolina`;
   if (US_STATES[n]) return { key: `US.${US_STATES[n].code}`, label: US_STATES[n].name, cc: 'US' };
   if (REGION_ALIASES[n]) return REGION_ALIASES[n];
   const country = gz.countries.get(n);

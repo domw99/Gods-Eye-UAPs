@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "इस विषय पर NASA का अपना काम यहाँ है:",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "ऊपर की NASA फ़ाइलें 2026 की PURSUE रिलीज़ में जारी की गई थीं; वे ऐप में अन्य आधिकारिक रिकॉर्ड की तरह चलती हैं।",
   "SIMILAR CASES": "मिलते-जुलते मामले",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "वर्ष के अनुसार रिकॉर्ड। वर्षों की सीमा चुनने के लिए खींचें; साफ़ करने के लिए डबल-क्लिक करें।",
   "Give the sighting a title": "दृश्य को एक शीर्षक दें",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "दृश्य जोड़ा गया, पर यह ब्राउज़र उसे सहेज नहीं सका: पेज बंद करते ही वह चला जाएगा",
   "Could not update the saved log in this browser": "इस ब्राउज़र में सहेजा गया लॉग अपडेट नहीं हो सका",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "ग्लोब को WebGL चाहिए, जो इस ब्राउज़र या डिवाइस में बंद है या समर्थित नहीं है। कोई दूसरा ब्राउज़र आज़माएँ या हार्डवेयर एक्सेलेरेशन चालू करें।",
   "unlimited": "असीमित",
   "surface": "सतह",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "वर्ष के अनुसार रिकॉर्ड। वर्षों की सीमा चुनने के लिए इस पर खींचें या तीर कुंजियाँ इस्तेमाल करें; हटाने के लिए डबल-क्लिक करें या Esc दबाएँ।",
 };

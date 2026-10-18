@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "Die NASA selbst behandelt das Thema auf",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Die oben genannten NASA-Dateien stammen aus den PURSUE-Freigaben von 2026; sie lassen sich in der App wie die übrigen offiziellen Akten abspielen.",
   "SIMILAR CASES": "ÄHNLICHE FÄLLE",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Einträge pro Jahr. Ziehen, um einen Zeitraum zu wählen; Doppelklick zum Löschen.",
   "Give the sighting a title": "Gib der Sichtung einen Titel",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "Sichtung hinzugefügt, aber dieser Browser konnte sie nicht speichern: Sie ist weg, sobald du die Seite schließt",
   "Could not update the saved log in this browser": "Das gespeicherte Protokoll in diesem Browser konnte nicht aktualisiert werden",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Der Globus braucht WebGL, das dieser Browser oder dieses Gerät abgeschaltet hat oder nicht unterstützt. Probieren Sie einen anderen Browser oder aktivieren Sie die Hardwarebeschleunigung.",
   "unlimited": "unbegrenzt",
   "surface": "Boden",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Datensätze pro Jahr. Darüber ziehen oder die Pfeiltasten nutzen, um Jahre auszuwählen; Doppelklick oder Esc hebt die Auswahl auf.",
 };

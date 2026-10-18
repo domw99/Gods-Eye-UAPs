@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "NASA’s eigen kijk op het onderwerp staat op",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "De NASA-bestanden hierboven zijn die uit de PURSUE-vrijgaves van 2026; ze spelen af in de app zoals de andere officiële dossiers.",
   "SIMILAR CASES": "VERGELIJKBARE ZAKEN",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Records per jaar. Sleep om een reeks jaren te kiezen; dubbelklik om te wissen.",
   "Give the sighting a title": "Geef de waarneming een titel",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "Waarneming toegevoegd, maar deze browser kon haar niet opslaan: ze verdwijnt zodra je de pagina sluit",
   "Could not update the saved log in this browser": "Het opgeslagen logboek in deze browser kon niet worden bijgewerkt",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "De globe heeft WebGL nodig, dat deze browser of dit apparaat heeft uitgezet of niet ondersteunt. Probeer een andere browser of schakel hardwareversnelling in.",
   "unlimited": "onbeperkt",
   "surface": "grondniveau",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Records per jaar. Sleep erover, of gebruik de pijltjestoetsen, om jaren te kiezen; dubbelklik of Esc wist de keuze.",
 };

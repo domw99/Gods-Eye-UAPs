@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "Собственный взгляд NASA на тему — на",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Приведённые выше файлы NASA опубликованы в рамках релизов PURSUE 2026 года; они воспроизводятся в приложении, как и другие официальные записи.",
   "SIMILAR CASES": "ПОХОЖИЕ СЛУЧАИ",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Записи по годам. Проведите, чтобы выбрать период; двойной щелчок — сбросить.",
   "Give the sighting a title": "Дайте наблюдению название",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "Наблюдение добавлено, но браузер не смог его сохранить: оно исчезнет при закрытии страницы",
   "Could not update the saved log in this browser": "Не удалось обновить сохранённый журнал в этом браузере",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Для глобуса нужен WebGL, который в этом браузере или на этом устройстве отключён или не поддерживается. Попробуйте другой браузер или включите аппаратное ускорение.",
   "unlimited": "без ограничения",
   "surface": "поверхность",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Записи по годам. Проведите по графику или используйте стрелки, чтобы выбрать период; двойной щелчок или Esc сбрасывает выбор.",
 };

@@ -677,7 +677,6 @@ export default {
   "NASA’s own look at the subject is at": "NASA’nın konuya kendi bakışı şurada:",
   "The NASA files above are the ones released in the 2026 PURSUE releases; they play in the app like the other official records.": "Yukarıdaki NASA dosyaları 2026 PURSUE yayınlarında paylaşılanlardır; uygulamada diğer resmî kayıtlar gibi oynatılır.",
   "SIMILAR CASES": "BENZER VAKALAR",
-  "Records by year. Drag across it to choose a range of years; double-click to clear.": "Yıla göre kayıtlar. Yıl aralığı seçmek için sürükleyin; temizlemek için çift tıklayın.",
   "Give the sighting a title": "Gözleme bir başlık verin",
   "Sighting added, but this browser could not store it: it will be gone when you close the page": "Gözlem eklendi ama bu tarayıcı onu saklayamadı: sayfayı kapattığınızda kaybolacak",
   "Could not update the saved log in this browser": "Bu tarayıcıdaki kayıtlı günlük güncellenemedi",
@@ -1166,4 +1165,5 @@ export default {
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Küre, bu tarayıcıda veya cihazda kapalı olan ya da desteklenmeyen WebGL’e ihtiyaç duyar. Başka bir tarayıcı deneyin veya donanım hızlandırmayı açın.",
   "unlimited": "sınırsız",
   "surface": "yüzey",
+  "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Yıllara göre kayıtlar. Yıl aralığı seçmek için üzerinde sürükleyin ya da ok tuşlarını kullanın; temizlemek için çift tıklayın veya Esc'ye basın.",
 };

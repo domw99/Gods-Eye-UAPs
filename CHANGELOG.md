@@ -2,6 +2,16 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.3] — 2026-10-18
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.3)
+
+**Three loose ends from the 2.2 audit, closed.**
+
+- **The years bar works from the keyboard.** Focus it and use the arrow keys to move the range, <kbd>Shift</kbd> + arrows for its later end, <kbd>Alt</kbd> + arrows for its earlier end, <kbd>PageUp</kbd> and <kbd>PageDown</kbd> for ten years, <kbd>Home</kbd> and <kbd>End</kbd> for the ends of the record, and <kbd>Esc</kbd> to clear. A screen reader hears it as a slider with its range.
+- **Two open tabs no longer overwrite each other's sighting log.** A save now starts from what the browser holds, so an entry added or deleted in another tab is kept, and a tab shows the other's changes as they happen. A log entry whose title is not text no longer stops the app when it is opened.
+- **Blue Book files named "N-Carolina", "S-Carolina" or "East of South Carolina"** are placed in the Carolinas, not in the town of Carolina in Puerto Rico (eight files: Greenville, Clemson, Sullivan's Island, Fort Bragg, Pope AFB, Winston-Salem and two states).
+
 ## [2.2] — 2026-10-18
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.2)

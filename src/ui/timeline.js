@@ -117,6 +117,11 @@ export function createTimeline({ onPlayToggle }) {
       g.fillText(text, tx + 5, pad.t + 11);
     }
     label.textContent = state.yearRange ? `${state.yearRange[0]} – ${state.yearRange[1]}` : t('ALL YEARS');
+    // The brush as a slider for a screen reader: its end year, and the whole range in words.
+    canvas.setAttribute('aria-valuemin', String(YEAR_MIN));
+    canvas.setAttribute('aria-valuemax', String(YEAR_MAX));
+    canvas.setAttribute('aria-valuenow', String(state.yearRange ? state.yearRange[1] : YEAR_MAX));
+    canvas.setAttribute('aria-valuetext', label.textContent);
   }
 
   function inRange(year) {
@@ -156,6 +161,15 @@ export function createTimeline({ onPlayToggle }) {
   // A cancelled touch never sends pointerup; without this the brush stayed live.
   canvas.addEventListener('pointercancel', endDrag);
   canvas.addEventListener('lostpointercapture', endDrag);
+  // From the keyboard: arrows move the range (Shift moves its later end, Alt its earlier end, PageUp and PageDown by ten years), Home and End jump to the start and the end of the record, Escape clears.
+  canvas.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
+    const range = keyedRange(e, state.yearRange);
+    if (range === undefined) return;
+    e.preventDefault();
+    e.stopPropagation(); // Escape would otherwise also close the case file beside it
+    update({ yearRange: range }, 'yearRange');
+  });
   canvas.addEventListener('dblclick', () => update({ yearRange: null }, 'yearRange'));
   document.getElementById('tl-play').addEventListener('click', onPlayToggle);
   new ResizeObserver(resize).observe(canvas);
@@ -205,4 +219,27 @@ export function countByYear(years) {
   const out = new Array(N).fill(0);
   for (const y of years) if (y != null) out[Math.max(0, Math.min(N - 1, y - YEAR_MIN))]++;
   return out;
+}
+
+/**
+ * The year range after a key on the brush: a new [from, to], null to clear, or undefined for a key it does not use.
+ * With no range yet, an arrow starts a ten-year one at the end it points away from.
+ */
+export function keyedRange(e, range, min = YEAR_MIN, max = YEAR_MAX) {
+  const clamp = (y) => Math.max(min, Math.min(max, y));
+  const step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 10, PageDown: -10 }[e.key];
+  if (e.key === 'Escape' || e.key === 'Delete' || e.key === 'Backspace') return range ? null : undefined;
+  if (e.key === 'Home') return range ? [min, Math.max(min, range[1] - (range[0] - min))] : [min, min + 9];
+  if (e.key === 'End') return range ? [Math.min(max, range[0] + (max - range[1])), max] : [max - 9, max];
+  if (!step) return undefined;
+  if (!range) return step > 0 ? [min, min + 9] : [max - 9, max];
+  let [a, b] = range;
+  if (e.shiftKey) b = Math.max(a, clamp(b + step));
+  else if (e.altKey) a = Math.min(b, clamp(a + step));
+  else {
+    const width = b - a;
+    a = Math.max(min, Math.min(max - width, a + step));
+    b = a + width;
+  }
+  return [a, b];
 }

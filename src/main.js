@@ -7,7 +7,7 @@ import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, pl
 import { fmtDate } from './util/when.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
 import { CASES } from './data/cases/index.js';
-import { CASE_ITEMS, loadOfficial, userToItem, isLogEntry } from './data/items.js';
+import { CASE_ITEMS, loadOfficial, userToItem, isLogEntry, currentLog } from './data/items.js';
 import { onThisDay } from './data/onthisday.js';
 import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
@@ -1562,9 +1562,14 @@ function saveUserLog(list) {
     }
   }
 }
+// Entries this tab could not store (a full or blocked browser store): only the page's memory has them.
+const unsavedLog = new Set();
+/** The log now: what the browser holds (other tabs write to it too), and this tab's unsaved entries. */
+const freshLog = () => currentLog(loadUserLog(), userItems.map((u) => u.ref), unsavedLog);
 function addUser(entry) {
-  const list = [...userItems.map((u) => u.ref), entry];
+  const list = [...freshLog(), entry];
   const stored = saveUserLog(list);
+  for (const u of list) stored ? unsavedLog.delete(u.id) : unsavedLog.add(u.id);
   userItems = list.map(userToItem);
   itemLayer.setItems(allItems());
   if (!state.layers.user) setLayer('user', true);
@@ -1573,13 +1578,22 @@ function addUser(entry) {
   toast(stored ? 'Sighting saved in this browser' : 'Sighting added, but this browser could not store it: it will be gone when you close the page', stored ? 2600 : 7000);
 }
 function deleteUser(id) {
-  const list = userItems.map((u) => u.ref).filter((u) => u.id !== id);
+  const list = freshLog().filter((u) => u.id !== id);
+  unsavedLog.delete(id);
   if (!saveUserLog(list)) toast('Could not update the saved log in this browser');
   userItems = list.map(userToItem);
   itemLayer.setItems(allItems());
   deselect();
   refresh();
 }
+// Another tab changed the log: show its version.
+window.addEventListener('storage', (e) => {
+  if (e.key !== LOG_KEY && e.key !== null) return;
+  userItems = freshLog().map(userToItem);
+  itemLayer.setItems(allItems());
+  if (state.selected?.startsWith('user:') && !userItems.some((u) => u.key === state.selected)) deselect();
+  refresh();
+});
 function exportUserLog() {
   const fc = {
     type: 'FeatureCollection',

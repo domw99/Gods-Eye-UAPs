@@ -26,3 +26,24 @@ describe('?view= links', () => {
     expect(parseView('0,0,4.2e7')).not.toBeNull();
   });
 });
+
+describe('the year range from the keyboard', () => {
+  it('moves, widens and clears the range, and starts a ten-year one when there is none', async () => {
+    const { keyedRange } = await import('../src/ui/timeline.js');
+    const key = (k, extra = {}) => ({ key: k, ...extra });
+    expect(keyedRange(key('ArrowRight'), [1990, 1995], 1900, 2030)).toEqual([1991, 1996]);
+    expect(keyedRange(key('ArrowLeft'), [1900, 1905], 1900, 2030)).toEqual([1900, 1905]);
+    expect(keyedRange(key('ArrowRight'), [2025, 2030], 1900, 2030)).toEqual([2025, 2030]);
+    expect(keyedRange(key('ArrowRight', { shiftKey: true }), [1990, 1995], 1900, 2030)).toEqual([1990, 1996]);
+    expect(keyedRange(key('ArrowLeft', { shiftKey: true }), [1990, 1990], 1900, 2030)).toEqual([1990, 1990]);
+    expect(keyedRange(key('ArrowLeft', { altKey: true }), [1990, 1995], 1900, 2030)).toEqual([1989, 1995]);
+    expect(keyedRange(key('PageUp'), [1990, 1995], 1900, 2030)).toEqual([2000, 2005]);
+    expect(keyedRange(key('Home'), [1990, 1995], 1900, 2030)).toEqual([1900, 1905]);
+    expect(keyedRange(key('End'), [1990, 1995], 1900, 2030)).toEqual([2025, 2030]);
+    expect(keyedRange(key('ArrowLeft'), null, 1900, 2030)).toEqual([2021, 2030]);
+    expect(keyedRange(key('ArrowRight'), null, 1900, 2030)).toEqual([1900, 1909]);
+    expect(keyedRange(key('Escape'), [1990, 1995], 1900, 2030)).toBeNull();
+    expect(keyedRange(key('Escape'), null, 1900, 2030)).toBeUndefined(); // Esc with nothing chosen closes the case file as usual
+    expect(keyedRange(key('a'), [1990, 1995], 1900, 2030)).toBeUndefined();
+  });
+});
