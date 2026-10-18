@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "Pochyl widok lub znów patrz prosto w dół",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Nowość: jasne bolidy NASA na globusie i w sprawdzaniu obserwacji oraz przyciski kompasu i pochylenia widoku",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Globus wymaga WebGL, który ta przeglądarka lub to urządzenie ma wyłączony albo nie obsługuje. Spróbuj innej przeglądarki lub włącz akcelerację sprzętową.",
+  "unlimited": "bez ograniczeń",
+  "surface": "powierzchnia ziemi",
 };

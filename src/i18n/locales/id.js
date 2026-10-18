@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "Miringkan tampilan, atau lihat lurus ke bawah lagi",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Baru: bola api terang NASA di globe dan dalam pemeriksaan pengamatan, plus tombol kompas dan kemiringan untuk tampilan",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Globe membutuhkan WebGL, yang dinonaktifkan atau tidak didukung oleh browser atau perangkat ini. Coba browser lain atau aktifkan akselerasi perangkat keras.",
+  "unlimited": "tanpa batas",
+  "surface": "permukaan",
 };

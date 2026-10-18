@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "화면을 기울이거나 다시 바로 아래를 봅니다",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "새 기능: NASA의 밝은 화구가 지구본과 목격 검사에 추가되었고, 화면용 나침반과 기울기 버튼도 생겼습니다",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "지구본에는 WebGL이 필요한데 이 브라우저나 기기에서 꺼져 있거나 지원되지 않습니다. 다른 브라우저를 사용하거나 하드웨어 가속을 켜 보세요.",
+  "unlimited": "제한 없음",
+  "surface": "지표면",
 };

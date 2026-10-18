@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "Inclina la vista, o torna a guardare dall’alto",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Novità: i bolidi luminosi della NASA sul globo e nei controlli degli avvistamenti, e pulsanti bussola e inclinazione per la vista",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Il globo richiede WebGL, che questo browser o dispositivo ha disattivato o non supporta. Prova un altro browser o attiva l’accelerazione hardware.",
+  "unlimited": "illimitato",
+  "surface": "superficie",
 };

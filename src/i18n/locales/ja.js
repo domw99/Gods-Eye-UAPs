@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "視点を傾ける、または再び真下を見る",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新機能：NASAの明るい火球を地球儀と目撃チェックに追加し、表示用のコンパスと傾きボタンも加わりました",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "地球儀にはWebGLが必要ですが、このブラウザまたはデバイスでは無効か非対応です。別のブラウザを試すか、ハードウェアアクセラレーションを有効にしてください。",
+  "unlimited": "上限なし",
+  "surface": "地表",
 };

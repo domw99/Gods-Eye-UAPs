@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "दृश्य झुकाएँ, या फिर सीधे नीचे देखें",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "नया: ग्लोब और अवलोकन जाँच में NASA के चमकीले आग के गोले, और दृश्य के लिए कंपास व झुकाव बटन",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "ग्लोब को WebGL चाहिए, जो इस ब्राउज़र या डिवाइस में बंद है या समर्थित नहीं है। कोई दूसरा ब्राउज़र आज़माएँ या हार्डवेयर एक्सेलेरेशन चालू करें।",
+  "unlimited": "असीमित",
+  "surface": "सतह",
 };

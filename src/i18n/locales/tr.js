@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "Görünümü eğ ya da yeniden dik aşağı bak",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Yeni: NASA’nın parlak ateş topları küre üzerinde ve gözlem denetimlerinde, ayrıca görünüm için pusula ve eğme düğmeleri",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Küre, bu tarayıcıda veya cihazda kapalı olan ya da desteklenmeyen WebGL’e ihtiyaç duyar. Başka bir tarayıcı deneyin veya donanım hızlandırmayı açın.",
+  "unlimited": "sınırsız",
+  "surface": "yüzey",
 };

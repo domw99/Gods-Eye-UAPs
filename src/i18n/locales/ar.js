@@ -1164,4 +1164,6 @@ export default {
   "Tilt the view, or look straight down again": "إمالة العرض أو النظر مجددًا إلى الأسفل مباشرة",
   "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "جديد: كرات ناسا النارية الساطعة على الكرة الأرضية وفي فحوص المشاهدات، مع زرّي البوصلة والإمالة للعرض",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "تحتاج الكرة الأرضية إلى WebGL، وهو معطّل في هذا المتصفح أو الجهاز أو غير مدعوم. جرّب متصفحًا آخر أو فعّل تسريع الأجهزة.",
+  "unlimited": "غير محدود",
+  "surface": "سطح الأرض",
 };

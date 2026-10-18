@@ -1,3 +1,5 @@
+import { t, locale } from '../i18n/index.js';
+
 /**
  * U.S. special-use airspace (FAA), bundled by scripts/build-airspace.mjs.
  * Used for the map layer and to say which military areas a case sits in.
@@ -67,7 +69,7 @@ export function loadAirspace(base = '/') {
   return cache;
 }
 
-export const formatFt = (ft) => (ft >= 99999 ? 'unlimited' : ft === 0 ? 'surface' : ft >= 18000 ? `FL${Math.round(ft / 100)}` : `${ft.toLocaleString()} ft`);
+export const formatFt = (ft) => (ft >= 99999 ? t('unlimited') : ft === 0 ? t('surface') : ft >= 18000 ? `FL${Math.round(ft / 100)}` : `${ft.toLocaleString(locale())} ft`);
 
 /** Is this point anywhere near the dataset (U.S. and territories)? Cheap pre-check. */
 export const nearUS = (lat, lon) => (lon > -180 && lon < -60 && lat > 12 && lat < 83) || (lon > 140 && lon < 180 && lat > 10 && lat < 30); // up to 83°N: the warning areas off the Arctic coast reach 82°N

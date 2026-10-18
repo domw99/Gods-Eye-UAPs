@@ -166,3 +166,22 @@ describe('Commons credits', () => {
     expect(info.license).toBe('CC BY-SA 4.0');
   });
 });
+
+describe('airspace limits in the interface language', () => {
+  it('writes "surface" and "unlimited" in the chosen language and the feet with its digits', async () => {
+    vi.stubGlobal('document', { documentElement: { dataset: {} }, body: null });
+    const { setLanguage } = await import('../src/i18n/index.js');
+    const { formatFt } = await import('../src/services/airspace.js');
+    try {
+      await setLanguage('fr', { save: false });
+      expect(formatFt(0)).toBe('surface');
+      expect(formatFt(99999)).toBe('illimité');
+      await setLanguage('de', { save: false });
+      expect(formatFt(0)).toBe('Boden');
+      expect(formatFt(12500)).toBe('12.500 ft');
+    } finally {
+      await setLanguage('en', { save: false });
+    }
+    expect(formatFt(12500)).toBe('12,500 ft');
+  });
+});
