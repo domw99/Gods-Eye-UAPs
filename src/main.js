@@ -2185,6 +2185,8 @@ document.getElementById('btn-map').addEventListener('click', () => {
     render.request();
     document.getElementById('btn-tour').textContent = tourTimer ? t('■ STOP') : t('▶ TOUR');
     redrawDossier(); // the open record's text was written in the old language
+    shownTilt = null; // the tilt button's title was written in code, so write it again
+    viewer.scene.requestRender();
   });
 }
 

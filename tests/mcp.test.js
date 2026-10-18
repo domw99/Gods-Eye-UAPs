@@ -145,6 +145,12 @@ describe('fireballs and links to the globe', () => {
     expect(r.record).toMatch(/does not rule/);
   });
 
+  it('reads a time with no zone as UTC, whatever zone the server is in', () => {
+    const at = (when) => fireballsNearTool({ lat: 55.2, lon: 61.4, when, hours: 1 });
+    expect(at('2013-02-15T03:30:00').total).toBe(1);
+    expect(at('2013-02-15 03:30').when).toBe('2013-02-15T03:30:00.000Z');
+  });
+
   it('says what is wrong with a missing place or time, through the protocol', () => {
     expect(() => fireballsNearTool({ lat: 1, lon: 1 })).toThrow(/when is required/);
     const reply = callTool('fireballs_near', { lat: 1, lon: 1, when: 'yesterday-ish' });

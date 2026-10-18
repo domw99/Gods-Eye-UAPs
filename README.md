@@ -349,6 +349,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>T</kbd> | Guided tour | <kbd>L</kbd> | Log a sighting |
 | <kbd>R</kbd> | Reset view (whole globe, north up) | <kbd>+</kbd> <kbd>−</kbd> | Zoom toward the centre |
 | <kbd>N</kbd> | Near me | <kbd>S</kbd> | Statistics |
+| <kbd>B</kbd> | North up (turn the view so north is at the top) | <kbd>P</kbd> | Tilt the view, or look straight down again |
 | <kbd>K</kbd> | Space & Moon | <kbd>U</kbd> | Switch between the Earth and the Moon (on the Moon: arrows turn, <kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> reset, <kbd>N</kbd> names) |
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |

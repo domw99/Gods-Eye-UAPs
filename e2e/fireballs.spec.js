@@ -74,6 +74,11 @@ test.describe('Compass and tilt', () => {
     await expect(tilt).toHaveAttribute('aria-pressed', 'true', { timeout: 10_000 });
     const pitch = () => page.evaluate(() => (window.__uap.viewer.camera.pitch * 180) / Math.PI);
     await expect.poll(pitch, { timeout: 10_000 }).toBeGreaterThan(-60);
+    // The title is written in code, so it follows a change of language.
+    await page.selectOption('#lang', 'de');
+    await expect(tilt).toHaveAttribute('title', /^Gekippt/);
+    await page.selectOption('#lang', 'en');
+    await expect(tilt).toHaveAttribute('title', /^Tilted/);
     await tilt.click();
     await expect(tilt).toHaveAttribute('aria-pressed', 'false', { timeout: 10_000 });
     await expect.poll(pitch, { timeout: 10_000 }).toBeLessThan(-85);
