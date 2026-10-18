@@ -1640,8 +1640,8 @@ async function explainSighting({ date, lat, lon, report }) {
   if (weather) checked.push(t('wind and cloud'));
   checked.push(airfields ? t('airfields within 80 km') : t('aircraft: not checkable'));
   if (aurora) checked.push(t('geomagnetic activity (Kp)'));
+  else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.')); // the note belongs to the Kp check, not to the fireballs line below
   if (fireballs) checked.push(t('fireballs in NASA’s record'));
-  else if (when.getUTCFullYear() >= 1932) notes.push(t('Geomagnetic activity is not in the bundled record for this date.'));
   return { candidates: rankCandidates({ report, sky, satellites, launches, weather, airfields, aurora, fireballs }), checked, notes };
 }
 

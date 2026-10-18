@@ -146,7 +146,8 @@ export function fireballsNearTool(args = {}, rows = fireballData()) {
   const lat = num(args.lat);
   const lon = num(args.lon);
   if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new ArgError('lat (-90 to 90) and lon (-180 to 180) are required');
-  const when = new Date(args.when);
+  // The tool says UTC, but a date and time without an offset is read as local time, which moves the window by the server's offset.
+  const when = new Date(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(String(args.when ?? '').trim()) ? `${String(args.when).trim().replace(' ', 'T')}Z` : args.when);
   if (!args.when || Number.isNaN(when.getTime())) throw new ArgError('when is required, as a date and time such as "2013-02-15T03:30:00Z"');
   const hours = num(args.hours) ?? 3;
   const radius = num(args.radius_km) ?? 600;

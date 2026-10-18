@@ -74,6 +74,11 @@ describe('the elements the code looks up', () => {
 
   it('finds them all', () => expect(looked.length).toBeGreaterThan(80));
 
+  it('says the Kp record is missing only when the Kp check came back empty, not for a missing fireball record', () => {
+    const main = readFileSync('src/main.js', 'utf8');
+    expect(main).toMatch(/if \(aurora\) checked\.push\(t\('geomagnetic activity \(Kp\)'\)\);\n\s*else if \(when\.getUTCFullYear\(\) >= 1932\) notes\.push\(t\('Geomagnetic activity is not in the bundled record/);
+  });
+
   it('has every id in index.html or in markup that the code builds', () => {
     const missing = looked.filter(([, id]) => !page.includes(`id="${id}"`) && !built.has(id)).map(([file, id]) => `${file}: #${id}`);
     expect(missing).toEqual([]);
