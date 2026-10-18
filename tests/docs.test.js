@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { CASES } from '../src/data/cases/index.js';
+import { STATUS } from '../src/data/taxonomy.js';
 
 const ONES = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
@@ -19,6 +20,14 @@ describe('the numbers the known-issues page quotes', () => {
 
   it('say how many cases have an approximate time of day', () => {
     expect(text).toContain(`${words(CASES.filter((c) => c.timeApprox).length)} older cases record only a date or part of a day`);
+  });
+});
+
+describe('CONTRIBUTING.md', () => {
+  it('lists the statuses a case can have, all of them and no other', () => {
+    const line = readFileSync('CONTRIBUTING.md', 'utf8').split('\n').find((l) => l.includes('an `explanation` for anything that is not `unresolved`'));
+    const named = [...line.matchAll(/`([a-z]+)`/g)].map((m) => m[1]).filter((w) => w !== 'status' && w !== 'explanation');
+    expect([...new Set(named)].sort()).toEqual(Object.keys(STATUS).sort());
   });
 });
 
