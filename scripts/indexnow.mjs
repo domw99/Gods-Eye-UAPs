@@ -7,7 +7,7 @@
  *
  *   node scripts/indexnow.mjs
  */
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { siteUrl } from './lib/site.mjs';
@@ -18,7 +18,7 @@ const SITE = siteUrl();
 async function main() {
   const file = (await readdir(path.join(ROOT, 'public'))).find((f) => /^[a-f0-9]{32}\.txt$/.test(f));
   if (!file) throw new Error('No IndexNow key file in public/');
-  const key = (await readFile(path.join(ROOT, 'public', file), 'utf8')).trim();
+  const key = file.slice(0, -4);
   const xml = await (await fetch(`${SITE}sitemap.xml`)).text();
   const urlList = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   if (!urlList.length) throw new Error(`No URLs in ${SITE}sitemap.xml`);

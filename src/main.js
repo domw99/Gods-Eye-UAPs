@@ -2479,18 +2479,18 @@ const params = new URLSearchParams(location.search);
  * ?open=<what> opens one of the app's screens on load: the targets of the
  * installed app's shortcuts and of links that say "check your sighting here".
  */
-const OPEN_TARGETS = {
-  explain: () => openExplainNow(),
-  stats: () => openStatsNow(),
-  files: () => openFiles(),
-  space: () => openSpaceNow(),
-  log: () => openLog(),
-  about: () => openAboutModal(),
-  tour: () => startTour(),
-  random: () => surpriseMe(),
-  surprise: () => surpriseMe(),
-};
-const openTarget = Object.keys(OPEN_TARGETS).includes(params.get('open')) ? OPEN_TARGETS[params.get('open')] : null;
+const OPEN_TARGETS = new Map([
+  ['explain', () => openExplainNow()],
+  ['stats', () => openStatsNow()],
+  ['files', () => openFiles()],
+  ['space', () => openSpaceNow()],
+  ['log', () => openLog()],
+  ['about', () => openAboutModal()],
+  ['tour', () => startTour()],
+  ['random', () => surpriseMe()],
+  ['surprise', () => surpriseMe()],
+]);
+const openTarget = OPEN_TARGETS.get(params.get('open'));
 if (params.get('mode')) setMode(params.get('mode'));
 if (params.get('layers'))
   for (const l of params.get('layers').split(',')) if (Object.hasOwn(state.layers, l)) setLayer(l, true);

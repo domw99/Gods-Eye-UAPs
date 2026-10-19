@@ -10,7 +10,7 @@
  *
  *   node scripts/build-nuforc.mjs
  */
-import { mkdir, readFile, writeFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,7 +23,8 @@ const SRC =
 async function cached(name, url) {
   const file = path.join(CACHE, name);
   try {
-    if ((await stat(file)).size > 0) return readFile(file, 'utf8');
+    const cached = await readFile(file, 'utf8');
+    if (cached.length > 0) return cached;
   } catch {}
   console.log(`Downloading ${url}`);
   const res = await fetch(url);

@@ -18,7 +18,7 @@
  *
  *   node scripts/build-journals.mjs [--offline]
  */
-import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import path from 'node:path';
 import { ROOT, CACHE, UA, cached, loadGazetteer } from './lib/geonames.mjs';
@@ -126,10 +126,20 @@ export function pagesFromDjvuXml(xml) {
     s.replace(/&(#x?[0-9a-f]+|amp|lt|gt|quot|apos);/gi, (_, e) =>
       e[0] === '#' ? String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : +e.slice(1)) : { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }[e.toLowerCase()],
     );
+  const text = (s) => {
+    let out = '';
+    let inTag = false;
+    for (const c of s) {
+      if (c === '<') inTag = true;
+      else if (c === '>') inTag = false;
+      else if (!inTag) out += c;
+    }
+    return out;
+  };
   return (xml.match(/<OBJECT[\s\S]*?<\/OBJECT>/g) || []).map((obj) =>
     clean(
       (obj.match(/<LINE>[\s\S]*?<\/LINE>/g) || [])
-        .map((line) => (line.match(/<WORD[^>]*>([\s\S]*?)<\/WORD>/g) || []).map((w) => ent(w.replace(/<[^>]+>/g, ''))).join(' '))
+        .map((line) => (line.match(/<WORD[^>]*>([\s\S]*?)<\/WORD>/g) || []).map((w) => text(ent(w))).join(' '))
         .join('\n'),
     ),
   );
@@ -172,7 +182,8 @@ async function fetchBuf(url) {
 async function readPages(is) {
   const file = path.join(CACHE, 'journals', `${is.id.replace(/[^\w.-]+/g, '_')}.pages.json.gz`);
   try {
-    if ((await stat(file)).size > 0) return JSON.parse(gunzipSync(await readFile(file)));
+    const cached = await readFile(file);
+    if (cached.length > 0) return JSON.parse(gunzipSync(cached));
   } catch {}
   const base = `https://archive.org/download/${encodeURIComponent(is.item)}/${encodeURIComponent(is.file)}`;
   let pages;

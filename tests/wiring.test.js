@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseNearHash } from '../src/app/links.js';
 import { isLogEntry } from '../src/data/items.js';
@@ -58,11 +58,11 @@ describe('the saved stars', () => {
 
 describe('the elements the code looks up', () => {
   const read = (dir, out = []) => {
-    for (const name of readdirSync(dir)) {
-      const path = join(dir, name);
-      if (statSync(path).isDirectory()) {
-        if (!/i18n|data$/.test(path)) read(path, out);
-      } else if (path.endsWith('.js')) out.push([path, readFileSync(path, 'utf8')]);
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!/(i18n|data)$/.test(path)) read(path, out);
+      } else if (entry.isFile() && path.endsWith('.js')) out.push([path, readFileSync(path, 'utf8')]);
     }
     return out;
   };
