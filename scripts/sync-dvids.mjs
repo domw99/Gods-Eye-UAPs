@@ -65,14 +65,14 @@ async function fetchText(url, attempt = 0) {
 const decode = (s) =>
   s
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;|&apos;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&amp;/g, '&')
+    .replace(/[<>]/g, '')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();

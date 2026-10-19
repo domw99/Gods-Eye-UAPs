@@ -34,7 +34,17 @@ const decodeEntities = (s) =>
     const code = name[1] === 'x' || name[1] === 'X' ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10);
     return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
   });
-const stripTags = (s) => decodeEntities(String(s || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
+const stripHtmlTags = (s) => {
+  let text = '';
+  let inTag = false;
+  for (const c of s) {
+    if (c === '<') inTag = true;
+    else if (c === '>') inTag = false;
+    else if (!inTag) text += c;
+  }
+  return text;
+};
+const stripTags = (s) => decodeEntities(stripHtmlTags(String(s || ''))).replace(/\s+/g, ' ').trim();
 
 export async function wikiSummary(title) {
   const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`;

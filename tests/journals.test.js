@@ -36,6 +36,11 @@ describe('research archive build', () => {
     const xml = `<DjVuXML><BODY><OBJECT><LINE><WORD>Saw</WORD><WORD>a</WORD><WORD>light</WORD></LINE><LINE><WORD>AT&amp;T</WORD></LINE></OBJECT><OBJECT><LINE><WORD>Page&#32;2</WORD></LINE></OBJECT></BODY></DjVuXML>`;
     expect(pagesFromDjvuXml(xml)).toEqual(['Saw a light AT&T', 'Page 2']);
   });
+
+  it('does not turn encoded markup in OCR text into markup', () => {
+    const xml = '<DjVuXML><OBJECT><LINE><WORD>&lt;script&gt;alert(1)&lt;/script&gt;</WORD></LINE></OBJECT></DjVuXML>';
+    expect(pagesFromDjvuXml(xml)).toEqual(['alert(1)']);
+  });
 });
 
 describe('archive page links', () => {
