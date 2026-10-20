@@ -40,6 +40,10 @@ export const hasIonToken = () => Boolean(ION_TOKEN);
 export const ESRI_CREDIT =
   'Powered by Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community';
 
+// Imagery, terrain and 3D tiles come from servers that speak HTTP/2, which carries many requests on one connection: the default of six at a time
+// leaves a zoomed-in view waiting on its own queue.
+Cesium.RequestScheduler.maximumRequestsPerServer = 18;
+
 async function createBaseLayer() {
   try {
     const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(

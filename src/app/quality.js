@@ -36,6 +36,8 @@ export function deviceProfile() {
     // Imagery detail: lower is sharper (more tiles). High-DPI screens get finer tiles.
     screenSpaceError: low ? 2 : dpr >= 1.5 ? 1.25 : 1.5,
     tileCache: low ? 250 : 600,
+    // While the view moves, coarser tiles are asked for (a third fewer on screen), so the request queue holds only what the settled view needs.
+    motionScreenSpaceError: (low ? 2 : dpr >= 1.5 ? 1.25 : 1.5) * 1.5,
   };
 }
 
@@ -86,6 +88,7 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
   let settle = 0;
   const sharpen = () => {
     settle = 0;
+    scene.globe.maximumScreenSpaceError = profile.screenSpaceError; // the settled view asks for its finest tiles now
     if (viewer.resolutionScale !== sharpScale) {
       viewer.resolutionScale = sharpScale;
       scene.requestRender();
@@ -103,6 +106,7 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
     clearTimeout(settle);
     settle = setTimeout(sharpen, SETTLE_MS);
     if (viewer.resolutionScale !== scale) viewer.resolutionScale = scale;
+    if (moved && profile.motionScreenSpaceError && scene.globe.maximumScreenSpaceError !== profile.motionScreenSpaceError) scene.globe.maximumScreenSpaceError = profile.motionScreenSpaceError;
     if (dt > 250) return; // the first frame of a new motion: no frame time to judge yet
     if (dt > 34) {
       slow += dt > 80 ? 3 : 1;

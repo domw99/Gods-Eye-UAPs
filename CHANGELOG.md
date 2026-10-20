@@ -2,6 +2,16 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.4] — 2026-10-20
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.4)
+
+**Faster map tiles when you zoom in.**
+
+- **More tiles at once.** Imagery, terrain and 3D tiles come from servers that carry many requests on one connection, but the app asked for only six at a time, so a zoomed-in view waited on its own queue. It now asks for eighteen.
+- **Coarser tiles while you move, the finest when you stop.** During a zoom, pan or turn the app asks for fewer, larger tiles, so the queue holds only what the settled view needs; a third of a second after the motion stops it asks for the full detail. A still view and a flight-path playback are unchanged.
+- **A head start on the map servers.** The page opens its connections to the imagery and terrain servers while the app is still loading.
+
 ## [2.3] — 2026-10-18
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.3)

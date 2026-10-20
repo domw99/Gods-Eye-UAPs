@@ -51,3 +51,11 @@ describe('shortestTurn (the compass turns the short way round)', () => {
     expect(shortestTurn(0, 0)).toBeCloseTo(0);
   });
 });
+
+describe('tile detail while the view moves', () => {
+  it('asks for coarser tiles in motion than at rest, for every kind of device', async () => {
+    const { deviceProfile } = await import('../src/app/quality.js');
+    const p = deviceProfile();
+    expect(p.motionScreenSpaceError).toBeGreaterThan(p.screenSpaceError);
+  });
+});
