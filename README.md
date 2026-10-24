@@ -284,7 +284,7 @@ The pins are placed by a mapping fitted to known craters on the photograph (Greg
 
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
-On phones and tablets the buttons are sized for a finger (44 px), and the layout holds up with the phone held sideways.
+On phones and tablets the buttons are sized for a finger, and the layout holds up with the phone held sideways (the top bar keeps to two rows). Playing a flight path clears the screen down to the globe and a slim playback bar (**DETAILS** brings the panels back), the phone's Back button closes an open dialog, and the on-screen keyboard no longer covers the field you are typing in.
 
 <a href="docs/media/whats-new-1.2.mp4"><img src="docs/media/whats-new-1.2.webp" alt="What's new in 1.2: the Noir and Snow sensor looks, the day, night and off lighting switch in the top bar, the years bar hiding, a case file switching between Japanese and Russian, live earthquakes along the US west coast, and one of the 12 new cases" width="100%" /></a>
 
