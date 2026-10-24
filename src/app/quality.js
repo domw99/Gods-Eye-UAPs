@@ -17,7 +17,20 @@ import * as Cesium from 'cesium';
 export const lessMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
 const IDLE_MS = 500; // a slow heartbeat catches anything that changed without asking
+const QUIET_MS = 15_000; // after this long with no other frame, nothing is settling any more:
+const QUIET_EVERY = 4; // the heartbeat slows to one frame in four (every 2 s)
 const SETTLE_MS = 350; // this long after the last moving frame, draw a sharp one
+
+/**
+ * Whether heartbeat number `tick` should draw a frame, `quietMs` after the
+ * last frame drawn for any other reason. Late changes (an image or a font
+ * arriving, an entity changed without asking) come soon after something
+ * happened, so the full rate is kept then; a globe left still while someone
+ * reads a case file draws a quarter as often, which saves the GPU and battery.
+ */
+export function heartbeatDue(tick, quietMs) {
+  return quietMs < QUIET_MS || tick % QUIET_EVERY === 0;
+}
 
 export function deviceProfile() {
   const coarse = globalThis.matchMedia?.('(pointer: coarse)').matches ?? false;
@@ -71,9 +84,18 @@ export function createRenderLoop(viewer, profile = deviceProfile()) {
     scene.requestRender();
     if (!raf) raf = requestAnimationFrame(pump);
   };
+  let lastFrame = performance.now(); // the last frame drawn for something other than the heartbeat
+  let beat = false;
+  let tick = 0;
   setInterval(() => {
-    if (!document.hidden) scene.requestRender();
+    if (document.hidden || !heartbeatDue(++tick, performance.now() - lastFrame)) return;
+    beat = true;
+    scene.requestRender();
   }, IDLE_MS);
+  scene.postRender.addEventListener(() => {
+    if (!beat) lastFrame = performance.now();
+    beat = false;
+  });
 
   // Motion resolution: while the view is in motion (camera moving, clock
   // running, an animation pumping) frames use `scale`, which slow frames
