@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Record per anno. Trascina sopra di esso, o usa le frecce, per scegliere un intervallo di anni; doppio clic o Esc per cancellare.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Orbita lentamente attorno al centro dello schermo; da lontano, fai ruotare la Terra",
   "Turning the Earth — press O or touch the globe to stop": "La Terra ruota: premi O o tocca il globo per fermare",
+  "Place search could not be reached; coordinates typed here still work.": "La ricerca dei luoghi non è raggiungibile; le coordinate scritte qui funzionano comunque.",
 };

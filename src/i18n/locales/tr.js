@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Yıllara göre kayıtlar. Yıl aralığı seçmek için üzerinde sürükleyin ya da ok tuşlarını kullanın; temizlemek için çift tıklayın veya Esc'ye basın.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Ekranın ortasında yavaşça dön; uzaktan Dünya’yı döndür",
   "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
+  "Place search could not be reached; coordinates typed here still work.": "Yer araması şu anda erişilemiyor; buraya yazılan koordinatlar yine çalışır.",
 };

@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Catatan per tahun. Seret di atasnya, atau gunakan tombol panah, untuk memilih rentang tahun; klik dua kali atau tekan Esc untuk menghapus.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Mengorbit pelan di sekitar tengah layar; dari jauh, memutar Bumi",
   "Turning the Earth — press O or touch the globe to stop": "Memutar Bumi — tekan O atau sentuh globe untuk berhenti",
+  "Place search could not be reached; coordinates typed here still work.": "Pencarian tempat tidak dapat dijangkau; koordinat yang diketik di sini tetap berfungsi.",
 };

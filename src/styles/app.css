@@ -660,6 +660,7 @@ body.pov #globe::after {
 #place-results button:focus-visible { background: rgba(125, 211, 255, 0.12); }
 #place-results .go { margin-left: auto; font: 600 10px var(--font-mono); letter-spacing: 0.08em; color: var(--accent); }
 #place-results .dim { font-size: 11px; }
+#place-results .offline { padding: 4px 10px; font: 500 11.5px var(--font-sans); color: var(--text-secondary); }
 
 /* ── Weather ─────────────────────────────────────────── */
 .wx-wrap { display: grid; grid-template-columns: 46px 1fr; gap: 10px; align-items: start; }

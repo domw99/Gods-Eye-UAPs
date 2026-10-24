@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Records per jaar. Sleep erover, of gebruik de pijltjestoetsen, om jaren te kiezen; dubbelklik of Esc wist de keuze.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Langzaam rond het midden van het scherm draaien; van ver weg de aarde laten draaien",
   "Turning the Earth — press O or touch the globe to stop": "De aarde draait — druk op O of raak de wereldbol aan om te stoppen",
+  "Place search could not be reached; coordinates typed here still work.": "Zoeken naar plaatsen is niet bereikbaar; hier getypte coördinaten werken nog steeds.",
 };

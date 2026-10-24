@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "연도별 기록. 드래그하거나 화살표 키로 연도 범위를 선택하세요. 두 번 클릭하거나 Esc를 누르면 해제됩니다.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "화면 중앙을 중심으로 천천히 공전, 멀리서는 지구를 자전시킴",
   "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
+  "Place search could not be reached; coordinates typed here still work.": "장소 검색에 연결할 수 없습니다. 여기에 입력한 좌표는 계속 사용할 수 있습니다.",
 };

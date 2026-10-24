@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Записи по годам. Проведите по графику или используйте стрелки, чтобы выбрать период; двойной щелчок или Esc сбрасывает выбор.",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Медленно вращаться вокруг центра экрана; издалека — вращать Землю",
   "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
+  "Place search could not be reached; coordinates typed here still work.": "Поиск мест недоступен; введённые здесь координаты по-прежнему работают.",
 };

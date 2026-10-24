@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "वर्ष के अनुसार रिकॉर्ड। वर्षों की सीमा चुनने के लिए इस पर खींचें या तीर कुंजियाँ इस्तेमाल करें; हटाने के लिए डबल-क्लिक करें या Esc दबाएँ।",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें; दूर से, पृथ्वी को घुमाएँ",
   "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
+  "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
 };

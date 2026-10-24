@@ -1167,4 +1167,5 @@ export default {
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "年ごとの記録。ドラッグするか矢印キーで年の範囲を選べます。ダブルクリックまたはEscで解除します。",
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "画面の中央を中心にゆっくり周回。遠くからは地球を自転させる",
   "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
+  "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
 };
