@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "قرّب أكثر لإمالة العرض",
   "North up: turn the view so north is at the top": "الشمال لأعلى: يدير العرض ليكون الشمال في الأعلى",
   "Tilt the view, or look straight down again": "إمالة العرض أو النظر مجددًا إلى الأسفل مباشرة",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "جديد: كرات ناسا النارية الساطعة على الكرة الأرضية وفي فحوص المشاهدات، مع زرّي البوصلة والإمالة للعرض",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "تحتاج الكرة الأرضية إلى WebGL، وهو معطّل في هذا المتصفح أو الجهاز أو غير مدعوم. جرّب متصفحًا آخر أو فعّل تسريع الأجهزة.",
   "unlimited": "غير محدود",
   "surface": "سطح الأرض",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "الدوران ببطء حول منتصف الشاشة؛ ومن بعيد، تدوير الأرض",
   "Turning the Earth — press O or touch the globe to stop": "الأرض تدور — اضغط O أو المس الكرة للإيقاف",
   "Place search could not be reached; coordinates typed here still work.": "تعذّر الوصول إلى البحث عن الأماكن؛ ولا تزال الإحداثيات المكتوبة هنا تعمل.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "جديد: 13 حالة إضافية، وكرة أرضية أسرع، وأزرار بحجم الإصبع على الهاتف",
 };

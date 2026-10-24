@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Przybliż bardziej, aby pochylić widok",
   "North up: turn the view so north is at the top": "Północ u góry: obraca widok tak, by północ była na górze",
   "Tilt the view, or look straight down again": "Pochyl widok lub znów patrz prosto w dół",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Nowość: jasne bolidy NASA na globusie i w sprawdzaniu obserwacji oraz przyciski kompasu i pochylenia widoku",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Globus wymaga WebGL, który ta przeglądarka lub to urządzenie ma wyłączony albo nie obsługuje. Spróbuj innej przeglądarki lub włącz akcelerację sprzętową.",
   "unlimited": "bez ograniczeń",
   "surface": "powierzchnia ziemi",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Powoli krąż wokół środka ekranu; z daleka obracaj Ziemię",
   "Turning the Earth — press O or touch the globe to stop": "Obracanie Ziemi — naciśnij O lub dotknij globusa, aby zatrzymać",
   "Place search could not be reached; coordinates typed here still work.": "Wyszukiwanie miejsc jest nieosiągalne; wpisane tu współrzędne nadal działają.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Nowość: 13 nowych spraw, szybszy globus i przyciski na miarę palca w telefonie",
 };

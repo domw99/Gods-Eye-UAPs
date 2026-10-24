@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "दृश्य झुकाने के लिए और ज़ूम करें",
   "North up: turn the view so north is at the top": "उत्तर ऊपर: दृश्य को इस तरह घुमाएँ कि उत्तर ऊपर रहे",
   "Tilt the view, or look straight down again": "दृश्य झुकाएँ, या फिर सीधे नीचे देखें",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "नया: ग्लोब और अवलोकन जाँच में NASA के चमकीले आग के गोले, और दृश्य के लिए कंपास व झुकाव बटन",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "ग्लोब को WebGL चाहिए, जो इस ब्राउज़र या डिवाइस में बंद है या समर्थित नहीं है। कोई दूसरा ब्राउज़र आज़माएँ या हार्डवेयर एक्सेलेरेशन चालू करें।",
   "unlimited": "असीमित",
   "surface": "सतह",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें; दूर से, पृथ्वी को घुमाएँ",
   "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
   "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "नया: 13 और मामले, तेज़ ग्लोब, और फ़ोन पर उंगली के आकार के बटन",
 };

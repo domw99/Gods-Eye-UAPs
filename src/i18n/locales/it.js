@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Avvicinati di più per inclinare la vista",
   "North up: turn the view so north is at the top": "Nord in alto: ruota la vista in modo che il nord sia in alto",
   "Tilt the view, or look straight down again": "Inclina la vista, o torna a guardare dall’alto",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Novità: i bolidi luminosi della NASA sul globo e nei controlli degli avvistamenti, e pulsanti bussola e inclinazione per la vista",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Il globo richiede WebGL, che questo browser o dispositivo ha disattivato o non supporta. Prova un altro browser o attiva l’accelerazione hardware.",
   "unlimited": "illimitato",
   "surface": "superficie",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Orbita lentamente attorno al centro dello schermo; da lontano, fai ruotare la Terra",
   "Turning the Earth — press O or touch the globe to stop": "La Terra ruota: premi O o tocca il globo per fermare",
   "Place search could not be reached; coordinates typed here still work.": "La ricerca dei luoghi non è raggiungibile; le coordinate scritte qui funzionano comunque.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Novità: 13 casi in più, un globo più veloce e pulsanti a misura di dito sul telefono",
 };

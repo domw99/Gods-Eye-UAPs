@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "请再放大一些以倾斜视图",
   "North up: turn the view so north is at the top": "正北朝上：旋转视图，使北方位于上方",
   "Tilt the view, or look straight down again": "倾斜视图，或再次垂直向下看",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新增：NASA 的明亮火球出现在地球仪和目击检查中，并为视图添加了指南针和倾斜按钮",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "地球仪需要 WebGL，但此浏览器或设备已关闭或不支持它。请尝试其他浏览器，或开启硬件加速。",
   "unlimited": "无上限",
   "surface": "地表",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "围绕屏幕中心缓慢环绕；从远处则让地球自转",
   "Turning the Earth — press O or touch the globe to stop": "地球正在自转——按 O 或触摸地球即可停止",
   "Place search could not be reached; coordinates typed here still work.": "无法连接地点搜索；在此输入的坐标仍然可用。",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "新增：13 个新案例、更快的地球仪，以及手机上适合手指点按的按钮",
 };

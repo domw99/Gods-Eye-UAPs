@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Perbesar lebih dekat untuk memiringkan tampilan",
   "North up: turn the view so north is at the top": "Utara di atas: putar tampilan agar utara berada di atas",
   "Tilt the view, or look straight down again": "Miringkan tampilan, atau lihat lurus ke bawah lagi",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Baru: bola api terang NASA di globe dan dalam pemeriksaan pengamatan, plus tombol kompas dan kemiringan untuk tampilan",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Globe membutuhkan WebGL, yang dinonaktifkan atau tidak didukung oleh browser atau perangkat ini. Coba browser lain atau aktifkan akselerasi perangkat keras.",
   "unlimited": "tanpa batas",
   "surface": "permukaan",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Mengorbit pelan di sekitar tengah layar; dari jauh, memutar Bumi",
   "Turning the Earth — press O or touch the globe to stop": "Memutar Bumi — tekan O atau sentuh globe untuk berhenti",
   "Place search could not be reached; coordinates typed here still work.": "Pencarian tempat tidak dapat dijangkau; koordinat yang diketik di sini tetap berfungsi.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Baru: 13 kasus lagi, globe yang lebih cepat, dan tombol seukuran jari di ponsel",
 };

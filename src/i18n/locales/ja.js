@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "視点を傾けるにはもっとズームインしてください",
   "North up: turn the view so north is at the top": "北を上に：北が上になるよう表示を回転します",
   "Tilt the view, or look straight down again": "視点を傾ける、または再び真下を見る",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "新機能：NASAの明るい火球を地球儀と目撃チェックに追加し、表示用のコンパスと傾きボタンも加わりました",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "地球儀にはWebGLが必要ですが、このブラウザまたはデバイスでは無効か非対応です。別のブラウザを試すか、ハードウェアアクセラレーションを有効にしてください。",
   "unlimited": "上限なし",
   "surface": "地表",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "画面の中央を中心にゆっくり周回。遠くからは地球を自転させる",
   "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
   "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "新機能：事例が13件増え、地球儀が速くなり、スマホのボタンが指で押しやすい大きさになりました",
 };

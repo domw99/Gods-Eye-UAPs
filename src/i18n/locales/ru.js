@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Приблизьте сильнее, чтобы наклонить вид",
   "North up: turn the view so north is at the top": "Север сверху: поворачивает вид так, чтобы север был вверху",
   "Tilt the view, or look straight down again": "Наклонить вид или снова смотреть прямо вниз",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Новое: яркие болиды NASA на глобусе и в проверках наблюдений, а также кнопки компаса и наклона вида",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Для глобуса нужен WebGL, который в этом браузере или на этом устройстве отключён или не поддерживается. Попробуйте другой браузер или включите аппаратное ускорение.",
   "unlimited": "без ограничения",
   "surface": "поверхность",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Медленно вращаться вокруг центра экрана; издалека — вращать Землю",
   "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
   "Place search could not be reached; coordinates typed here still work.": "Поиск мест недоступен; введённые здесь координаты по-прежнему работают.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Новое: ещё 13 случаев, более быстрый глобус и кнопки под палец на телефоне",
 };

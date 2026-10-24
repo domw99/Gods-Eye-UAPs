@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "화면을 기울이려면 더 확대하세요",
   "North up: turn the view so north is at the top": "북쪽을 위로: 북쪽이 위로 오도록 화면을 돌립니다",
   "Tilt the view, or look straight down again": "화면을 기울이거나 다시 바로 아래를 봅니다",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "새 기능: NASA의 밝은 화구가 지구본과 목격 검사에 추가되었고, 화면용 나침반과 기울기 버튼도 생겼습니다",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "지구본에는 WebGL이 필요한데 이 브라우저나 기기에서 꺼져 있거나 지원되지 않습니다. 다른 브라우저를 사용하거나 하드웨어 가속을 켜 보세요.",
   "unlimited": "제한 없음",
   "surface": "지표면",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "화면 중앙을 중심으로 천천히 공전, 멀리서는 지구를 자전시킴",
   "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
   "Place search could not be reached; coordinates typed here still work.": "장소 검색에 연결할 수 없습니다. 여기에 입력한 좌표는 계속 사용할 수 있습니다.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "새 기능: 사례 13건 추가, 더 빨라진 지구본, 휴대폰에서 손가락 크기에 맞춘 버튼",
 };

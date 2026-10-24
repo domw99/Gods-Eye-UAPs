@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Görünümü eğmek için daha fazla yakınlaştırın",
   "North up: turn the view so north is at the top": "Kuzey yukarı: görünümü kuzey üstte olacak şekilde çevirir",
   "Tilt the view, or look straight down again": "Görünümü eğ ya da yeniden dik aşağı bak",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Yeni: NASA’nın parlak ateş topları küre üzerinde ve gözlem denetimlerinde, ayrıca görünüm için pusula ve eğme düğmeleri",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "Küre, bu tarayıcıda veya cihazda kapalı olan ya da desteklenmeyen WebGL’e ihtiyaç duyar. Başka bir tarayıcı deneyin veya donanım hızlandırmayı açın.",
   "unlimited": "sınırsız",
   "surface": "yüzey",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Ekranın ortasında yavaşça dön; uzaktan Dünya’yı döndür",
   "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
   "Place search could not be reached; coordinates typed here still work.": "Yer araması şu anda erişilemiyor; buraya yazılan koordinatlar yine çalışır.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Yeni: 13 vaka daha, daha hızlı bir küre ve telefonda parmağa göre boyutlanmış düğmeler",
 };

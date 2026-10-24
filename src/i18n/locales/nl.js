@@ -1160,7 +1160,6 @@ export default {
   "Zoom in closer to tilt the view": "Zoom verder in om het beeld te kantelen",
   "North up: turn the view so north is at the top": "Noorden boven: draait het beeld zodat noord bovenaan ligt",
   "Tilt the view, or look straight down again": "Beeld kantelen, of weer recht naar beneden kijken",
-  "New: NASA’s bright fireballs on the globe and in the sighting checks, plus compass and tilt buttons for the view": "Nieuw: de heldere vuurbollen van NASA op de globe en in de waarnemingschecks, plus kompas- en kantelknoppen voor het beeld",
   "The globe needs WebGL, which this browser or device has turned off or does not support. Try another browser, or turn on hardware acceleration.": "De globe heeft WebGL nodig, dat deze browser of dit apparaat heeft uitgezet of niet ondersteunt. Probeer een andere browser of schakel hardwareversnelling in.",
   "unlimited": "onbeperkt",
   "surface": "grondniveau",
@@ -1168,4 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Langzaam rond het midden van het scherm draaien; van ver weg de aarde laten draaien",
   "Turning the Earth — press O or touch the globe to stop": "De aarde draait — druk op O of raak de wereldbol aan om te stoppen",
   "Place search could not be reached; coordinates typed here still work.": "Zoeken naar plaatsen is niet bereikbaar; hier getypte coördinaten werken nog steeds.",
+  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Nieuw: 13 extra zaken, een snellere globe en knoppen op vingermaat op de telefoon",
 };

@@ -36,7 +36,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| **161** curated case files<br><sub>1561 → 2024, 33 countries and territories</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
+| **174** curated case files<br><sub>1561 → 2024, 33 countries and territories</sub> | **174** official U.S. releases<br><sub>AARO / PURSUE footage via DVIDS</sub> | **10,096** Project Blue Book files<br><sub>USAF scans, 1947–1969, on the map</sub> | **2,768** GEIPAN files<br><sub>France's official cases, graded A–D</sub> |
 | **485** MUFON Journal issues<br><sub>1967–2008 · 2,517 report places mapped</sub> | **873** research journal issues<br><sub>APRO · NICAP · CUFOS · MUFON chapters</sub> | **22,000** journal pages<br><sub>full-text searchable in the app</sub> | **80,332** civilian reports<br><sub>NUFORC, as a density layer</sub> |
 
 ## Features
@@ -45,7 +45,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 
 <img src="docs/media/globe.jpg" alt="The globe with curated case files (cyan and amber) and official U.S. releases (magenta)" width="100%" />
 
-- **161 curated case files** from 1561 to 2024, in 33 countries and territories. Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. Latest additions: the 1913 Great Meteor Procession, Clyde Tombaugh's 1949 sighting, the Kirtland AFB tower (1957), the Antarctic sightings of 1965, the Paulding Light, Wurtsmith AFB and its tanker chase (1975), Alitalia over Kent (1991), Air France 3532 (1994), British Airways 5061 (1995), Bariloche (1995), the Colorado drones (2019), Langley AFB (2023) and the 2024 drones over the U.S. bases in England. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
+- **174 curated case files** from 1561 to 2024, in 33 countries and territories. New in 2.5: Ellsworth AFB (1953), the Zond IV re-entry (1968), Jimmy Carter's light at Leary (1969), the Cergy-Pontoise hoax (1979), the 1990 Proton re-entry over France, the Ladakh "drones" that were Jupiter and Venus (2012), the Iridium-4 launch over Los Angeles (2017), AARO's Southeast Asia triangles (2017) and Eglin balloon (2023) resolutions, the Sendai balloon (2020), the FBI's north-eastern orb files (2021), the Las Vegas backyard call (2023) and the Yemen Hellfire video shown to Congress (2024). Examples: Kenneth Arnold, Washington 1952, the Kinross F-89, the RB-47, Socorro, the Hills, Minot AFB 1968, Rendlesham, Tehran 1976, JAL 1628, the Belgian wave, the Phoenix Lights, the Nimitz "Tic Tac", Gimbal/GoFast, Aguadilla, the 2023 shoot-downs and the 2024 New Jersey drones. Latest additions: the 1913 Great Meteor Procession, Clyde Tombaugh's 1949 sighting, the Kirtland AFB tower (1957), the Antarctic sightings of 1965, the Paulding Light, Wurtsmith AFB and its tanker chase (1975), Alitalia over Kent (1991), Air France 3532 (1994), British Airways 5061 (1995), Bariloche (1995), the Colorado drones (2019), Langley AFB (2023) and the 2024 drones over the U.S. bases in England. New in 1.3: Cussac, Quarouble, Zanfretta, the Broad Haven schoolchildren, Ilkley Moor, the Wonsan B-29s, the Vilas-Boas claim, Coyame, the 2018 Irish airline sightings and American 2292. New in 1.2: the Delphos ring, Pascagoula, the Coyne helicopter, Loring AFB, La Joya, Boianai, Dalnegorsk, the Knowles family, the 1991 Mexico City eclipse videos, Chile's 2014 Navy helicopter video, Ubatuba and Maury Island.
 - Each case has evidence tags, witnesses, a timeline, a **0–10 documentation score** and a status: *unresolved*, *disputed*, *explained* or *identified*. The official or best-supported explanation is shown first.
 - **The evidence itself, where it survives.** 76 cases show archived photos, film, video or documents. For U.S. cases from 1947–1969 that includes pages from the Air Force's own Blue Book photo files: frames of the 1950 Mariana film, Carl Hart's Lubbock Lights photos, Rex Heflin's Polaroids, the Socorro landing site and the Minot B-52's radar scope.
 - **Filter** by status, evidence type or shape (disc, tic tac, triangle, sphere, lights, formation). Brush the year histogram (drag across it, or focus it and use the arrow keys), or press ▶ to sweep through history.
@@ -55,7 +55,7 @@ It runs in your browser with nothing to install and no sign-up or API keys.
 - **Group or ungroup** nearby markers (<kbd>C</kbd>). Labels that would overlap are hidden by priority, so the view stays readable.
 - **Share any view**: the address bar keeps the camera position.
 - **Reset** (<kbd>R</kbd>, or the button beside the globe) flies back to the whole globe, north up. The compass beside it turns with the view and, pressed (<kbd>B</kbd>), turns it back to north by the short way; the tilt button (<kbd>P</kbd>) leans the view 45° to see the ground from an angle, and back. Zooming in with the wheel heads for the pointer; zooming out (wheel, **−** button or key) stays centred and levels the view as it rises, so the globe ends up in the middle.
-- **Fly with the keyboard**: arrow keys move over the ground, <kbd>Shift</kbd>+arrows turn and tilt, <kbd>O</kbd> orbits slowly around the middle of the screen, and <kbd>F</kbd> hides every panel for a clean view of the globe.
+- **Fly with the keyboard**: arrow keys move over the ground, <kbd>Shift</kbd>+arrows turn and tilt, <kbd>O</kbd> orbits slowly around the middle of the screen (from far out it turns the Earth on its axis, once in 90 seconds), and <kbd>F</kbd> hides every panel for a clean view of the globe.
 - **Star cases** (☆ in a case file) to keep your own list in this browser, then show only those under *Filters › Saved*. **⚄ Random** opens a case with something to see, and first-time visitors get a short "start here" card.
 
 ### ✈️ Replay the encounter, from the witness's seat
@@ -198,7 +198,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 - **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
 - **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
-- **Case dossiers list the journal pages that discuss them.** 92 of the 161 cases have coverage, for example:
+- **Case dossiers list the journal pages that discuss them.** 92 of the 174 cases have coverage, for example:
   - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
   - 60 on Travis Walton;
   - 39 on the 2008 Stephenville lights.
@@ -284,6 +284,8 @@ The pins are placed by a mapping fitted to known craters on the photograph (Greg
 
 ### 📱 Works on a phone, installs like an app, and speaks 16 languages
 
+On phones and tablets the buttons are sized for a finger (44 px), and the layout holds up with the phone held sideways.
+
 <a href="docs/media/whats-new-1.2.mp4"><img src="docs/media/whats-new-1.2.webp" alt="What's new in 1.2: the Noir and Snow sensor looks, the day, night and off lighting switch in the top bar, the years bar hiding, a case file switching between Japanese and Russian, live earthquakes along the US west coast, and one of the 12 new cases" width="100%" /></a>
 
 <sub><b>New in 1.2:</b> Noir and Snow looks, lighting in the top bar, a hideable years bar, 16 languages, live earthquakes and 12 more cases. <a href="docs/media/whats-new-1.2.mp4">▶ Watch the 23-second video (MP4)</a></sub>
@@ -355,7 +357,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
 | <kbd>D</kbd> | Lighting: auto → day → night → off | <kbd>F</kbd> | Clean view: hide every panel |
-| <kbd>O</kbd> | Orbit around the middle of the screen | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
+| <kbd>O</kbd> | Orbit the middle of the screen; from far out, turn the Earth | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
 | years bar (focused) | ← → move the range · <kbd>Shift</kbd> later end · <kbd>Alt</kbd> earlier end · <kbd>PageUp</kbd> <kbd>PageDown</kbd> ten years | <kbd>Esc</kbd> | Clear the range |
 
 </details>
@@ -403,10 +405,12 @@ flowchart LR
     S5 & S7 --> S11["build-textindex.mjs"]
   end
   S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 & S11 --> DATA[("public/data/*.json")]
-  CASES["src/data/cases/*.js<br/>161 curated cases"] --> APP
+  CASES["src/data/cases/*.js<br/>174 curated cases"] --> APP
   DATA --> APP["<b>Browser app</b><br/>Vite · CesiumJS<br/>astronomy-engine<br/>satellite.js"]
   LIVE["<b>Live, keyless APIs</b><br/>Esri imagery · terrain<br/>OpenFreeMap buildings<br/>CelesTrak TLEs<br/>Launch Library 2<br/>USGS earthquakes<br/>Open-Meteo weather<br/>Wikipedia · Photon"] --> APP
 ```
+
+**Built to stay quick.** The globe draws only when something changes, and a still globe redraws every 2 s. It starts without waiting for the imagery's service description (the loading screen clears about 40% sooner in local tests), asks the map servers for up to 18 tiles at a time, and uses coarser tiles while the camera moves. Markers and labels keep their GPU buffers when they change: with every layer on, a search uploads about 3 MB instead of 35 MB. Repeat visits load Cesium and the data from the offline cache without rewriting it.
 
 | Layer | Code |
 |---|---|
@@ -432,11 +436,11 @@ src/
               quality.js (render on demand, device quality) · horizon.js (markers hidden behind the Earth)
               basemap.js (map styles, place names) · zoom.js (centred zoom-out) · flycam.js (keys, orbit)
   data/       cases/ (curated case files) · govFiles.js · regions.js · taxonomy.js · items.js
-  layers/     items.js (case & release markers) · tracks.js (flight paths + playback)
+  layers/     items.js (case & release markers) · tracks.js (flight paths + playback) · billboard-buffers.js (markers keep their GPU buffers)
               points.js (Blue Book / GEIPAN / MUFON / NUFORC) · satellites.js (live SGP4)
               buildings.js (keyless OpenStreetMap 3D buildings) · launches.js (launch pads)
               airspace.js (military airspace volumes) · declutter.js (label overlap)
-  services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars)
+  services/   wiki.js (Wikipedia summaries, Commons media) · sky.js (planets, Moon, stars) · places.js (place search)
               launches.js (Launch Library 2) · weather.js (Open-Meteo) · airspace.js (FAA SUA)
               geomagnetic.js (Kp, aurora) · airfields.js (nearest airfields) · fireballs.js (NASA fireballs)
               explain.js (sighting checker scoring) · mufon.js (MUFON Journal issues & page text)
@@ -462,7 +466,7 @@ CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · CHANGELOG.md · DATA_SOU
 
 ## Open data
 
-The 161 case files are free to reuse, under the same MIT licence as the code, from **[the open data page](https://domw99.github.io/Gods-Eye-UAPs/open-data/)**:
+The 174 case files are free to reuse, under the same MIT licence as the code, from **[the open data page](https://domw99.github.io/Gods-Eye-UAPs/open-data/)**:
 
 | File | What's in it |
 |---|---|
@@ -472,7 +476,7 @@ The 161 case files are free to reuse, under the same MIT licence as the code, fr
 
 They are made from `src/data/cases/` on every build, with the page describing them as a schema.org Dataset so dataset search engines can find it. There is also a plain **[list of all case files](https://domw99.github.io/Gods-Eye-UAPs/case/)**, with no 3D globe needed, and pages that **[browse them](https://domw99.github.io/Gods-Eye-UAPs/browse/)** by country, decade, status, kind of encounter, evidence and shape.
 
-**For AI assistants:** [`llms.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms.txt) and [`llms-full.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt) describe the site and give every case as plain text, and `npm run mcp` starts a local [Model Context Protocol server](docs/MCP.md) (no network, no dependencies) with tools to search the cases, read one, find the cases near a place, list a date's, check for a bright fireball near a sighting and make a link to the globe. See [docs/MCP.md](docs/MCP.md) for Claude Code and Claude Desktop.
+**For AI assistants:** [`llms.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms.txt) and [`llms-full.txt`](https://domw99.github.io/Gods-Eye-UAPs/llms-full.txt) describe the site and give every case as plain text, and `npm run mcp` starts a local [Model Context Protocol server](docs/MCP.md) (no network, no dependencies) with tools to search the cases (and count them by status, country, decade, evidence or shape), read one, find the cases near a place, list a date's, check for a bright fireball near a sighting and make a link to the globe. See [docs/MCP.md](docs/MCP.md) for Claude Code and Claude Desktop.
 
 ## Where the data comes from
 
