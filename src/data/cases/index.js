@@ -7,7 +7,8 @@ import moreCases from './more-cases.js';
 import abroadCases from './abroad-cases.js';
 import moreEncounters from './more-encounters.js';
 import filesAndResolutions from './files-and-resolutions.js';
+import europeMore from './europe-more.js';
 
-export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions].sort(
+export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...europeMore].sort(
   (a, b) => Date.parse(a.date) - Date.parse(b.date),
 );

@@ -264,6 +264,20 @@ describe('details checked against the articles the cases cite', () => {
     expect(t).not.toContain('Jul 27, ~23:25');
   });
 
+  it('puts the Tunguska burst at 00:14 UT, as the seismograph records do', () => {
+    expect(new Date(byId('tunguska-1908').date).toISOString()).toBe('1908-06-30T00:14:00.000Z');
+  });
+
+  it('gives the GEIPAN cases the class GEIPAN gives them now, and links each to its GEIPAN file', () => {
+    // Guipavas was class D in the old file (a radar echo); the re-examination made it B, a meteoroid.
+    const expected = { 'gujan-mestras-1978': 'explained', 'pranles-1979': 'unresolved', 'guipavas-1981': 'explained', 'trancrainville-1982': 'unresolved' };
+    for (const [id, status] of Object.entries(expected)) {
+      const c = byId(id);
+      expect(c.status, id).toBe(status);
+      expect(c.sources.some((s) => s.kind === 'official' && s.url.startsWith('https://www.cnes-geipan.fr/fr/cas/')), id).toBe(true);
+    }
+  });
+
   it('dates the Ängelholm memorial to 1972, after Carlsson first told the story in 1971', () => {
     // Wikipedia ("Ängelholm UFO memorial", English and Swedish): interview in 1971, memorial built the next year.
     const c = byId('angelholm-1946');
