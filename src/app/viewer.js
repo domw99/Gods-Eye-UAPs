@@ -44,21 +44,37 @@ export const ESRI_CREDIT =
 // leaves a zoomed-in view waiting on its own queue.
 Cesium.RequestScheduler.maximumRequestsPerServer = 18;
 
-async function createBaseLayer() {
-  try {
-    const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(
-      'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-      { credit: ESRI_CREDIT, enablePickFeatures: false },
-    );
-    return { layer: new Cesium.ImageryLayer(provider), name: 'ESRI SATELLITE' };
-  } catch (error) {
+/**
+ * Esri's imagery needs its service description before the first tile. The
+ * layer is handed to the globe at once and fills in when that arrives (the
+ * globe's tiles wait for it, so the loading screen still follows the
+ * imagery), instead of the whole app waiting for one more round trip before
+ * the globe, the case list and the terrain request even start. If Esri
+ * cannot be reached, OpenStreetMap takes its place.
+ */
+function createBaseLayer(viewerReady) {
+  const esri = Cesium.ArcGisMapServerImageryProvider.fromUrl(
+    'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+    { credit: ESRI_CREDIT, enablePickFeatures: false },
+  );
+  const layer = Cesium.ImageryLayer.fromProviderAsync(esri);
+  layer.errorEvent.addEventListener(async (error) => {
     console.warn('[map] Esri imagery unavailable, using OSM', error);
-    const provider = new Cesium.OpenStreetMapImageryProvider({
-      url: 'https://tile.openstreetmap.org/',
-      credit: '© OpenStreetMap contributors',
-    });
-    return { layer: new Cesium.ImageryLayer(provider), name: 'OPENSTREETMAP' };
-  }
+    const viewer = await viewerReady;
+    const layers = viewer.imageryLayers;
+    const index = layers.indexOf(layer);
+    if (index < 0) return; // another map style has already replaced it
+    const osm = new Cesium.ImageryLayer(
+      new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/', credit: '© OpenStreetMap contributors' }),
+    );
+    osm.brightness = layer.brightness; // keep any night dimming
+    layers.remove(layer, true);
+    layers.add(osm, index);
+    if (viewer.__mapName === viewer.__baseMapName) viewer.__mapName = 'OPENSTREETMAP';
+    viewer.__baseMapName = 'OPENSTREETMAP';
+    viewer.scene.requestRender();
+  });
+  return { layer, name: 'ESRI SATELLITE' };
 }
 
 async function createTerrain() {
@@ -185,7 +201,13 @@ export async function createViewer(container) {
   // Never fall back to Cesium's shared demo token.
   Cesium.Ion.defaultAccessToken = ION_TOKEN || '';
 
-  const base = await createBaseLayer();
+  let viewerReady;
+  const base = createBaseLayer(new Promise((resolve) => (viewerReady = resolve)));
+  const terrain = createTerrain();
+  // Building the viewer holds the page for a moment (WebGL, shaders), and the browser only sends a
+  // request once the page lets go: yield once so the imagery and terrain descriptions, and the
+  // catalogue fetch started before this, are on the wire while it builds.
+  await new Promise((resolve) => setTimeout(resolve, 0));
   const viewer = new Cesium.Viewer(container, {
     baseLayer: base.layer,
     baseLayerPicker: false,
@@ -216,11 +238,12 @@ export async function createViewer(container) {
   viewer.cesiumWidget.creditContainer.style.display = 'block';
   translateDom(container); // Cesium's own labels (the data attribution box) are built after the first pass
 
-  createTerrain().then((terrain) => {
-    viewer.terrainProvider = terrain;
+  terrain.then((provider) => {
+    viewer.terrainProvider = provider;
   });
   viewer.__baseMapName = base.name;
   viewer.__mapName = base.name;
+  viewerReady(viewer);
 
   // Start on a slightly tilted whole-earth view over the Atlantic.
   viewer.camera.setView({
