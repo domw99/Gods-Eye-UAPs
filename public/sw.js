@@ -18,6 +18,20 @@ function keep(cache, req, res) {
   caches.open(cache).then((c) => c.put(req, copy)).catch(() => {});
 }
 
+/**
+ * True when a fresh answer is the same file as the saved copy (same ETag, or
+ * same Last-Modified date). Every visit refreshes Cesium (6 MB) and the data
+ * files in the background; storing an unchanged copy again only rewrote
+ * megabytes on the device while the globe was loading.
+ */
+function unchanged(saved, res) {
+  if (!saved) return false;
+  const tag = res.headers.get('etag');
+  if (tag) return tag === saved.headers.get('etag');
+  const modified = res.headers.get('last-modified');
+  return Boolean(modified) && modified === saved.headers.get('last-modified');
+}
+
 self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
@@ -73,7 +87,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(req).then((hit) => {
       const fresh = fetch(req)
         .then((res) => {
-          if (res.ok) keep(FILES, req, res);
+          if (res.ok && !unchanged(hit, res)) keep(FILES, req, res);
           return res;
         })
         .catch(() => hit);
