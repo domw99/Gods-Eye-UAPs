@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import { translateDom } from '../i18n/index.js';
+import { keepBuffersInPlace } from '../layers/billboard-buffers.js';
 
 /**
  * Globe setup. Mirrors God's Eye View's keyless start: Esri World Imagery and
@@ -43,22 +44,40 @@ export const ESRI_CREDIT =
 // Imagery, terrain and 3D tiles come from servers that speak HTTP/2, which carries many requests on one connection: the default of six at a time
 // leaves a zoomed-in view waiting on its own queue.
 Cesium.RequestScheduler.maximumRequestsPerServer = 18;
+// Markers and labels keep their GPU buffers when they change instead of rebuilding them twice (layers/billboard-buffers.js).
+keepBuffersInPlace();
 
-async function createBaseLayer() {
-  try {
-    const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(
-      'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-      { credit: ESRI_CREDIT, enablePickFeatures: false },
-    );
-    return { layer: new Cesium.ImageryLayer(provider), name: 'ESRI SATELLITE' };
-  } catch (error) {
+/**
+ * Esri's imagery needs its service description before the first tile. The
+ * layer is handed to the globe at once and fills in when that arrives (the
+ * globe's tiles wait for it, so the loading screen still follows the
+ * imagery), instead of the whole app waiting for one more round trip before
+ * the globe, the case list and the terrain request even start. If Esri
+ * cannot be reached, OpenStreetMap takes its place.
+ */
+function createBaseLayer(viewerReady) {
+  const esri = Cesium.ArcGisMapServerImageryProvider.fromUrl(
+    'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+    { credit: ESRI_CREDIT, enablePickFeatures: false },
+  );
+  const layer = Cesium.ImageryLayer.fromProviderAsync(esri);
+  layer.errorEvent.addEventListener(async (error) => {
     console.warn('[map] Esri imagery unavailable, using OSM', error);
-    const provider = new Cesium.OpenStreetMapImageryProvider({
-      url: 'https://tile.openstreetmap.org/',
-      credit: '© OpenStreetMap contributors',
-    });
-    return { layer: new Cesium.ImageryLayer(provider), name: 'OPENSTREETMAP' };
-  }
+    const viewer = await viewerReady;
+    const layers = viewer.imageryLayers;
+    const index = layers.indexOf(layer);
+    if (index < 0) return; // another map style has already replaced it
+    const osm = new Cesium.ImageryLayer(
+      new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/', credit: '© OpenStreetMap contributors' }),
+    );
+    osm.brightness = layer.brightness; // keep any night dimming
+    layers.remove(layer, true);
+    layers.add(osm, index);
+    if (viewer.__mapName === viewer.__baseMapName) viewer.__mapName = 'OPENSTREETMAP';
+    viewer.__baseMapName = 'OPENSTREETMAP';
+    viewer.scene.requestRender();
+  });
+  return { layer, name: 'ESRI SATELLITE' };
 }
 
 async function createTerrain() {
@@ -185,9 +204,21 @@ export async function createViewer(container) {
   // Never fall back to Cesium's shared demo token.
   Cesium.Ion.defaultAccessToken = ION_TOKEN || '';
 
-  const base = await createBaseLayer();
+  let viewerReady;
+  const base = createBaseLayer(new Promise((resolve) => (viewerReady = resolve)));
+  const terrain = createTerrain();
+  // Building the viewer holds the page for a moment (WebGL, shaders), and the browser only sends a
+  // request once the page lets go: yield once so the imagery and terrain descriptions, and the
+  // catalogue fetch started before this, are on the wire while it builds.
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  // Cesium's own star field is only a stand-in for the NASA sky (loadStarSky), so it starts hidden and is
+  // never downloaded: its 0.9 MB of pictures competed with the first map tiles. It shows only if the
+  // NASA sky cannot load.
+  const standInSky = Cesium.SkyBox.createEarthSkyBox();
+  standInSky.show = false;
   const viewer = new Cesium.Viewer(container, {
     baseLayer: base.layer,
+    skyBox: standInSky,
     baseLayerPicker: false,
     geocoder: false,
     homeButton: false,
@@ -216,11 +247,12 @@ export async function createViewer(container) {
   viewer.cesiumWidget.creditContainer.style.display = 'block';
   translateDom(container); // Cesium's own labels (the data attribution box) are built after the first pass
 
-  createTerrain().then((terrain) => {
-    viewer.terrainProvider = terrain;
+  terrain.then((provider) => {
+    viewer.terrainProvider = provider;
   });
   viewer.__baseMapName = base.name;
   viewer.__mapName = base.name;
+  viewerReady(viewer);
 
   // Start on a slightly tilted whole-earth view over the Atlantic.
   viewer.camera.setView({
@@ -232,8 +264,9 @@ export async function createViewer(container) {
 /**
  * The sky behind the globe: NASA's Deep Star Maps 2020 (Hipparcos-2, Tycho-2
  * and Gaia DR2 stars; NASA/Goddard SVS), as six 2048-px cube faces made by
- * scripts/build-skybox.py. Loaded after the globe is up and swapped in whole,
- * so there is no gap; Cesium's own star field shows until then.
+ * scripts/build-skybox.py. Loaded once the first map tiles are in, so it does
+ * not compete with them; until it arrives the sky behind the globe is dark,
+ * and if it cannot load, Cesium's own star field is shown instead.
  */
 export async function loadStarSky(viewer, base, { small = false } = {}) {
   const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
@@ -247,7 +280,9 @@ export async function loadStarSky(viewer, base, { small = false } = {}) {
     if (old && !old.isDestroyed?.()) old.destroy();
     viewer.scene.requestRender();
   } catch (e) {
-    console.warn('[sky] keeping the default star field', e);
+    console.warn('[sky] using the default star field', e);
+    if (viewer.scene.skyBox && !viewer.scene.skyBox.isDestroyed?.()) viewer.scene.skyBox.show = true;
+    viewer.scene.requestRender();
   }
 }
 

@@ -109,3 +109,59 @@ describe('service worker: cleaning up old caches', () => {
     expect(deleted.sort()).toEqual(['gods-eye-files-v0', 'gods-eye-pages-v0']);
   });
 });
+
+describe('service worker: refreshing saved files in the background', () => {
+  const FILE = `${PAGE}cesium/Cesium.js`;
+  function get(handlers, url = FILE) {
+    const event = {
+      request: { method: 'GET', mode: 'no-cors', url, headers: new Headers() },
+      answer: null,
+      respondWith(p) {
+        this.answer = p;
+      },
+    };
+    handlers.fetch(event);
+    return event.answer;
+  }
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 10));
+
+  it('serves the saved copy and does not store an unchanged file again', async () => {
+    const saved = new Response('v1', { headers: { etag: '"a"' } });
+    const { handlers, store } = loadWorker({ fetchImpl: async () => new Response('v1', { headers: { etag: '"a"' } }) });
+    store.set(FILE, saved);
+    expect(await text(get(handlers))).toBe('v1');
+    await settle();
+    expect(store.get(FILE)).toBe(saved);
+  });
+
+  it('stores a changed file for next time', async () => {
+    const { handlers, store } = loadWorker({ fetchImpl: async () => new Response('v2', { headers: { etag: '"b"' } }) });
+    store.set(FILE, new Response('v1', { headers: { etag: '"a"' } }));
+    expect(await text(get(handlers))).toBe('v1');
+    await settle();
+    expect(await store.get(FILE).text()).toBe('v2');
+  });
+
+  it('compares the modified date when there is no ETag, and stores when it cannot tell', async () => {
+    const date = 'Sat, 24 Oct 2026 10:00:00 GMT';
+    const same = loadWorker({ fetchImpl: async () => new Response('v1', { headers: { 'last-modified': date } }) });
+    const saved = new Response('v1', { headers: { 'last-modified': date } });
+    same.store.set(FILE, saved);
+    await get(same.handlers);
+    await settle();
+    expect(same.store.get(FILE)).toBe(saved);
+
+    const unknown = loadWorker({ fetchImpl: async () => new Response('v2') });
+    unknown.store.set(FILE, new Response('v1'));
+    await get(unknown.handlers);
+    await settle();
+    expect(await unknown.store.get(FILE).text()).toBe('v2');
+  });
+
+  it('stores a file seen for the first time', async () => {
+    const { handlers, store } = loadWorker({ fetchImpl: async () => new Response('v1', { headers: { etag: '"a"' } }) });
+    expect(await text(get(handlers))).toBe('v1');
+    await settle();
+    expect(store.has(FILE)).toBe(true);
+  });
+});
