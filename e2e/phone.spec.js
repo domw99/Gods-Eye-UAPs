@@ -55,6 +55,18 @@ test('on a phone, the close, back, play and view buttons are big enough for a fi
   expect((await page.locator('#tl-hide').boundingBox()).height).toBeGreaterThanOrEqual(36);
 });
 
+test('on a phone, the map data credit can be tapped, not hidden under the case list', async ({ page }) => {
+  await openApp(page);
+  await expect(page.locator('#loading')).toHaveClass(/done/, { timeout: 60_000 });
+  const reachable = await page.evaluate(() => {
+    const a = document.querySelector('#globe .cesium-credit-expand-link');
+    const b = a.getBoundingClientRect();
+    const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+    return a.contains(hit);
+  });
+  expect(reachable).toBe(true);
+});
+
 test('on a phone held sideways, the welcome card and the view controls stay below the top bar', async ({ page }) => {
   await page.setViewportSize({ width: 839, height: 412 });
   await openApp(page);

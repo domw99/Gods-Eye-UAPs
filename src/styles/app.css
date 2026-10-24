@@ -597,6 +597,9 @@ body:not(.tl-hidden) .tl-show { display: none; }
   .tl-labels #tl-hint { display: none; }
   .hud-br { display: none; }
   .map-controls, body.dossier-open .map-controls { right: calc(10px + var(--sar)); bottom: auto; top: calc(var(--top-off) + 14px); transform: none; }
+  /* The data credit sat in the 8px between the case list and the years bar, under both, where it could not be tapped. */
+  #globe .cesium-viewer-bottom, #globe .cesium-widget-credits,
+  body.dossier-open #globe .cesium-viewer-bottom, body.dossier-open #globe .cesium-widget-credits { top: calc(var(--top-off) + 74px) !important; bottom: auto !important; right: calc(12px + var(--sar)) !important; }
   #playback { bottom: calc(var(--bottom-gap) - 2px); }
   .form-grid { grid-template-columns: 1fr; }
 }
@@ -831,7 +834,7 @@ body.embed .top-actions { margin-left: auto; order: 0; width: auto; }
 
 /* ── Welcome card (first visit) ───────────────────────── */
 .welcome { position: fixed; z-index: 30; left: calc(var(--left-w) + 34px); right: 80px; bottom: calc(var(--bottom-gap) + 54px); max-width: 520px; padding: 18px 20px 14px; border-radius: 14px; }
-.welcome h2 { margin: 6px 0 6px; font-size: 19px; line-height: 1.25; text-wrap: balance; }
+.welcome h2 { margin: 6px 0 6px; padding-right: 36px; font-size: 19px; line-height: 1.25; text-wrap: balance; } /* clear of the close button, which sits on the right in every language: a right-to-left heading started under it */
 .welcome p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
 .welcome .btn-row { gap: 6px; margin-bottom: 10px; }
 .welcome-kicker { font-size: 10px; letter-spacing: 0.26em; color: var(--accent); }
@@ -892,6 +895,8 @@ select.chip.lang option { background: var(--menu-bg); color: var(--text-primary)
 html[data-text-dir='rtl'] .panel-body, html[data-text-dir='rtl'] .modal, html[data-text-dir='rtl'] #story, html[data-text-dir='rtl'] .welcome,
 html[data-text-dir='rtl'] #toast, html[data-text-dir='rtl'] .topbar .chip, html[data-text-dir='rtl'] .hover-label { direction: rtl; }
 html[data-text-dir='rtl'] .case-item, html[data-text-dir='rtl'] .layer { text-align: right; }
+/* A Latin case name in an Arabic row: its own direction, so "USS NIMITZ "TIC TAC"" keeps its quotes in place. */
+html[data-text-dir='rtl'] .welcome [data-welcome='nimitz'] { unicode-bidi: plaintext; }
 html[data-text-dir='rtl'] .d-kv dd, html[data-text-dir='rtl'] .d-text { text-align: right; }
 html[data-text-dir='rtl'] .mono, html[data-text-dir='rtl'] .sky-chart, html[data-text-dir='rtl'] #tl-canvas, html[data-text-dir='rtl'] .stats-svg { direction: ltr; }
 /* Case texts and archive quotes stay English: each paragraph takes its own direction from its first letter, so they read left to right inside an Arabic panel. */
@@ -1026,6 +1031,9 @@ html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
   select.chip.lang { padding-block: 8px; }
   .tl-labels #tl-hide { padding: 14px 10px; margin: -14px -10px; } /* a bigger target, the same layout */
   #pb-speed { padding: 8px 6px; }
+  .ex-looks { row-gap: 0; }
+  .ex-looks label { min-height: 44px; } /* the whole row is the target, not the 13px box */
+  .ex-looks input { width: 18px; height: 18px; }
 }
 @media (pointer: coarse) and (max-width: 720px), (pointer: coarse) and (max-height: 580px) {
   .map-controls { width: auto; }
