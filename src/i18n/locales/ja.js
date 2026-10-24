@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "ライティング：自動（事案の時刻）→ 昼 → 夜 → オフ",
   "Clean view: hide every panel": "クリーンビュー：すべてのパネルを隠す",
   "Hide or show the years bar": "年のバーを隠す／表示",
-  "Orbit slowly around the middle of the screen": "画面の中央を中心にゆっくり周回",
   "Fly the camera; with Shift, turn and tilt": "カメラを移動。Shiftで回転・傾き",
   "Reset view: whole globe, north up": "ビューをリセット：地球全体、北が上",
   "Zoom toward the centre of the screen": "画面中央に向かってズーム",
@@ -1166,4 +1165,7 @@ export default {
   "unlimited": "上限なし",
   "surface": "地表",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "年ごとの記録。ドラッグするか矢印キーで年の範囲を選べます。ダブルクリックまたはEscで解除します。",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "画面の中央を中心にゆっくり周回。遠くからは地球を自転させる",
+  "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
+  "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
 };

@@ -36,7 +36,7 @@ To try it by hand, run `npm run mcp` and type one JSON message per line, for exa
 
 | Tool | What it does |
 |---|---|
-| `search_cases` | Find cases by words (all must match) and filters: `status`, `category`, `evidence`, `shape`, `country` (name or ISO code), `from_year`, `to_year`, `limit` (default 10, at most 50). Brief records, oldest first, with a total. |
+| `search_cases` | Find cases by words (all must match) and filters: `status`, `category`, `evidence`, `shape`, `country` (name or ISO code), `from_year`, `to_year`, `limit` (default 10, at most 50). Brief records, oldest first, with a total. `group_by` (`status`, `category`, `country`, `decade`, `evidence` or `shape`) also counts every match, not only those shown, so "how many of the 1970s French cases were explained?" is answered from the data. |
 | `get_case` | The full file for one `id`: date, place and coordinates, status and explanation, evidence, summary, timeline, flight-path tracks (counted; `include_tracks` for every point) and sources. |
 | `cases_near` | Cases within `radius_km` (default 250) of `lat`, `lon`, nearest first. Cases whose position is only a region are left out. |
 | `on_this_day` | Cases that happened on a day of the year, in any year (default: today). |

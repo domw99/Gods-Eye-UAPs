@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "Verlichting: auto (tijdstip van de zaak) → dag → nacht → uit",
   "Clean view: hide every panel": "Schone weergave: verberg alle panelen",
   "Hide or show the years bar": "Jaarbalk verbergen of tonen",
-  "Orbit slowly around the middle of the screen": "Langzaam rond het midden van het scherm draaien",
   "Fly the camera; with Shift, turn and tilt": "Camera besturen; met Shift draaien en kantelen",
   "Reset view: whole globe, north up": "Weergave herstellen: hele wereldbol, noorden boven",
   "Zoom toward the centre of the screen": "Zoomen naar het midden van het scherm",
@@ -1166,4 +1165,7 @@ export default {
   "unlimited": "onbeperkt",
   "surface": "grondniveau",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Records per jaar. Sleep erover, of gebruik de pijltjestoetsen, om jaren te kiezen; dubbelklik of Esc wist de keuze.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Langzaam rond het midden van het scherm draaien; van ver weg de aarde laten draaien",
+  "Turning the Earth — press O or touch the globe to stop": "De aarde draait — druk op O of raak de wereldbol aan om te stoppen",
+  "Place search could not be reached; coordinates typed here still work.": "Zoeken naar plaatsen is niet bereikbaar; hier getypte coördinaten werken nog steeds.",
 };

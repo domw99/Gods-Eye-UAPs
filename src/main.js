@@ -42,6 +42,7 @@ import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
+import { searchPlaces } from './services/places.js';
 import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
 import { loadAirfields, nearestAirfields } from './services/airfields.js';
 import { loadFireballs, fireballRows, fireballsNear, fireballSize, fireballsCover, SIGHT_KM } from './services/fireballs.js';
@@ -1865,7 +1866,7 @@ viewer.container.addEventListener(
   { capture: true },
 );
 
-// Arrow keys fly the camera, O orbits the middle of the screen (see app/flycam.js).
+// Arrow keys fly the camera, O orbits the middle of the screen or, from far out, turns the Earth (see app/flycam.js).
 const flycam = createFlycam(viewer, {
   blocked: () => Boolean(viewer.trackedEntity) || story.active || trackLayer.witnessOn,
   onMove: () => {
@@ -1878,6 +1879,7 @@ function setOrbit(on) {
   const now = on ? flycam.toggleOrbit() || flycam.orbiting : (flycam.stopOrbit(), false);
   document.body.classList.toggle('orbiting', Boolean(now));
   if (on && !now) toast('Nothing to orbit here', 1500);
+  else if (on && flycam.spinning) toast('Turning the Earth — press O or touch the globe to stop', 2200);
   else if (on) toast('Orbiting — press O or touch the globe to stop', 2200);
 }
 window.addEventListener('keyup', (e) => flycam.key(e, false));
@@ -2410,16 +2412,7 @@ subscribe((s, reason) => {
   placeTimer = setTimeout(async () => {
     placeAbort = new AbortController();
     try {
-      const res = await fetch(`https://photon.komoot.io/api/?${new URLSearchParams({ q, limit: '3', lang: 'en' })}`, { signal: placeAbort.signal });
-      if (!res.ok) throw new Error(`Photon ${res.status}`);
-      const json = await res.json();
-      const places = (json.features || []).map((f) => ({
-        name: f.properties.name,
-        detail: [f.properties.state, f.properties.country].filter(Boolean).join(', '),
-        lon: f.geometry.coordinates[0],
-        lat: f.geometry.coordinates[1],
-        extent: f.properties.extent, // [west, north, east, south]
-      }));
+      const places = await searchPlaces(q, { signal: placeAbort.signal });
       mount(
         placeList,
         html`${journalRow}${places.map(
@@ -2444,9 +2437,10 @@ subscribe((s, reason) => {
         showNearby(p.lat, p.lon, p.name, { fly: false });
       };
     } catch (error) {
-      if (error.name === 'AbortError') return;
+      if (error.name === 'AbortError') return; // a newer search took over
       console.warn('[places]', error);
-      mount(placeList, journalRow);
+      // Say so, rather than an empty list that reads as "no such place".
+      mount(placeList, html`${journalRow}<li class="offline" role="status">${t('Place search could not be reached; coordinates typed here still work.')}</li>`);
     }
   }, 450);
 });

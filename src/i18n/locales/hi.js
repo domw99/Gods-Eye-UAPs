@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "प्रकाश: स्वतः (घटना का समय) → दिन → रात → बंद",
   "Clean view: hide every panel": "साफ़ दृश्य: सभी पैनल छिपाएँ",
   "Hide or show the years bar": "वर्ष पट्टी छिपाएँ या दिखाएँ",
-  "Orbit slowly around the middle of the screen": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें",
   "Fly the camera; with Shift, turn and tilt": "कैमरा चलाएँ; Shift के साथ घुमाएँ और झुकाएँ",
   "Reset view: whole globe, north up": "दृश्य रीसेट: पूरा ग्लोब, उत्तर ऊपर",
   "Zoom toward the centre of the screen": "स्क्रीन के केंद्र की ओर ज़ूम करें",
@@ -1166,4 +1165,7 @@ export default {
   "unlimited": "असीमित",
   "surface": "सतह",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "वर्ष के अनुसार रिकॉर्ड। वर्षों की सीमा चुनने के लिए इस पर खींचें या तीर कुंजियाँ इस्तेमाल करें; हटाने के लिए डबल-क्लिक करें या Esc दबाएँ।",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें; दूर से, पृथ्वी को घुमाएँ",
+  "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
+  "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
 };

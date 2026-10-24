@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "الإضاءة: تلقائي (وقت الحالة) ← نهار ← ليل ← إيقاف",
   "Clean view: hide every panel": "عرض نظيف: إخفاء كل اللوحات",
   "Hide or show the years bar": "إخفاء أو إظهار شريط السنوات",
-  "Orbit slowly around the middle of the screen": "الدوران ببطء حول منتصف الشاشة",
   "Fly the camera; with Shift, turn and tilt": "تحريك الكاميرا؛ مع Shift للتدوير والإمالة",
   "Reset view: whole globe, north up": "إعادة ضبط العرض: الكرة كاملة والشمال لأعلى",
   "Zoom toward the centre of the screen": "التقريب أو التبعيد نحو منتصف الشاشة",
@@ -1166,4 +1165,7 @@ export default {
   "unlimited": "غير محدود",
   "surface": "سطح الأرض",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "السجلات حسب السنة. اسحب عليه أو استخدم مفاتيح الأسهم لاختيار نطاق من السنوات؛ انقر مرتين أو اضغط Esc للمسح.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "الدوران ببطء حول منتصف الشاشة؛ ومن بعيد، تدوير الأرض",
+  "Turning the Earth — press O or touch the globe to stop": "الأرض تدور — اضغط O أو المس الكرة للإيقاف",
+  "Place search could not be reached; coordinates typed here still work.": "تعذّر الوصول إلى البحث عن الأماكن؛ ولا تزال الإحداثيات المكتوبة هنا تعمل.",
 };

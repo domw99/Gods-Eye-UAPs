@@ -46,6 +46,30 @@ function oneOf(name, value, allowed) {
   return v;
 }
 
+/**
+ * What search_cases can count its matches by. The counts cover every match, not only the rows shown, so a
+ * question like "how many 1970s French cases are explained?" is answered from the data instead of from a
+ * sample of ten. A case with several kinds of evidence or shapes counts once under each; one with none
+ * counts as "none", so the groups always account for every match.
+ */
+const GROUPS = {
+  status: (c) => c.status,
+  category: (c) => c.category,
+  country: (c) => c.country,
+  decade: (c) => `${c.date.slice(0, 3)}0s`,
+  evidence: (c) => c.evidence,
+  shape: (c) => shapeClasses(c.shape),
+};
+
+function countBy(cases, key) {
+  const out = {};
+  for (const c of cases) {
+    const values = [].concat(key(c) ?? []).filter(Boolean);
+    for (const v of values.length ? values : ['none']) out[v] = (out[v] || 0) + 1;
+  }
+  return Object.fromEntries(Object.entries(out).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
+}
+
 export function searchCases(args = {}, cases = CASES) {
   const status = oneOf('status', args.status, Object.keys(STATUS));
   const category = oneOf('category', args.category, Object.keys(CATEGORY));
@@ -56,6 +80,7 @@ export function searchCases(args = {}, cases = CASES) {
   if ((from != null && !Number.isFinite(from)) || (to != null && !Number.isFinite(to))) throw new ArgError('from_year and to_year must be numbers');
   const terms = lower(args.query).split(/\s+/).filter(Boolean);
   const shape = args.shape ? lower(args.shape) : null;
+  const groupBy = oneOf('group_by', args.group_by, Object.keys(GROUPS));
   const found = cases.filter((c) => {
     const year = Number(c.date.slice(0, 4));
     if (status && c.status !== status) return false;
@@ -73,7 +98,9 @@ export function searchCases(args = {}, cases = CASES) {
   });
   found.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
   const limit = clampLimit(args.limit);
-  return { total: found.length, shown: Math.min(limit, found.length), cases: found.slice(0, limit).map((c) => brief(c)) };
+  const out = { total: found.length, shown: Math.min(limit, found.length), cases: found.slice(0, limit).map((c) => brief(c)) };
+  if (groupBy) out.groups = countBy(found, GROUPS[groupBy]);
+  return out;
 }
 
 export function getCase(args = {}, cases = CASES) {
@@ -205,7 +232,7 @@ export const TOOLS = [
   {
     name: 'search_cases',
     title: 'Search the case files',
-    description: 'Find documented UFO/UAP cases by words and filters. All words must match (title, place, summary, explanation, shape, witnesses). Returns brief records, oldest first; use get_case for the full file.',
+    description: 'Find documented UFO/UAP cases by words and filters. All words must match (title, place, summary, explanation, shape, witnesses). Returns brief records, oldest first; use get_case for the full file. Set group_by to count all the matches by status, category, country, decade, evidence or shape, rather than estimating from the rows shown.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -218,6 +245,7 @@ export const TOOLS = [
         from_year: { type: 'integer' },
         to_year: { type: 'integer' },
         limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Default 10.' },
+        group_by: { type: 'string', enum: Object.keys(GROUPS), description: 'Also count every match (not only those shown) by this field, most first. A case with several kinds of evidence or shapes counts under each; one with none counts as "none".' },
       },
       additionalProperties: false,
     },

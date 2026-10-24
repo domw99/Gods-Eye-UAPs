@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "光照：自动（事件时间）→ 白天 → 夜晚 → 关闭",
   "Clean view: hide every panel": "纯净视图：隐藏所有面板",
   "Hide or show the years bar": "隐藏或显示年份栏",
-  "Orbit slowly around the middle of the screen": "围绕屏幕中心缓慢环绕",
   "Fly the camera; with Shift, turn and tilt": "移动镜头；按住 Shift 可旋转和倾斜",
   "Reset view: whole globe, north up": "重置视图：整个地球，北在上",
   "Zoom toward the centre of the screen": "向屏幕中心缩放",
@@ -1166,4 +1165,7 @@ export default {
   "unlimited": "无上限",
   "surface": "地表",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "按年份显示的记录。在其上拖动或使用方向键来选择年份范围；双击或按 Esc 清除。",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "围绕屏幕中心缓慢环绕；从远处则让地球自转",
+  "Turning the Earth — press O or touch the globe to stop": "地球正在自转——按 O 或触摸地球即可停止",
+  "Place search could not be reached; coordinates typed here still work.": "无法连接地点搜索；在此输入的坐标仍然可用。",
 };
