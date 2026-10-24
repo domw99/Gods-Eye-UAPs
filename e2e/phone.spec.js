@@ -43,3 +43,41 @@ test('on a phone, EARTH | MOON sits beside the lighting, and the Moon list folds
   await expect(page.locator('#moon-view')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+test('on a phone, the close, back, play and view buttons are big enough for a finger', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#case-list .case-item').first().tap();
+  await expect(page.locator('#dossier')).not.toHaveClass(/hidden/);
+  for (const sel of ['#dossier-close', '#dossier-back', '#tl-play', '#map-controls [data-view="in"]', '#map-controls [data-view="home"]']) {
+    const box = await page.locator(sel).boundingBox();
+    expect(Math.min(box.width, box.height), sel).toBeGreaterThanOrEqual(44);
+  }
+  expect((await page.locator('#tl-hide').boundingBox()).height).toBeGreaterThanOrEqual(36);
+});
+
+test('on a phone, the map data credit can be tapped, not hidden under the case list', async ({ page }) => {
+  await openApp(page);
+  await expect(page.locator('#loading')).toHaveClass(/done/, { timeout: 60_000 });
+  const reachable = await page.evaluate(() => {
+    const a = document.querySelector('#globe .cesium-credit-expand-link');
+    const b = a.getBoundingClientRect();
+    const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+    return a.contains(hit);
+  });
+  expect(reachable).toBe(true);
+});
+
+test('on a phone held sideways, the welcome card and the view controls stay below the top bar', async ({ page }) => {
+  await page.setViewportSize({ width: 839, height: 412 });
+  await openApp(page);
+  await page.evaluate(() => (document.getElementById('welcome').hidden = false)); // browser tests skip the first-visit card
+  const bar = await page.locator('.topbar').boundingBox();
+  const card = await page.locator('#welcome').boundingBox();
+  expect(card.y).toBeGreaterThanOrEqual(bar.y + bar.height);
+  expect(card.y + card.height).toBeLessThanOrEqual(412);
+  await page.locator('[data-welcome="close"]').tap();
+  await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004', 'list'));
+  await expect(page.locator('#dossier')).not.toHaveClass(/hidden/);
+  const controls = page.locator('#map-controls');
+  if (await controls.isVisible()) expect((await controls.boundingBox()).y).toBeGreaterThanOrEqual(bar.y + bar.height);
+});
