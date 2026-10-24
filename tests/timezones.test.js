@@ -13,7 +13,7 @@ const ZONES = {
   US: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'America/Phoenix', 'America/Anchorage', 'America/Honolulu', 'America/Puerto_Rico', 'America/Indiana/Indianapolis', 'America/Detroit', 'America/Boise', 'America/Juneau', 'America/Adak', 'Pacific/Guam'],
   CA: ['America/St_Johns', 'America/Halifax', 'America/Toronto', 'America/Winnipeg', 'America/Edmonton', 'America/Vancouver', 'America/Regina', 'America/Whitehorse', 'America/Moncton'],
   GB: ['Europe/London'], GG: ['Europe/London'], IE: ['Europe/Dublin'], FR: ['Europe/Paris'], DE: ['Europe/Berlin'], IT: ['Europe/Rome'], BE: ['Europe/Brussels'], NL: ['Europe/Amsterdam'],
-  NO: ['Europe/Oslo'], SE: ['Europe/Stockholm'], PL: ['Europe/Warsaw'], CH: ['Europe/Zurich'], ES: ['Europe/Madrid', 'Atlantic/Canary'],
+  NO: ['Europe/Oslo'], SE: ['Europe/Stockholm'], PL: ['Europe/Warsaw'], CH: ['Europe/Zurich'], PT: ['Europe/Lisbon', 'Atlantic/Azores', 'Atlantic/Madeira'], BY: ['Europe/Minsk'], ES: ['Europe/Madrid', 'Atlantic/Canary'],
   RU: ['Europe/Moscow', 'Europe/Kaliningrad', 'Asia/Yekaterinburg', 'Europe/Samara', 'Asia/Novosibirsk', 'Asia/Vladivostok'],
   MX: ['America/Mexico_City', 'America/Chihuahua', 'America/Tijuana', 'America/Monterrey', 'America/Hermosillo', 'America/Mazatlan', 'America/Merida', 'America/Cancun', 'America/Matamoros', 'America/Ojinaga'],
   BR: ['America/Sao_Paulo', 'America/Belem', 'America/Manaus', 'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Noronha', 'America/Cuiaba', 'America/Campo_Grande'],

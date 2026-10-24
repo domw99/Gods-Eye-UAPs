@@ -10,5 +10,7 @@ import filesAndResolutions from './files-and-resolutions.js';
 import unitedStatesMore from './united-states-more.js';
 
 export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...unitedStatesMore].sort(
+import europeMore from './europe-more.js';
+export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...europeMore].sort(
   (a, b) => Date.parse(a.date) - Date.parse(b.date),
 );
