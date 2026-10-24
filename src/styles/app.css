@@ -507,7 +507,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
 .file-card .links .chip { white-space: normal; text-align: left; }
 .tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.form-grid label { display: grid; gap: 4px; font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; }
+.form-grid label { display: grid; gap: 4px; align-content: end; /* a label that wraps (a long language, or a hint after it) keeps its field level with the one beside it */ font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.05em; }
 .form-grid .full { grid-column: 1 / -1; }
 .form-grid input, .form-grid select, .form-grid textarea { padding: 8px 10px; font-size: 13px; font-family: var(--font-sans); color: var(--text-primary); background: rgba(255,255,255,.04); border: 1px solid var(--glass-border); border-radius: 8px; }
 .form-grid textarea { min-height: 80px; resize: vertical; }
@@ -733,7 +733,8 @@ button, .chip, .icon-btn, .layer, .case-item, summary { touch-action: manipulati
 
 /* ── Journal search ──────────────────────────────── */
 .js-form { display: flex; gap: 8px; margin: 10px 0 12px; }
-.js-form input { flex: 1; min-width: 0; }
+.js-form input { flex: 1; min-width: 0; padding: 8px 10px; }
+.js-form input::placeholder { color: var(--text-dim); }
 .files-search { margin-top: 4px; }
 .js-hits li a.dim { margin-left: 6px; font-size: 11px; }
 .js-summary { margin: 4px 0; }
