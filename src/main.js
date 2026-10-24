@@ -2509,6 +2509,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
     if (done) return;
     done = true;
     loadingStep(t('READY'), 100);
+    loadStarSky(viewer, BASE, { small: deviceProfile().low }); // the first tiles are in: the sky no longer competes with them
     setTimeout(() => {
       loading.classList.add('done');
       if (!routeToMoon()) routeToSpace();
@@ -2517,7 +2518,6 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
       // Compile the picking shaders while idle, so the first hover doesn't stall.
       const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
       (window.requestIdleCallback || setTimeout)(warm, { timeout: 3000 });
-      (window.requestIdleCallback || setTimeout)(() => loadStarSky(viewer, BASE, { small: deviceProfile().low }), { timeout: 4000 });
     }, 250);
     removeProgress();
   };

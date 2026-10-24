@@ -208,8 +208,14 @@ export async function createViewer(container) {
   // request once the page lets go: yield once so the imagery and terrain descriptions, and the
   // catalogue fetch started before this, are on the wire while it builds.
   await new Promise((resolve) => setTimeout(resolve, 0));
+  // Cesium's own star field is only a stand-in for the NASA sky (loadStarSky), so it starts hidden and is
+  // never downloaded: its 0.9 MB of pictures competed with the first map tiles. It shows only if the
+  // NASA sky cannot load.
+  const standInSky = Cesium.SkyBox.createEarthSkyBox();
+  standInSky.show = false;
   const viewer = new Cesium.Viewer(container, {
     baseLayer: base.layer,
+    skyBox: standInSky,
     baseLayerPicker: false,
     geocoder: false,
     homeButton: false,
@@ -255,8 +261,9 @@ export async function createViewer(container) {
 /**
  * The sky behind the globe: NASA's Deep Star Maps 2020 (Hipparcos-2, Tycho-2
  * and Gaia DR2 stars; NASA/Goddard SVS), as six 2048-px cube faces made by
- * scripts/build-skybox.py. Loaded after the globe is up and swapped in whole,
- * so there is no gap; Cesium's own star field shows until then.
+ * scripts/build-skybox.py. Loaded once the first map tiles are in, so it does
+ * not compete with them; until it arrives the sky behind the globe is dark,
+ * and if it cannot load, Cesium's own star field is shown instead.
  */
 export async function loadStarSky(viewer, base, { small = false } = {}) {
   const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
@@ -270,7 +277,9 @@ export async function loadStarSky(viewer, base, { small = false } = {}) {
     if (old && !old.isDestroyed?.()) old.destroy();
     viewer.scene.requestRender();
   } catch (e) {
-    console.warn('[sky] keeping the default star field', e);
+    console.warn('[sky] using the default star field', e);
+    if (viewer.scene.skyBox && !viewer.scene.skyBox.isDestroyed?.()) viewer.scene.skyBox.show = true;
+    viewer.scene.requestRender();
   }
 }
 
