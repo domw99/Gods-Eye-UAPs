@@ -1055,7 +1055,7 @@ html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
 /* ── Watch mode (phones): while a flight path plays, only the globe and a slim playback bar ── */
 #pb-panels { display: none; }
 @media (max-width: 720px), (max-height: 580px) {
-  #pb-panels { display: inline-flex; }
+  #pb-panels { display: inline-flex; align-items: center; }
   body.pb-focus :is(.topbar, #left, #dossier, #timeline, .tl-show, .map-controls, #hud, #active-filters, #welcome, .install-hint) { display: none !important; }
   body.pb-focus #playback {
     display: flex !important;
@@ -1067,3 +1067,60 @@ html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
   /* The data credit stays, small, in the top corner: the panels it was placed beside are gone. */
   body.pb-focus :is(#globe .cesium-viewer-bottom, #globe .cesium-widget-credits) { top: calc(8px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: calc(10px + var(--sar)) !important; }
 }
+
+/* ── Phones held sideways: two rows of top bar, not four ──
+   On a 412px-high screen the top bar took 176px and left the case list 120px. The name gives way to the logo (as
+   it does upright), the looks share the first row when there is room, and the actions scroll in one row. */
+@media (max-height: 500px) {
+  .topbar { padding: 5px 10px; gap: 5px 8px; }
+  .brand > div { display: none; }
+  .brand, .worlds { order: 1; }
+  .lighting { order: 2; margin-left: auto; }
+  .modes { order: 3; width: auto; margin-left: 0; flex: none; }
+  .modes button { flex: none; padding-inline: 8px; font-size: 10px; }
+  .top-actions { order: 4; flex: 1 1 220px; min-width: 0; width: auto; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-inline-end: 28px; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+  .top-actions::-webkit-scrollbar { display: none; }
+  .top-actions .chip { flex: none; }
+}
+/* Sideways with a case open, the playback bar squeezed between the list and the case file ran three rows up under
+   the top bar. It takes the years bar's place instead, the full width, below both panels. */
+@media (min-width: 721px) and (max-height: 580px) {
+  body.dossier-open #playback { left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); width: auto; transform: none; bottom: calc(10px + var(--sab)); }
+  body.dossier-open:has(#playback:not(.hidden)) #timeline { visibility: hidden; }
+  body.dossier-open:has(#playback:not(.hidden)) { --pb-lift: 0px; }
+  /* One row: the clock gives way when the row is short of room for it (the case file shows the time). */
+  @container (max-width: 820px) { #pb-time { display: none; } }
+}
+
+/* ── Playback bar on a phone: the slider and ✕ on the first row, the views on the second ──
+   Wrapped as it came, the ✕ was left alone on a third row (on a small phone, DETAILS too). The empty ::after is a
+   line break; the speed joins the first row when the clock is not there. */
+@media (max-width: 720px) {
+  #playback { row-gap: 0; gap: 0 6px; }
+  #playback::after { content: ''; order: 1; flex-basis: 100%; height: 0; }
+  :is(#pb-speed, #pb-follow, #pb-pov, #pb-panels) { order: 2; margin-top: 6px; }
+  #pb-scrub { min-width: 60px; }
+  body.pb-focus #pb-speed { order: 0; margin-top: 0; }
+}
+/* A small phone has no room for the clock beside the slider (the case file shows the time). */
+@media (max-width: 400px) {
+  #pb-time { display: none; }
+  #pb-speed { order: 0; margin-top: 0; }
+}
+
+/* ── Touch: the buttons in panels and dialogs, the filter chips and the slider get a finger's room ──
+   They were 29px (21px for the filters, 5px apart). The top bar keeps its own, smaller sizes (above). */
+@media (pointer: coarse) {
+  /* Padding rather than a minimum height, so that the words stay centred in a link made a chip too. */
+  :where(.panel-body, .modal, .welcome, #playback, #story) .chip { padding-block: 12.5px; min-width: 44px; text-align: center; }
+  :where(.panel-body, .modal) .chip.small { padding-block: 10px; }
+  :is(#search, #moon-search, .form-grid input, .form-grid select, .js-form input, .share-link input) { min-height: 44px; }
+  .chips, .file-card .links, .mufon-years .links { gap: 7px; }
+  #pb-speed { min-height: 40px; }
+  #pb-scrub { height: 40px; }
+  details.filters > summary { padding-block: 12px; margin-block: 2px 0; }
+  .list-label select { min-height: 36px; }
+  .stats-table > summary { padding-block: 12px; }
+}
+/* The witness view's badge spoke of keys and sat under the toast at the top of a phone: the lit button says it. */
+@media (pointer: coarse) { body.pov #globe::after { display: none; } }
