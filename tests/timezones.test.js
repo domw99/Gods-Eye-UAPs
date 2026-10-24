@@ -19,7 +19,7 @@ const ZONES = {
   BR: ['America/Sao_Paulo', 'America/Belem', 'America/Manaus', 'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Noronha', 'America/Cuiaba', 'America/Campo_Grande'],
   AR: ['America/Argentina/Buenos_Aires', 'America/Argentina/Cordoba', 'America/Argentina/Mendoza'], CL: ['America/Santiago'], PE: ['America/Lima'], CR: ['America/Costa_Rica'],
   AU: ['Australia/Sydney', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Darwin', 'Australia/Hobart'], NZ: ['Pacific/Auckland'], PG: ['Pacific/Port_Moresby'],
-  JP: ['Asia/Tokyo'], CN: ['Asia/Shanghai'], IN: ['Asia/Kolkata'], IR: ['Asia/Tehran'], ZA: ['Africa/Johannesburg'], ZW: ['Africa/Harare'], KP: ['Asia/Pyongyang', 'Asia/Seoul'], PR: ['America/Puerto_Rico'],
+  JP: ['Asia/Tokyo'], CN: ['Asia/Shanghai'], IN: ['Asia/Kolkata'], IR: ['Asia/Tehran'], ZA: ['Africa/Johannesburg'], ZW: ['Africa/Harare'], MA: ['Africa/Casablanca'], KW: ['Asia/Kuwait'], IL: ['Asia/Jerusalem'], MY: ['Asia/Kuching', 'Asia/Kuala_Lumpur'], TH: ['Asia/Bangkok'], AE: ['Asia/Dubai'], SY: ['Asia/Damascus'], KP: ['Asia/Pyongyang', 'Asia/Seoul'], PR: ['America/Puerto_Rico'],
 };
 
 const minutes = (iso) => {

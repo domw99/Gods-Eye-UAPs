@@ -4,7 +4,7 @@ A guide for anyone changing this repository, people and coding agents alike. [CO
 
 ## What it is
 
-A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 174 documented UFO/UAP cases with reconstructed flight paths, the official U.S. and French files, the MUFON and research-archive journals, tools to check a sighting against the sky, weather and airspace, and a globe of the Moon. Vanilla JavaScript (ES modules), Vite, CesiumJS. It is built to be read: a case says what is documented, what is only claimed, and what the best explanation is.
+A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 194 documented UFO/UAP cases with reconstructed flight paths, the official U.S. and French files, the MUFON and research-archive journals, tools to check a sighting against the sky, weather and airspace, and a globe of the Moon. Vanilla JavaScript (ES modules), Vite, CesiumJS. It is built to be read: a case says what is documented, what is only claimed, and what the best explanation is.
 
 ## Commands
 

@@ -6,7 +6,7 @@ There is no backend. A source is either **built** (a script fetches it ahead of 
 
 ## What the case files are
 
-The 174 curated case files (`src/data/cases/`) are written for this project. Each cites its sources, and every status ("explained", "disputed", "unresolved"…) says what the cited evidence supports, not what anyone believes. The facts, dates and coordinates come from the sources linked on each case; the wording is original. The [open data](https://domw99.github.io/Gods-Eye-UAPs/open-data/) files are released under the MIT licence; the pages, media and archives they link to keep their own.
+The 194 curated case files (`src/data/cases/`) are written for this project. Each cites its sources, and every status ("explained", "disputed", "unresolved"…) says what the cited evidence supports, not what anyone believes. The facts, dates and coordinates come from the sources linked on each case; the wording is original. The [open data](https://domw99.github.io/Gods-Eye-UAPs/open-data/) files are released under the MIT licence; the pages, media and archives they link to keep their own.
 
 ## Built into the repository (rebuilt by scripts)
 
