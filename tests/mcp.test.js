@@ -78,6 +78,25 @@ describe('searching', () => {
     expect(both.cases.every((c) => c.status === 'unresolved' && c.evidence.includes('radar') && c.date >= '1970')).toBe(true);
   });
 
+  it('counts every match by a field when asked, not only the rows shown', () => {
+    const r = searchCases({ country: 'US', group_by: 'status', limit: 1 });
+    expect(r.cases.length).toBe(1);
+    const sum = Object.values(r.groups).reduce((a, b) => a + b, 0);
+    expect(sum).toBe(r.total); // one status per case, so the groups add up to the total
+    expect(r.groups.unresolved).toBe(CASES.filter((c) => c.cc === 'US' && c.status === 'unresolved').length);
+    const counts = Object.values(r.groups);
+    expect(counts).toEqual([...counts].sort((a, b) => b - a)); // most first
+    expect(searchCases({ query: 'radar' }).groups).toBeUndefined(); // only when asked
+
+    const decades = searchCases({ from_year: 1950, to_year: 1969, group_by: 'decade' }).groups;
+    expect(Object.keys(decades).sort()).toEqual(['1950s', '1960s']);
+    // A case with several kinds of evidence counts under each, and one with none still counts.
+    const evidence = searchCases({ group_by: 'evidence' });
+    expect(evidence.groups.radar).toBe(CASES.filter((c) => (c.evidence || []).includes('radar')).length);
+    expect(Object.values(evidence.groups).reduce((a, b) => a + b, 0)).toBeGreaterThanOrEqual(evidence.total);
+    expect(callTool('search_cases', { group_by: 'colour' }).content[0].text).toMatch(/group_by must be one of: status, category, country, decade, evidence, shape/);
+  });
+
   it('caps the limit and keeps summaries short', () => {
     expect(searchCases({ limit: 500 }).cases.length).toBeLessThanOrEqual(50);
     expect(searchCases({ limit: 0 }).cases.length).toBe(1);
