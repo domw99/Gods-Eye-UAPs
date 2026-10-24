@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { horizonOf } from '../app/horizon.js';
 import { glyphUrl } from './glyphs.js';
+import { fixBufferLayout } from './billboard-buffers.js';
 
 /**
  * Large point layers (Project Blue Book ~10k files, NUFORC ~80k reports),
@@ -9,7 +10,7 @@ import { glyphUrl } from './glyphs.js';
  * { layer, index } for picking.
  */
 export function createPointLayer(viewer, { name, color, size = 18, alpha = 0.85, near = 1.3, far = 0.45, underneath = false }) {
-  const collection = viewer.scene.primitives.add(new Cesium.BillboardCollection({ blendOption: Cesium.BlendOption.TRANSLUCENT }));
+  const collection = viewer.scene.primitives.add(fixBufferLayout(new Cesium.BillboardCollection({ blendOption: Cesium.BlendOption.TRANSLUCENT })));
   collection.show = false;
   if (underneath) viewer.scene.primitives.lowerToBottom(collection); // a dense wash: keep it under the other markers
   const image = glyphUrl(name); // a URL is the texture's id, so every marker shares one picture
