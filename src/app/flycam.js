@@ -2,7 +2,9 @@ import * as Cesium from 'cesium';
 
 /**
  * Two ways to move the camera without the mouse:
- * - Orbit: circle slowly around whatever is at the middle of the screen.
+ * - Orbit: circle slowly around whatever is at the middle of the screen. From
+ *   far out, where circling a point only twists the picture of the globe, it
+ *   turns the Earth on its axis instead, the way it really turns.
  * - Arrow keys: fly forward, back and sideways over the ground (speed scales
  *   with height); with Shift they turn and tilt the view around the middle
  *   of the screen. Held keys move every frame, so motion is smooth.
@@ -10,6 +12,18 @@ import * as Cesium from 'cesium';
  * story mode, the witness view).
  */
 const ORBIT_DEG_PER_S = 6;
+const SPIN_DEG_PER_S = 4; // one turn in 90 s
+
+/** From this camera height (m) up, O turns the Earth instead of circling the middle of the screen. */
+export const SPIN_FROM_M = 3_000_000;
+export const spinsEarth = (height) => Number.isFinite(height) && height >= SPIN_FROM_M;
+
+/**
+ * The angle (radians) to turn the camera about the Earth's axis for a frame of `dt` seconds. The camera
+ * goes west, so the ground below moves east, as the Earth turns: Camera#rotate turns by minus its angle
+ * about the axis, so a positive angle about +Z takes longitude down.
+ */
+export const spinStep = (dt) => Cesium.Math.toRadians(SPIN_DEG_PER_S) * Math.max(0, dt || 0);
 const TURN_DEG_PER_S = 45;
 
 /**
@@ -24,7 +38,7 @@ export function tiltStep(pitch, up) {
 export function createFlycam(viewer, { blocked = () => false, onMove = () => {} } = {}) {
   const { scene, camera } = viewer;
   const held = new Set();
-  let orbit = null; // { target }
+  let orbit = null; // { target } to circle a point, { spin: true } to turn the Earth
   let last = 0;
 
   function centerPoint() {
@@ -61,7 +75,8 @@ export function createFlycam(viewer, { blocked = () => false, onMove = () => {} 
       orbit = null;
       return;
     }
-    if (orbit) around(orbit.target, Cesium.Math.toRadians(ORBIT_DEG_PER_S) * dt, 0);
+    if (orbit?.spin) camera.rotate(Cesium.Cartesian3.UNIT_Z, spinStep(dt));
+    else if (orbit) around(orbit.target, Cesium.Math.toRadians(ORBIT_DEG_PER_S) * dt, 0);
     if (!held.size || !dt) return;
     const shift = held.has('Shift');
     const turn = Cesium.Math.toRadians(TURN_DEG_PER_S) * dt;
@@ -108,6 +123,13 @@ export function createFlycam(viewer, { blocked = () => false, onMove = () => {} 
     },
     toggleOrbit() {
       if (orbit || blocked()) return this.stopOrbit();
+      // Turning about the axis needs the plain Earth-fixed frame; a look-at frame left by something else would turn around it.
+      if (spinsEarth(camera.positionCartographic.height) && Cesium.Matrix4.equals(camera.transform, Cesium.Matrix4.IDENTITY)) {
+        camera.cancelFlight();
+        orbit = { spin: true };
+        onMove();
+        return true;
+      }
       const target = centerPoint();
       if (!target) return false;
       camera.cancelFlight();
@@ -122,6 +144,10 @@ export function createFlycam(viewer, { blocked = () => false, onMove = () => {} 
     },
     get orbiting() {
       return orbit !== null;
+    },
+    /** Orbiting by turning the whole Earth (from far out). */
+    get spinning() {
+      return Boolean(orbit?.spin);
     },
   };
 }

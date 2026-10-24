@@ -1865,7 +1865,7 @@ viewer.container.addEventListener(
   { capture: true },
 );
 
-// Arrow keys fly the camera, O orbits the middle of the screen (see app/flycam.js).
+// Arrow keys fly the camera, O orbits the middle of the screen or, from far out, turns the Earth (see app/flycam.js).
 const flycam = createFlycam(viewer, {
   blocked: () => Boolean(viewer.trackedEntity) || story.active || trackLayer.witnessOn,
   onMove: () => {
@@ -1878,6 +1878,7 @@ function setOrbit(on) {
   const now = on ? flycam.toggleOrbit() || flycam.orbiting : (flycam.stopOrbit(), false);
   document.body.classList.toggle('orbiting', Boolean(now));
   if (on && !now) toast('Nothing to orbit here', 1500);
+  else if (on && flycam.spinning) toast('Turning the Earth — press O or touch the globe to stop', 2200);
   else if (on) toast('Orbiting — press O or touch the globe to stop', 2200);
 }
 window.addEventListener('keyup', (e) => flycam.key(e, false));

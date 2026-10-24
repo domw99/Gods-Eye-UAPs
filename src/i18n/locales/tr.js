@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "Aydınlatma: otomatik (vaka zamanı) → gündüz → gece → kapalı",
   "Clean view: hide every panel": "Temiz görünüm: tüm panelleri gizle",
   "Hide or show the years bar": "Yıl çubuğunu gizle veya göster",
-  "Orbit slowly around the middle of the screen": "Ekranın ortasında yavaşça dön",
   "Fly the camera; with Shift, turn and tilt": "Kamerayı uçur; Shift ile döndür ve eğ",
   "Reset view: whole globe, north up": "Görünümü sıfırla: tüm küre, kuzey yukarıda",
   "Zoom toward the centre of the screen": "Ekranın merkezine doğru yakınlaştır",
@@ -1166,4 +1165,6 @@ export default {
   "unlimited": "sınırsız",
   "surface": "yüzey",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Yıllara göre kayıtlar. Yıl aralığı seçmek için üzerinde sürükleyin ya da ok tuşlarını kullanın; temizlemek için çift tıklayın veya Esc'ye basın.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Ekranın ortasında yavaşça dön; uzaktan Dünya’yı döndür",
+  "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
 };

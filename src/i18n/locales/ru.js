@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "Освещение: авто (время случая) → день → ночь → выкл.",
   "Clean view: hide every panel": "Чистый вид: скрыть все панели",
   "Hide or show the years bar": "Скрыть или показать шкалу годов",
-  "Orbit slowly around the middle of the screen": "Медленно вращаться вокруг центра экрана",
   "Fly the camera; with Shift, turn and tilt": "Управление камерой; с Shift — поворот и наклон",
   "Reset view: whole globe, north up": "Сбросить вид: весь глобус, север сверху",
   "Zoom toward the centre of the screen": "Масштаб к центру экрана",
@@ -1166,4 +1165,6 @@ export default {
   "unlimited": "без ограничения",
   "surface": "поверхность",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Записи по годам. Проведите по графику или используйте стрелки, чтобы выбрать период; двойной щелчок или Esc сбрасывает выбор.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Медленно вращаться вокруг центра экрана; издалека — вращать Землю",
+  "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
 };

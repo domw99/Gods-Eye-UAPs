@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "조명: 자동(사건 시각) → 낮 → 밤 → 끔",
   "Clean view: hide every panel": "깔끔한 보기: 모든 패널 숨기기",
   "Hide or show the years bar": "연도 막대 숨기기/보기",
-  "Orbit slowly around the middle of the screen": "화면 중앙을 중심으로 천천히 공전",
   "Fly the camera; with Shift, turn and tilt": "카메라 이동, Shift와 함께 회전·기울이기",
   "Reset view: whole globe, north up": "보기 초기화: 지구 전체, 북쪽이 위",
   "Zoom toward the centre of the screen": "화면 중앙으로 확대/축소",
@@ -1166,4 +1165,6 @@ export default {
   "unlimited": "제한 없음",
   "surface": "지표면",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "연도별 기록. 드래그하거나 화살표 키로 연도 범위를 선택하세요. 두 번 클릭하거나 Esc를 누르면 해제됩니다.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "화면 중앙을 중심으로 천천히 공전, 멀리서는 지구를 자전시킴",
+  "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
 };

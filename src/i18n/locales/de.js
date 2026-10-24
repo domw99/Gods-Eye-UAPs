@@ -433,7 +433,6 @@ export default {
   "Lighting: auto (case time) → day → night → off": "Beleuchtung: Auto (Zeitpunkt des Falls) → Tag → Nacht → aus",
   "Clean view: hide every panel": "Saubere Ansicht: alle Panels ausblenden",
   "Hide or show the years bar": "Jahresleiste aus- oder einblenden",
-  "Orbit slowly around the middle of the screen": "Langsam um die Bildschirmmitte kreisen",
   "Fly the camera; with Shift, turn and tilt": "Kamera fliegen; mit Umschalt drehen und kippen",
   "Reset view: whole globe, north up": "Ansicht zurücksetzen: ganzer Globus, Norden oben",
   "Zoom toward the centre of the screen": "Zum Bildschirmmittelpunkt zoomen",
@@ -1166,4 +1165,6 @@ export default {
   "unlimited": "unbegrenzt",
   "surface": "Boden",
   "Records by year. Drag across it, or use the arrow keys, to choose a range of years; double-click or press Escape to clear.": "Datensätze pro Jahr. Darüber ziehen oder die Pfeiltasten nutzen, um Jahre auszuwählen; Doppelklick oder Esc hebt die Auswahl auf.",
+  "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Langsam um die Bildschirmmitte kreisen; aus großer Entfernung die Erde drehen",
+  "Turning the Earth — press O or touch the globe to stop": "Die Erde dreht sich – zum Beenden O drücken oder den Globus berühren",
 };
