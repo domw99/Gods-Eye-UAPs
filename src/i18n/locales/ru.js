@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Медленно вращаться вокруг центра экрана; издалека — вращать Землю",
   "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
   "Place search could not be reached; coordinates typed here still work.": "Поиск мест недоступен; введённые здесь координаты по-прежнему работают.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Новое: ещё 13 случаев, более быстрый глобус и кнопки под палец на телефоне",
+  "New: 77 more cases from around the world, 251 in all": "Новое: ещё 77 случаев со всего мира, всего 251",
 };

@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "화면 중앙을 중심으로 천천히 공전, 멀리서는 지구를 자전시킴",
   "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
   "Place search could not be reached; coordinates typed here still work.": "장소 검색에 연결할 수 없습니다. 여기에 입력한 좌표는 계속 사용할 수 있습니다.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "새 기능: 사례 13건 추가, 더 빨라진 지구본, 휴대폰에서 손가락 크기에 맞춘 버튼",
+  "New: 77 more cases from around the world, 251 in all": "새 기능: 전 세계의 사례 77건 추가, 총 251건",
 };

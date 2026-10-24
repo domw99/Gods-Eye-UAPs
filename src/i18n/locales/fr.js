@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Tourner lentement autour du centre de l’écran ; de loin, faire tourner la Terre",
   "Turning the Earth — press O or touch the globe to stop": "La Terre tourne — appuyez sur O ou touchez le globe pour arrêter",
   "Place search could not be reached; coordinates typed here still work.": "La recherche de lieux est injoignable ; les coordonnées saisies ici fonctionnent toujours.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Nouveau : 13 cas de plus, un globe plus rapide et des boutons à la taille du doigt sur téléphone",
+  "New: 77 more cases from around the world, 251 in all": "Nouveau : 77 cas de plus du monde entier, 251 au total",
 };

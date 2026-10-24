@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें; दूर से, पृथ्वी को घुमाएँ",
   "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
   "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "नया: 13 और मामले, तेज़ ग्लोब, और फ़ोन पर उंगली के आकार के बटन",
+  "New: 77 more cases from around the world, 251 in all": "नया: दुनिया भर से 77 और मामले, कुल 251",
 };

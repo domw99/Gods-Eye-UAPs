@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Langzaam rond het midden van het scherm draaien; van ver weg de aarde laten draaien",
   "Turning the Earth — press O or touch the globe to stop": "De aarde draait — druk op O of raak de wereldbol aan om te stoppen",
   "Place search could not be reached; coordinates typed here still work.": "Zoeken naar plaatsen is niet bereikbaar; hier getypte coördinaten werken nog steeds.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Nieuw: 13 extra zaken, een snellere globe en knoppen op vingermaat op de telefoon",
+  "New: 77 more cases from around the world, 251 in all": "Nieuw: 77 extra zaken van over de hele wereld, 251 in totaal",
 };

@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Ekranın ortasında yavaşça dön; uzaktan Dünya’yı döndür",
   "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
   "Place search could not be reached; coordinates typed here still work.": "Yer araması şu anda erişilemiyor; buraya yazılan koordinatlar yine çalışır.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Yeni: 13 vaka daha, daha hızlı bir küre ve telefonda parmağa göre boyutlanmış düğmeler",
+  "New: 77 more cases from around the world, 251 in all": "Yeni: dünyanın dört bir yanından 77 vaka daha, toplam 251",
 };

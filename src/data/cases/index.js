@@ -8,13 +8,10 @@ import abroadCases from './abroad-cases.js';
 import moreEncounters from './more-encounters.js';
 import filesAndResolutions from './files-and-resolutions.js';
 import unitedStatesMore from './united-states-more.js';
-
-export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...unitedStatesMore].sort(
 import europeMore from './europe-more.js';
-export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...europeMore].sort(
 import latinAmericaMore from './latin-america-more.js';
-export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...latinAmericaMore].sort(
 import worldMore2 from './world-more-2.js';
-export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...worldMore2].sort(
+
+export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...unitedStatesMore, ...europeMore, ...latinAmericaMore, ...worldMore2].sort(
   (a, b) => Date.parse(a.date) - Date.parse(b.date),
 );

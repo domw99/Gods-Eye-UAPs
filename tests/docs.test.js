@@ -7,6 +7,7 @@ const ONES = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 /** A number below 100 in words, capitalised, as KNOWN-ISSUES.md writes them ("Fifty-two"). */
 const words = (n) => {
+  if (n >= 100) return String(n); // the page writes the figure past ninety-nine
   const w = n < 20 ? ONES[n] : `${TENS[Math.floor(n / 10)]}${n % 10 ? `-${ONES[n % 10]}` : ''}`;
   return w[0].toUpperCase() + w.slice(1);
 };

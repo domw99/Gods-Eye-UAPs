@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "画面の中央を中心にゆっくり周回。遠くからは地球を自転させる",
   "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
   "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "新機能：事例が13件増え、地球儀が速くなり、スマホのボタンが指で押しやすい大きさになりました",
+  "New: 77 more cases from around the world, 251 in all": "新機能：世界各地の事例が77件増え、合計251件になりました",
 };

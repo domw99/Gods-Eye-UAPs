@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "围绕屏幕中心缓慢环绕；从远处则让地球自转",
   "Turning the Earth — press O or touch the globe to stop": "地球正在自转——按 O 或触摸地球即可停止",
   "Place search could not be reached; coordinates typed here still work.": "无法连接地点搜索；在此输入的坐标仍然可用。",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "新增：13 个新案例、更快的地球仪，以及手机上适合手指点按的按钮",
+  "New: 77 more cases from around the world, 251 in all": "新增：来自世界各地的 77 个案例，共 251 个",
 };

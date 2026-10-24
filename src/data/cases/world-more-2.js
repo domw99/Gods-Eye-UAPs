@@ -16,39 +16,6 @@ import { p, link, commons, dvids, MIN } from './helpers.js';
  */
 export default [
   {
-    id: 'tunguska-1908',
-    title: 'Tunguska event — the blast that became a “crashed spaceship”',
-    date: '1908-06-30T07:14:00+07:00',
-    place: 'Podkamennaya Tunguska River, Yeniseysk Governorate (now Krasnoyarsk Krai), Siberia',
-    country: 'Russia',
-    cc: 'RU',
-    lat: 60.9031,
-    lon: 101.9097,
-    precision: 'area',
-    category: 'object-event',
-    evidence: ['multiple-witnesses', 'physical-trace'],
-    status: 'explained',
-    explanation:
-      'The scientific consensus is the air burst of a stony asteroid (or possibly a comet fragment) some 50–60 m across, exploding 5–10 km above the taiga with an energy usually put at 10–15 megatons; that is why there is no crater, only flattened forest with the trees at the centre left standing. The spacecraft explanation began as fiction (Alexander Kazantsev’s 1946 story “Explosion” imagined a Martian ship’s engine blowing up), and the story that Nikola Tesla caused it with a “death ray” is a later legend contradicted by the record.',
-    shape: 'A column of bluish light “as bright as the Sun” crossing the sky, then a flash and a blast',
-    witnesses: 'Evenk herders and settlers across central Siberia, including S. B. Semyonov at the Vanavara trading post, about 65 km away',
-    duration: 'Seconds; the blast and the shock wave were felt hundreds of kilometres away',
-    summary:
-      'At about 7:14 a.m. on June 30, 1908, something exploded in the air over the forest near the Podkamennaya Tunguska River. About 2,150 km² of trees, some 80 million, were knocked flat in a radial pattern; at Vanavara, 65 km away, Semyon Semyonov described the sky “split in two” and a heat that made him feel his shirt was on fire before the blast threw him from his porch. Several Evenk herders are known to have died. The first scientific expedition, led by Leonid Kulik, reached the area only in 1927 and found no crater and no meteorite, which left room for speculation. In 1946 the science-fiction writer Alexander Kazantsev turned it into the explosion of a nuclear-powered spacecraft, and the idea passed into UFO books as fact. A century of fieldwork, modelling and comparison with later events such as Chelyabinsk supports a natural air burst; the object’s exact nature is still argued, but not that it was natural.',
-    timeline: [
-      { t: '07:14', text: 'A brilliant light crosses the sky and explodes over the taiga; seismographs across Eurasia record it.' },
-      { t: 'Nights after', text: 'Skies glow so brightly over Europe and Asia that newspapers could be read at midnight.' },
-      { t: '1927', text: 'Leonid Kulik reaches the blast zone: flattened forest, no crater.' },
-      { t: '1946', text: 'Alexander Kazantsev publishes “Explosion”, the alien-spaceship version.' },
-      { t: 'Today', text: 'Studies agree on an air burst of a body tens of metres across.' },
-    ],
-    tracks: [],
-    observers: [{ label: 'Vanavara trading post', lat: 60.34, lon: 102.28 }],
-    wiki: 'Tunguska event',
-    media: [commons('Tunguska Ereignis-1.jpg', 'Trees flattened by the 1908 blast, photographed by Leonid Kulik’s expedition in 1929')],
-    sources: [link('Wikipedia — Tunguska event', 'https://en.wikipedia.org/wiki/Tunguska_event')],
-  },
-  {
     id: 'nz-airship-scare-1909',
     title: 'The 1909 New Zealand airship scare',
     date: '1909-07-23T12:00:00+11:30',
@@ -467,7 +434,7 @@ export default [
     date: '2011-01-28T01:00:00+02:00',
     timeApprox: true,
     place: 'Dome of the Rock, Temple Mount (Haram al-Sharif), Old City of Jerusalem',
-    country: 'Israel',
+    country: 'Jerusalem',
     cc: 'IL',
     lat: 31.778,
     lon: 35.2354,

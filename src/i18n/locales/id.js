@@ -1167,5 +1167,5 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Mengorbit pelan di sekitar tengah layar; dari jauh, memutar Bumi",
   "Turning the Earth — press O or touch the globe to stop": "Memutar Bumi — tekan O atau sentuh globe untuk berhenti",
   "Place search could not be reached; coordinates typed here still work.": "Pencarian tempat tidak dapat dijangkau; koordinat yang diketik di sini tetap berfungsi.",
-  "New: 13 more cases, a faster globe, and buttons sized for a finger on phones": "Baru: 13 kasus lagi, globe yang lebih cepat, dan tombol seukuran jari di ponsel",
+  "New: 77 more cases from around the world, 251 in all": "Baru: 77 kasus lagi dari seluruh dunia, total 251",
 };

@@ -216,6 +216,7 @@ describe('numbers the docs quote about the cases', () => {
   const UNITS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
   const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
   const spelled = (words) => {
+    if (/^\d+$/.test(words)) return Number(words); // past ninety-nine the page writes the figure
     const parts = words.toLowerCase().split('-');
     return parts.reduce((sum, w) => sum + (UNITS.indexOf(w) >= 0 ? UNITS.indexOf(w) : TENS.indexOf(w) * 10), 0);
   };
@@ -227,8 +228,8 @@ describe('numbers the docs quote about the cases', () => {
 
   it('quote how many cases have a flight path and how many have an approximate time in docs/KNOWN-ISSUES.md', () => {
     const text = doc('docs/KNOWN-ISSUES.md');
-    expect(spelled(/([A-Za-z-]+) cases draw one/.exec(text)[1])).toBe(CASES.filter((c) => c.tracks?.length).length);
-    expect(spelled(/([A-Za-z-]+)(?: older)? cases record only a date or part of a day/.exec(text)[1])).toBe(CASES.filter((c) => c.timeApprox).length);
+    expect(spelled(/([A-Za-z0-9-]+) cases draw one/.exec(text)[1])).toBe(CASES.filter((c) => c.tracks?.length).length);
+    expect(spelled(/([A-Za-z0-9-]+)(?: older)? cases record only a date or part of a day/.exec(text)[1])).toBe(CASES.filter((c) => c.timeApprox).length);
   });
 });
 
