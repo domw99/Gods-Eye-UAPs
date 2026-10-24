@@ -12,5 +12,7 @@ import unitedStatesMore from './united-states-more.js';
 export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...unitedStatesMore].sort(
 import europeMore from './europe-more.js';
 export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...europeMore].sort(
+import latinAmericaMore from './latin-america-more.js';
+export const CASES = [...historical, ...northAmerica, ...northAmericaMore, ...world, ...worldMore, ...moreCases, ...abroadCases, ...moreEncounters, ...filesAndResolutions, ...latinAmericaMore].sort(
   (a, b) => Date.parse(a.date) - Date.parse(b.date),
 );
