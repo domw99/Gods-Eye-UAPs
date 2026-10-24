@@ -30,11 +30,49 @@ function setBackgroundInert(on) {
   }
 }
 
+/*
+ * The browser's Back button (a phone's back gesture) steps out of a dialog, as Esc does. An open dialog adds one
+ * history entry with the same address; without it, Back closed the case behind the dialog, or left the site.
+ * Closed some other way (✕, Esc), the entry is taken back off, unless something opened since then (a link in the
+ * dialog, a record chosen in it) has moved on past it.
+ */
+let historyEntry = 0; // the open dialog's entry, by a number kept in its state
+let skipPop = false;
+function pushHistoryEntry() {
+  if (historyEntry || typeof history === 'undefined') return;
+  historyEntry = Date.now();
+  history.pushState({ ...history.state, dialog: historyEntry }, '');
+}
+function dropHistoryEntry() {
+  if (!historyEntry) return;
+  const entry = historyEntry;
+  historyEntry = 0;
+  // Later, so that a link or a record opened from the dialog has made its own entry first, and is not undone.
+  setTimeout(() => {
+    if (history.state?.dialog !== entry) return;
+    skipPop = true;
+    history.back();
+  });
+}
+/** For the page's popstate handler: true when this Back belonged to a dialog (it is then handled here). */
+export function dialogHistoryPop() {
+  if (skipPop) {
+    skipPop = false;
+    return true;
+  }
+  if (!historyEntry) return false;
+  historyEntry = 0;
+  backModal();
+  if (root().children.length) pushHistoryEntry(); // a dialog beneath is still open: the next Back closes it
+  return true;
+}
+
 /** Close every dialog. */
 export function closeModal() {
   stack.length = 0;
   mount(root(), html``);
   setBackgroundInert(false);
+  dropHistoryEntry();
   lastFocus?.focus?.();
 }
 
@@ -74,6 +112,7 @@ function modal(title, content, { wide = true } = {}) {
     else if (e.target.closest('a[href^="#/"]')) closeModal();
   });
   setBackgroundInert(true);
+  pushHistoryEntry();
   if (position >= 0) restoreFocus(backdrop, position);
   else backdrop.querySelector('.modal button, .modal input, .modal a')?.focus();
   return backdrop;
@@ -415,6 +454,7 @@ export function openLightbox({ lightbox, caption, credit, href }) {
     if (e.target === lb || e.target.closest('button[data-close]')) closeModal();
   });
   setBackgroundInert(true);
+  pushHistoryEntry();
   lb.querySelector('button').focus();
 }
 

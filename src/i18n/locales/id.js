@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "Baru: 77 kasus lagi dari seluruh dunia, total 251",
   "Show the case file and the panels": "Tampilkan berkas kasus dan panel",
   "Hide the panels to watch the path": "Sembunyikan panel untuk menonton lintasan",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Sudut saksi: {who}. Ketuk SUDUT SAKSI lagi untuk keluar.",
 };

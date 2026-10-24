@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "新增：来自世界各地的 77 个案例，共 251 个",
   "Show the case file and the panels": "显示案例档案和面板",
   "Hide the panels to watch the path": "隐藏面板以观看路径",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "目击者视角：{who}。再次点按“目击者视角”即可退出。",
 };

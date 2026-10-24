@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "Nowość: 77 nowych spraw z całego świata, razem 251",
   "Show the case file and the panels": "Pokaż akta sprawy i panele",
   "Hide the panels to watch the path": "Ukryj panele, aby oglądać trasę",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Widok świadka: {who}. Dotknij ponownie WIDOK ŚWIADKA, aby wyjść.",
 };

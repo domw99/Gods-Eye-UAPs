@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "Yeni: dünyanın dört bir yanından 77 vaka daha, toplam 251",
   "Show the case file and the panels": "Vaka dosyasını ve panelleri göster",
   "Hide the panels to watch the path": "Rotayı izlemek için panelleri gizle",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Tanık görüşü: {who}. Çıkmak için TANIK GÖRÜŞÜ'ne yeniden dokunun.",
 };

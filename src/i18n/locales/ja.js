@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "新機能：世界各地の事例が77件増え、合計251件になりました",
   "Show the case file and the panels": "事例ファイルとパネルを表示",
   "Hide the panels to watch the path": "パネルを隠して経路を見る",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "目撃者視点：{who}。もう一度「目撃者視点」をタップすると戻ります。",
 };

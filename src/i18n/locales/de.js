@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "Neu: 77 weitere Fälle aus aller Welt, insgesamt 251",
   "Show the case file and the panels": "Fallakte und Bereiche einblenden",
   "Hide the panels to watch the path": "Bereiche ausblenden, um den Flugweg zu sehen",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Zeugensicht: {who}. Zum Verlassen erneut auf ZEUGENSICHT tippen.",
 };

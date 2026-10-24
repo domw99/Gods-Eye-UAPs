@@ -3,6 +3,7 @@ import { createViewer, createPhotoreal, saveGoogleKey, storedGoogleKey, hasEnvGo
 import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { createInstall, installSteps } from './app/install.js';
+import { keepFieldAboveKeyboard } from './app/keyboard.js';
 import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale, upper } from './i18n/index.js';
 import { fmtDate } from './util/when.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
@@ -39,7 +40,7 @@ import { createBasemap, BASEMAPS } from './app/basemap.js';
 import { openSpace } from './ui/space.js';
 import { openMoon, closeMoon, isMoonOpen, moonGlobe, setMoonMode, setMoonLighting } from './ui/moonview.js';
 import { dropCaches } from './util/storage.js';
-import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal } from './ui/modals.js';
+import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal, dialogHistoryPop } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
 import { weatherAt } from './services/weather.js';
 import { searchPlaces } from './services/places.js';
@@ -109,6 +110,7 @@ render.pulseWhile(() => effects.mode !== 'normal' && !lessMotion(), 66); // sens
 render.keepAliveWhile(() => story.active);
 render.keepAliveWhile(() => itemLayer.animating); // selection ping
 window.addEventListener('resize', () => render.request());
+keepFieldAboveKeyboard();
 
 let officialMeta = null;
 let officialItems = [];
@@ -1015,6 +1017,7 @@ function routeToMoon() {
 }
 // Back / Forward, or a link to #/…: show that record (or close the dossier).
 window.addEventListener('popstate', (e) => {
+  if (dialogHistoryPop()) return;
   navDepth = e.state?.depth || 0;
   updateBackButton();
   routing = true;
@@ -1429,7 +1432,9 @@ function toggleWitnessView(force) {
   if (on && who) {
     pb.follow.setAttribute('aria-pressed', 'false');
     document.body.classList.add('pov');
-    toast(t('Witness view: {who}. Press V or Esc to leave.', { who }), 3500);
+    // A phone has no V or Esc to press: the lit button is the way out there.
+    const touch = matchMedia('(pointer: coarse)').matches;
+    toast(touch ? t('Witness view: {who}. Tap WITNESS VIEW again to leave.', { who }) : t('Witness view: {who}. Press V or Esc to leave.', { who }), 3500);
     if (!trackLayer.playing) trackLayer.play();
   } else {
     document.body.classList.remove('pov');
@@ -1437,6 +1442,9 @@ function toggleWitnessView(force) {
 }
 pb.pov.addEventListener('click', () => toggleWitnessView());
 document.getElementById('pb-close').addEventListener('click', () => {
+  // During the tour this is the way out on a phone: watch mode hides the top bar and its STOP, and the tour
+  // would otherwise open its next case a few seconds later.
+  stopTour();
   trackLayer.pause();
   toggleWitnessView(false);
   trackLayer.follow(false);

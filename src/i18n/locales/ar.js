@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "جديد: 77 حالة إضافية من أنحاء العالم، 251 في المجموع",
   "Show the case file and the panels": "إظهار ملف الحالة واللوحات",
   "Hide the panels to watch the path": "إخفاء اللوحات لمشاهدة المسار",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "منظور الشاهد: {who}. اضغط «منظور الشاهد» مرة أخرى للخروج.",
 };

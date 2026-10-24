@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "नया: दुनिया भर से 77 और मामले, कुल 251",
   "Show the case file and the panels": "केस फ़ाइल और पैनल दिखाएँ",
   "Hide the panels to watch the path": "रास्ता देखने के लिए पैनल छिपाएँ",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "गवाह का दृश्य: {who}। बाहर निकलने के लिए फिर से «गवाह का दृश्य» पर टैप करें।",
 };

@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "Nieuw: 77 extra zaken van over de hele wereld, 251 in totaal",
   "Show the case file and the panels": "Toon het dossier en de panelen",
   "Hide the panels to watch the path": "Verberg de panelen om de route te bekijken",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Getuigenblik: {who}. Tik nogmaals op GETUIGENBLIK om te verlaten.",
 };

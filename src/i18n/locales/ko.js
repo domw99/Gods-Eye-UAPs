@@ -1170,4 +1170,5 @@ export default {
   "New: 77 more cases from around the world, 251 in all": "새 기능: 전 세계의 사례 77건 추가, 총 251건",
   "Show the case file and the panels": "사례 파일과 패널 표시",
   "Hide the panels to watch the path": "경로를 보려면 패널 숨기기",
+  "Witness view: {who}. Tap WITNESS VIEW again to leave.": "목격자 시점: {who}. 나가려면 '목격자 시점'을 다시 누르세요.",
 };
