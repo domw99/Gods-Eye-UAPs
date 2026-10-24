@@ -19,7 +19,7 @@ describe('the numbers the known-issues page quotes', () => {
   });
 
   it('say how many cases have an approximate time of day', () => {
-    expect(text).toContain(`${words(CASES.filter((c) => c.timeApprox).length)} older cases record only a date or part of a day`);
+    expect(text).toContain(`${words(CASES.filter((c) => c.timeApprox).length)} cases record only a date or part of a day`);
   });
 });
 
