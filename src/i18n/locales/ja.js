@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
   "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
   "New: 77 more cases from around the world, 251 in all": "新機能：世界各地の事例が77件増え、合計251件になりました",
+  "Show the case file and the panels": "事例ファイルとパネルを表示",
+  "Hide the panels to watch the path": "パネルを隠して経路を見る",
 };

@@ -1368,12 +1368,35 @@ function setPovTitle() {
 }
 function hidePlayback() {
   pb.bar.classList.add('hidden');
+  setWatchMode(false);
   if (trackLayer.witnessOn) trackLayer.witnessView(false);
   document.body.classList.remove('pov');
 }
+/*
+ * Watch mode, on a phone: while a flight path plays, everything but a slim playback bar steps aside, so the path
+ * can be seen. DETAILS brings the panels back without stopping it; it starts again each time playback starts.
+ */
+const PHONE = '(max-width: 720px), (max-height: 580px)';
+const pbPanels = document.getElementById('pb-panels');
+function setWatchMode(on) {
+  document.body.classList.toggle('pb-focus', on);
+  pbPanels.setAttribute('aria-pressed', String(!on));
+  pbPanels.title = on ? t('Show the case file and the panels') : t('Hide the panels to watch the path');
+  render.request();
+}
+pbPanels.addEventListener('click', () => {
+  const back = document.body.classList.contains('pb-focus');
+  setWatchMode(!back);
+  // The case file comes back folded down (peek), so the playback bar above it, and DETAILS on it, stay in reach.
+  const d = document.getElementById('dossier');
+  if (back && !d.classList.contains('hidden') && !d.classList.contains('peek')) document.getElementById('dossier-peek').click();
+});
+let wasPlaying = false;
 function updatePlaybackUi() {
   const cur = trackLayer.current;
   if (!cur) return;
+  if (trackLayer.playing && !wasPlaying && matchMedia(PHONE).matches) setWatchMode(true);
+  wasPlaying = Boolean(trackLayer.playing);
   pb.play.textContent = trackLayer.playing ? '❚❚' : '▶';
   pb.play.setAttribute('aria-pressed', String(Boolean(trackLayer.playing))); // the label says "Play" either way; this says which it is now
   pb.scrub.value = String(Math.round(trackLayer.progress() * 1000));

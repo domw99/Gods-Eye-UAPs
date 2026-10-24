@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
   "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
   "New: 77 more cases from around the world, 251 in all": "नया: दुनिया भर से 77 और मामले, कुल 251",
+  "Show the case file and the panels": "केस फ़ाइल और पैनल दिखाएँ",
+  "Hide the panels to watch the path": "रास्ता देखने के लिए पैनल छिपाएँ",
 };

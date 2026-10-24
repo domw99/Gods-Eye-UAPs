@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "Memutar Bumi — tekan O atau sentuh globe untuk berhenti",
   "Place search could not be reached; coordinates typed here still work.": "Pencarian tempat tidak dapat dijangkau; koordinat yang diketik di sini tetap berfungsi.",
   "New: 77 more cases from around the world, 251 in all": "Baru: 77 kasus lagi dari seluruh dunia, total 251",
+  "Show the case file and the panels": "Tampilkan berkas kasus dan panel",
+  "Hide the panels to watch the path": "Sembunyikan panel untuk menonton lintasan",
 };

@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
   "Place search could not be reached; coordinates typed here still work.": "장소 검색에 연결할 수 없습니다. 여기에 입력한 좌표는 계속 사용할 수 있습니다.",
   "New: 77 more cases from around the world, 251 in all": "새 기능: 전 세계의 사례 77건 추가, 총 251건",
+  "Show the case file and the panels": "사례 파일과 패널 표시",
+  "Hide the panels to watch the path": "경로를 보려면 패널 숨기기",
 };

@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
   "Place search could not be reached; coordinates typed here still work.": "Yer araması şu anda erişilemiyor; buraya yazılan koordinatlar yine çalışır.",
   "New: 77 more cases from around the world, 251 in all": "Yeni: dünyanın dört bir yanından 77 vaka daha, toplam 251",
+  "Show the case file and the panels": "Vaka dosyasını ve panelleri göster",
+  "Hide the panels to watch the path": "Rotayı izlemek için panelleri gizle",
 };

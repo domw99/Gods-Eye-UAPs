@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "地球正在自转——按 O 或触摸地球即可停止",
   "Place search could not be reached; coordinates typed here still work.": "无法连接地点搜索；在此输入的坐标仍然可用。",
   "New: 77 more cases from around the world, 251 in all": "新增：来自世界各地的 77 个案例，共 251 个",
+  "Show the case file and the panels": "显示案例档案和面板",
+  "Hide the panels to watch the path": "隐藏面板以观看路径",
 };

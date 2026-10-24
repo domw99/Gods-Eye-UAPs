@@ -81,3 +81,21 @@ test('on a phone held sideways, the welcome card and the view controls stay belo
   const controls = page.locator('#map-controls');
   if (await controls.isVisible()) expect((await controls.boundingBox()).y).toBeGreaterThanOrEqual(bar.y + bar.height);
 });
+
+test('on a phone, playing a flight path clears the screen down to a slim playback bar, and DETAILS brings the panels back', async ({ page }) => {
+  await openApp(page, '/#/case/nimitz-tic-tac-2004');
+  await expect(page.locator('#dossier')).not.toHaveClass(/hidden/);
+  await page.locator('#dossier-body [data-action="play"]').first().tap();
+  const bar = page.locator('#playback');
+  await expect(bar).toBeVisible({ timeout: 15_000 });
+  for (const sel of ['.topbar', '#dossier', '#left', '#timeline']) await expect(page.locator(sel)).toBeHidden();
+  const box = await bar.boundingBox();
+  expect(box.height).toBeLessThan(140);
+  await page.locator('#pb-panels').tap();
+  await expect(page.locator('#dossier')).toBeVisible();
+  await expect(page.locator('.topbar')).toBeVisible();
+  await page.locator('#pb-panels').tap();
+  await expect(page.locator('.topbar')).toBeHidden();
+  await page.locator('#pb-close').tap();
+  await expect(page.locator('.topbar')).toBeVisible();
+});

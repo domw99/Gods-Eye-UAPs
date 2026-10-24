@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
   "Place search could not be reached; coordinates typed here still work.": "Поиск мест недоступен; введённые здесь координаты по-прежнему работают.",
   "New: 77 more cases from around the world, 251 in all": "Новое: ещё 77 случаев со всего мира, всего 251",
+  "Show the case file and the panels": "Показать досье и панели",
+  "Hide the panels to watch the path": "Скрыть панели, чтобы смотреть траекторию",
 };

@@ -1168,4 +1168,6 @@ export default {
   "Turning the Earth — press O or touch the globe to stop": "Obracanie Ziemi — naciśnij O lub dotknij globusa, aby zatrzymać",
   "Place search could not be reached; coordinates typed here still work.": "Wyszukiwanie miejsc jest nieosiągalne; wpisane tu współrzędne nadal działają.",
   "New: 77 more cases from around the world, 251 in all": "Nowość: 77 nowych spraw z całego świata, razem 251",
+  "Show the case file and the panels": "Pokaż akta sprawy i panele",
+  "Hide the panels to watch the path": "Ukryj panele, aby oglądać trasę",
 };
