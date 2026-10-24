@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import * as Cesium from 'cesium';
-import { fixBufferLayout } from '../src/layers/billboard-buffers.js';
+import { fixBufferLayout, keepBuffersInPlace } from '../src/layers/billboard-buffers.js';
 
 const require = createRequire(import.meta.url);
-const source = readFileSync(require.resolve('@cesium/engine/Source/Scene/BillboardCollection.js'), 'utf8');
+const read = (name) => readFileSync(require.resolve(`@cesium/engine/Source/Scene/${name}.js`), 'utf8');
+const source = read('BillboardCollection');
 
 /** Which property's usage decides the buffer an attribute goes in, as Cesium's createVAF says. */
 function usageOf(attribute) {
@@ -36,6 +37,30 @@ describe('fixed buffer layout for the big marker layers', () => {
     expect(usageOf('eyeOffset')).toBe('EYE_OFFSET_INDEX');
     expect(usageOf('compressedAttribute3')).toBe('DISTANCE_DISPLAY_CONDITION_INDEX');
     expect(source).toMatch(/const DISTANCE_DISPLAY_CONDITION_INDEX\s*=\s*Billboard\.DISTANCE_DISPLAY_CONDITION;/);
+  });
+
+  it('the usage switch it stops is still the one that rebuilds the buffers', () => {
+    // Both collections rebuild when computeNewBuffersUsage reports a switch, and only reset the change counts on a rebuild.
+    for (const name of ['BillboardCollection', 'PointPrimitiveCollection']) {
+      const code = read(name);
+      expect(code).toMatch(/if \(createVertexArray \|\| \(!picking && this\.computeNewBuffersUsage\(\)\)\)/);
+      expect(code).toMatch(/properties\[k\] === 0 \? BufferUsage\.STATIC_DRAW : BufferUsage\.STREAM_DRAW/);
+    }
+  });
+
+  it('stops every billboard and point collection from switching', () => {
+    const fake = { BillboardCollection: function () {}, PointPrimitiveCollection: function () {} };
+    fake.BillboardCollection.prototype.computeNewBuffersUsage = () => true;
+    fake.PointPrimitiveCollection.prototype.computeNewBuffersUsage = () => true;
+    keepBuffersInPlace(fake);
+    expect(new fake.BillboardCollection().computeNewBuffersUsage()).toBe(false);
+    expect(new fake.PointPrimitiveCollection().computeNewBuffersUsage()).toBe(false);
+    keepBuffersInPlace();
+    // Labels draw their letters with billboard collections of the same class.
+    const labels = new Cesium.LabelCollection();
+    expect(labels._glyphBillboardCollection).toBeInstanceOf(Cesium.BillboardCollection);
+    expect(labels._glyphBillboardCollection.computeNewBuffersUsage()).toBe(false);
+    expect(new Cesium.PointPrimitiveCollection().computeNewBuffersUsage()).toBe(false);
   });
 
   it('leaves a collection without those internals as it was', () => {

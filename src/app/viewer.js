@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import { translateDom } from '../i18n/index.js';
+import { keepBuffersInPlace } from '../layers/billboard-buffers.js';
 
 /**
  * Globe setup. Mirrors God's Eye View's keyless start: Esri World Imagery and
@@ -43,6 +44,8 @@ export const ESRI_CREDIT =
 // Imagery, terrain and 3D tiles come from servers that speak HTTP/2, which carries many requests on one connection: the default of six at a time
 // leaves a zoomed-in view waiting on its own queue.
 Cesium.RequestScheduler.maximumRequestsPerServer = 18;
+// Markers and labels keep their GPU buffers when they change instead of rebuilding them twice (layers/billboard-buffers.js).
+keepBuffersInPlace();
 
 /**
  * Esri's imagery needs its service description before the first tile. The
