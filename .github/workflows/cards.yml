@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   cards:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright installs its browser's system libraries only on the Ubuntu releases it supports; ubuntu-latest moved to 26 in October 2026
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
