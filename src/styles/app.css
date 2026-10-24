@@ -396,6 +396,8 @@ body.left-collapsed .hud-tl { left: 72px; }
 @media (min-width: 721px) { body:has(#playback:not(.hidden)) { --pb-lift: 52px; } }
 .hud-br { position: absolute; bottom: calc(var(--bottom-gap) + 8px + var(--pb-lift)); right: calc(16px + var(--sar)); display: grid; gap: 3px; text-align: right; }
 body.dossier-open .hud-br { right: calc(var(--right-w) + 26px + var(--sar)); }
+/* Between the case list and the dossier on a narrow window there is no room for the readout: it ran under the list. */
+@media (min-width: 721px) and (max-width: 960px) { body.dossier-open .hud-br { display: none; } }
 .hud .muted { color: rgba(0, 212, 255, 0.65); }
 .crosshair { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; transform: translate(-50%, -50%); opacity: 0.35; }
 .crosshair::before, .crosshair::after { content: ''; position: absolute; background: var(--accent); }
@@ -839,6 +841,13 @@ body.embed .top-actions { margin-left: auto; order: 0; width: auto; }
 @media (max-width: 760px) {
   .welcome { left: 10px; right: 10px; bottom: var(--bottom-gap); max-width: none; }
 }
+/* It never runs up under the top bar: on a phone held sideways there is little height, so it may cover the years bar (it is
+   there only until it is closed) and scrolls if it still does not fit. */
+.welcome { max-height: calc(100dvh - var(--top-off) - var(--bottom-gap) - 64px); overflow-y: auto; overscroll-behavior: contain; }
+@media (max-height: 580px) {
+  .welcome { bottom: calc(8px + var(--sab)); max-width: 640px; padding-block: 12px 10px; max-height: calc(100dvh - var(--top-off) - 24px - var(--sab)); }
+  .welcome h2 { font-size: 17px; }
+}
 
 /* ── Thermal scale (FLIR modes) ───────────────────────── */
 .thermal-scale { display: none; position: fixed; z-index: 12; left: calc(var(--left-w) + 34px); bottom: calc(var(--bottom-gap) + 54px); align-items: center; gap: 8px; font-size: 9.5px; letter-spacing: 0.16em; color: #e8eaed; text-shadow: 0 1px 2px #000; pointer-events: none; }
@@ -998,4 +1007,38 @@ html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
   flex: 1 1 220px;
   min-width: 0;
   font: 12px var(--font-mono);
+}
+
+/* ── Touch screens ────────────────────────────────────── */
+/* A finger needs about 44px. The icon buttons (close, back, collapse, play), the view controls and the
+   years bar's HIDE get it; the glyphs stay the same size. The top bar's three rows grow a little each:
+   44px apiece would take a fifth of a phone's height from the globe. */
+@media (pointer: coarse) {
+  .icon-btn { width: 44px; height: 44px; }
+  .panel-head .icon-btn { margin-block: -7px; } /* the header keeps its height */
+  .map-controls { width: 50px; }
+  .map-controls button { height: 44px; }
+  .map-controls .reset { height: 48px; }
+  .lighting button { width: 34px; height: 30px; }
+  .worlds button { height: 30px; }
+  .modes button { padding-block: 8px; }
+  .top-actions .chip { padding-block: 9px; }
+  select.chip.lang { padding-block: 8px; }
+  .tl-labels #tl-hide { padding: 14px 10px; margin: -14px -10px; } /* a bigger target, the same layout */
+  #pb-speed { padding: 8px 6px; }
+}
+@media (pointer: coarse) and (max-width: 720px), (pointer: coarse) and (max-height: 580px) {
+  .map-controls { width: auto; }
+  .map-controls button { width: 44px; }
+  .map-controls .reset { width: 56px; height: 44px; }
+}
+@media (pointer: coarse) and (min-width: 721px) and (max-height: 580px) {
+  body.dossier-open .map-controls { grid-template-columns: repeat(4, 44px); }
+  body.dossier-open .map-controls .reset { width: 44px; }
+}
+@media (pointer: coarse) and (max-width: 400px) { .lighting button { width: 28px; } } /* the first row stays one row on a small phone */
+/* A phone held sideways with a case open has no room left for the view controls: they slid under the top bar.
+   Pinch and drag do the same there; closing the dossier brings them back. */
+@media (pointer: coarse) and (min-width: 721px) and (max-width: 960px) and (max-height: 580px) {
+  body.dossier-open .map-controls { display: none; }
 }
