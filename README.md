@@ -198,7 +198,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 
 - **485 issues of *Skylook* and the *MUFON UFO Journal* (1967–2008)**, readable page by page inside the app. The library (<kbd>G</kbd>) lists every issue by year, plus 61 series of MUFON chapter newsletters.
 - **The MUFON files layer** (violet) marks **2,517 places named in the journal's sighting reports**. They were found automatically in the OCR text and geocoded offline. Each links to the exact page, with a short quote.
-- **Case dossiers list the journal pages that discuss them.** 92 of the 251 cases have coverage, for example:
+- **Case dossiers list the journal pages that discuss them.** 119 of the 251 cases have coverage, for example:
   - 26 pages on Lonnie Zamora's 1964 Socorro sighting;
   - 60 on Travis Walton;
   - 39 on the 2008 Stephenville lights.
@@ -212,7 +212,7 @@ MUFON and The Black Vault released the Mutual UFO Network's journal free as "The
 <td width="50%"><img src="docs/media/search.jpg" alt="Journal search: pages across the APRO Bulletin, Skylook and the MUFON UFO Journal that mention the Delphos ring" /></td>
 </tr>
 <tr>
-<td><sub><b>The research archives layer</b> (teal) maps <b>2,459 places</b> named in the sighting reports of the other big civilian groups: the <b>APRO Bulletin</b> (1952–1987), NICAP's <b>U.F.O. Investigator</b>, CUFOS's <b>International UFO Reporter</b> (1976–2009) and MUFON's state chapter newsletters. 78 case dossiers list the pages about them.</sub></td>
+<td><sub><b>The research archives layer</b> (teal) maps <b>2,459 places</b> named in the sighting reports of the other big civilian groups: the <b>APRO Bulletin</b> (1952–1987), NICAP's <b>U.F.O. Investigator</b>, CUFOS's <b>International UFO Reporter</b> (1976–2009) and MUFON's state chapter newsletters. 132 case dossiers list the pages about them.</sub></td>
 <td><sub><b>Search inside the journals</b>: every word of about 22,000 OCR pages is indexed, so a search like “Delphos ring” finds the 44 pages across APRO, Skylook and the MUFON Journal that mention both. Results open the page in the app.</sub></td>
 </tr>
 </table>

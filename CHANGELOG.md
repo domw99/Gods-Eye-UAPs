@@ -2,6 +2,15 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.7] — 2026-10-24
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.7)
+
+**Watching a flight path on a phone: the screen clears down to the globe and a slim playback bar.**
+
+- **Watch mode on phones.** When a flight path starts playing on a phone (portrait or held sideways), the top bar, the case file, the case list, the years bar, the HUD and the view controls step aside, leaving the globe and one slim bar: play/pause, the position slider, speed, chase cam, witness view, **DETAILS** and stop. DETAILS brings the panels back without stopping the path (the case file opens folded down, so the bar stays in reach), and tapping it again clears them. Before, in portrait the case file covered the whole globe and hid the playback bar; held sideways, three panels covered most of the screen.
+- **Journal pages for the new cases.** The MUFON Journal and the research archives (APRO, NICAP, CUFOS) were matched again against all 251 cases: **119** case files now list MUFON Journal pages that discuss them, and **132** list research-archive pages.
+
 ## [2.6] — 2026-10-24
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.6)
