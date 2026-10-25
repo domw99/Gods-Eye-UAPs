@@ -2,6 +2,27 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.11] — 2026-10-25
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.11)
+
+**Ten more cases, from the green fireballs over Los Alamos to the drones that closed Europe's airports.** 261 cases in all.
+
+- **Unresolved or disputed:**
+  - the green fireballs over New Mexico (1948–51) and the Air Force's Project Twinkle
+  - James McDivitt's "white cylinder with an arm" seen from Gemini 4 (1965)
+  - the Allagash abductions (1976), with one of the four's 2016 retraction
+  - the Yukon "mothership" (1996) and the rocket re-entry offered for it
+  - the drones that shut Copenhagen, Oslo, Aalborg, Munich, Brussels and Liège airports in 2025
+- **Claims and the story behind them:**
+  - the Trinity crash story (1945), first told in 2003
+  - Paul Bennewitz, the lights over Kirtland's Manzano area and the disinformation fed to him (1979–88)
+- **Solved:**
+  - the Betz sphere (1974), a ball check valve
+  - the Haiti UFO videos (2007), computer animation
+  - the Miami mall "alien" (2024), a teen brawl and a shadow
+- Each says what is documented, what is only claimed and the best explanation on offer. As always, the evidence decides the status.
+
 ## [2.10] — 2026-10-25
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.10)

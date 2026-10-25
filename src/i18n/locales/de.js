@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "VERSTANDEN",
   "◉ WITNESS VIEW": "◉ ZEUGENSICHT",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ZEUGENSICHT — V / ESC ZUM VERLASSEN",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Neu: Der Globus startet jetzt gleichmäßig beleuchtet. Der Lichtschalter in der oberen Leiste bringt Tag und Nacht zurück",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Neu: zehn weitere Fälle, von den grünen Feuerkugeln New Mexicos bis zu den Drohnen, die Europas Flughäfen schlossen",
 };

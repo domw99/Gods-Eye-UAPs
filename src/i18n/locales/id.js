@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "MENGERTI",
   "◉ WITNESS VIEW": "◉ PANDANGAN SAKSI",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ PANDANGAN SAKSI — V / ESC UNTUK KELUAR",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Baru: globe kini dimulai dengan cahaya merata. Sakelar pencahayaan di bilah atas mengembalikan siang dan malam",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Baru: sepuluh kasus lagi, dari bola api hijau New Mexico hingga drone yang menutup bandara-bandara Eropa",
 };

@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "समझ गया",
   "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "नया: ग्लोब अब समान रोशनी के साथ खुलता है। ऊपरी पट्टी का प्रकाश स्विच दिन और रात वापस लाता है",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "नया: दस और मामले, न्यू मैक्सिको के हरे आग के गोलों से लेकर उन ड्रोनों तक जिन्होंने यूरोप के हवाई अड्डे बंद कराए",
 };

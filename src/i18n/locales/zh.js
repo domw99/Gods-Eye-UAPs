@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "知道了",
   "◉ WITNESS VIEW": "◉ 目击者视角",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目击者视角 — 按 V / Esc 退出",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "新功能：地球仪现在以均匀光照启动。顶部栏的照明开关可恢复昼夜效果",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新增：十个案例，从新墨西哥州的绿色火球到导致欧洲机场关闭的无人机",
 };

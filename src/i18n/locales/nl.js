@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "BEGREPEN",
   "◉ WITNESS VIEW": "◉ GETUIGENZICHT",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ GETUIGENZICHT — V / ESC OM TE STOPPEN",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Nieuw: de wereldbol start nu gelijkmatig verlicht. De verlichtingsschakelaar in de bovenbalk brengt dag en nacht terug",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Nieuw: tien nieuwe zaken, van de groene vuurballen van New Mexico tot de drones die Europese luchthavens sloten",
 };

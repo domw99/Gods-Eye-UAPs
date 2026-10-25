@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "ПОНЯТНО",
   "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Новое: глобус теперь открывается равномерно освещённым. Переключатель освещения на верхней панели возвращает день и ночь",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Новое: ещё десять случаев, от зелёных огненных шаров Нью-Мексико до дронов, закрывших аэропорты Европы",
 };

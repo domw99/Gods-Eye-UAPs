@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "ANLADIM",
   "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Yeni: Küre artık eşit aydınlatılmış olarak açılıyor. Üst çubuktaki aydınlatma anahtarı gece ve gündüzü geri getirir",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Yeni: New Mexico’nun yeşil ateş toplarından Avrupa havalimanlarını kapatan dronlara kadar on yeni vaka",
 };

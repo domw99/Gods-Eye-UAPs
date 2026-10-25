@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "فهمت",
   "◉ WITNESS VIEW": "◉ منظور الشاهد",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ منظور الشاهد — V / ESC للخروج",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "جديد: تبدأ الكرة الأرضية الآن بإضاءة متساوية. يعيد مفتاح الإضاءة في الشريط العلوي النهار والليل",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "جديد: عشر حالات أخرى، من الكرات النارية الخضراء في نيو مكسيكو إلى الطائرات المسيّرة التي أغلقت مطارات أوروبا",
 };

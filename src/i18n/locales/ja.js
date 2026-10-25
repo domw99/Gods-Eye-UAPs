@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "了解",
   "◉ WITNESS VIEW": "◉ 目撃者の視点",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "新機能：地球儀は均一な明るさで始まるようになりました。上部バーの照明スイッチで昼と夜を戻せます",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新着：ニューメキシコの緑の火球から、ヨーロッパの空港を閉鎖させたドローンまで、10件の事例を追加",
 };

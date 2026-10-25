@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "HO CAPITO",
   "◉ WITNESS VIEW": "◉ VISTA DEL TESTIMONE",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VISTA DEL TESTIMONE — V / ESC PER USCIRE",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Novità: il globo ora parte illuminato in modo uniforme. Il selettore dell’illuminazione nella barra in alto riporta il giorno e la notte",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Novità: dieci casi in più, dalle palle di fuoco verdi del New Mexico ai droni che hanno chiuso gli aeroporti europei",
 };

@@ -1175,5 +1175,5 @@ export default {
   "GOT IT": "확인",
   "◉ WITNESS VIEW": "◉ 목격자 시점",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
-  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "새 기능: 이제 지구본이 고르게 밝은 상태로 시작합니다. 상단 막대의 조명 스위치로 낮과 밤을 되돌릴 수 있습니다",
+  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "새 소식: 뉴멕시코의 녹색 불덩이부터 유럽 공항을 폐쇄시킨 드론까지 사례 10건 추가",
 };
