@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Ekranın ortasında yavaşça dön; uzaktan Dünya’yı döndür",
   "Turning the Earth — press O or touch the globe to stop": "Dünya dönüyor — durdurmak için O tuşuna basın veya küreye dokunun",
   "Place search could not be reached; coordinates typed here still work.": "Yer araması şu anda erişilemiyor; buraya yazılan koordinatlar yine çalışır.",
-  "New: 77 more cases from around the world, 251 in all": "Yeni: dünyanın dört bir yanından 77 vaka daha, toplam 251",
   "Show the case file and the panels": "Vaka dosyasını ve panelleri göster",
   "Hide the panels to watch the path": "Rotayı izlemek için panelleri gizle",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Tanık görüşü: {who}. Çıkmak için TANIK GÖRÜŞÜ'ne yeniden dokunun.",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "ANLADIM",
   "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Yeni: Küre artık eşit aydınlatılmış olarak açılıyor. Üst çubuktaki aydınlatma anahtarı gece ve gündüzü geri getirir",
 };

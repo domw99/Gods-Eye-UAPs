@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Orbita lentamente attorno al centro dello schermo; da lontano, fai ruotare la Terra",
   "Turning the Earth — press O or touch the globe to stop": "La Terra ruota: premi O o tocca il globo per fermare",
   "Place search could not be reached; coordinates typed here still work.": "La ricerca dei luoghi non è raggiungibile; le coordinate scritte qui funzionano comunque.",
-  "New: 77 more cases from around the world, 251 in all": "Novità: 77 casi in più da tutto il mondo, 251 in totale",
   "Show the case file and the panels": "Mostra il fascicolo e i pannelli",
   "Hide the panels to watch the path": "Nascondi i pannelli per guardare la traiettoria",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Vista del testimone: {who}. Tocca di nuovo VISTA DEL TESTIMONE per uscire.",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "HO CAPITO",
   "◉ WITNESS VIEW": "◉ VISTA DEL TESTIMONE",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VISTA DEL TESTIMONE — V / ESC PER USCIRE",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Novità: il globo ora parte illuminato in modo uniforme. Il selettore dell’illuminazione nella barra in alto riporta il giorno e la notte",
 };

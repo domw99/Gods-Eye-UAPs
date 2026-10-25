@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "画面の中央を中心にゆっくり周回。遠くからは地球を自転させる",
   "Turning the Earth — press O or touch the globe to stop": "地球を自転中 — Oキーか地球儀に触れると停止",
   "Place search could not be reached; coordinates typed here still work.": "地名検索に接続できません。ここに入力した座標は引き続き使えます。",
-  "New: 77 more cases from around the world, 251 in all": "新機能：世界各地の事例が77件増え、合計251件になりました",
   "Show the case file and the panels": "事例ファイルとパネルを表示",
   "Hide the panels to watch the path": "パネルを隠して経路を見る",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "目撃者視点：{who}。もう一度「目撃者視点」をタップすると戻ります。",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "了解",
   "◉ WITNESS VIEW": "◉ 目撃者の視点",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "新機能：地球儀は均一な明るさで始まるようになりました。上部バーの照明スイッチで昼と夜を戻せます",
 };

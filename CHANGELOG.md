@@ -2,6 +2,15 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.10] — 2026-10-25
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.10)
+
+**The globe starts evenly lit, and Nearby no longer shows France's files far from France.**
+
+- **Lighting starts off.** A first visit opens on the evenly lit globe, and the map name in the corner no longer adds "· OFF". The lighting switch in the top bar (or <kbd>D</kbd>) still turns on *Auto*, *Day* or *Night*, and a choice you make is remembered as before. Returning visitors see a one-line note about it once.
+- **Nearby** showed an empty GEIPAN (France) section for any place once the French files had loaded. It now appears only in mainland France or near a GEIPAN record, which covers the overseas territories.
+
 ## [2.9] — 2026-10-25
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.9)
@@ -255,7 +264,7 @@ Four researchers worked a region each, checked every case against its primary so
 - The count of countries was 34, which counted the two cases whose position is only a region (Reaper drones over the Middle East and South Asia). It is **33 countries and territories**, here, on the pages and in the open data.
 - Everything new is translated into all 15 languages, with 114 new unit tests and 9 new browser tests.
 
-## [1.7] — 2026-10-03
+## [1.7] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.7)
 
@@ -290,7 +299,7 @@ The page describes the data in the schema.org Dataset format, so dataset search 
 - The small print on the case pages was below the contrast that screen accessibility asks for.
 - On a slow connection, the service worker could show the app at a case page's address. Only the app itself now falls back to the copy it keeps.
 
-## [1.6] — 2026-10-03
+## [1.6] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.6)
 
@@ -333,7 +342,7 @@ Symbols come and go with their names as you zoom. The landing sites and reports 
 - **On the Moon,** <kbd>M</kbd> opens the map settings, as the MAP button does.
 - **Screen readers:** the case panel's collapse button says whether the panel is open.
 
-## [1.5] — 2026-10-02
+## [1.5] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.5)
 
@@ -359,7 +368,7 @@ Each has its sources, a timeline and a status that says what is documented, what
 
 This release also carries the Moon beside the Earth (**EARTH | MOON** in the top bar), described in the 1.4 notes.
 
-## [1.4] — 2026-10-02
+## [1.4] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.4)
 
@@ -386,7 +395,7 @@ This release also carries the Moon beside the Earth (**EARTH | MOON** in the top
 - **A link with a stray `%` in it** (a cut-off or hand-typed address such as `#/case/%`) stopped the app from starting. It now opens the app, and the part it can't read is left as it is.
 - A damaged entry in the saved sighting log no longer discards the whole log.
 
-## [1.3] — 2026-10-02
+## [1.3] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.3)
 
@@ -417,7 +426,7 @@ This release also carries the Moon beside the Earth (**EARTH | MOON** in the top
 **Fixed**
 - Case links for the 22 newest cases previewed the default image on X, Reddit and Discord. They now have their own cards.
 
-## [1.2] — 2026-10-02
+## [1.2] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.2)
 
@@ -443,7 +452,7 @@ This release also carries the Moon beside the Earth (**EARTH | MOON** in the top
 
 A 23-second video of what is new, `whats-new-1.2.mp4`, is attached.
 
-## [1.1] — 2026-09-27
+## [1.1] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.1)
 
@@ -474,7 +483,7 @@ A 21-second video of what's new, `whats-new-1.1.mp4`, is attached below.
 - Quotes and page text from the scanned journals and Blue Book files no longer show the OCR's line-break mark mid-word ("Switzer¬ land"), and the journal search now finds words the scans had split across two lines.
 - Deleting a logged sighting asks on the button itself instead of in a browser pop-up.
 
-## [1.0] — 2026-09-26
+## [1.0] — 2026-10-06
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v1.0)
 

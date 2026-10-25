@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Медленно вращаться вокруг центра экрана; издалека — вращать Землю",
   "Turning the Earth — press O or touch the globe to stop": "Земля вращается — нажмите O или коснитесь глобуса, чтобы остановить",
   "Place search could not be reached; coordinates typed here still work.": "Поиск мест недоступен; введённые здесь координаты по-прежнему работают.",
-  "New: 77 more cases from around the world, 251 in all": "Новое: ещё 77 случаев со всего мира, всего 251",
   "Show the case file and the panels": "Показать досье и панели",
   "Hide the panels to watch the path": "Скрыть панели, чтобы смотреть траекторию",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Глазами свидетеля: {who}. Чтобы выйти, снова нажмите «ГЛАЗАМИ СВИДЕТЕЛЯ».",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "ПОНЯТНО",
   "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Новое: глобус теперь открывается равномерно освещённым. Переключатель освещения на верхней панели возвращает день и ночь",
 };

@@ -71,13 +71,14 @@ test.describe('God’s Eye // UAP', () => {
 
   test('lighting is one click away in the top bar', async ({ page }) => {
     await openApp(page);
-    await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('#light-switch [data-light="off"]')).toHaveAttribute('aria-checked', 'true'); // a first visit starts with the lighting off
+    await expect(page.locator('#hud-map')).not.toContainText('·');
     await page.locator('#light-switch [data-light="night"]').click();
     await expect(page.locator('#light-switch [data-light="night"]')).toHaveAttribute('aria-checked', 'true');
     await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'false');
     await expect(page.locator('#hud-map')).toContainText('· NIGHT');
     await page.locator('#light-switch [data-light="off"]').click();
-    await expect(page.locator('#hud-map')).toContainText('· OFF');
+    await expect(page.locator('#hud-map')).not.toContainText('·');
     await page.keyboard.press('d'); // the key cycles on from the current choice and the bar follows
     await expect(page.locator('#light-switch [data-light="auto"]')).toHaveAttribute('aria-checked', 'true');
   });

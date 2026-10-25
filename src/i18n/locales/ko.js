@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "화면 중앙을 중심으로 천천히 공전, 멀리서는 지구를 자전시킴",
   "Turning the Earth — press O or touch the globe to stop": "지구 자전 중 — O 키를 누르거나 지구본을 터치하면 멈춥니다",
   "Place search could not be reached; coordinates typed here still work.": "장소 검색에 연결할 수 없습니다. 여기에 입력한 좌표는 계속 사용할 수 있습니다.",
-  "New: 77 more cases from around the world, 251 in all": "새 기능: 전 세계의 사례 77건 추가, 총 251건",
   "Show the case file and the panels": "사례 파일과 패널 표시",
   "Hide the panels to watch the path": "경로를 보려면 패널 숨기기",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "목격자 시점: {who}. 나가려면 '목격자 시점'을 다시 누르세요.",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "확인",
   "◉ WITNESS VIEW": "◉ 목격자 시점",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "새 기능: 이제 지구본이 고르게 밝은 상태로 시작합니다. 상단 막대의 조명 스위치로 낮과 밤을 되돌릴 수 있습니다",
 };

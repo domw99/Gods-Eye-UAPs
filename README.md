@@ -108,7 +108,7 @@ There are seven sensor looks, rendered as real-time post-processing shaders (key
 </table>
 
 - **Map style** (**MAP** or <kbd>M</kbd>): Satellite, Dark, Streets or Topographic, all keyless. Over the satellite map you can add **place names and borders**, which fade out close in where 3D buildings take over.
-- **Lighting**: *Auto* lights an open case by the sun at the moment it happened, with city lights on the night side; *Day* and *Night* hold that look everywhere; *Off* keeps the globe evenly lit. The four-button switch in the top bar (☀ auto, day, night, off) changes it in one click, without opening any settings.
+- **Lighting**: *Auto* lights an open case by the sun at the moment it happened, with city lights on the night side; *Day* and *Night* hold that look everywhere; *Off*, where a first visit starts, keeps the globe evenly lit. The four-button switch in the top bar (☀ auto, day, night, off) changes it in one click, without opening any settings.
 - **Hide the years bar** (**HIDE** on the bar, or <kbd>Y</kbd>) for more room; the panels grow into the space, the choice is remembered, and **▲ YEARS** brings it back.
 - **Earthquakes** (new in 1.2): the last 24 hours from the USGS, sized and coloured by magnitude. Strong quakes are sometimes reported as booms or odd lights, so it helps check a same-day sighting.
 <img src="docs/media/earthquakes.jpg" alt="The Earthquakes layer over Japan and the western Pacific: pentagon markers sized and coloured by magnitude, listed in the layers panel with their own symbol" width="100%" />
@@ -356,7 +356,7 @@ Restrict browser keys to your domain, because anything built into the site is pu
 | <kbd>C</kbd> | Group nearby markers on / off | <kbd>Esc</kbd> | Close, or back to the previous dialog |
 | <kbd>H</kbd> | Hide the HUD | Browser Back | The record you had open before |
 | <kbd>Y</kbd> | Hide / show the years bar | <kbd>`</kbd> | Show the frame rate |
-| <kbd>D</kbd> | Lighting: auto → day → night → off | <kbd>F</kbd> | Clean view: hide every panel |
+| <kbd>D</kbd> | Lighting: off (the start) → auto → day → night | <kbd>F</kbd> | Clean view: hide every panel |
 | <kbd>O</kbd> | Orbit the middle of the screen; from far out, turn the Earth | ← ↑ → ↓ | Fly the camera (<kbd>Shift</kbd>: turn and tilt) |
 | years bar (focused) | ← → move the range · <kbd>Shift</kbd> later end · <kbd>Alt</kbd> earlier end · <kbd>PageUp</kbd> <kbd>PageDown</kbd> ten years | <kbd>Esc</kbd> | Clear the range |
 

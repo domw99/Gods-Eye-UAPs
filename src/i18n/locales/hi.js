@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "स्क्रीन के बीच के चारों ओर धीरे-धीरे घूमें; दूर से, पृथ्वी को घुमाएँ",
   "Turning the Earth — press O or touch the globe to stop": "पृथ्वी घूम रही है — रोकने के लिए O दबाएँ या ग्लोब को छुएँ",
   "Place search could not be reached; coordinates typed here still work.": "स्थान खोज तक नहीं पहुँचा जा सका; यहाँ लिखे निर्देशांक अब भी काम करते हैं।",
-  "New: 77 more cases from around the world, 251 in all": "नया: दुनिया भर से 77 और मामले, कुल 251",
   "Show the case file and the panels": "केस फ़ाइल और पैनल दिखाएँ",
   "Hide the panels to watch the path": "रास्ता देखने के लिए पैनल छिपाएँ",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "गवाह का दृश्य: {who}। बाहर निकलने के लिए फिर से «गवाह का दृश्य» पर टैप करें।",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "समझ गया",
   "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "नया: ग्लोब अब समान रोशनी के साथ खुलता है। ऊपरी पट्टी का प्रकाश स्विच दिन और रात वापस लाता है",
 };

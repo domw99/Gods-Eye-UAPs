@@ -626,15 +626,15 @@ function setSceneMoment(rec) {
 /* Lighting, chosen in the Map panel (or D): AUTO lights an open case by the
    sun at its moment and leaves the globe flat otherwise; DAY keeps the view
    in daylight; NIGHT turns the side you look at to night, with city lights;
-   OFF never shades. */
+   OFF never shades, and is where a first visit starts: an evenly lit globe reads best. */
 const LIGHT_MODES = { auto: 'Auto (case time)', day: 'Day', night: 'Night', off: 'Off' };
 const LIGHT_KEY = 'gods-eye-uap:lighting';
 let lightMode = (() => {
   try {
     const m = localStorage.getItem(LIGHT_KEY);
-    return Object.hasOwn(LIGHT_MODES, m) ? m : 'auto';
+    return Object.hasOwn(LIGHT_MODES, m) ? m : 'off';
   } catch {
-    return 'auto';
+    return 'off';
   }
 })();
 const sunLight = viewer.scene.light;
@@ -1136,8 +1136,8 @@ async function showNearby(lat, lon, label, { fly = true } = {}) {
     within(m.records, 60)
       .slice(0, 25)
       .map((r) => ({ is: m.issues[r.issue], leaf: r.leaf, place: r.place, quote: r.quote, distKm: r.distKm, bearing: r.bearing }));
-  // GEIPAN only covers France and its territories.
-  const inFrance = (lat > 41 && lat < 51.5 && lon > -5.5 && lon < 10) || geipan;
+  // GEIPAN only covers France and its territories: mainland by its box, the overseas ones by a loaded record nearby.
+  const inFrance = (lat > 41 && lat < 51.5 && lon > -5.5 && lon < 10) || !!geipan?.records?.some((r) => r.lat != null && Math.abs(r.lat - lat) < 1 && haversineKm(lat, lon, r.lat, r.lon) <= 50);
   const data = {
     cases: within(allItems().filter((i) => i.kind !== 'official' || i.precision !== 'region'), 250).slice(0, 25),
     bluebook: null,
@@ -1953,7 +1953,7 @@ function maybeWelcome() {
   if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('New: 77 more cases from around the world, 251 in all', 7000);
+    toast('New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night', 7000);
 }
 /* On a phone, once: the app is roomier on a computer. It sits over the welcome card, which is there when it is closed. */
 const PHONE_NOTE_KEY = 'gods-eye-uap:phone-note';
@@ -2412,7 +2412,7 @@ setInterval(() => {
   const digits = c.height > 2e6 ? 0 : c.height > 3e5 ? 1 : c.height > 3e4 ? 2 : c.height > 3e3 ? 3 : c.height > 300 ? 4 : 5;
   hud.mgrs.textContent = toMgrs(Cesium.Math.toDegrees(c.latitude), Cesium.Math.toDegrees(c.longitude), digits) || '—';
   hud.alt.textContent = c.height > 1e4 ? `${(c.height / 1000).toFixed(0)} KM` : `${Math.round(c.height)} M`;
-  hud.map.textContent = `${viewer.__mapName || ''}${lightMode !== 'auto' ? ` · ${lightMode.toUpperCase()}` : ''}`;
+  hud.map.textContent = `${viewer.__mapName || ''}${lightMode !== 'off' ? ` · ${lightMode.toUpperCase()}` : ''}`; // off is the usual state, so only a chosen lighting is named
 }, 250);
 
 /* ── Start ─────────────────────────────────────────────── */

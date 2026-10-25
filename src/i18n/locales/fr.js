@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Tourner lentement autour du centre de l’écran ; de loin, faire tourner la Terre",
   "Turning the Earth — press O or touch the globe to stop": "La Terre tourne — appuyez sur O ou touchez le globe pour arrêter",
   "Place search could not be reached; coordinates typed here still work.": "La recherche de lieux est injoignable ; les coordonnées saisies ici fonctionnent toujours.",
-  "New: 77 more cases from around the world, 251 in all": "Nouveau : 77 cas de plus du monde entier, 251 au total",
   "Show the case file and the panels": "Afficher le dossier et les panneaux",
   "Hide the panels to watch the path": "Masquer les panneaux pour regarder la trajectoire",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Vue du témoin : {who}. Touchez de nouveau VUE DU TÉMOIN pour quitter.",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "COMPRIS",
   "◉ WITNESS VIEW": "◉ VUE DU TÉMOIN",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VUE DU TÉMOIN — V / ÉCHAP POUR QUITTER",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Nouveau : le globe s’ouvre désormais uniformément éclairé. Le sélecteur d’éclairage de la barre du haut ramène le jour et la nuit",
 };

@@ -1167,7 +1167,6 @@ export default {
   "Orbit slowly around the middle of the screen; from far out, turn the Earth": "Mengorbit pelan di sekitar tengah layar; dari jauh, memutar Bumi",
   "Turning the Earth — press O or touch the globe to stop": "Memutar Bumi — tekan O atau sentuh globe untuk berhenti",
   "Place search could not be reached; coordinates typed here still work.": "Pencarian tempat tidak dapat dijangkau; koordinat yang diketik di sini tetap berfungsi.",
-  "New: 77 more cases from around the world, 251 in all": "Baru: 77 kasus lagi dari seluruh dunia, total 251",
   "Show the case file and the panels": "Tampilkan berkas kasus dan panel",
   "Hide the panels to watch the path": "Sembunyikan panel untuk menonton lintasan",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Sudut saksi: {who}. Ketuk SUDUT SAKSI lagi untuk keluar.",
@@ -1176,4 +1175,5 @@ export default {
   "GOT IT": "MENGERTI",
   "◉ WITNESS VIEW": "◉ PANDANGAN SAKSI",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ PANDANGAN SAKSI — V / ESC UNTUK KELUAR",
+  "New: the globe now starts evenly lit. The lighting switch in the top bar brings back day and night": "Baru: globe kini dimulai dengan cahaya merata. Sakelar pencahayaan di bilah atas mengembalikan siang dan malam",
 };
