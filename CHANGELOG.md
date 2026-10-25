@@ -2,6 +2,15 @@
 
 What changed in each release of God's Eye // UAP, newest first. This file is generated from [`.github/release-notes/`](.github/release-notes) by `npm run build:changelog`; the same notes are the text of each [GitHub release](https://github.com/domw99/Gods-Eye-UAPs/releases).
 
+## [2.9] — 2026-10-25
+
+[Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.9)
+
+**A note for phone visitors, and the witness view's badge in every language.**
+
+- **On a phone, the first visit says the app is roomier on a computer.** A small card over the globe: it works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet. **GOT IT** closes it for good in that browser; it never shows on a computer.
+- **The witness view's badge** over the globe is now in the interface language (it was always English), and on a touch screen it no longer mentions keys.
+
 ## [2.8] — 2026-10-24
 
 [Release page](https://github.com/domw99/Gods-Eye-UAPs/releases/tag/v2.8)

@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Vaka dosyasını ve panelleri göster",
   "Hide the panels to watch the path": "Rotayı izlemek için panelleri gizle",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Tanık görüşü: {who}. Çıkmak için TANIK GÖRÜŞÜ'ne yeniden dokunun.",
+  "Best on a computer": "En iyisi bilgisayarda",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Telefonda çalışır, ancak küre, vaka dosyaları ve araçlar bilgisayarda ya da tablette çok daha fazla yer bulur.",
+  "GOT IT": "ANLADIM",
+  "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
 };

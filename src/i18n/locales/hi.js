@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "केस फ़ाइल और पैनल दिखाएँ",
   "Hide the panels to watch the path": "रास्ता देखने के लिए पैनल छिपाएँ",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "गवाह का दृश्य: {who}। बाहर निकलने के लिए फिर से «गवाह का दृश्य» पर टैप करें।",
+  "Best on a computer": "कंप्यूटर पर सबसे अच्छा",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "यह फ़ोन पर चलता है, पर ग्लोब, केस फ़ाइलों और टूल को कंप्यूटर या टैबलेट पर कहीं ज़्यादा जगह मिलती है।",
+  "GOT IT": "समझ गया",
+  "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
 };

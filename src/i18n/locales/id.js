@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Tampilkan berkas kasus dan panel",
   "Hide the panels to watch the path": "Sembunyikan panel untuk menonton lintasan",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Sudut saksi: {who}. Ketuk SUDUT SAKSI lagi untuk keluar.",
+  "Best on a computer": "Paling baik di komputer",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Bisa dipakai di ponsel, tetapi globe, berkas kasus, dan alatnya punya ruang jauh lebih luas di komputer atau tablet.",
+  "GOT IT": "MENGERTI",
+  "◉ WITNESS VIEW": "◉ PANDANGAN SAKSI",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ PANDANGAN SAKSI — V / ESC UNTUK KELUAR",
 };

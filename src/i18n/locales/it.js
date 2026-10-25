@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Mostra il fascicolo e i pannelli",
   "Hide the panels to watch the path": "Nascondi i pannelli per guardare la traiettoria",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Vista del testimone: {who}. Tocca di nuovo VISTA DEL TESTIMONE per uscire.",
+  "Best on a computer": "Meglio su un computer",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Funziona sul telefono, ma il globo, i fascicoli e gli strumenti hanno molto più spazio su un computer o un tablet.",
+  "GOT IT": "HO CAPITO",
+  "◉ WITNESS VIEW": "◉ VISTA DEL TESTIMONE",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VISTA DEL TESTIMONE — V / ESC PER USCIRE",
 };

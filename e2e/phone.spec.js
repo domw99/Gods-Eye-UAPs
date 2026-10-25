@@ -195,3 +195,18 @@ test('on a phone, the buttons in the case file and the filter chips are big enou
   expect(Math.min(...chips)).toBeGreaterThanOrEqual(32);
   expect((await page.locator('#search').boundingBox()).height).toBeGreaterThanOrEqual(44);
 });
+
+test('on a phone, the first visit says the app is roomier on a computer, once', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'webdriver', { get: () => false })); // the note stays out of the way of automated runs
+  await openApp(page);
+  const note = page.locator('#phone-note');
+  await expect(note).toBeVisible({ timeout: 30_000 });
+  await expect(note).toContainText('Best on a computer');
+  await expect(note.locator('button')).toBeFocused();
+  await note.locator('button').tap();
+  await expect(note).toBeHidden();
+  await page.reload();
+  await expect(page.locator('#case-list .case-item').first()).toBeVisible({ timeout: 60_000 });
+  await page.waitForTimeout(3000);
+  await expect(note).toBeHidden();
+});

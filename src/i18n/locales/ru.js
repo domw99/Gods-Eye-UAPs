@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Показать досье и панели",
   "Hide the panels to watch the path": "Скрыть панели, чтобы смотреть траекторию",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Глазами свидетеля: {who}. Чтобы выйти, снова нажмите «ГЛАЗАМИ СВИДЕТЕЛЯ».",
+  "Best on a computer": "Лучше на компьютере",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Работает и на телефоне, но глобусу, досье и инструментам гораздо просторнее на компьютере или планшете.",
+  "GOT IT": "ПОНЯТНО",
+  "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
 };

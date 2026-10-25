@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Fallakte und Bereiche einblenden",
   "Hide the panels to watch the path": "Bereiche ausblenden, um den Flugweg zu sehen",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Zeugensicht: {who}. Zum Verlassen erneut auf ZEUGENSICHT tippen.",
+  "Best on a computer": "Am besten am Computer",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Es funktioniert auf dem Handy, aber Globus, Fallakten und Werkzeuge haben auf einem Computer oder Tablet viel mehr Platz.",
+  "GOT IT": "VERSTANDEN",
+  "◉ WITNESS VIEW": "◉ ZEUGENSICHT",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ZEUGENSICHT — V / ESC ZUM VERLASSEN",
 };

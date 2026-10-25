@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "显示案例档案和面板",
   "Hide the panels to watch the path": "隐藏面板以观看路径",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "目击者视角：{who}。再次点按“目击者视角”即可退出。",
+  "Best on a computer": "在电脑上体验最佳",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "手机上也能用，但在电脑或平板上，地球仪、案例档案和工具的空间要大得多。",
+  "GOT IT": "知道了",
+  "◉ WITNESS VIEW": "◉ 目击者视角",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目击者视角 — 按 V / Esc 退出",
 };

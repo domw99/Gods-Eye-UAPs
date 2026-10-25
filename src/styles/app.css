@@ -634,7 +634,7 @@ body:not(.tl-hidden) .tl-show { display: none; }
 
 /* ── Witness view ────────────────────────────────────── */
 body.pov #globe::after {
-  content: '◉ WITNESS VIEW — V / ESC TO LEAVE';
+  content: attr(data-pov-label); /* set from the code, so it is in the interface language */
   position: absolute;
   top: calc(var(--top-h, 80px) + 14px);
   left: 50%;
@@ -1124,3 +1124,11 @@ html[data-text-dir='rtl'] .link-btn.moon-site { unicode-bidi: plaintext; }
 }
 /* The witness view's badge spoke of keys and sat under the toast at the top of a phone: the lit button says it. */
 @media (pointer: coarse) { body.pov #globe::after { display: none; } }
+
+/* ── The once-only note on a phone: the app is roomier on a computer ── */
+.phone-note-backdrop { position: fixed; inset: 0; z-index: 45; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.55); }
+.phone-note-backdrop[hidden] { display: none; }
+.phone-note { width: min(360px, 100%); padding: 18px 20px 16px; border-radius: 14px; background: var(--glass-strong); }
+.phone-note h2 { margin: 6px 0 6px; font-size: 19px; line-height: 1.25; }
+.phone-note p { margin: 0 0 14px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.phone-note .btn-row { justify-content: flex-end; }

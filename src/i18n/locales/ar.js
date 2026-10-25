@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "إظهار ملف الحالة واللوحات",
   "Hide the panels to watch the path": "إخفاء اللوحات لمشاهدة المسار",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "منظور الشاهد: {who}. اضغط «منظور الشاهد» مرة أخرى للخروج.",
+  "Best on a computer": "الأفضل على الحاسوب",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "يعمل على الهاتف، لكن الكرة الأرضية وملفات الحالات والأدوات تحظى بمساحة أكبر بكثير على الحاسوب أو الجهاز اللوحي.",
+  "GOT IT": "فهمت",
+  "◉ WITNESS VIEW": "◉ منظور الشاهد",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ منظور الشاهد — V / ESC للخروج",
 };

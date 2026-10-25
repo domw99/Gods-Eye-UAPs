@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "事例ファイルとパネルを表示",
   "Hide the panels to watch the path": "パネルを隠して経路を見る",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "目撃者視点：{who}。もう一度「目撃者視点」をタップすると戻ります。",
+  "Best on a computer": "パソコンでの利用がおすすめ",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "スマホでも使えますが、地球儀・事例ファイル・ツールはパソコンやタブレットの方がずっと広く使えます。",
+  "GOT IT": "了解",
+  "◉ WITNESS VIEW": "◉ 目撃者の視点",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
 };

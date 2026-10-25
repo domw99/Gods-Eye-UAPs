@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "사례 파일과 패널 표시",
   "Hide the panels to watch the path": "경로를 보려면 패널 숨기기",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "목격자 시점: {who}. 나가려면 '목격자 시점'을 다시 누르세요.",
+  "Best on a computer": "컴퓨터에서 가장 좋습니다",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "휴대폰에서도 작동하지만, 지구본과 사례 파일, 도구는 컴퓨터나 태블릿에서 훨씬 넓게 쓸 수 있습니다.",
+  "GOT IT": "확인",
+  "◉ WITNESS VIEW": "◉ 목격자 시점",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
 };

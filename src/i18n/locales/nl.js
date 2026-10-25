@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Toon het dossier en de panelen",
   "Hide the panels to watch the path": "Verberg de panelen om de route te bekijken",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Getuigenblik: {who}. Tik nogmaals op GETUIGENBLIK om te verlaten.",
+  "Best on a computer": "Het best op een computer",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Het werkt op een telefoon, maar de globe, de dossiers en de hulpmiddelen hebben veel meer ruimte op een computer of tablet.",
+  "GOT IT": "BEGREPEN",
+  "◉ WITNESS VIEW": "◉ GETUIGENZICHT",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ GETUIGENZICHT — V / ESC OM TE STOPPEN",
 };

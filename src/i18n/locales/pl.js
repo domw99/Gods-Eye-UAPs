@@ -1171,4 +1171,9 @@ export default {
   "Show the case file and the panels": "Pokaż akta sprawy i panele",
   "Hide the panels to watch the path": "Ukryj panele, aby oglądać trasę",
   "Witness view: {who}. Tap WITNESS VIEW again to leave.": "Widok świadka: {who}. Dotknij ponownie WIDOK ŚWIADKA, aby wyjść.",
+  "Best on a computer": "Najlepiej na komputerze",
+  "It works on a phone, but the globe, the case files and the tools have much more room on a computer or a tablet.": "Działa na telefonie, ale globus, akta spraw i narzędzia mają znacznie więcej miejsca na komputerze lub tablecie.",
+  "GOT IT": "ROZUMIEM",
+  "◉ WITNESS VIEW": "◉ WIDOK ŚWIADKA",
+  "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ WIDOK ŚWIADKA — V / ESC, ABY WYJŚĆ",
 };

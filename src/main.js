@@ -1346,6 +1346,12 @@ viewer.scene.canvas.addEventListener('pointerleave', () => clearTimeout(hoverTim
 viewer.scene.canvas.addEventListener('pointerdown', () => stopTour());
 viewer.scene.canvas.addEventListener('pointerleave', hideHover);
 
+/* The witness view's badge over the globe, in the interface language. */
+const labelWitnessView = () => {
+  document.getElementById('globe').dataset.povLabel = matchMedia('(pointer: coarse)').matches ? t('◉ WITNESS VIEW') : t('◉ WITNESS VIEW — V / ESC TO LEAVE');
+};
+labelWitnessView();
+
 /* ── Playback bar ──────────────────────────────────────── */
 const pb = {
   bar: document.getElementById('playback'),
@@ -1949,6 +1955,33 @@ function maybeWelcome() {
   else if (seen && release !== RELEASE)
     toast('New: 77 more cases from around the world, 251 in all', 7000);
 }
+/* On a phone, once: the app is roomier on a computer. It sits over the welcome card, which is there when it is closed. */
+const PHONE_NOTE_KEY = 'gods-eye-uap:phone-note';
+const phoneNote = document.getElementById('phone-note');
+function maybePhoneNote() {
+  if (navigator.webdriver || EMBED || !matchMedia(PHONE).matches) return;
+  try {
+    if (localStorage.getItem(PHONE_NOTE_KEY)) return;
+  } catch {}
+  phoneNote.hidden = false;
+  phoneNote.querySelector('button').focus();
+}
+function closePhoneNote() {
+  phoneNote.hidden = true;
+  try {
+    localStorage.setItem(PHONE_NOTE_KEY, '1');
+  } catch {}
+}
+phoneNote.addEventListener('click', (e) => {
+  if (e.target === phoneNote || e.target.closest('[data-phone-note]')) closePhoneNote();
+});
+phoneNote.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Tab') {
+    e.preventDefault(); // one button: Tab stays on it, Esc closes
+    e.stopPropagation();
+    if (e.key === 'Escape') closePhoneNote();
+  }
+});
 welcome.addEventListener('click', (e) => {
   const b = e.target.closest('[data-welcome]');
   if (!b) return;
@@ -2233,6 +2266,7 @@ document.getElementById('btn-map').addEventListener('click', () => {
     document.getElementById('btn-tour').textContent = tourTimer ? t('■ STOP') : t('▶ TOUR');
     redrawDossier(); // the open record's text was written in the old language
     shownTilt = null; // the tilt button's title was written in code, so write it again
+    labelWitnessView();
     viewer.scene.requestRender();
   });
 }
@@ -2539,6 +2573,7 @@ if (!routed && !viewFromParam(params.get('view'))) flyHome(2.5);
       loading.classList.add('done');
       if (!routeToMoon()) routeToSpace();
       maybeWelcome();
+      maybePhoneNote();
       openTarget?.();
       // Compile the picking shaders while idle, so the first hover doesn't stall.
       const warm = () => viewer.scene.pick(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
