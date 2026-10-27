@@ -1,11 +1,10 @@
 import * as Cesium from 'cesium';
-import * as satellite from 'satellite.js';
 import * as Astro from 'astronomy-engine';
 import { t } from '../i18n/index.js';
 import { fetchWithTimeout } from '../util/net.js';
 
 /**
- * Live "sky check" layer: propagates CelesTrak element sets with satellite.js
+ * Live "sky check" layer: propagates CelesTrak element sets with satellite.js (in orbits.js)
  * so observers can see what is overhead right now — Starlink trains, the ISS
  * and bright satellites are a leading source of modern UAP reports.
  */
@@ -43,28 +42,14 @@ async function fetchTle(url) {
   }
 }
 
-/**
- * The satellite's position (km, ECI) at `date`, or null. satellite.js does not throw on a damaged element set:
- * it hands back a position of NaN, which on the globe stops Cesium drawing at all ("Invalid array length").
- */
-export function propagatePosition(satrec, date) {
-  const pv = satellite.propagate(satrec, date);
-  const r = pv?.position;
-  if (!r || typeof r === 'boolean' || !Number.isFinite(r.x + r.y + r.z)) return null;
-  return { ...pv, position: r };
-}
-
-export function parseTle(text) {
-  const lines = text.split(/\r?\n/).map((l) => l.trimEnd()).filter(Boolean);
-  const out = [];
-  for (let i = 0; i + 2 < lines.length + 1; i += 3) {
-    const [name, l1, l2] = lines.slice(i, i + 3);
-    if (!l1?.startsWith('1 ') || !l2?.startsWith('2 ')) continue;
-    try {
-      out.push({ name: name.trim(), satrec: satellite.twoline2satrec(l1, l2), norad: l2.slice(2, 7).trim() });
-    } catch {}
-  }
-  return out;
+/** The orbit maths (layers/orbits.js), loaded with the first element sets. */
+let orbitsModule = null;
+function loadOrbits() {
+  orbitsModule ||= import('./orbits.js').catch((error) => {
+    orbitsModule = null; // offline: try again next time
+    throw error;
+  });
+  return orbitsModule;
 }
 
 export function createSatelliteLayer(viewer, onStatus = () => {}) {
@@ -74,6 +59,7 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
   let loaded = false;
   let loading = null;
   let timer = null;
+  let orbits = null; // the orbit maths, once loaded
   const scratch = new Cesium.Cartesian3();
 
   function load() {
@@ -83,12 +69,21 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
   async function doLoad() {
     if (loaded) return;
     loaded = true;
+    try {
+      orbits = await loadOrbits();
+    } catch (error) {
+      console.warn('[satellites]', error);
+      loaded = false;
+      loading = null;
+      onStatus('offline');
+      return;
+    }
     const seen = new Set();
     for (const g of GROUPS) {
       try {
         onStatus(t('Loading {name}…', { name: t(g.label) }));
         const text = await fetchTle(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g.id}&FORMAT=tle`);
-        for (const s of parseTle(text)) {
+        for (const s of orbits.parseTle(text)) {
           if (seen.has(s.norad)) continue;
           seen.add(s.norad);
           const point = collection.add({
@@ -113,23 +108,10 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     tick();
   }
 
-  function position(sat, date) {
-    const pv = propagatePosition(sat.satrec, date);
-    if (!pv) return null;
-    const gmst = satellite.gstime(date);
-    const geo = satellite.eciToGeodetic(pv.position, gmst);
-    return {
-      lat: satellite.degreesLat(geo.latitude),
-      lon: satellite.degreesLong(geo.longitude),
-      altKm: geo.height,
-      speed: pv.velocity ? Math.hypot(pv.velocity.x, pv.velocity.y, pv.velocity.z) : null,
-    };
-  }
-
   function tick() {
     const now = new Date();
     for (const sat of sats) {
-      const p = position(sat, now);
+      const p = orbits.geodeticAt(sat.satrec, now);
       if (!p) {
         sat.point.show = false;
         continue;
@@ -156,17 +138,12 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     },
     /** Satellites above the horizon from an observer right now. */
     overhead(lat, lon, minElevationDeg = 10) {
-      const now = new Date();
-      const gmst = satellite.gstime(now);
-      const observer = { latitude: satellite.degreesToRadians(lat), longitude: satellite.degreesToRadians(lon), height: 0.1 };
+      if (!sats.length) return [];
+      const look = orbits.skyFrom(lat, lon, new Date());
       const out = [];
       for (const s of sats) {
-        const pv = propagatePosition(s.satrec, now);
-        if (!pv) continue;
-        const look = satellite.ecfToLookAngles(observer, satellite.eciToEcf(pv.position, gmst));
-        const el = satellite.radiansToDegrees(look.elevation);
-        if (el >= minElevationDeg)
-          out.push({ name: s.name, group: s.group, elevation: el, azimuth: satellite.radiansToDegrees(look.azimuth), rangeKm: look.rangeSat });
+        const l = look(s.satrec);
+        if (l && l.elevation >= minElevationDeg) out.push({ name: s.name, group: s.group, elevation: l.elevation, azimuth: l.azimuth, rangeKm: l.rangeKm });
       }
       return out.sort((a, b) => b.elevation - a.elevation);
     },
@@ -181,25 +158,22 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
      * a few weeks either side of today.
      */
     visibleAt(lat, lon, date, minElevationDeg = 10) {
-      const gmst = satellite.gstime(date);
-      const observer = { latitude: satellite.degreesToRadians(lat), longitude: satellite.degreesToRadians(lon), height: 0.1 };
+      if (!sats.length) return [];
+      const look = orbits.skyFrom(lat, lon, date);
       const sun = Astro.GeoVector(Astro.Body.Sun, Astro.MakeTime(date), true);
       const sLen = Math.hypot(sun.x, sun.y, sun.z);
       const s = { x: sun.x / sLen, y: sun.y / sLen, z: sun.z / sLen };
       const out = [];
       for (const sat of sats) {
-        const pv = propagatePosition(sat.satrec, date);
-        if (!pv) continue;
-        const look = satellite.ecfToLookAngles(observer, satellite.eciToEcf(pv.position, gmst));
-        const el = satellite.radiansToDegrees(look.elevation);
-        if (el < minElevationDeg) continue;
+        const l = look(sat.satrec);
+        if (!l || l.elevation < minElevationDeg) continue;
         out.push({
           name: sat.name,
           group: sat.group,
-          elevation: el,
-          azimuth: satellite.radiansToDegrees(look.azimuth),
-          rangeKm: look.rangeSat,
-          sunlit: isSunlit(pv.position, s),
+          elevation: l.elevation,
+          azimuth: l.azimuth,
+          rangeKm: l.rangeKm,
+          sunlit: isSunlit(l.position, s),
         });
       }
       return out.sort((a, b) => b.elevation - a.elevation);
