@@ -550,6 +550,9 @@ body:not(.tl-hidden) .tl-show { display: none; }
 #toast.show { opacity: 1; }
 #loading { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg-dark); z-index: 100; font-size: 11px; letter-spacing: 0.25em; color: var(--accent); transition: opacity 600ms; }
 #loading.done { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 600ms, visibility 0s 600ms; } /* hidden once faded, so a screen reader doesn't find it */
+/* Under the loading screen the panels settle (the layers fill in, the top bar's height is measured). Nobody sees that,
+   but browsers count it as layout shift (0.11 on a phone): kept hidden until the screen lifts, they simply appear. */
+body:has(#loading:not(.done)) :is(.topbar, #left, #dossier, #map-controls, #hud, #timeline) { visibility: hidden; }
 .loading-bar { width: 180px; height: 2px; background: rgba(0, 212, 255, 0.15); border-radius: 2px; overflow: hidden; }
 .loading-bar i { display: block; height: 100%; width: 8%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 300ms ease-out; }
 .loading-ring { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(0, 212, 255, 0.2); border-top-color: var(--accent); animation: spin 1s linear infinite; }
