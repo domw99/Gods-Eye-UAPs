@@ -148,7 +148,7 @@ export default [
   {
     id: 'coyame-1974',
     title: 'Coyame “crash” — Chihuahua',
-    date: '1974-08-25T22:00:00-07:00',
+    date: '1974-08-25T22:00:00-06:00',
     timeApprox: true,
     place: 'Coyame, Chihuahua, Mexico',
     country: 'Mexico',

@@ -145,7 +145,7 @@ export default [
     witnesses: 'Antoine, Jerri and Terry Betz; the U.S. Navy at Jacksonville; reporters',
     duration: 'Found in an afternoon; the stories ran for weeks',
     summary:
-      'On March 27, 1974, the Betz family went to look at a small brush fire near their home on Fort George Island and found a shiny metal sphere about 8 inches (20 cm) across, weighing about 22 lb (10 kg), They took it for a conquistadors’ cannonball and kept it. Two weeks later their son Terry was playing the guitar near it and said it answered with a throbbing hum; the family went on to say it rolled across the floor, stopped and turned by itself, and seemed to follow people around the house. The story went national, the National Enquirer offered a reward for proof that anything was from outer space, and the Navy took the ball for tests: it was hollow, with a shell about half an inch thick, and made of stainless steel. A panel of scientists at an Enquirer conference in June agreed it was “made on earth”.',
+      'On March 27, 1974, the Betz family went to look at a small brush fire near their home on Fort George Island and found a shiny metal sphere about 8 inches (20 cm) across, weighing about 22 lb (10 kg). They took it for a conquistadors’ cannonball and kept it. Two weeks later their son Terry was playing the guitar near it and said it answered with a throbbing hum; the family went on to say it rolled across the floor, stopped and turned by itself, and seemed to follow people around the house. The story went national, the National Enquirer offered a reward for proof that anything was from outer space, and the Navy took the ball for tests: it was hollow, with a shell about half an inch thick, and made of stainless steel. A panel of scientists at an Enquirer conference in June agreed it was “made on earth”.',
     timeline: [
       { t: 'Mar 27', text: 'The family finds the sphere near a brush fire.' },
       { t: '~Apr 10', text: 'It hums to Terry’s guitar and is said to roll by itself.' },
@@ -173,7 +173,7 @@ export default [
     evidence: ['multiple-witnesses'],
     status: 'disputed',
     explanation:
-      'The abduction rests on memories recovered under hypnosis years later, a method that is known to produce false memories. The four agree that they saw a bright light over the lake and that their fire had burned down sooner than they expected; the rest is in dispute. In 2016 Chuck Rak said the abduction “didn’t happen”, that he had backed the story to make money and that they had been “stoned” on the lake; Charlie Foltz and Jim Weiner deny the drugs and stand by it.',
+      'The abduction rests on memories recovered under hypnosis years later, a method that is known to produce false memories. The four agree that they saw a bright light over the lake and that their fire had burned down sooner than they expected; the rest is in dispute. In 2016 Chuck Rak told a Maine newspaper that the abductions never took place and that he had backed the story at first because he “wanted to make money”, calling it “brilliant storytelling” rather than a hoax; he still says he saw the craft. The others stand by their account.',
     shape: 'A large glowing sphere that changed colour and shone a beam on the water',
     witnesses: 'Jim and Jack Weiner and Chuck Rak, art students, and their guide Charlie Foltz',
     duration: 'Minutes as they remember it; hours by the fire',
@@ -243,7 +243,7 @@ export default [
     evidence: ['multiple-witnesses'],
     status: 'disputed',
     explanation:
-      'The satellite watcher Ted Molczan matched the time and direction to the re-entry of the rocket body that launched Cosmos 2335, and the skeptic Robert Sheaffer repeated that in 2012; a re-entry breaks up into a row of glowing fragments, which fits a line of lights. Martin Jasek, who collected the witnesses’ accounts over two years, concluded they saw a single enormous craft, and some witnesses describe a beam and a slow, close object that a re-entry does not explain.',
+      'In 2012 the satellite watchers Ted Molczan and Harro Zimmer matched the time and direction to the re-entry of the rocket body that had launched Cosmos 2335 less than a day earlier, and the skeptic Robert Sheaffer published it; a re-entry breaks up into a row of glowing fragments, which fits a line of lights. Martin Jasek, who collected the witnesses’ accounts over two years, concluded they saw a single enormous craft, and some witnesses describe a beam and a slow, close object that a re-entry does not explain.',
     shape: 'A row of rectangular lights, taken by some for the windows of a craft the size of a stadium; one witness describes a white beam',
     witnesses: 'At least 31 people in four places along the highway, many of them in cars',
     duration: 'Minutes',
@@ -252,7 +252,7 @@ export default [
     timeline: [
       { t: 'Dec 11, night', text: 'Witnesses near Fox Lake, Carmacks and Pelly Crossing see a row of lights.' },
       { t: '1997–98', text: 'Martin Jasek collects at least 31 accounts.' },
-      { t: 'Later', text: 'Ted Molczan matches the sighting to the Cosmos 2335 rocket body re-entering.' },
+      { t: '2012', text: 'Ted Molczan and Harro Zimmer match the sighting to the Cosmos 2335 rocket body re-entering.' },
       { t: '2022', text: 'The Royal Canadian Mint issues “The Yukon Encounter” coin.' },
     ],
     tracks: [],

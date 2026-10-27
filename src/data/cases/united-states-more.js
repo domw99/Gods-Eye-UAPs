@@ -563,7 +563,7 @@ export default [
   {
     id: 'america-west-564-1995',
     title: 'America West Flight 564 over the Texas Panhandle',
-    date: '1995-05-25T21:25:00-06:00',
+    date: '1995-05-25T22:25:00-05:00',
     timeApprox: true,
     place: 'Over Bovina, Texas, near the New Mexico border',
     country: 'United States',
@@ -580,7 +580,7 @@ export default [
     summary:
       'On the night of May 25, 1995, America West Flight 564, a Boeing 757 flying west at 39,000 ft from Tampa to Las Vegas, was passing over Bovina in the Texas Panhandle when the first officer, John Waller, and a flight attendant saw a row of bright white lights off to the right and below, flashing in sequence from left to right. When lightning lit the thunderclouds behind it, the crew saw a dark, wingless, cigar-shaped silhouette, which they estimated at 300 to 400 ft long, though its distance was unknown. Waller asked Albuquerque Center about traffic; the controllers had nothing on their radar and called NORAD, which reported a track that later proved to be a small aircraft with a faulty transponder. The next morning a controller said NORAD had tracked another target that stopped and accelerated repeatedly, but that was never confirmed. Walter Webb investigated for the Fund for UFO Research, interviewed the crew and the controllers and obtained the FAA tapes, and found no explanation; the SETI astronomer Seth Shostak later remarked that bright planets fool trained pilots, without analysing this case.',
     timeline: [
-      { t: '~21:25', text: 'Flashing lights and then a dark silhouette are seen to the right of the 757 at 39,000 ft.' },
+      { t: '~22:25', text: 'Flashing lights and then a dark silhouette are seen to the right of the 757 at 39,000 ft (about 9:25 p.m. Mountain time in the reports).' },
       { t: 'Minutes later', text: 'The first officer calls Albuquerque Center; the controllers check with NORAD.' },
       { t: 'May 26', text: 'A controller says NORAD had tracked an unusual target; it is never confirmed.' },
       { t: 'Jul 1996', text: 'Walter Webb’s final report for the Fund for UFO Research.' },
