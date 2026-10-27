@@ -14,7 +14,7 @@ A static web app (no backend, no accounts, no API keys): a CesiumJS 3D globe of 
 | `npm run dev` | Dev server at http://localhost:5173 |
 | `npm run build` | Production build into `dist/` (also writes a page per case, the case index, the open data and `sitemap.xml`) |
 | `npm run preview` | Serve `dist/` at http://localhost:4173 (what the browser tests use) |
-| `npm test` | Vitest, about 1,100 tests, a few seconds. Run it before every commit |
+| `npm test` | Vitest, about 1,500 tests, about 15 seconds. Run it before every commit |
 | `npm run e2e` | Playwright browser tests (desktop and phone), about 15 minutes. Needs `npx playwright install chromium` once, and a build first |
 | `npm run verify:media` | Checks the Commons files, Wikipedia titles, DVIDS ids and Blue Book ids the case files cite. Run it after editing a case |
 | `npm run data` | Rebuilds every dataset in `public/data/` from its source (slow, network) |
@@ -42,7 +42,7 @@ The README's "How it works" table and project structure list every module. The o
 - **Map symbols** are drawn from the shapes in `src/layers/glyphs.js`; add a shape there and use `glyphUrl()` / `glyphSvg()` instead of a new image.
 - **Rendering on demand.** The Earth and Moon viewers render only when something changes (`requestRenderMode`); call `scene.requestRender()` after changing an entity from code.
 - **Accessibility is tested.** Controls need an accessible name and a visible focus; dialogs trap focus and close on Esc; colour contrast is checked by axe in `e2e/`. Text must be at least 4.5:1 against its background.
-- **Pages are static HTML.** The case, index, browse and open-data pages (`scripts/lib/`; `page-shell.mjs` is the frame the browse pages share) have their own inline styles and no scripts beyond one redirect. Keep them that way. `llms.mjs` writes `robots.txt`, `llms.txt` and `llms-full.txt`.
+- **Pages are static HTML.** The case, index, browse, open-data and not-found (`404.html`) pages (`scripts/lib/`; `page-shell.mjs` is the frame the browse pages and the 404 share; the 404 can be served at any depth, so its links are absolute) have their own inline styles and no scripts beyond one redirect. Keep them that way. `llms.mjs` writes `robots.txt`, `llms.txt` and `llms-full.txt`.
 - **`?open=<screen>`** opens a screen on load (`OPEN_TARGETS` in `src/main.js`); the manifest's shortcuts use it, and `tests/manifest.test.js` checks they agree.
 - Small functions, comments that say why, no dependencies added lightly (the bundle is already large because of Cesium; check `THIRD_PARTY_NOTICES.md` after a change).
 
