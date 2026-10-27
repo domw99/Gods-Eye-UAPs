@@ -175,6 +175,8 @@ export function createSatelliteLayer(viewer, onStatus = () => {}) {
     },
     /** Load the element sets without showing the layer (for the sighting checker). */
     ensureLoaded: () => load(),
+    /** The loaded element sets, { name, group, norad, satrec }, for predicting passes. */
+    elementSets: () => sats.map(({ name, group, norad, satrec }) => ({ name, group, norad, satrec })),
     /**
      * Satellites above `minElevationDeg` from an observer at `date`, with
      * whether each was lit by the Sun. Current element sets are only good for

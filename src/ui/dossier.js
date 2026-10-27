@@ -1035,6 +1035,7 @@ export function renderNearby({ label, lat, lon, data }) {
         : html`<p class="d-text">${th('<b>{n}</b> unverified reports within 50 km (1906–2014). Turn on <b>Civilian reports</b> to see them.', { n: d.nuforc.toLocaleString(locale()) })}</p>`,
     )}
     ${section('WHAT’S OVERHEAD NOW', html`<div class="btn-row"><button class="chip" data-action="skycheck">RUN SKY CHECK HERE</button><button class="chip on" data-action="explain-here">WHAT DID I SEE?</button></div><div id="d-sky"></div>`)}
+    ${section('VISIBLE PASSES, NEXT 24 HOURS', html`<p class="d-text">${t('The ISS, the brightest satellites and Starlink trains that will cross the dark sky here: worth knowing before a light is reported.')}</p><div class="btn-row"><button class="chip" data-action="passes">PREDICT PASSES</button></div><div id="d-passes" aria-live="polite"></div>`)}
     ${section('THE LOCATION', siteLinks(lat, lon))}`,
   );
   return token;
@@ -1141,6 +1142,29 @@ export function renderSkyCheck(list, el = document.getElementById('d-sky')) {
     el,
     html`<p class="d-text" style="margin-top:8px">${list.length ? th('<b>{n}</b> satellites are more than 10° above the horizon here right now:', { n: list.length }) : t('No satellites are more than 10° above the horizon here right now.')}</p>
     <ul class="source-list" style="margin-top:6px">${list.slice(0, 15).map((s) => html`<li><span class="badge">${Math.round(s.elevation)}°</span><span>${s.name} <span class="dim">· az ${Math.round(s.azimuth)}° · ${Math.round(s.rangeKm)} km · ${s.group}</span></span></li>`)}</ul>`,
+  );
+}
+
+/**
+ * Predicted visible passes (src/services/passes.js) in `el`: 'loading', null when the orbits could not be loaded,
+ * or the passes, soonest first. Times are the viewer's own clock, which is not the place's when it is far away, so it says so.
+ */
+export function renderPasses(passes, el = document.getElementById('d-passes')) {
+  if (!el) return;
+  if (passes === 'loading') return void mount(el, html`<div class="loading-line">${t('Predicting passes from CelesTrak orbits…')}</div>`);
+  if (!passes) return void mount(el, html`<div class="loading-line">Satellite orbits could not be loaded from CelesTrak.</div>`);
+  const when = (d) => d.toLocaleString(locale(), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const clock = (d) => d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+  let zone = '';
+  try {
+    zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  } catch {}
+  const shown = passes.slice(0, 20);
+  mount(
+    el,
+    html`<p class="d-text" style="margin-top:8px">${passes.length ? plural(passes.length, '{n} visible pass in the next 24 hours:', '{n} visible passes in the next 24 hours:') : t('No visible passes here in the next 24 hours.')}</p>
+    ${shown.length ? html`<ul class="source-list" style="margin-top:6px">${shown.map((p) => html`<li><span class="badge" title="${t('Highest point above the horizon')}">${Math.round(p.peak.el)}°</span><span><b>${when(p.start.date)}–${clock(p.end.date)}</b> · ${p.train ? t('Starlink train, {n} satellites', { n: p.train }) : p.name}<br /><span class="dim">${t('appears {from}, highest {to}, disappears {end}', { from: compass(p.start.az), to: compass(p.peak.az), end: compass(p.end.az) })}</span></span></li>`)}</ul>` : ''}
+    <p class="caveat">${t('Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.', { zone: zone || 'UTC' })}</p>`,
   );
 }
 

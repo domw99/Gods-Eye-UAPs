@@ -94,8 +94,11 @@ const SORTERS = {
   name: (a, b) => a.title.localeCompare(b.title),
 };
 
+/** The items in the order the list shows them (and an export writes them). */
+export const sortedItems = (items) => [...items].sort(SORTERS[state.sort] || SORTERS['date-desc']);
+
 export function renderList(items) {
-  const sorted = [...items].sort(SORTERS[state.sort] || SORTERS['date-desc']);
+  const sorted = sortedItems(items);
   const list = document.getElementById('case-list');
   document.getElementById('case-count').textContent = t('{n} shown', { n: items.length });
   if (!sorted.length) {

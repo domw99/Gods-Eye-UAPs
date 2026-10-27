@@ -220,6 +220,8 @@ body[data-mode='ironbow'] :is(#scope, .moon-scope) { opacity: 1; }
 .list-label { gap: 8px; }
 .list-label > span, .list-label .link-btn { white-space: nowrap; } /* a longer translation squeezes the sort box, not the words beside it */
 .list-label select { min-width: 0; flex: 0 1 auto; text-overflow: ellipsis; }
+.export-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 12px; color: var(--text-secondary); }
+.export-row > span { flex: 1 1 100%; }
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 details.filters > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
 details.filters > summary::-webkit-details-marker { display: none; }
