@@ -37,6 +37,13 @@ describe('case pages', () => {
     }
   });
 
+  it('names the year in the title once', () => {
+    const titleOf = (c) => casePage(c, { site: SITE }).match(/<title>([^<]*)<\/title>/)[1];
+    expect(titleOf({ ...CASES[0], title: 'Lights over Kansas', date: '1965-08-02T21:00:00-05:00' })).toBe("Lights over Kansas (1965) · God's Eye // UAP");
+    expect(titleOf({ ...CASES[0], title: 'The 1909 airship scare', date: '1909-07-01T21:00:00+12:00' })).toBe("The 1909 airship scare · God's Eye // UAP");
+    for (const c of CASES) expect(titleOf(c), c.id).not.toMatch(/\b(\d{4})\b.*\(\1\)/);
+  });
+
   it('falls back to the site image when a case has no card yet', () => {
     const page = casePage(CASES[0], { site: SITE, card: false });
     expect(page).toContain(`content="${SITE}og.jpg"`);

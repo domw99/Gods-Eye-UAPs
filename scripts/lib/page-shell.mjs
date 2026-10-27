@@ -19,6 +19,16 @@ export function caseDate(iso) {
   return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${Number(m[1])}` : '';
 }
 
+/**
+ * A case's title with its year, for its page's title and link previews ("Roswell debris recovery (1947)").
+ * The year once: "The 1909 New Zealand airship scare (1909)" read as a mistake in search results.
+ * (llms-full.txt keeps "(year)" on every heading, so the file can be read by a program.)
+ */
+export function titleWithYear(c) {
+  const year = String(c.date || '').slice(0, 4).replace(/^0+/, '');
+  return /^\d+$/.test(year) && new RegExp(`\\b${year}\\b`).test(c.title) ? c.title : `${c.title} (${year})`;
+}
+
 export const PAGE_CSS = `:root{color-scheme:dark}
 body{margin:0;background:#05070c;color:#e8eaed;font:16px/1.6 Inter,system-ui,sans-serif}
 main{max-width:760px;margin:0 auto;padding:40px 20px 56px}
