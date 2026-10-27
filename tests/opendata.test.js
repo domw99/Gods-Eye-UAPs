@@ -107,6 +107,15 @@ describe('open data', () => {
     expect(ld.description.length).toBeGreaterThan(50);
     expect(data.page).not.toMatch(/undefined|\[object Object\]|NaN/);
   });
+
+  it('gives search a description of whole sentences, and links the files for AI assistants', () => {
+    const desc = data.page.match(/<meta name="description" content="([^"]*)">/)[1];
+    expect(desc).toMatch(/\.$/);
+    expect(desc.length).toBeLessThanOrEqual(300);
+    // llms.txt only helps on a project path when a page links it (scripts/lib/llms.mjs)
+    expect(data.page).toContain('href="../llms.txt"');
+    expect(data.page).toContain('href="../llms-full.txt"');
+  });
 });
 
 describe('the pages search engines read', () => {

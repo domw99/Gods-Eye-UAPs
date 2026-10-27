@@ -43,8 +43,10 @@ footer a{color:inherit}`;
 /**
  * A page. `root` is the relative path back to the site root ('../../'), for the
  * logo and the footer links; `url` is the page's own absolute address.
+ * `noindex` is for the not-found page: kept out of search, with no canonical
+ * address (it answers for every missing one) and no structured data.
  */
-export function pageShell({ site, root, url, title, description, ld, body, image }) {
+export function pageShell({ site, root, url, title, description, ld, body, image, noindex = false }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -53,10 +55,9 @@ export function pageShell({ site, root, url, title, description, ld, body, image
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <meta name="author" content="${AUTHOR}">
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="robots" content="${noindex ? 'noindex' : 'index,follow,max-image-preview:large'}">
 <meta name="theme-color" content="#05070c">
-<link rel="canonical" href="${esc(url)}">
-<link rel="icon" type="image/svg+xml" href="${root}logo.svg">
+${noindex ? '' : `<link rel="canonical" href="${esc(url)}">\n`}<link rel="icon" type="image/svg+xml" href="${root}logo.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="God's Eye // UAP">
 <meta property="og:title" content="${esc(title)}">
@@ -64,8 +65,7 @@ export function pageShell({ site, root, url, title, description, ld, body, image
 <meta property="og:url" content="${esc(url)}">
 <meta property="og:image" content="${esc(image || `${site}og.jpg`)}">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">${ldJson(ld)}</script>
-<style>
+${ld ? `<script type="application/ld+json">${ldJson(ld)}</script>\n` : ''}<style>
 ${PAGE_CSS}
 </style>
 </head>
@@ -77,4 +77,26 @@ ${body}
 </body>
 </html>
 `;
+}
+
+/**
+ * 404.html at the site root, which GitHub Pages serves for every missing address
+ * (a mistyped or renamed case page, an old link). It can be shown at any depth,
+ * so its links are absolute. No script: it only offers the ways back.
+ */
+export function notFoundPage({ site }) {
+  const body = `<nav class="crumbs"><a class="brand" href="${esc(site)}">GOD'S EYE // UAP</a></nav>
+<h1>Page not found</h1>
+<p>There is no page at this address. If you followed a link to a case, its address may have changed: every case is in the list of case files, and the globe can search them all.</p>
+<a class="open" href="${esc(site)}">Open the 3D globe →</a><a class="open" href="${esc(site)}case/">All case files</a><a class="open" href="${esc(site)}browse/">Browse</a>`;
+  return pageShell({
+    site,
+    root: site,
+    url: `${site}404.html`,
+    title: "Page not found · God's Eye // UAP",
+    description: 'There is no page at this address. Every case file is listed in the case index, and the 3D globe can search them all.',
+    ld: null,
+    body,
+    noindex: true,
+  });
 }

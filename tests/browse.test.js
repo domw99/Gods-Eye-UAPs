@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { existsSync } from 'node:fs';
 import { browseGroups, browseIndex, groupPage, groupPath, groupsOf, countryName, statusMix, CATEGORY_PLURAL, EVIDENCE_PHRASE, SHAPE_PHRASE, KINDS, MIN_CASES } from '../scripts/lib/browse-pages.mjs';
 import { casePage, caseIndex, sitemap } from '../scripts/lib/case-pages.mjs';
-import { pageShell } from '../scripts/lib/page-shell.mjs';
+import { pageShell, notFoundPage } from '../scripts/lib/page-shell.mjs';
 import { CATEGORY, EVIDENCE, SHAPES, STATUS, shapeClasses } from '../src/data/taxonomy.js';
 import { CASES } from '../src/data/cases/index.js';
 
@@ -133,6 +133,17 @@ describe('browse pages', () => {
     expect(page).toContain('<meta name="robots" content="index,follow,max-image-preview:large">');
     expect(page).not.toContain('</script><');
     expect(page).toContain(`<meta property="og:image" content="${SITE}og.jpg">`);
+  });
+
+  it('has a not-found page with absolute links back, kept out of search, with no script', () => {
+    const page = notFoundPage({ site: SITE });
+    expect(page).toContain('<h1>Page not found</h1>');
+    expect(page).toContain('<meta name="robots" content="noindex">');
+    expect(page).not.toContain('rel="canonical"');
+    expect(page).not.toContain('<script');
+    for (const path of ['', 'case/', 'browse/', 'logo.svg']) expect(page).toContain(`href="${SITE}${path}"`);
+    // GitHub Pages serves it at any depth, so no link may be relative
+    expect([...page.matchAll(/href="([^"]+)"/g)].every(([, h]) => /^https?:\/\//.test(h))).toBe(true);
   });
 
   it('has every status named in the taxonomy', () => {
