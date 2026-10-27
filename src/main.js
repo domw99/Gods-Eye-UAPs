@@ -1574,9 +1574,11 @@ document.getElementById('dossier-peek').addEventListener('click', () => {
 }
 
 // The top bar wraps on small screens; keep panels and HUD clear of it.
-new ResizeObserver(([entry]) => {
-  document.documentElement.style.setProperty('--top-h', `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
-}).observe(document.querySelector('.topbar'));
+// It is also measured when the panels first show (see 'booting'): the observer's first answer comes a frame
+// later, and moved the map controls on a phone (layout shift).
+const topbarEl = document.querySelector('.topbar');
+const setTopH = () => document.documentElement.style.setProperty('--top-h', `${Math.ceil(topbarEl.getBoundingClientRect().height)}px`);
+new ResizeObserver(setTopH).observe(topbarEl);
 
 /* ── User sighting log ─────────────────────────────────── */
 function loadUserLog() {
@@ -2597,6 +2599,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (document.readyState === 'complete') registerSw();
   else window.addEventListener('load', registerSw, { once: true });
 }
+
+setTopH();
+document.body.classList.remove('booting'); // the panels are filled: show them (under the loading screen until it fades)
 
 // Expose for debugging and automated screenshots.
 window.__uap = { viewer, moonGlobe, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, northUp, toggleTilt, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),
