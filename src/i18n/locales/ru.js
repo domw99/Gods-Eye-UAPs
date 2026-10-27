@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Новое: ещё десять случаев, от зелёных огненных шаров Нью-Мексико до дронов, закрывших аэропорты Европы",
+  "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Приложение хранит только места, номера страниц и короткие цитаты; сами страницы загружаются из Internet Archive.",
 };

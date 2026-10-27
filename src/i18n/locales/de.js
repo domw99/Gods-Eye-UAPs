@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ ZEUGENSICHT",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ZEUGENSICHT — V / ESC ZUM VERLASSEN",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Neu: zehn weitere Fälle, von den grünen Feuerkugeln New Mexicos bis zu den Drohnen, die Europas Flughäfen schlossen",
+  "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Die App speichert nur die Orte, Seitenzahlen und kurze Zitate; die Seiten werden vom Internet Archive geladen.",
 };
