@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Yeni: New Mexico’nun yeşil ateş toplarından Avrupa havalimanlarını kapatan dronlara kadar on yeni vaka",
+  "In a list: move between the rows; Enter opens one": "Bir listede: satırlar arasında gezinme; Enter birini açar",
 };

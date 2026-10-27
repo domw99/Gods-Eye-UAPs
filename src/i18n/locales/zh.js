@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ 目击者视角",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目击者视角 — 按 V / Esc 退出",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新增：十个案例，从新墨西哥州的绿色火球到导致欧洲机场关闭的无人机",
+  "In a list: move between the rows; Enter opens one": "在列表中：在各行之间移动；按 Enter 打开",
 };

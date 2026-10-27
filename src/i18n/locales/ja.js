@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ 目撃者の視点",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新着：ニューメキシコの緑の火球から、ヨーロッパの空港を閉鎖させたドローンまで、10件の事例を追加",
+  "In a list: move between the rows; Enter opens one": "リスト内：行の間を移動、Enter で開く",
 };

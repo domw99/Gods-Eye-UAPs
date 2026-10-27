@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "नया: दस और मामले, न्यू मैक्सिको के हरे आग के गोलों से लेकर उन ड्रोनों तक जिन्होंने यूरोप के हवाई अड्डे बंद कराए",
+  "In a list: move between the rows; Enter opens one": "सूची में: पंक्तियों के बीच जाएँ; Enter से एक खुलती है",
 };

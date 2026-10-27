@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ WIDOK ŚWIADKA",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ WIDOK ŚWIADKA — V / ESC, ABY WYJŚĆ",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Nowość: dziesięć nowych przypadków, od zielonych kul ognia nad Nowym Meksykiem po drony, które zamknęły europejskie lotniska",
+  "In a list: move between the rows; Enter opens one": "Na liście: przechodzenie między wierszami; Enter otwiera wiersz",
 };

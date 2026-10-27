@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ 목격자 시점",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "새 소식: 뉴멕시코의 녹색 불덩이부터 유럽 공항을 폐쇄시킨 드론까지 사례 10건 추가",
+  "In a list: move between the rows; Enter opens one": "목록에서: 행 사이를 이동, Enter로 열기",
 };

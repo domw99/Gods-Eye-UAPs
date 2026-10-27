@@ -2195,9 +2195,9 @@ document.getElementById('world-switch').addEventListener('click', (e) => {
 document.getElementById('btn-space').addEventListener('click', () => openSpaceNow());
 document.getElementById('btn-log').addEventListener('click', openLog);
 document.getElementById('btn-explain').addEventListener('click', () => openExplainNow());
-const openAboutModal = () =>
-  openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated });
-document.getElementById('btn-about').addEventListener('click', openAboutModal);
+const openAboutModal = (options) =>
+  openAbout({ officialGenerated: officialMeta?.generated, bluebookGenerated: bluebook?.meta?.generated }, options);
+document.getElementById('btn-about').addEventListener('click', () => openAboutModal());
 // In an embed, the way out: the full app at the same place, in a new tab.
 {
   const open = document.getElementById('embed-open');
@@ -2310,7 +2310,7 @@ function moonKey(e, typing) {
   } else if (k === 'd') nextLighting();
   else if (k === 'h') document.body.classList.toggle('hud-off');
   else if (k === 'f') setCleanView();
-  else if (e.key === '?') openAboutModal();
+  else if (e.key === '?') openAboutModal({ keys: true }); // "? for all shortcuts": open at them
   else if (k === 'g') openFiles();
   else if (k === 's') openStatsNow();
   else if (k === 'k') openSpaceNow();
@@ -2367,7 +2367,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.key.toLowerCase() === 'l') openLog();
   else if (e.key.toLowerCase() === 'e') openExplainNow();
   else if (e.key.toLowerCase() === 'h') document.body.classList.toggle('hud-off');
-  else if (e.key === '?') openAboutModal();
+  else if (e.key === '?') openAboutModal({ keys: true }); // "? for all shortcuts": open at them
   else if (e.key.toLowerCase() === 'm') openMapSettingsNow();
   else if (e.key.toLowerCase() === 'v' && trackLayer.current && trackLayer.witnessLabel) toggleWitnessView();
   else if (e.key.toLowerCase() === 'r') resetView();

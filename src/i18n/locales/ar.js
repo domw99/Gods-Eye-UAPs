@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ منظور الشاهد",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ منظور الشاهد — V / ESC للخروج",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "جديد: عشر حالات أخرى، من الكرات النارية الخضراء في نيو مكسيكو إلى الطائرات المسيّرة التي أغلقت مطارات أوروبا",
+  "In a list: move between the rows; Enter opens one": "في قائمة: التنقل بين الصفوف؛ ويفتح Enter أحدها",
 };

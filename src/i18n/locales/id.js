@@ -1176,4 +1176,5 @@ export default {
   "◉ WITNESS VIEW": "◉ PANDANGAN SAKSI",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ PANDANGAN SAKSI — V / ESC UNTUK KELUAR",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Baru: sepuluh kasus lagi, dari bola api hijau New Mexico hingga drone yang menutup bandara-bandara Eropa",
+  "In a list: move between the rows; Enter opens one": "Dalam daftar: berpindah antarbaris; Enter membuka salah satunya",
 };
