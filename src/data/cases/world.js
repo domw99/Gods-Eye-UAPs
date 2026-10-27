@@ -541,9 +541,9 @@ export default [
     witnesses: 'Residents and scientists',
     duration: 'Ongoing since ~1981',
     summary:
-      'Lights have appeared over the 12-km Hessdalen valley since at least the early 1980s, peaking at up to 20 per week in 1981–84. Unusually, they have been measured: radar, spectra, magnetometers and a permanent camera station have recorded them, but their cause is still debated.',
+      'Lights have been reported over the 12-km Hessdalen valley since at least the 1930s, peaking at 15 to 20 a week from December 1981 to mid-1984. Unusually, they have been measured: radar, spectra, magnetometers and a permanent camera station have recorded them, but their cause is still debated.',
     timeline: [
-      { t: '1981–1984', text: 'Peak activity; up to 20 sightings a week.' },
+      { t: 'Dec 1981 – mid-1984', text: 'Peak activity: 15 to 20 sightings a week.' },
       { t: 'Feb 1984', text: 'Project Hessdalen field campaign with radar and cameras.' },
       { t: '1998', text: 'Automated measurement station installed.' },
     ],
