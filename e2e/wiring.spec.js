@@ -175,4 +175,64 @@ test.describe('wiring', () => {
     await page.keyboard.press('f'); // the clean view's way out is hidden in an embed too
     expect(await page.evaluate(() => document.body.classList.contains('clean'))).toBe(false);
   });
+
+  test('counting the civilian reports near a place does not close a case opened while they load', async ({ page }) => {
+    await page.route(/nuforc\.json/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await route.continue();
+    });
+    await openApp(page);
+    await page.evaluate(() => window.__uap.showNearby(48.85, 2.35, 'Paris', { fly: false }));
+    await click(page, '#dossier-body [data-action="near-nuforc"]');
+    await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004'));
+    await expect(page.locator('#dossier-id')).toHaveText('nimitz-tic-tac-2004');
+    await expect(page.locator('[data-layer="nuforc"] .state')).not.toHaveText('loading…', { timeout: 30_000 }); // the file is in
+    await page.waitForTimeout(500);
+    await expect(page.locator('#dossier-id')).toHaveText('nimitz-tic-tac-2004');
+    expect(await page.evaluate(() => location.hash)).toBe('#/case/nimitz-tic-tac-2004');
+  });
+
+  test('a location that arrives after another record was opened leaves that record open', async ({ page }) => {
+    // A slow answer, as when the browser asks for permission first.
+    await page.addInitScript(() => {
+      navigator.geolocation.getCurrentPosition = (ok) => setTimeout(() => ok({ coords: { latitude: 48.85, longitude: 2.35, accuracy: 10 } }), 1500);
+    });
+    await openApp(page);
+    await click(page, '#map-controls [data-view="near"]');
+    await page.evaluate(() => window.__uap.select('case:nimitz-tic-tac-2004'));
+    await page.waitForTimeout(2500);
+    await expect(page.locator('#dossier-id')).toHaveText('nimitz-tic-tac-2004');
+  });
+
+  test('a hover label that was waiting for the pointer to rest stays hidden once a dialog opens', async ({ page }) => {
+    await openApp(page);
+    const at = await page.evaluate(async () => {
+      const { viewer, Cesium } = window.__uap;
+      const marker = viewer.dataSources.getByName('uap-items')[0].entities.getById('case:roswell-1947');
+      // Hover waits for the camera to stop: draw frames until it says so.
+      const stopped = new Promise((resolve) => viewer.camera.moveEnd.addEventListener(resolve));
+      viewer.camera.setView({ destination: Cesium.Cartesian3.fromDegrees(marker.__lon, marker.__lat, 400_000) });
+      const frames = setInterval(() => viewer.scene.requestRender(), 50);
+      await Promise.race([stopped, new Promise((resolve) => setTimeout(resolve, 5000))]);
+      clearInterval(frames);
+      const p = viewer.scene.cartesianToCanvasCoordinates(marker.__pos);
+      const r = viewer.canvas.getBoundingClientRect();
+      return { x: r.left + p.x, y: r.top + p.y };
+    });
+    // The label does show for a pointer that rests on the marker…
+    await page.mouse.move(at.x, at.y);
+    await expect(page.locator('.hover-label')).not.toHaveClass(/hidden/);
+    await page.mouse.move(at.x - 300, at.y);
+    await expect(page.locator('.hover-label')).toHaveClass(/hidden/);
+    // …but not when a dialog opens before it has rested long enough (the label waits 90 ms; both happen in one go here).
+    await page.evaluate(({ x, y }) => {
+      const move = (cx) => document.querySelector('.cesium-widget canvas').dispatchEvent(new PointerEvent('pointermove', { clientX: cx, clientY: y, pointerType: 'mouse', pointerId: 1, isPrimary: true, bubbles: true }));
+      move(x - 2);
+      move(x);
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
+    }, at);
+    await expect(page.locator('#modal-root .modal')).toBeVisible();
+    await page.waitForTimeout(600);
+    await expect(page.locator('.hover-label')).toHaveClass(/hidden/);
+  });
 });
