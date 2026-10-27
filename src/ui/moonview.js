@@ -7,6 +7,7 @@ import { sunOnMoon } from '../app/moonsun.js';
 import { MODE_LABELS } from '../app/modes.js';
 import { STATUS } from '../data/taxonomy.js';
 import { statusBadge } from './space.js';
+import { rove, bindListbox, revealRow } from '../app/listbox.js';
 
 /**
  * The Moon, as the second world beside the Earth: the same top bar (EARTH |
@@ -90,13 +91,13 @@ function rowHtml(row, selectedKey) {
   const on = row.key === selectedKey ? 'true' : 'false';
   if (row.report) {
     const { entry, n, sites } = row.report;
-    return html`<li class="case-item numbered" role="option" tabindex="0" data-key="${row.key}" aria-selected="${on}">
+    return html`<li class="case-item numbered" role="option" tabindex="-1" data-key="${row.key}" aria-selected="${on}">
       <span class="num" aria-hidden="true">${n}</span>
       <div><div class="t">${entry.title}</div><div class="m">${entry.when}</div><div class="b">${statusBadge(entry.status)}<span class="badge">${t('LUNAR REPORT')}</span>${sites.some((s) => isFar(s.lon)) ? html`<span class="badge">${t('FAR SIDE')}</span>` : ''}</div></div>
     </li>`;
   }
   const p = row.place;
-  return html`<li class="case-item glyphed" role="option" tabindex="0" data-key="${row.key}" aria-selected="${on}">
+  return html`<li class="case-item glyphed" role="option" tabindex="-1" data-key="${row.key}" aria-selected="${on}">
     <span class="glyph" style="color:${MOON_INK[p.kind]}">${raw(glyphSvg(moonGlyph(p), 'glyph-svg'))}</span>
     <div><div class="t">${p.name}</div><div class="m">${p.kind === 'site' ? p.when : p.english || fmtLatLon(p.lat, p.lon)}</div><div class="b"><span class="badge${p.kind === 'site' ? ' path' : ''}">${kindLabel(p)}</span>${isFar(p.lon) ? html`<span class="badge">${t('FAR SIDE')}</span>` : ''}</div></div>
   </li>`;
@@ -306,11 +307,14 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
         ? html`${shown.map((r) => rowHtml(r, key))}`
         : html`<li class="case-empty">${t('Nothing matches. Try a crater, a sea, a mission or a year.')}${prefs.layers.report && prefs.layers.site && prefs.layers.sea && prefs.layers.crater && prefs.layers.range ? '' : html`<br /><span class="dim">${t('Some layers are off.')}</span>`}</li>`,
     );
+    rove(listEl);
   }
   function markSelected() {
     const key = selected ? `${selected.kind}:${selected.id}` : null;
     for (const li of listEl.querySelectorAll('.case-item')) li.setAttribute('aria-selected', li.dataset.key === key ? 'true' : 'false');
-    if (key) listEl.querySelector(`[data-key="${CSS.escape(key)}"]`)?.scrollIntoView({ block: 'nearest' });
+    rove(listEl);
+    const row = key && listEl.querySelector(`[data-key="${CSS.escape(key)}"]`);
+    if (row) revealRow(row);
   }
 
   // ── Panels: collapsing the list, opening and closing the dossier ──
@@ -530,6 +534,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
       e.target.closest('button').setAttribute('aria-expanded', String(!peek));
     }
   });
+  const listKey = bindListbox(listEl);
   listEl.addEventListener('keydown', (e) => {
     const li = e.target.closest('[data-key]');
     if (!li) return;
@@ -538,11 +543,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
       choose(li.dataset.key);
       // From the keyboard, carry on in the dossier instead of leaving the focus in the list.
       dossier.focus({ preventScroll: true });
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      e.stopPropagation();
-      (e.key === 'ArrowDown' ? li.nextElementSibling : li.previousElementSibling)?.focus();
-    }
+    } else if (listKey(e)) e.stopPropagation();
   });
   searchEl.addEventListener('input', () => {
     clearTimeout(searchTimer);
