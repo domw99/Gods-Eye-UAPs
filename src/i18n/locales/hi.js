@@ -1177,4 +1177,5 @@ export default {
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "नया: दस और मामले, न्यू मैक्सिको के हरे आग के गोलों से लेकर उन ड्रोनों तक जिन्होंने यूरोप के हवाई अड्डे बंद कराए",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "ऐप केवल स्थान, पृष्ठ संख्याएँ और छोटे उद्धरण रखता है; पृष्ठ Internet Archive से पढ़े जाते हैं।",
+  "(No text on this page.)": "(इस पृष्ठ पर कोई पाठ नहीं है।)",
 };

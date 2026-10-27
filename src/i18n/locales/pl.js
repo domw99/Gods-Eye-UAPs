@@ -1177,4 +1177,5 @@ export default {
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ WIDOK ŚWIADKA — V / ESC, ABY WYJŚĆ",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Nowość: dziesięć nowych przypadków, od zielonych kul ognia nad Nowym Meksykiem po drony, które zamknęły europejskie lotniska",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Aplikacja przechowuje tylko miejsca, numery stron i krótkie cytaty; same strony są wczytywane z Internet Archive.",
+  "(No text on this page.)": "(Brak tekstu na tej stronie.)",
 };

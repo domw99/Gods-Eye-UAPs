@@ -1177,4 +1177,5 @@ export default {
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "새 소식: 뉴멕시코의 녹색 불덩이부터 유럽 공항을 폐쇄시킨 드론까지 사례 10건 추가",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "앱은 장소, 페이지 번호, 짧은 인용문만 저장하며, 페이지는 Internet Archive에서 불러옵니다.",
+  "(No text on this page.)": "(이 페이지에는 텍스트가 없습니다.)",
 };
