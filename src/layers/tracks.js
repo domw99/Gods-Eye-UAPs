@@ -29,7 +29,7 @@ export function trackStats(track) {
 function dotImage(color, size = 18) {
   const c = document.createElement('canvas');
   c.width = c.height = size * 2;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   const grad = g.createRadialGradient(size, size, 0, size, size, size);
   grad.addColorStop(0, '#ffffff');
   grad.addColorStop(0.25, color);
@@ -49,7 +49,7 @@ function curtainImage(css, strength) {
   const c = document.createElement('canvas');
   c.width = 4;
   c.height = 128;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   const grad = g.createLinearGradient(0, 0, 0, 128);
   const col = Cesium.Color.fromCssColorString(css);
   const rgba = (a) => `rgba(${Math.round(col.red * 255)},${Math.round(col.green * 255)},${Math.round(col.blue * 255)},${a})`;
