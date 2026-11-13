@@ -3,7 +3,7 @@
  * ZIP reader and the GeoNames cities1000 gazetteer (CC BY 4.0). Nothing is
  * sent to a geocoding service.
  */
-import { mkdir, readFile, writeFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { inflateRawSync } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,7 +17,8 @@ export const UA = 'GodsEyeUAP/0.1 (+https://github.com/domw99/Gods-Eye-UAPs) dat
 export async function cached(name, url) {
   const file = path.join(CACHE, name);
   try {
-    if ((await stat(file)).size > 0) return readFile(file);
+    const cached = await readFile(file);
+    if (cached.length > 0) return cached;
   } catch {}
   console.log(`Downloading ${url}`);
   let res;

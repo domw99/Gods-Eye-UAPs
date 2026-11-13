@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from 'node:fs';
 const manifest = JSON.parse(readFileSync('public/manifest.webmanifest', 'utf8'));
 const main = readFileSync('src/main.js', 'utf8');
 // The names ?open= understands, read from the table in main.js.
-const targets = [...main.match(/const OPEN_TARGETS = \{([\s\S]*?)\n\};/)[1].matchAll(/^\s+(\w+):/gm)].map((m) => m[1]);
+const targets = [...main.match(/const OPEN_TARGETS = new Map\(\[([\s\S]*?)\n\]\);/)[1].matchAll(/^\s+\['([^']+)'/gm)].map((m) => m[1]);
 
 describe('the app manifest', () => {
   it('has shortcuts, as many as phones show, each with a name, a link inside the app and an icon that exists', () => {

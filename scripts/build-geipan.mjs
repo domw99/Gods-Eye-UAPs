@@ -296,7 +296,7 @@ async function main() {
       c.cas_classification || '',
       +c.cas_temoins_nb || null,
       repairAccents(c.cas_resume_web, vocab).replace(/<br\s*\/?>/gi, ' ').trim(),
-      repairAccents(c.cas_resume, vocab).replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim().slice(0, 1200),
+      repairAccents(c.cas_resume, vocab).replace(/<br\s*\/?>/gi, '\n').replace(/[<>]/g, '').trim().slice(0, 1200),
     ]);
   }
   records.sort((a, b) => (a[7] || 0) - (b[7] || 0) || (a[8] || 0) - (b[8] || 0) || (a[9] || 0) - (b[9] || 0));

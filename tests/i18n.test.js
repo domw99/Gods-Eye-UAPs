@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 // The i18n module only touches the document to set <html lang/dir>; give it a stand-in.
@@ -42,11 +42,11 @@ describe('interface languages', () => {
   it('has a translation for every text the code asks for by name', () => {
     const files = [];
     const walk = (dir) => {
-      for (const name of readdirSync(dir)) {
-        const path = join(dir, name);
-        if (statSync(path).isDirectory()) {
-          if (!/i18n|data$/.test(path)) walk(path);
-        } else if (path.endsWith('.js')) files.push(path);
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (!/(i18n|data)$/.test(path)) walk(path);
+        } else if (entry.isFile() && path.endsWith('.js')) files.push(path);
       }
     };
     walk('src');
@@ -73,9 +73,25 @@ const eachText = (fn) => {
   for (const [code, dict] of Object.entries(locales))
     for (const [key, value] of Object.entries(dict)) for (const [form, text] of forms(value)) fn({ code, key, form, text, where: `${code}: ${key}${form ? ` [${form}]` : ''}` });
 };
-const bare = (s) => String(s).replace(/<[^>]+>|\{\w+\}/g, '');
+const stripMarkup = (s) => {
+  let text = '';
+  let inTag = false;
+  for (const c of s) {
+    if (c === '<') inTag = true;
+    else if (c === '>') inTag = false;
+    else if (!inTag) text += c;
+  }
+  return text;
+};
+const bare = (s) => stripMarkup(String(s).replace(/\{\w+\}/g, ''));
 const chars = (...codes) => codes.map((c) => String.fromCharCode(c)).join('');
 const range = (from, to) => `${String.fromCharCode(from)}-${String.fromCharCode(to)}`;
+
+it('strips complete and malformed markup delimiters from plain text', () => {
+  expect(stripMarkup('<script>alert(1)</script>')).toBe('alert(1)');
+  expect(stripMarkup('<<script>alert(1)</script>')).not.toMatch(/[<>]/);
+});
+
 const SCRIPTS = {
   cyrillic: range(0x400, 0x4ff),
   arabic: range(0x600, 0x6ff),
@@ -137,7 +153,7 @@ describe('dictionary quality', () => {
     const bad = [];
     eachText(({ code, key, text, where }) => {
       if (code !== 'ar') return;
-      const plain = text.replace(rlm, '').replace(/<[^>]*>/g, '').replace(/\{\w+\}/g, '');
+      const plain = stripMarkup(text.replace(rlm, '').replace(/\{\w+\}/g, ''));
       const first = [...plain].find((c) => latin.test(c) || arabic.test(c));
       const opensLatin = first && latin.test(first) && arabic.test(plain);
       if ((opensLatin || key.startsWith('{name}')) && !text.startsWith(rlm)) bad.push(where);
@@ -195,11 +211,11 @@ describe('dictionary quality', () => {
   it('keeps no text the code can no longer ask for (an old release toast, a replaced label)', () => {
     const files = [join('index.html')];
     const walk = (dir) => {
-      for (const name of readdirSync(dir)) {
-        const path = join(dir, name);
-        if (statSync(path).isDirectory()) {
-          if (name !== 'locales') walk(path);
-        } else if (/\.(js|mjs|html)$/.test(name)) files.push(path);
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name !== 'locales') walk(path);
+        } else if (entry.isFile() && /\.(js|mjs|html)$/.test(entry.name)) files.push(path);
       }
     };
     walk('src');
@@ -211,7 +227,7 @@ describe('dictionary quality', () => {
     const stale = Object.keys(locales.es).filter((key) => {
       if (built.has(key)) return false;
       // a text may be written in another case in the code and upper-cased when it is shown
-      return !key.split('|').some((part) => [part, part.replace(/'/g, "\\'"), part.replace(/&/g, '&amp;'), part.replace(/’/g, '&rsquo;')].some((v) => source.includes(v) || lower.includes(v.toLowerCase().replace(/\s+/g, ' '))));
+      return !key.split('|').some((part) => [part, part.replace(/\\/g, '\\\\').replace(/'/g, "\\'"), part.replace(/&/g, '&amp;'), part.replace(/’/g, '&rsquo;')].some((v) => source.includes(v) || lower.includes(v.toLowerCase().replace(/\s+/g, ' '))));
     });
     expect(stale).toEqual([]);
   });
