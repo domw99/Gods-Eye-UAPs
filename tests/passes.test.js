@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as satellite from 'satellite.js';
-import { parseTle, propagatePosition } from '../src/layers/satellites.js';
+import { parseTle, propagatePosition } from '../src/layers/orbits.js';
 import { predictPasses, passCandidates, groupTrains, meanAltitudeKm, LOW_STARLINK_KM, MAX_LOW_STARLINK } from '../src/services/passes.js';
 import { sunAltitude } from '../src/services/sky.js';
 

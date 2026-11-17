@@ -14,7 +14,6 @@ import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
-import { predictPasses, passCandidates, groupTrains } from './services/passes.js';
 import { createBuildingLayer } from './layers/buildings.js';
 import { createLaunchLayer, relativeTime } from './layers/launches.js';
 import { createAirspaceLayer } from './layers/airspace.js';
@@ -1567,7 +1566,9 @@ bindDossierActions({
     renderPasses('loading', box);
     satLayer
       .ensureLoaded()
-      .then(() => (satLayer.count ? predictPasses(passCandidates(satLayer.elementSets()), { lat: at.lat, lon: at.lon }).then(groupTrains) : null))
+      // The pass maths (with satellite.js) loads on first use, like the satellite layer's own orbits.
+      .then(() => (satLayer.count ? import('./services/passes.js') : null))
+      .then((P) => (P ? P.predictPasses(P.passCandidates(satLayer.elementSets()), { lat: at.lat, lon: at.lon }).then(P.groupTrains) : null))
       .then((passes) => renderPasses(passes, box))
       .catch((error) => {
         console.warn('[passes]', error);

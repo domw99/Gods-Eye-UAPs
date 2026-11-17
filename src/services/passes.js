@@ -1,6 +1,7 @@
 import * as satellite from 'satellite.js';
 import * as Astro from 'astronomy-engine';
-import { propagatePosition, isSunlit } from '../layers/satellites.js';
+import { propagatePosition } from '../layers/orbits.js';
+import { isSunlit } from '../layers/satellites.js';
 import { sunAltitude } from './sky.js';
 
 /**
