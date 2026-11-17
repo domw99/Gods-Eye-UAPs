@@ -59,7 +59,10 @@ async function fetchText(url, attempt = 0) {
     return fetchText(url, attempt + 1);
   }
   if (!res.ok) throw new Error(`${res.status} ${url}`);
-  return res.text();
+  const text = await res.text();
+  // Since November 2026 DVIDS answers scripted searches with an empty 202 (a bot check) instead of the page.
+  if (res.status === 202 || !text.trim()) throw new Error(`${res.status} (empty answer: DVIDS refused the request) ${url}`);
+  return text;
 }
 
 const decode = (s) =>
@@ -229,7 +232,12 @@ async function main() {
   const assets = found.assets.slice(0, MAX);
   console.log(`Found ${assets.length} candidate assets`);
   // DVIDS down or refusing us finds nothing; that must not replace the catalogue with an empty one.
-  if (!assets.length) throw new Error(`The DVIDS search found no assets (${found.failed} search pages failed); the catalogue is unchanged`);
+  if (!assets.length) {
+    // Nothing to sync is not a broken build: say so on the run (a warning annotation) and leave the file alone,
+    // so the workflow's other steps (the Kp index, the fireball record) still run.
+    console.log(`::warning::The DVIDS search found no assets (${found.failed} search pages failed or were refused); the catalogue is unchanged`);
+    return;
+  }
   let items = [];
   for (const [i, a] of assets.entries()) {
     try {
