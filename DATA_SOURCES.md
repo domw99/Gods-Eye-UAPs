@@ -32,7 +32,7 @@ The 291 curated case files (`src/data/cases/`) are written for this project. Eac
 
 | What | Service | Terms |
 |---|---|---|
-| Satellite imagery | [Esri World Imagery](https://services.arcgisonline.com/) ("Powered by Esri"). The OpenStreetMap fallback is © OpenStreetMap contributors | Esri's terms for the public services; OSM under the [ODbL](https://www.openstreetmap.org/copyright) |
+| Satellite imagery, the Dark, Streets and Topographic maps, and the place names and borders overlay | [Esri World Imagery](https://services.arcgisonline.com/) ("Powered by Esri") and Esri's other public basemap services. The OpenStreetMap fallback is © OpenStreetMap contributors | Esri's terms for the public services; OSM under the [ODbL](https://www.openstreetmap.org/copyright) |
 | Terrain | [Re:Earth](https://terrain.reearth.land/) / Mapterhorn | CC BY 4.0 |
 | 3D buildings | [OpenFreeMap](https://openfreemap.org/) vector tiles, from © OpenMapTiles and © OpenStreetMap contributors | ODbL and the OpenMapTiles licence |
 | City lights on the night side, and the Earth on the day of a case | NASA GIBS (Black Marble 2016; MODIS Terra corrected reflectance) | NASA, public domain |

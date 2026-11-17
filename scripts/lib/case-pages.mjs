@@ -11,7 +11,7 @@
  */
 import { STATUS, CATEGORY } from '../../src/data/taxonomy.js';
 import { AUTHOR, AUTHOR_URL, REPO_URL } from '../../src/config.js';
-import { esc, ldJson, caseDate } from './page-shell.mjs';
+import { esc, ldJson, caseDate, titleWithYear } from './page-shell.mjs';
 
 export { esc, ldJson, caseDate };
 
@@ -30,8 +30,7 @@ export function clip(text, max) {
 export function casePage(c, { site, card = false, similar = [], groups = [] }) {
   const url = `${site}case/${c.id}/`;
   const app = `../../#/case/${encodeURIComponent(c.id)}`;
-  const year = (c.date || '').slice(0, 4).replace(/^0+/, '');
-  const title = `${c.title} (${year})`;
+  const title = titleWithYear(c);
   const description = clip(c.summary, 200);
   const image = card ? `${site}cards/${c.id}.jpg` : `${site}og.jpg`;
   const status = STATUS[c.status] || { label: String(c.status || '').toUpperCase(), long: '', color: '#00d4ff' };

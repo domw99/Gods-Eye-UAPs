@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ 目击者视角",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目击者视角 — 按 V / Esc 退出",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新增：十个案例，从新墨西哥州的绿色火球到导致欧洲机场关闭的无人机",
+  "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "本应用只保存地点、页码和简短引文；页面本身从 Internet Archive 读取。",
+  "(No text on this page.)": "（此页没有文字。）",
 };

@@ -988,7 +988,7 @@ export async function showMufonText(is, leaf) {
   try {
     const text = await pageText(is, leaf);
     if (!document.body.contains(el)) return;
-    mount(el, html`<pre class="mono ocr-text" tabindex="0" role="region" aria-label="READ OCR TEXT">${text || '(No text on this page.)'}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
+    mount(el, html`<pre class="mono ocr-text" tabindex="0" role="region" aria-label="READ OCR TEXT">${text || t('(No text on this page.)')}</pre><p class="caveat">Machine OCR of the printed journal — expect errors.</p>`);
   } catch {
     mount(el, html`<div class="loading-line">Page text unavailable. Try the Internet Archive reader.</div>`);
   }

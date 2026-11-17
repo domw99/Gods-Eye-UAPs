@@ -125,6 +125,8 @@ export function openData(cases, { site, version, date }) {
   const csv = toCsv(records);
   const geojson = `${JSON.stringify({ ...toGeoJson(records), metadata: meta })}\n`;
   const description = `${records.length} well-documented UFO/UAP encounters from ${Math.min(...years)} to ${Math.max(...years)} in ${countries} countries and territories. For each: the date and place with coordinates, the kind of encounter, the evidence, the official or best explanation and its status, a short summary and timeline, and the sources. ${withTracks} cases have reconstructed flight paths, each marked with what it is based on (radar, an official report, witness reports or an approximate reconstruction). Made for the God's Eye // UAP 3D globe.`;
+  // For search results and link previews: whole sentences (a cut at 300 characters ended mid-word).
+  const summary = description.split(/(?<=\.) /).slice(0, 2).join(' ');
   const files = [
     { name: 'cases.json', format: 'application/json', what: 'Every field, with the flight paths and timelines.' },
     { name: 'cases.csv', format: 'text/csv', what: 'One row per case, for spreadsheets. Lists are joined with “ | ”; flight paths are counted, not included.' },
@@ -168,7 +170,7 @@ export function openData(cases, { site, version, date }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open data: ${records.length} UFO/UAP case files · God's Eye // UAP</title>
-<meta name="description" content="${esc(description.slice(0, 300))}">
+<meta name="description" content="${esc(summary)}">
 <meta name="author" content="${AUTHOR}">
 <meta name="theme-color" content="#05070c">
 <link rel="canonical" href="${esc(url)}">
@@ -176,7 +178,7 @@ export function openData(cases, { site, version, date }) {
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="God's Eye // UAP">
 <meta property="og:title" content="Open data: ${records.length} UFO/UAP case files">
-<meta property="og:description" content="${esc(description.slice(0, 300))}">
+<meta property="og:description" content="${esc(summary)}">
 <meta property="og:url" content="${esc(url)}">
 <meta property="og:image" content="${esc(site)}og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -212,6 +214,7 @@ footer a{color:inherit}
 <ul class="files">
 ${files.map((f) => `<li><a href="${f.name}" download>${f.name}</a> <span>· ${esc(f.what)}</span></li>`).join('\n')}
 </ul>
+<p>For AI assistants: <a href="../llms.txt">llms.txt</a> says what the site is and how to read a case honestly, and <a href="../llms-full.txt">llms-full.txt</a> has every case as Markdown in one file.</p>
 <h2>Fields</h2>
 <div class="table" role="region" aria-label="The fields" tabindex="0"><table>
 ${fields.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('\n')}

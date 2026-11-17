@@ -6,6 +6,7 @@ import { casePage, caseIndex, sitemap, siteStructuredData, ldJson } from './scri
 import { openData } from './scripts/lib/open-data.mjs';
 import { browseGroups, browseIndex, groupPage, groupPath, groupsOf } from './scripts/lib/browse-pages.mjs';
 import { robotsTxt, llmsTxt, llmsFullTxt } from './scripts/lib/llms.mjs';
+import { notFoundPage } from './scripts/lib/page-shell.mjs';
 import { siteUrl } from './scripts/lib/site.mjs';
 import { similarCases } from './src/data/similar.js';
 import { RELEASE, SITE_URL } from './src/config.js';
@@ -43,7 +44,7 @@ export default defineConfig({
     },
     // A page per case (case/<id>/) so a shared case link previews that case and
     // search engines can index it, an index of them all (case/), the case files
-    // as open data (open-data/), and a sitemap listing the pages.
+    // as open data (open-data/), a sitemap listing the pages, and the not-found page GitHub Pages serves (404.html).
     {
       name: 'case-pages',
       apply: 'build',
@@ -61,6 +62,7 @@ export default defineConfig({
         emit('open-data/cases.json', data.json);
         emit('open-data/cases.csv', data.csv);
         emit('open-data/cases.geojson', data.geojson);
+        emit('404.html', notFoundPage({ site: SITE }));
         emit('sitemap.xml', sitemap(SITE, CASES.map((c) => c.id), today, groups.map(groupPath)));
         emit('robots.txt', robotsTxt(SITE));
         emit('llms.txt', llmsTxt(CASES, { site: SITE }));
