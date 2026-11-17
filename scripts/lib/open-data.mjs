@@ -7,6 +7,9 @@
 import { STATUS, CATEGORY, PRECISION, TRACK_BASIS } from '../../src/data/taxonomy.js';
 import { AUTHOR, AUTHOR_URL, REPO_URL } from '../../src/config.js';
 import { esc, ldJson } from './case-pages.mjs';
+import { csvField } from '../../src/util/csv.js';
+
+export { csvField };
 
 const wikiUrl = (title) => (title ? `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}` : null);
 
@@ -55,17 +58,6 @@ const CSV_COLUMNS = [
   'category', 'status', 'statusLabel', 'explanation', 'evidence', 'shape', 'witnesses', 'duration', 'summary',
   'tracks', 'wikipedia', 'sources', 'page', 'globe',
 ];
-
-/**
- * A CSV field: quoted when it has to be, quotes doubled. Text a spreadsheet would run as a formula
- * (it starts with = + - @, a tab or a return) gets a leading apostrophe; numbers are left as they are.
- */
-export function csvField(v) {
-  if (v == null) return '';
-  let s = String(v);
-  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 /** All records as CSV, one row per case. Lists are joined with " | "; the flight paths are only counted (they are in the JSON and GeoJSON). */
 export function toCsv(records) {

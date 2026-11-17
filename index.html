@@ -108,6 +108,7 @@
       <div class="section-label list-label">
         <span>RESULTS</span>
         <button id="btn-random" class="link-btn" type="button" title="Open a random case">⚄ RANDOM</button>
+        <button id="btn-export" class="link-btn" type="button" aria-expanded="false" aria-controls="export-row" title="Download the records shown">⇩ EXPORT</button>
         <select id="sort" aria-label="Sort cases">
           <option value="date-desc">Newest first</option>
           <option value="date-asc">Oldest first</option>
@@ -115,6 +116,7 @@
           <option value="name">A–Z</option>
         </select>
       </div>
+      <div id="export-row" class="export-row hidden" role="group" aria-label="Export the list"><span id="export-what"></span><button class="chip small" type="button" data-export="csv">CSV</button><button class="chip small" type="button" data-export="geojson">GeoJSON</button></div>
       <ul id="place-results" aria-label="Places"></ul>
       <ul id="case-list" class="case-list" role="listbox" aria-label="Cases"></ul>
       <p class="made-by"><a href="./case/">All case files</a> · <a href="./browse/">Browse</a> · <a href="./open-data/">Open data</a> · <span>made by</span> <a href="https://github.com/domw99" target="_blank" rel="noopener">domw99</a></p>

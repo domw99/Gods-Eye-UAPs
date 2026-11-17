@@ -14,16 +14,18 @@ import { createItemLayer } from './layers/items.js';
 import { createTrackLayer } from './layers/tracks.js';
 import { createPointLayer, townJitter } from './layers/points.js';
 import { createSatelliteLayer } from './layers/satellites.js';
+import { predictPasses, passCandidates, groupTrains } from './services/passes.js';
 import { createBuildingLayer } from './layers/buildings.js';
 import { createLaunchLayer, relativeTime } from './layers/launches.js';
 import { createAirspaceLayer } from './layers/airspace.js';
 import { loadAirspace, areasAt, AIRSPACE_TYPES, formatFt } from './services/airspace.js';
 import { launchesAroundNow, launchesNear, RateLimitError } from './services/launches.js';
-import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList, markSelected } from './ui/list.js';
+import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList, markSelected, sortedItems } from './ui/list.js';
+import { listRecord, listCsv, listGeoJson, describeFilters, exportName } from './data/listexport.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
   renderCase, renderOfficial, renderBlueBook, renderNuforc, renderUser, renderSatellite,
-  renderSkyCheck, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderFireball, fireballEnergy, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
+  renderSkyCheck, renderPasses, redrawDossier, closeDossier, bindDossierActions, showOcr, renderLaunchPad, renderQuake, renderFireball, fireballEnergy, renderAirspace, renderMufon, showMufonText, renderGeipan, renderNearby,
 } from './ui/dossier.js';
 import { loadMufon, issueDate, pageNumber } from './services/mufon.js';
 import { loadQuakes, quakeSize, quakeColor } from './services/quakes.js';
@@ -238,11 +240,48 @@ try {
 document.getElementById('tl-hide').addEventListener('click', () => setTimelineHidden(true));
 document.getElementById('tl-show').addEventListener('click', () => setTimelineHidden(false));
 
+/* ── Export the list as it stands (CSV for a spreadsheet, GeoJSON for a map) ── */
+let listShown = [];
+const exportBtn = document.getElementById('btn-export');
+const exportRow = document.getElementById('export-row');
+function describeExport() {
+  if (exportRow.classList.contains('hidden')) return;
+  document.getElementById('export-what').textContent = listShown.length
+    ? plural(listShown.length, 'Download the {n} record shown, with the filters in force:', 'Download the {n} records shown, with the filters in force:')
+    : t('No records match these filters.');
+  for (const b of exportRow.querySelectorAll('[data-export]')) b.disabled = !listShown.length;
+}
+function setExportOpen(on) {
+  exportRow.classList.toggle('hidden', !on);
+  exportBtn.setAttribute('aria-expanded', String(on));
+  describeExport();
+}
+exportBtn.addEventListener('click', () => setExportOpen(exportRow.classList.contains('hidden')));
+exportRow.addEventListener('click', (e) => {
+  const kind = e.target.closest('[data-export]')?.dataset.export;
+  if (!kind || !listShown.length) return;
+  const records = sortedItems(listShown).map((it) => listRecord(it));
+  const blob =
+    kind === 'csv'
+      ? new Blob([listCsv(records)], { type: 'text/csv;charset=utf-8' })
+      : new Blob([JSON.stringify(listGeoJson(records, { filters: describeFilters(state) }))], { type: 'application/geo+json' });
+  downloadBlob(blob, exportName(kind));
+});
+for (const el of [exportBtn, exportRow])
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || exportRow.classList.contains('hidden')) return;
+    e.stopPropagation(); // close this, not the case file beside it
+    setExportOpen(false);
+    exportBtn.focus();
+  });
+
 let nuforcShapeClasses = null;
 function refresh() {
   const base = allItems().filter(passesNonYear);
   const visible = base.filter((it) => inYearRange(it.year));
   renderList(visible);
+  listShown = visible;
+  describeExport();
   itemLayer.setVisible(new Set(visible.map((i) => i.key)));
   timeline.setItems(base);
   // Point layers follow the same year/search filters.
@@ -1519,6 +1558,24 @@ bindDossierActions({
     const box = document.getElementById('d-sky'); // the answer belongs in this record's box, even if another is open by then
     renderSkyCheck('loading', box);
     satLayer.ensureLoaded().then(() => renderSkyCheck(satLayer.count ? satLayer.overhead(item.lat, item.lon) : null, box));
+  },
+  passes: (btn) => {
+    const at = nearPoint;
+    if (!at || btn.disabled) return;
+    const box = document.getElementById('d-passes'); // the answer belongs in this place's box, even if another is open by then
+    btn.disabled = true;
+    renderPasses('loading', box);
+    satLayer
+      .ensureLoaded()
+      .then(() => (satLayer.count ? predictPasses(passCandidates(satLayer.elementSets()), { lat: at.lat, lon: at.lon }).then(groupTrains) : null))
+      .then((passes) => renderPasses(passes, box))
+      .catch((error) => {
+        console.warn('[passes]', error);
+        renderPasses(null, box);
+      })
+      .finally(() => {
+        btn.disabled = false;
+      });
   },
   'export-user': exportUserLog,
   compare: () => {
