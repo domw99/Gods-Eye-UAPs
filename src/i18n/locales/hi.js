@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "नया: दस और मामले, न्यू मैक्सिको के हरे आग के गोलों से लेकर उन ड्रोनों तक जिन्होंने यूरोप के हवाई अड्डे बंद कराए",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "ग्लोब दिखना बंद हो गया: ब्राउज़र ने वह ग्राफ़िक्स मेमोरी वापस ले ली जिसका वह उपयोग कर रहा था। उसे वापस लाने के लिए पेज फिर से लोड करें; जो केस खुला था वह खुला रहेगा।",
+  "RELOAD": "फिर से लोड करें",
 };

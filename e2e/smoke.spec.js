@@ -274,4 +274,22 @@ test.describe('God’s Eye // UAP', () => {
     await page.reload();
     await expect(page.locator('#map-controls [data-view="group"]')).toHaveAttribute('aria-pressed', 'false');
   });
+
+  test('a globe whose graphics context is lost says so, and a reload brings it back with the case still open', async ({ page }) => {
+    await openApp(page, '/#/case/socorro-zamora-1964');
+    await expect(page.locator('#dossier-body .d-title')).toHaveText(/Socorro landing/);
+    const notice = page.locator('#gl-lost');
+    await expect(notice).toBeHidden();
+    await page.evaluate(() => {
+      const canvas = window.__uap.viewer.scene.canvas;
+      (canvas.getContext('webgl2') || canvas.getContext('webgl')).getExtension('WEBGL_lose_context').loseContext();
+    });
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('The globe stopped drawing');
+    const reload = notice.getByRole('button', { name: 'RELOAD' });
+    await expect(reload).toBeFocused();
+    await reload.click();
+    await expect(page.locator('#dossier-body .d-title')).toHaveText(/Socorro landing/, { timeout: 60_000 });
+    await expect(page.locator('#gl-lost')).toBeHidden();
+  });
 });

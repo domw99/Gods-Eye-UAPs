@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ 目撃者の視点",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新着：ニューメキシコの緑の火球から、ヨーロッパの空港を閉鎖させたドローンまで、10件の事例を追加",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "地球儀の描画が止まりました。ブラウザが使用中のグラフィックメモリを取り戻したためです。ページを再読み込みすると元に戻ります。開いていた事案は開いたままです。",
+  "RELOAD": "再読み込み",
 };

@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ 목격자 시점",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "새 소식: 뉴멕시코의 녹색 불덩이부터 유럽 공항을 폐쇄시킨 드론까지 사례 10건 추가",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "지구본이 더 이상 그려지지 않습니다. 브라우저가 지구본이 쓰던 그래픽 메모리를 회수했습니다. 페이지를 새로 고치면 다시 나타나며, 열어 둔 사건은 그대로 열려 있습니다.",
+  "RELOAD": "새로 고침",
 };

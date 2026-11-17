@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ منظور الشاهد",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ منظور الشاهد — V / ESC للخروج",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "جديد: عشر حالات أخرى، من الكرات النارية الخضراء في نيو مكسيكو إلى الطائرات المسيّرة التي أغلقت مطارات أوروبا",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "توقفت الكرة الأرضية عن الظهور: استعاد المتصفح ذاكرة الرسوميات التي كانت تستخدمها. أعد تحميل الصفحة لاستعادتها؛ وتبقى الحالة التي كانت مفتوحة مفتوحة.",
+  "RELOAD": "أعد التحميل",
 };

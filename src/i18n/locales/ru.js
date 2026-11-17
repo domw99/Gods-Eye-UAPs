@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Новое: ещё десять случаев, от зелёных огненных шаров Нью-Мексико до дронов, закрывших аэропорты Европы",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Глобус перестал отрисовываться: браузер забрал графическую память, которую он использовал. Перезагрузите страницу, чтобы вернуть его; открытое дело останется открытым.",
+  "RELOAD": "ПЕРЕЗАГРУЗИТЬ",
 };

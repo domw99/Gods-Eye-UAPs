@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Yeni: New Mexico’nun yeşil ateş toplarından Avrupa havalimanlarını kapatan dronlara kadar on yeni vaka",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Küre artık çizilmiyor: tarayıcı, kürenin kullandığı grafik belleğini geri aldı. Geri getirmek için sayfayı yeniden yükleyin; açık olan vaka açık kalır.",
+  "RELOAD": "YENİDEN YÜKLE",
 };

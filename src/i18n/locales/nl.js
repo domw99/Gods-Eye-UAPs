@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ GETUIGENZICHT",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ GETUIGENZICHT — V / ESC OM TE STOPPEN",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Nieuw: tien nieuwe zaken, van de groene vuurballen van New Mexico tot de drones die Europese luchthavens sloten",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "De globe wordt niet meer getekend: de browser heeft het grafische geheugen teruggenomen dat hij gebruikte. Laad de pagina opnieuw om hem terug te krijgen; de zaak die open stond, blijft open.",
+  "RELOAD": "OPNIEUW LADEN",
 };

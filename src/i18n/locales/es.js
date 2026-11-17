@@ -1176,4 +1176,6 @@ export default {
   "◉ WITNESS VIEW": "◉ VISTA DEL TESTIGO",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VISTA DEL TESTIGO — V / ESC PARA SALIR",
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Novedad: diez casos más, desde las bolas de fuego verdes de Nuevo México hasta los drones que cerraron aeropuertos de Europa",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "El globo ha dejado de dibujarse: el navegador ha recuperado la memoria gráfica que usaba. Recarga la página para recuperarlo; el caso que tenías abierto seguirá abierto.",
+  "RELOAD": "RECARGAR",
 };
