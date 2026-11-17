@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "ANLADIM",
   "◉ WITNESS VIEW": "◉ TANIK GÖRÜŞÜ",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ TANIK GÖRÜŞÜ — ÇIKMAK İÇİN V / ESC",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Yeni: New Mexico’nun yeşil ateş toplarından Avrupa havalimanlarını kapatan dronlara kadar on yeni vaka",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Uygulama yalnızca yerleri, sayfa numaralarını ve kısa alıntıları saklar; sayfalar Internet Archive’dan okunur.",
   "(No text on this page.)": "(Bu sayfada metin yok.)",
   "In a list: move between the rows; Enter opens one": "Bir listede: satırlar arasında gezinme; Enter birini açar",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "İlk {n} tanesi listelendi; diğerleri günün ilerleyen saatlerinde.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Küre artık çizilmiyor: tarayıcı, kürenin kullandığı grafik belleğini geri aldı. Geri getirmek için sayfayı yeniden yükleyin; açık olan vaka açık kalır.",
   "RELOAD": "YENİDEN YÜKLE",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "3.0’da yeni: 37 yeni vaka, her yer için görünür uydu geçişleri ve listeyi dışa aktarma",
 };

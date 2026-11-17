@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "MENGERTI",
   "◉ WITNESS VIEW": "◉ PANDANGAN SAKSI",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ PANDANGAN SAKSI — V / ESC UNTUK KELUAR",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Baru: sepuluh kasus lagi, dari bola api hijau New Mexico hingga drone yang menutup bandara-bandara Eropa",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Aplikasi hanya menyimpan tempat, nomor halaman, dan kutipan singkat; halamannya dibaca dari Internet Archive.",
   "(No text on this page.)": "(Tidak ada teks di halaman ini.)",
   "In a list: move between the rows; Enter opens one": "Dalam daftar: berpindah antarbaris; Enter membuka salah satunya",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "{n} yang pertama dicantumkan; sisanya menyusul lebih lambat pada hari itu.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Globe berhenti digambar: browser mengambil kembali memori grafis yang dipakainya. Muat ulang halaman untuk memunculkannya lagi; kasus yang sedang terbuka tetap terbuka.",
   "RELOAD": "MUAT ULANG",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "Baru di 3.0: 37 kasus lagi, lintasan satelit yang terlihat untuk tempat mana pun, dan ekspor daftar",
 };

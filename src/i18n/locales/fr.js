@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "COMPRIS",
   "◉ WITNESS VIEW": "◉ VUE DU TÉMOIN",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ VUE DU TÉMOIN — V / ÉCHAP POUR QUITTER",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Nouveau : dix cas de plus, des boules de feu vertes du Nouveau-Mexique aux drones qui ont fermé des aéroports européens",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "L’application ne conserve que les lieux, les numéros de page et de courtes citations ; les pages sont lues sur l’Internet Archive.",
   "(No text on this page.)": "(Aucun texte sur cette page.)",
   "In a list: move between the rows; Enter opens one": "Dans une liste : passer d’une ligne à l’autre ; Entrée en ouvre une",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "Les {n} premiers sont listés ; les autres viennent plus tard dans la journée.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Le globe ne s’affiche plus : le navigateur a repris la mémoire graphique qu’il utilisait. Rechargez la page pour le retrouver ; le cas que vous aviez ouvert reste ouvert.",
   "RELOAD": "RECHARGER",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "Nouveau dans la 3.0 : 37 cas de plus, les passages visibles de satellites pour n’importe quel lieu et l’export de la liste",
 };

@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "了解",
   "◉ WITNESS VIEW": "◉ 目撃者の視点",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 目撃者の視点 — V / Esc で終了",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新着：ニューメキシコの緑の火球から、ヨーロッパの空港を閉鎖させたドローンまで、10件の事例を追加",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "アプリが保存するのは場所、ページ番号、短い引用だけで、ページ自体は Internet Archive から読み込みます。",
   "(No text on this page.)": "（このページにはテキストがありません。）",
   "In a list: move between the rows; Enter opens one": "リスト内：行の間を移動、Enter で開く",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "最初の{n}件を表示しています。残りはその日の後の時間帯です。",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "地球儀の描画が止まりました。ブラウザが使用中のグラフィックメモリを取り戻したためです。ページを再読み込みすると元に戻ります。開いていた事案は開いたままです。",
   "RELOAD": "再読み込み",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "3.0の新機能：37件の事例を追加、任意の場所で見える衛星の通過予報、一覧のエクスポート",
 };

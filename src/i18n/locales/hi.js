@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "समझ गया",
   "◉ WITNESS VIEW": "◉ गवाह का दृश्य",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ गवाह का दृश्य — बाहर निकलने के लिए V / ESC",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "नया: दस और मामले, न्यू मैक्सिको के हरे आग के गोलों से लेकर उन ड्रोनों तक जिन्होंने यूरोप के हवाई अड्डे बंद कराए",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "ऐप केवल स्थान, पृष्ठ संख्याएँ और छोटे उद्धरण रखता है; पृष्ठ Internet Archive से पढ़े जाते हैं।",
   "(No text on this page.)": "(इस पृष्ठ पर कोई पाठ नहीं है।)",
   "In a list: move between the rows; Enter opens one": "सूची में: पंक्तियों के बीच जाएँ; Enter से एक खुलती है",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "पहले {n} सूचीबद्ध हैं; बाकी दिन में बाद में आते हैं।",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "ग्लोब दिखना बंद हो गया: ब्राउज़र ने वह ग्राफ़िक्स मेमोरी वापस ले ली जिसका वह उपयोग कर रहा था। उसे वापस लाने के लिए पेज फिर से लोड करें; जो केस खुला था वह खुला रहेगा।",
   "RELOAD": "फिर से लोड करें",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "3.0 में नया: 37 और मामले, किसी भी जगह के लिए दिखने वाले उपग्रह गुज़रने, और सूची का निर्यात",
 };

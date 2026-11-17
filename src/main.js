@@ -2061,7 +2061,7 @@ function maybeWelcome() {
   if (navigator.webdriver || EMBED) return;
   if (!seen && !location.hash && !state.selected && !params.get('open')) welcome.hidden = false;
   else if (seen && release !== RELEASE)
-    toast('New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports', 7000);
+    toast('New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list', 7000);
 }
 /* On a phone, once: the app is roomier on a computer. It sits over the welcome card, which is there when it is closed. */
 const PHONE_NOTE_KEY = 'gods-eye-uap:phone-note';

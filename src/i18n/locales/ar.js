@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "فهمت",
   "◉ WITNESS VIEW": "◉ منظور الشاهد",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ منظور الشاهد — V / ESC للخروج",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "جديد: عشر حالات أخرى، من الكرات النارية الخضراء في نيو مكسيكو إلى الطائرات المسيّرة التي أغلقت مطارات أوروبا",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "لا يحفظ التطبيق إلا الأماكن وأرقام الصفحات والاقتباسات القصيرة؛ أما الصفحات فتُقرأ من Internet Archive.",
   "(No text on this page.)": "(لا يوجد نص في هذه الصفحة.)",
   "In a list: move between the rows; Enter opens one": "في قائمة: التنقل بين الصفوف؛ ويفتح Enter أحدها",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "تُعرض أول {n}؛ والباقي يأتي لاحقًا في اليوم.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "توقفت الكرة الأرضية عن الظهور: استعاد المتصفح ذاكرة الرسوميات التي كانت تستخدمها. أعد تحميل الصفحة لاستعادتها؛ وتبقى الحالة التي كانت مفتوحة مفتوحة.",
   "RELOAD": "أعد التحميل",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "جديد في 3.0: 37 حالة إضافية، ومرور الأقمار الصناعية المرئي لأي مكان، وتصدير القائمة",
 };

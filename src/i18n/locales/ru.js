@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "ПОНЯТНО",
   "◉ WITNESS VIEW": "◉ ВИД ОЧЕВИДЦА",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ ВИД ОЧЕВИДЦА — V / ESC, ЧТОБЫ ВЫЙТИ",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Новое: ещё десять случаев, от зелёных огненных шаров Нью-Мексико до дронов, закрывших аэропорты Европы",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Приложение хранит только места, номера страниц и короткие цитаты; сами страницы загружаются из Internet Archive.",
   "(No text on this page.)": "(На этой странице нет текста.)",
   "In a list: move between the rows; Enter opens one": "В списке: переход между строками; Enter открывает строку",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "Показаны первые {n}; остальные будут позже в течение дня.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "Глобус перестал отрисовываться: браузер забрал графическую память, которую он использовал. Перезагрузите страницу, чтобы вернуть его; открытое дело останется открытым.",
   "RELOAD": "ПЕРЕЗАГРУЗИТЬ",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "Новое в 3.0: ещё 37 случаев, видимые пролёты спутников для любого места и экспорт списка",
 };

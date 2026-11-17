@@ -1175,7 +1175,6 @@ export default {
   "GOT IT": "확인",
   "◉ WITNESS VIEW": "◉ 목격자 시점",
   "◉ WITNESS VIEW — V / ESC TO LEAVE": "◉ 목격자 시점 — 나가려면 V / ESC",
-  "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "새 소식: 뉴멕시코의 녹색 불덩이부터 유럽 공항을 폐쇄시킨 드론까지 사례 10건 추가",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "앱은 장소, 페이지 번호, 짧은 인용문만 저장하며, 페이지는 Internet Archive에서 불러옵니다.",
   "(No text on this page.)": "(이 페이지에는 텍스트가 없습니다.)",
   "In a list: move between the rows; Enter opens one": "목록에서: 행 사이를 이동, Enter로 열기",
@@ -1196,4 +1195,5 @@ export default {
   "The first {n} are listed; the others come later in the day.": "처음 {n}개만 표시합니다. 나머지는 그날 더 늦게 지나갑니다.",
   "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "지구본이 더 이상 그려지지 않습니다. 브라우저가 지구본이 쓰던 그래픽 메모리를 회수했습니다. 페이지를 새로 고치면 다시 나타나며, 열어 둔 사건은 그대로 열려 있습니다.",
   "RELOAD": "새로 고침",
+  "New in 3.0: 37 more cases, visible satellite passes for any place, and export of the list": "3.0 새 기능: 사례 37건 추가, 어느 곳에서나 보이는 위성 통과 예보, 목록 내보내기",
 };
