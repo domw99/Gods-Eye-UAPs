@@ -553,6 +553,9 @@ body:not(.tl-hidden) .tl-show { display: none; }
 /* Under the loading screen the panels settle (the layers fill in, the top bar's height is measured). Nobody sees that,
    but browsers count it as layout shift (0.11 on a phone): kept hidden until the screen lifts, they simply appear. */
 body:has(#loading:not(.done)) :is(.topbar, #left, #dossier, #map-controls, #hud, #timeline) { visibility: hidden; }
+/* Until the app has filled them, the panels behind the loading screen stay hidden: the layer rows and the
+   case list arriving pushed the rest of the panel down, which counted as layout shift (0.1 on a phone). */
+body.booting :is(.topbar, #left, #hud, .map-controls, #timeline, .tl-show) { visibility: hidden; }
 .loading-bar { width: 180px; height: 2px; background: rgba(0, 212, 255, 0.15); border-radius: 2px; overflow: hidden; }
 .loading-bar i { display: block; height: 100%; width: 8%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 300ms ease-out; }
 .loading-ring { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(0, 212, 255, 0.2); border-top-color: var(--accent); animation: spin 1s linear infinite; }

@@ -6,7 +6,7 @@ const SOURCE = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8')
 const PAGE = 'https://example.test/app/';
 
 /** Run the service worker's script against a fake worker scope; returns what it registered. */
-function loadWorker({ fetchImpl, saved = null, cacheNames = [], deleted = [] }) {
+function loadWorker({ fetchImpl, saved = null, cacheNames = [], deleted = [], registration }) {
   const handlers = {};
   const store = new Map(saved ? [[PAGE, saved]] : []);
   const at = (req) => (typeof req === 'string' ? new URL(req, PAGE).href : req.url);
@@ -17,7 +17,7 @@ function loadWorker({ fetchImpl, saved = null, cacheNames = [], deleted = [] }) 
     delete: async (name) => deleted.push(name) > 0,
   };
   const scope = {
-    self: { location: { origin: 'https://example.test', href: `${PAGE}sw.js` }, addEventListener: (type, fn) => (handlers[type] = fn), skipWaiting() {}, clients: { claim() {} } },
+    self: { location: { origin: 'https://example.test', href: `${PAGE}sw.js` }, addEventListener: (type, fn) => (handlers[type] = fn), skipWaiting() {}, clients: { claim() {} }, registration },
     caches,
     fetch: fetchImpl,
     URL,
@@ -28,9 +28,10 @@ function loadWorker({ fetchImpl, saved = null, cacheNames = [], deleted = [] }) 
   return { handlers, store };
 }
 
-function navigate(handlers, url = PAGE) {
+function navigate(handlers, url = PAGE, preloadResponse) {
   const event = {
     request: { method: 'GET', mode: 'navigate', url, headers: new Headers() },
+    preloadResponse,
     answer: null,
     respondWith(p) {
       this.answer = p;
@@ -92,6 +93,45 @@ describe('service worker: opening the app', () => {
     navigate(handlers);
     await vi.advanceTimersByTimeAsync(9_500);
     expect(await store.get(PAGE).text()).toBe('fresh');
+  });
+});
+
+describe('service worker: navigation preload', () => {
+  it('turns navigation preload on when it starts, where the browser has it', async () => {
+    let enabled = 0;
+    const { handlers } = loadWorker({ fetchImpl: async () => new Response(''), registration: { navigationPreload: { enable: async () => void enabled++ } } });
+    let done;
+    handlers.activate({ waitUntil: (p) => (done = p) });
+    await done;
+    expect(enabled).toBe(1);
+  });
+
+  it('starts without it in a browser that does not have it, or when turning it on fails', async () => {
+    for (const registration of [undefined, {}, { navigationPreload: { enable: async () => Promise.reject(new Error('no')) } }]) {
+      const { handlers } = loadWorker({ fetchImpl: async () => new Response(''), registration });
+      let done;
+      handlers.activate({ waitUntil: (p) => (done = p) });
+      await done; // a rejection would fail the test: the worker must start either way
+    }
+  });
+
+  it('uses the preloaded page instead of asking again, and saves it', async () => {
+    let asked = 0;
+    const { handlers, store } = loadWorker({ fetchImpl: async () => (asked++, new Response('fetched')), saved: new Response('saved') });
+    expect(await text(navigate(handlers, PAGE, Promise.resolve(new Response('preloaded'))))).toBe('preloaded');
+    expect(asked).toBe(0);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(await store.get(PAGE).text()).toBe('preloaded');
+  });
+
+  it('asks the network itself when nothing was preloaded', async () => {
+    const { handlers } = loadWorker({ fetchImpl: async () => new Response('fetched') });
+    expect(await text(navigate(handlers, PAGE, Promise.resolve(undefined)))).toBe('fetched');
+  });
+
+  it('falls back to the saved page when the preload fails offline', async () => {
+    const { handlers } = loadWorker({ fetchImpl: async () => Promise.reject(new TypeError('offline')), saved: new Response('saved') });
+    expect(await text(navigate(handlers, PAGE, Promise.reject(new TypeError('offline'))))).toBe('saved');
   });
 });
 

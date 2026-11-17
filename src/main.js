@@ -37,8 +37,6 @@ import { toMgrs } from './util/mgrs.js';
 import { createZoomOut, LEVEL_FROM } from './app/zoom.js';
 import { createFlycam } from './app/flycam.js';
 import { createBasemap, BASEMAPS } from './app/basemap.js';
-import { openSpace } from './ui/space.js';
-import { openMoon, closeMoon, isMoonOpen, moonGlobe, setMoonMode, setMoonLighting } from './ui/moonview.js';
 import { dropCaches } from './util/storage.js';
 import { openStats, openJournalSearch, openGovFiles, openAbout, openLogForm, openLightbox, openMapSettings, openExplain, openCompare, openInstallHelp, openShare, backModal, dialogHistoryPop } from './ui/modals.js';
 import { skyAt, sunAltitude, nightDim } from './services/sky.js';
@@ -55,6 +53,38 @@ import { shapeClasses, evidenceScore, STATUS, EVIDENCE } from './data/taxonomy.j
 import { RELEASE } from './config.js';
 
 const BASE = import.meta.env.BASE_URL;
+
+/**
+ * A screen most visits never open, loaded the first time it is asked for rather than with the app
+ * (the Space & Moon dialog, the Moon map). Says so if it cannot be fetched (offline before it was ever opened).
+ */
+function lazyScreen(load, name) {
+  let pending = null;
+  return () =>
+    (pending ||= load().catch((error) => {
+      pending = null;
+      console.warn(error);
+      toast(t('Could not load {file}', { file: t(name) }));
+      throw error;
+    }));
+}
+const loadSpace = lazyScreen(() => import('./ui/space.js'), 'Space & Moon');
+const loadMoon = lazyScreen(() => import('./ui/moonview.js'), 'Moon');
+// The Moon map's controls; until it has been loaded it is not open, and there is nothing to close or restyle.
+let moonUi = null;
+const isMoonOpen = () => moonUi?.isMoonOpen() ?? false;
+const moonGlobe = () => moonUi?.moonGlobe() ?? null;
+const closeMoon = (options) => moonUi?.closeMoon(options);
+const setMoonMode = (mode) => moonUi?.setMoonMode(mode);
+const setMoonLighting = (mode) => moonUi?.setMoonLighting(mode);
+function openMoon(options) {
+  return loadMoon().then((m) => {
+    moonUi = m;
+    const opened = m.openMoon(options); // open from here on (the globe itself follows)
+    markWorld();
+    return opened;
+  });
+}
 // ?embed=1: shown inside another page (an <iframe>), with the globe and the case file and a way out to the full app.
 const EMBED = new URLSearchParams(location.search).get('embed') === '1';
 document.body.classList.toggle('embed', EMBED);
@@ -1567,9 +1597,11 @@ document.getElementById('dossier-peek').addEventListener('click', () => {
 }
 
 // The top bar wraps on small screens; keep panels and HUD clear of it.
-new ResizeObserver(([entry]) => {
-  document.documentElement.style.setProperty('--top-h', `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
-}).observe(document.querySelector('.topbar'));
+// It is also measured when the panels first show (see 'booting'): the observer's first answer comes a frame
+// later, and moved the map controls on a phone (layout shift).
+const topbarEl = document.querySelector('.topbar');
+const setTopH = () => document.documentElement.style.setProperty('--top-h', `${Math.ceil(topbarEl.getBoundingClientRect().height)}px`);
+new ResizeObserver(setTopH).observe(topbarEl);
 
 /* ── User sighting log ─────────────────────────────────── */
 function loadUserLog() {
@@ -2109,7 +2141,7 @@ document.getElementById('btn-stats').addEventListener('click', () => openStatsNo
 /** Space & Moon: reports from orbit, from the Moon and from deep space. */
 function openSpaceNow(focus) {
   hideHover();
-  openSpace({
+  loadSpace().then(({ openSpace }) => openSpace({
     base: BASE,
     officialById,
     focus,
@@ -2119,7 +2151,7 @@ function openSpaceNow(focus) {
       deselect();
       viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2_800_000), duration: 2.5 });
     },
-  });
+  }), () => {});
 }
 
 /**
@@ -2163,6 +2195,15 @@ function openMoonNow(focus) {
       }
       moonPushed = false;
     },
+  }).catch(() => {
+    // The map could not be fetched (it has said so): stay on the Earth.
+    viewer.useDefaultRenderLoop = true;
+    render.request();
+    if (MOON_ROUTE.test(location.hash)) {
+      if (moonPushed) history.back();
+      else history.replaceState(history.state, '', `${location.pathname}${location.search}`);
+    }
+    moonPushed = false;
   });
   markWorld();
 }
@@ -2589,6 +2630,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (document.readyState === 'complete') registerSw();
   else window.addEventListener('load', registerSw, { once: true });
 }
+
+setTopH();
+document.body.classList.remove('booting'); // the panels are filled: show them (under the loading screen until it fades)
 
 // Expose for debugging and automated screenshots.
 window.__uap = { viewer, moonGlobe, showNearby, setGrouping, select, selectBlueBook, selectGeipan, selectMufonPage, selectJournalPage, resetView, zoomView, northUp, toggleTilt, setMode, setLayer, state, startTour, trackLayer, showLaunchPad: (i) => renderLaunchPad(launchLayer.info(i)),

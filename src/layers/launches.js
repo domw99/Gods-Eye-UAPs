@@ -9,7 +9,7 @@ import { t, plural } from '../i18n/index.js';
 function rocketGlyph(color) {
   const c = document.createElement('canvas');
   c.width = c.height = 40;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.translate(20, 20);
   g.shadowColor = color;
   g.shadowBlur = 8;

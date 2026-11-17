@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as satellite from 'satellite.js';
-import { parseTle, propagatePosition, isSunlit } from '../src/layers/satellites.js';
+import { isSunlit } from '../src/layers/satellites.js';
+import { parseTle, propagatePosition, geodeticAt, skyFrom } from '../src/layers/orbits.js';
 
 const ISS = ['ISS (ZARYA)', '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9006', '2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.50000000    19'];
 const AT = new Date('2024-01-01T13:00:00Z');
@@ -34,6 +35,30 @@ describe('element sets', () => {
     const [sat] = parseTle(ISS.join('\n'));
     expect(propagatePosition(sat.satrec, new Date(NaN))).toBeNull();
     expect(satellite.propagate(blank[0].satrec, AT).position.x).toBeNaN(); // what the library does, which is why
+  });
+});
+
+describe('where a satellite is', () => {
+  const [sat] = parseTle(ISS.join('\n'));
+  it('gives its latitude, longitude, height and speed', () => {
+    const p = geodeticAt(sat.satrec, AT);
+    expect(Math.abs(p.lat)).toBeLessThanOrEqual(51.7); // the station's orbit is inclined 51.6°
+    expect(p.lon).toBeGreaterThanOrEqual(-180);
+    expect(p.lon).toBeLessThanOrEqual(180);
+    expect(p.altKm).toBeGreaterThan(300);
+    expect(p.altKm).toBeLessThan(600);
+    expect(p.speed).toBeCloseTo(7.7, 0);
+    expect(geodeticAt(sat.satrec, new Date(NaN))).toBeNull();
+  });
+
+  it('puts it overhead for someone under it and below the horizon on the far side of the Earth', () => {
+    const p = geodeticAt(sat.satrec, AT);
+    const under = skyFrom(p.lat, p.lon, AT)(sat.satrec);
+    expect(under.elevation).toBeGreaterThan(85);
+    expect(under.rangeKm).toBeCloseTo(p.altKm, -1);
+    const far = skyFrom(-p.lat, p.lon + 180 > 180 ? p.lon - 180 : p.lon + 180, AT)(sat.satrec);
+    expect(far.elevation).toBeLessThan(-60);
+    expect(skyFrom(0, 0, new Date(NaN))(sat.satrec)).toBeNull();
   });
 });
 

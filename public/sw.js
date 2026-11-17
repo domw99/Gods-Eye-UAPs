@@ -2,7 +2,9 @@
  * Service worker: makes the app installable and quick to reopen.
  * - Pages: network first, so a new deploy shows at once; the cached copy
  *   is used offline, or when the network hasn't answered within a few
- *   seconds (a poor connection shouldn't leave the app waiting).
+ *   seconds (a poor connection shouldn't leave the app waiting). The request
+ *   is sent while the worker itself starts (navigation preload), rather than
+ *   after: on a phone starting the worker can take a few hundred ms.
  * - Hashed build files (assets/): cache first, they never change.
  * - Everything else from this site (Cesium, data, icons): served from the
  *   cache and refreshed in the background.
@@ -37,10 +39,12 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
   // Only this worker's own caches: the satellite element sets (gods-eye-uap-tle) are kept for two hours so CelesTrak is not asked again.
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((k) => /^gods-eye-(pages|files)-/.test(k) && k !== PAGES && k !== FILES).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim()),
+    Promise.all([
+      caches
+        .keys()
+        .then((keys) => Promise.all(keys.filter((k) => /^gods-eye-(pages|files)-/.test(k) && k !== PAGES && k !== FILES).map((k) => caches.delete(k)))),
+      self.registration?.navigationPreload?.enable().catch(() => {}),
+    ]).then(() => self.clients.claim()),
   );
 });
 
@@ -51,7 +55,9 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (req.mode === 'navigate') {
-    const network = fetch(req).then((res) => {
+    // The preloaded answer when there is one (the browser started it with the worker); otherwise ask now.
+    const preloaded = Promise.resolve(event.preloadResponse).catch(() => undefined);
+    const network = preloaded.then((early) => early || fetch(req)).then((res) => {
       if (res.ok) keep(PAGES, req, res);
       return res;
     });

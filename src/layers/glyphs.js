@@ -57,7 +57,7 @@ export function glyphUrl(layer) {
   const size = 24;
   const c = document.createElement('canvas');
   c.width = c.height = size * PX;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true }); // read back at once: drawn on the CPU (see items.js)
   g.scale((size * PX) / 16, (size * PX) / 16);
   const path = new Path2D(shape.path);
   // A dark backdrop keeps the symbol readable over snow, desert and cloud.

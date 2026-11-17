@@ -16,6 +16,9 @@ import { spiralOffset } from '../util/geo.js';
  */
 const glyphCache = new Map();
 const PX = 2; // canvases are drawn at twice their size so markers stay sharp on high-DPI screens
+// Every marker canvas here (and in glyphs.js, tracks.js, launches.js) is read back at once, as a data URL or a
+// texture, so it is drawn on the CPU (willReadFrequently): a GPU canvas waits on the GPU for each read, and
+// the first one starts the GPU canvas machinery, which took over a second of the first load on a slow device.
 
 /** A marker glyph and its on-screen size: rings for cases (a reticle when there is a flight path), a diamond for official releases, a triangle for the user's own sightings. */
 function glyph(kind, color, emphasis = false) {
@@ -24,7 +27,7 @@ function glyph(kind, color, emphasis = false) {
   const s = emphasis ? 40 : 32;
   const c = document.createElement('canvas');
   c.width = c.height = s * PX;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.scale(PX, PX);
   const m = s / 2;
   const shape = (path) => {
@@ -99,7 +102,7 @@ function haloImage(color) {
   const s = 64;
   const c = document.createElement('canvas');
   c.width = c.height = s * PX;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.scale(PX, PX);
   g.strokeStyle = g.shadowColor = color;
   g.shadowBlur = 10;
@@ -197,7 +200,7 @@ function clusterImage(count, caseShare) {
   const s = Math.ceil(r * 2 + 10);
   const c = document.createElement('canvas');
   c.width = c.height = s * PX;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.scale(PX, PX);
   const m = s / 2;
   g.fillStyle = 'rgba(5, 9, 16, 0.72)';
