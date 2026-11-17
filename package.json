@@ -7,7 +7,7 @@
   "license": "MIT",
   "author": "domw99 (https://github.com/domw99)",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "scripts": {
     "dev": "vite",
@@ -36,15 +36,15 @@
   "dependencies": {
     "@mapbox/vector-tile": "^3.0.0",
     "astronomy-engine": "^2.1.19",
-    "cesium": "^1.145.0",
+    "cesium": "^1.147.0",
     "pbf": "^5.1.2",
     "satellite.js": "^6.0.2"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "1.56.1",
-    "vite": "^6.4.3",
+    "vite": "^6.4.6",
     "vite-plugin-cesium": "^1.2.23",
-    "vitest": "^5.0.1"
+    "vitest": "^5.1.0"
   }
 }

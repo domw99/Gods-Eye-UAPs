@@ -550,6 +550,30 @@ body:not(.tl-hidden) .tl-show { display: none; }
   transition: opacity var(--smooth);
 }
 #toast.show { opacity: 1; }
+/* The globe's graphics context was lost (src/app/glloss.js): above every panel, dialog and the loading screen, which never finishes once nothing draws. */
+.gl-lost {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--top-off) + 22px);
+  transform: translateX(-50%);
+  z-index: 110;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--glass-strong);
+  border: 1px solid var(--accent);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+.gl-lost[hidden] { display: none; }
+.gl-lost p { margin: 0; }
+html[data-text-dir='rtl'] .gl-lost { direction: rtl; }
 #loading { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg-dark); z-index: 100; font-size: 11px; letter-spacing: 0.25em; color: var(--accent); transition: opacity 600ms; }
 #loading.done { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 600ms, visibility 0s 600ms; } /* hidden once faded, so a screen reader doesn't find it */
 /* Until the app has filled them, the panels behind the loading screen stay hidden: the layer rows and the

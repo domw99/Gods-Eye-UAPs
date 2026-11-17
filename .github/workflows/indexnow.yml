@@ -17,8 +17,8 @@ jobs:
       # The address pages.yml builds the site for; without it the scripts use the default, which is not a fork's.
       SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Wait for GitHub Pages to publish the deploy

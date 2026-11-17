@@ -1194,4 +1194,6 @@ export default {
   "appears {from}, highest {to}, disappears {end}": "从 {from} 出现，在 {to} 最高，在 {end} 消失",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "时间为你所在时区（{zone}）。根据 CelesTrak 当前轨道，为空间站、最亮的卫星和低轨星链（发射后仍在爬升或正在降轨的批次）预测：卫星高于 10° 且被阳光照亮、而此处天空已暗时，列为一次过境。亮度会变化，因此有些过境较暗，新发射的列车可能提前或推迟几分钟。",
   "The first {n} are listed; the others come later in the day.": "列出了前 {n} 次；其余的在当天稍晚。",
+  "The globe stopped drawing: the browser took back the graphics memory it was using. Reload the page to bring it back; the case you had open stays open.": "地球仪已停止绘制：浏览器收回了它所使用的图形内存。重新加载页面即可恢复；你打开的案件会保持打开。",
+  "RELOAD": "重新加载",
 };

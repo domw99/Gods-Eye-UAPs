@@ -4,6 +4,7 @@ import { createEffects, MODE_LABELS } from './app/effects.js';
 import { createRenderLoop, deviceProfile, lessMotion } from './app/quality.js';
 import { createInstall, installSteps } from './app/install.js';
 import { keepFieldAboveKeyboard } from './app/keyboard.js';
+import { watchContextLoss, showContextLost } from './app/glloss.js';
 import { LANGUAGES, initLanguage, setLanguage, language, onLanguageChange, t, plural, locale, upper } from './i18n/index.js';
 import { fmtDate } from './util/when.js';
 import { state, subscribe, update, setLayer, inYearRange, YEAR_MIN, YEAR_MAX } from './state.js';
@@ -134,6 +135,7 @@ const viewer = await createViewer(document.getElementById('globe')).catch((error
   throw error;
 });
 const render = createRenderLoop(viewer);
+watchContextLoss(viewer.scene.canvas, () => showContextLost());
 // For visitors who ask for less motion, camera flights become cuts
 // (flyToBoundingSphere goes through flyTo too).
 {
