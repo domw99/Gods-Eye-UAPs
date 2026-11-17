@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "Starlink treni, {n} uydu",
   "appears {from}, highest {to}, disappears {end}": "{from} yönünde belirir, en yüksek {to}, {end} yönünde kaybolur",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "Saatler sizin saat diliminizdedir ({zone}). Uzay istasyonları, en parlak uydular ve alçak Starlink’ler (fırlatmadan sonra hâlâ yükselen ya da alçalan gruplar) için CelesTrak’in güncel yörüngelerinden tahmin edilmiştir: uydu en az 10° yüksekte ve güneş ışığında, buradaki gökyüzü de karanlıkken bir geçiş listelenir. Parlaklık değişir, bu yüzden bazı geçişler sönüktür ve yeni bir tren birkaç dakika erken ya da geç gelebilir.",
+  "The first {n} are listed; the others come later in the day.": "İlk {n} tanesi listelendi; diğerleri günün ilerleyen saatlerinde.",
 };

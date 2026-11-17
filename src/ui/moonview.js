@@ -414,7 +414,7 @@ export async function openMoon({ base, officialById = new Map(), focus, profile 
   function updateHud() {
     hudEl.utc.textContent = lit ? `◷ ${utc(new Date(lit.at))}${lit.approx ? ' ≈' : ''}` : utc(new Date());
     hudEl.mode.textContent = MODE_LABELS[sensor] || MODE_LABELS.normal;
-    hudEl.map.textContent = `${prefs.layers.relief ? 'LRO WAC + LOLA RELIEF' : 'LRO WAC MOSAIC'}${lightMode !== 'auto' ? ` · ${lightMode.toUpperCase()}` : ''}`;
+    hudEl.map.textContent = `${prefs.layers.relief ? 'LRO WAC + LOLA RELIEF' : 'LRO WAC MOSAIC'}${lightMode !== 'off' ? ` · ${lightMode.toUpperCase()}` : ''}`; // as on the Earth: off is the usual state, so only a chosen lighting is named
   }
   const clock = setInterval(() => !lit && !document.hidden && updateHud(), 1000);
 

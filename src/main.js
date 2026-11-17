@@ -73,18 +73,41 @@ const loadSpace = lazyScreen(() => import('./ui/space.js'), 'Space & Moon');
 const loadMoon = lazyScreen(() => import('./ui/moonview.js'), 'Moon');
 // The Moon map's controls; until it has been loaded it is not open, and there is nothing to close or restyle.
 let moonUi = null;
-const isMoonOpen = () => moonUi?.isMoonOpen() ?? false;
+// Asked for and still being fetched: the Moon counts as showing (U again, EARTH or Back leaves it), and opens when it arrives
+// only if no one has left it meanwhile.
+let moonLoading = false;
+const isMoonOpen = () => moonLoading || (moonUi?.isMoonOpen() ?? false);
 const moonGlobe = () => moonUi?.moonGlobe() ?? null;
-const closeMoon = (options) => moonUi?.closeMoon(options);
 const setMoonMode = (mode) => moonUi?.setMoonMode(mode);
 const setMoonLighting = (mode) => moonUi?.setMoonLighting(mode);
+let cancelMoonLoad = null;
+function closeMoon(options) {
+  if (moonLoading) return void cancelMoonLoad?.(options);
+  moonUi?.closeMoon(options);
+}
 function openMoon(options) {
-  return loadMoon().then((m) => {
-    moonUi = m;
-    const opened = m.openMoon(options); // open from here on (the globe itself follows)
+  if (moonUi) return Promise.resolve(moonUi.openMoon(options));
+  if (moonLoading) return Promise.resolve(); // already on its way (a second U or MOON)
+  moonLoading = true;
+  let cancelled = null;
+  cancelMoonLoad = (closeOptions = {}) => {
+    cancelled = closeOptions;
+    moonLoading = false;
     markWorld();
-    return opened;
-  });
+  };
+  return loadMoon()
+    .finally(() => {
+      moonLoading = false;
+      cancelMoonLoad = null;
+    })
+    .then((m) => {
+      moonUi = m;
+      // Left before it arrived: close as the Moon itself would have (onClose puts the Earth and the address back).
+      if (cancelled) return void options.onClose?.({ silent: Boolean(cancelled.silent) });
+      const opened = m.openMoon(options); // open from here on (the globe itself follows)
+      markWorld();
+      return opened;
+    });
 }
 // ?embed=1: shown inside another page (an <iframe>), with the globe and the case file and a way out to the full app.
 const EMBED = new URLSearchParams(location.search).get('embed') === '1';
@@ -262,7 +285,7 @@ exportRow.addEventListener('click', (e) => {
   const records = sortedItems(listShown).map((it) => listRecord(it));
   const blob =
     kind === 'csv'
-      ? new Blob([listCsv(records)], { type: 'text/csv;charset=utf-8' })
+      ? new Blob(['\uFEFF', listCsv(records)], { type: 'text/csv;charset=utf-8' }) // the mark tells Excel it is UTF-8 (titles have curly quotes)
       : new Blob([JSON.stringify(listGeoJson(records, { filters: describeFilters(state) }))], { type: 'application/geo+json' });
   downloadBlob(blob, exportName(kind));
 });

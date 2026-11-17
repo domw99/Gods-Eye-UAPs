@@ -133,6 +133,7 @@ test.describe('The Moon', () => {
     await page.keyboard.press('u');
     await expect(page.locator('#moon-view canvas')).toBeVisible({ timeout: 60_000 });
     await page.waitForFunction(() => window.__uap.moonGlobe());
+    await page.locator('#light-switch [data-light="auto"]').click(); // the lighting starts off; Auto lights a place by the Sun of its moment
     await page.locator('#moon-list [data-key="place:apollo-11"]').click();
     await expect(page.locator('#moon-dossier .d-title')).toHaveText('Apollo 11');
     await expect(page.locator('#moon-dossier')).toContainText('20 Jul 1969');

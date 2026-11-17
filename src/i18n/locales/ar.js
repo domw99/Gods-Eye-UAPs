@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "قطار Starlink، {n} من الأقمار الصناعية",
   "appears {from}, highest {to}, disappears {end}": "يظهر {from}، أعلى نقطة {to}، يختفي {end}",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "الأوقات بحسب منطقتك الزمنية ({zone}). متوقَّعة من مدارات CelesTrak الحالية لمحطات الفضاء وألمع الأقمار الصناعية وأقمار Starlink المنخفضة (دفعات لا تزال ترتفع بعد الإطلاق أو تهبط): يُدرَج العبور ما دام القمر على ارتفاع 10° على الأقل ومضاءً بالشمس والسماء هنا مظلمة. يتفاوت السطوع، لذا تكون بعض العبورات خافتة، وقد يتقدم قطار جديد أو يتأخر بضع دقائق.",
+  "The first {n} are listed; the others come later in the day.": "تُعرض أول {n}؛ والباقي يأتي لاحقًا في اليوم.",
 };

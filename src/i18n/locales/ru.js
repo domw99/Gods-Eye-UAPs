@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "«Поезд» Starlink, спутников: {n}",
   "appears {from}, highest {to}, disappears {end}": "появляется {from}, выше всего {to}, исчезает {end}",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "Время указано в вашем часовом поясе ({zone}). Рассчитано по текущим орбитам CelesTrak для космических станций, самых ярких спутников и низких Starlink (партий, которые ещё набирают высоту после запуска или снижаются): пролёт попадает в список, пока спутник не ниже 10° над горизонтом и освещён Солнцем, а небо здесь тёмное. Яркость бывает разной, поэтому некоторые пролёты слабые, а новый «поезд» может прийти на несколько минут раньше или позже.",
+  "The first {n} are listed; the others come later in the day.": "Показаны первые {n}; остальные будут позже в течение дня.",
 };

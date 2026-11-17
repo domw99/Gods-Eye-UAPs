@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "스타링크 행렬, 위성 {n}기",
   "appears {from}, highest {to}, disappears {end}": "{from}에서 나타나 {to}에서 가장 높고 {end}에서 사라짐",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "시각은 사용자의 시간대({zone}) 기준입니다. 우주정거장, 가장 밝은 위성, 낮은 궤도의 스타링크(발사 후 아직 상승 중이거나 하강 중인 묶음)에 대해 CelesTrak의 현재 궤도로 예측했습니다. 위성이 10° 이상 높이에서 햇빛을 받고 이곳 하늘이 어두운 동안을 통과로 표시합니다. 밝기가 달라 일부 통과는 희미하며, 새 행렬은 몇 분 일찍 또는 늦게 지나갈 수 있습니다.",
+  "The first {n} are listed; the others come later in the day.": "처음 {n}개만 표시합니다. 나머지는 그날 더 늦게 지나갑니다.",
 };

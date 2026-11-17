@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "Starlink ट्रेन, {n} उपग्रह",
   "appears {from}, highest {to}, disappears {end}": "{from} में दिखता है, सबसे ऊँचा {to}, {end} में ओझल",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "समय आपके समय क्षेत्र ({zone}) में हैं। अंतरिक्ष स्टेशनों, सबसे चमकीले उपग्रहों और निचले Starlink (प्रक्षेपण के बाद अभी ऊपर चढ़ते या नीचे आते समूह) के लिए CelesTrak की मौजूदा कक्षाओं से अनुमान: गुज़र तब सूचीबद्ध होता है जब उपग्रह कम से कम 10° ऊपर हो और सूर्य से प्रकाशित हो, और यहाँ आसमान अँधेरा हो। चमक बदलती रहती है, इसलिए कुछ गुज़र धुंधले होते हैं, और नई ट्रेन कुछ मिनट पहले या बाद में आ सकती है।",
+  "The first {n} are listed; the others come later in the day.": "पहले {n} सूचीबद्ध हैं; बाकी दिन में बाद में आते हैं।",
 };

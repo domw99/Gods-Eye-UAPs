@@ -78,13 +78,20 @@ export async function predictPasses(sats, { lat, lon, start = new Date(), hours 
     steps.push(step.sunAlt <= maxSunAlt ? step : null);
   }
   if (!steps.some(Boolean)) return [];
+  // The Sun and the sky's darkness at a moment are the same for every satellite: worked out once per moment.
+  const fine = new Map();
+  const stepFor = (date) => {
+    let step = fine.get(date.getTime());
+    if (!step) fine.set(date.getTime(), (step = stepAt(date, lat, lon)));
+    return step;
+  };
   const edge = (sat, from, dir) => {
     // Walk from the last visible step toward the next, in fine steps, to the moment it stops being visible.
     let last = from;
     for (let s = fineSec; s < stepSec; s += fineSec) {
       const date = new Date(from.date.getTime() + dir * s * 1000);
       if (date < start) break; // a pass already under way starts now, not before
-      const l = look(sat, stepAt(date, lat, lon), observer, minEl, maxSunAlt);
+      const l = look(sat, stepFor(date), observer, minEl, maxSunAlt);
       if (!l?.visible) break;
       last = { date, az: l.az, el: l.el };
     }

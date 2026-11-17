@@ -1193,4 +1193,5 @@ export default {
   "Starlink train, {n} satellites": "Starlinkの列、衛星{n}基",
   "appears {from}, highest {to}, disappears {end}": "{from}に現れ、{to}で最も高く、{end}に消える",
   "Times are in your time zone ({zone}). Predicted from CelesTrak’s current orbits for the space stations, the brightest satellites and the low Starlinks (batches still climbing after launch, or coming down): a pass is listed while the satellite is at least 10° up and sunlit and the sky here is dark. Brightness varies, so some passes are faint, and a new train can run minutes early or late.": "時刻はあなたのタイムゾーン({zone})です。宇宙ステーション、最も明るい衛星、低い軌道のStarlink(打ち上げ後にまだ上昇中、または降下中の群)について、CelesTrakの現在の軌道から予測しています。衛星が10°以上の高さにあって太陽に照らされ、ここの空が暗い間を通過として示します。明るさは変わるので暗い通過もあり、新しい列は数分早く、または遅く来ることがあります。",
+  "The first {n} are listed; the others come later in the day.": "最初の{n}件を表示しています。残りはその日の後の時間帯です。",
 };

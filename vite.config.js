@@ -60,7 +60,7 @@ export default defineConfig({
         const data = openData(CASES, { site: SITE, version: RELEASE, date: today });
         emit('open-data/index.html', data.page);
         emit('open-data/cases.json', data.json);
-        emit('open-data/cases.csv', data.csv);
+        emit('open-data/cases.csv', `\uFEFF${data.csv}`); // the byte-order mark tells Excel the file is UTF-8
         emit('open-data/cases.geojson', data.geojson);
         emit('404.html', notFoundPage({ site: SITE }));
         emit('sitemap.xml', sitemap(SITE, CASES.map((c) => c.id), today, groups.map(groupPath)));
