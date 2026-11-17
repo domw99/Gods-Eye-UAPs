@@ -148,7 +148,7 @@ export default [
   {
     id: 'coyame-1974',
     title: 'Coyame “crash” — Chihuahua',
-    date: '1974-08-25T22:00:00-07:00',
+    date: '1974-08-25T22:00:00-06:00',
     timeApprox: true,
     place: 'Coyame, Chihuahua, Mexico',
     country: 'Mexico',
@@ -318,7 +318,7 @@ export default [
   {
     id: 'aa2292-2021',
     title: 'American Airlines 2292 — “cruise-missile type of thing”',
-    date: '2021-02-21T12:29:00-07:00',
+    date: '2021-02-21T12:19:00-07:00',
     place: 'Northeastern New Mexico, at about 36,000 ft',
     country: 'United States',
     cc: 'US',
@@ -334,9 +334,9 @@ export default [
     witnesses: 'The crew of American Airlines Flight 2292',
     duration: 'Seconds',
     summary:
-      'On February 21, 2021, at about 12:29 p.m. local time, the crew of American Airlines Flight 2292, an Airbus A320 flying from Cincinnati to Phoenix at about 36,000 feet over the north-east corner of New Mexico, radioed: “Do you have any targets up here? We just had something go right over the top of us. I hate to say this, but it looked like a long cylindrical object that almost looked like a cruise missile type of thing, moving really fast right over the top of us.” The transmission was recorded by Steve Douglass, a radio listener. American Airlines at first denied that it was authentic, then confirmed that it was from Flight 2292 after talking to the crew. The FAA said controllers saw nothing on radar, and the Pentagon said it had no tests in the area.',
+      'On February 21, 2021, at about 12:19 p.m. local time (1:19 p.m. Central, by the recording), the crew of American Airlines Flight 2292, an Airbus A320 flying from Cincinnati to Phoenix at about 36,000 feet over the north-east corner of New Mexico, radioed: “Do you have any targets up here? We just had something go right over the top of us. I hate to say this, but it looked like a long cylindrical object that almost looked like a cruise missile type of thing, moving really fast right over the top of us.” The transmission was recorded by Steve Douglass, a radio listener. American Airlines at first denied that it was authentic, then confirmed that it was from Flight 2292 after talking to the crew. The FAA said controllers saw nothing on radar, and the Pentagon said it had no tests in the area.',
     timeline: [
-      { t: '12:29', text: 'The crew asks air traffic control whether it has targets nearby: something went right over the top of the aircraft.' },
+      { t: '~12:19', text: 'The crew asks air traffic control whether it has targets nearby: something went right over the top of the aircraft.' },
       { t: 'Later', text: 'A listener’s recording of the radio exchange is published.' },
       { t: 'Following days', text: 'American Airlines confirms the transmission; the FAA says nothing was seen on radar; the FBI says it is aware.' },
     ],

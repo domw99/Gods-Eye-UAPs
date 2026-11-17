@@ -279,7 +279,7 @@ export default [
     explanation:
       'The Belgian Air Force report left the radar contacts unexplained; critics attribute the F-16 lock-ons to the other fighter and to Bragg scattering. The famous Petit-Rechain triangle photo was admitted to be a hoax in 2011.',
     shape: 'Dark triangle with bright corner lights',
-    witnesses: '~13,500 reports in the wave; gendarmes; Air Force',
+    witnesses: 'About 2,600 reports to SOBEPS over the wave (some 13,500 witnesses claimed); gendarmes; Air Force',
     duration: 'Wave: Nov 1989 – Apr 1990',
     summary:
       'Beginning with a sighting by two gendarmes at Eupen on 29 November 1989, thousands of Belgians reported large, slow triangles with lights. On the night of 30–31 March 1990, after ground and radar reports, two Belgian Air Force F-16s from Beauvechain made nine interception attempts and obtained brief radar locks; the Air Force published its report openly.',
@@ -541,9 +541,9 @@ export default [
     witnesses: 'Residents and scientists',
     duration: 'Ongoing since ~1981',
     summary:
-      'Lights have appeared over the 12-km Hessdalen valley since at least the early 1980s, peaking at up to 20 per week in 1981–84. Unusually, they have been measured: radar, spectra, magnetometers and a permanent camera station have recorded them, but their cause is still debated.',
+      'Lights have been reported over the 12-km Hessdalen valley since at least the 1930s, peaking at 15 to 20 a week from December 1981 to mid-1984. Unusually, they have been measured: radar, spectra, magnetometers and a permanent camera station have recorded them, but their cause is still debated.',
     timeline: [
-      { t: '1981–1984', text: 'Peak activity; up to 20 sightings a week.' },
+      { t: 'Dec 1981 – mid-1984', text: 'Peak activity: 15 to 20 sightings a week.' },
       { t: 'Feb 1984', text: 'Project Hessdalen field campaign with radar and cameras.' },
       { t: '1998', text: 'Automated measurement station installed.' },
     ],
@@ -850,12 +850,12 @@ export default [
     witnesses: 'Pilot (radio transcript); later ground reports',
     duration: '~6 minutes of radio contact',
     summary:
-      'Twenty-year-old Frederick Valentich, flying a Cessna 182L from Moorabbin to King Island, told Melbourne Flight Service a large lit aircraft was orbiting over him. His last words were "It is not an aircraft", followed by 17 seconds of metallic noise. No trace of him or the aircraft was ever found.',
+      'Twenty-year-old Frederick Valentich, flying a Cessna 182L from Moorabbin to King Island, told Melbourne Flight Service a large lit aircraft was orbiting over him. His last words were "It’s not an aircraft", followed by 17 seconds of metallic noise. No trace of him or the aircraft was ever found.',
     timeline: [
       { t: '18:19', text: 'Departs Moorabbin for King Island.' },
       { t: '19:00', text: 'Reports over Cape Otway.' },
       { t: '19:06', text: 'Reports an unknown aircraft with four landing lights at his level.' },
-      { t: '19:12', text: 'Final transmission: "It is not an aircraft" — contact lost.' },
+      { t: '19:12', text: 'Final transmission: "It’s not an aircraft" — contact lost.' },
     ],
     tracks: [
       {

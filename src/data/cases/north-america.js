@@ -341,7 +341,7 @@ export default [
     evidence: ['photo', 'official-document'],
     status: 'disputed',
     explanation:
-      'The Condon Committee called it one of the few cases where the evidence was consistent with the witnesses’ account; skeptics (Sheaffer, Maccabee critics, later photogrammetry) argue it was a small model hung from overhead wires.',
+      'The Condon Committee called it one of the few cases where the evidence was consistent with the witnesses’ account; skeptics, among them Robert Sheaffer, and later photogrammetric studies argue it was a small model hung from overhead wires.',
     shape: 'Metallic disc with a raised "mast"',
     witnesses: 'Paul and Evelyn Trent',
     duration: 'A few minutes',
@@ -815,7 +815,7 @@ export default [
     timeline: [
       { t: '16:45', text: 'Fireball seen over Michigan, Ohio and Ontario; debris and grass fires reported.' },
       { t: 'Evening', text: 'Kecksburg residents report a crash in the woods; area cordoned off.' },
-      { t: '2005', text: 'NASA says fragments were once examined but the records were lost.' },
+      { t: '2005', text: 'NASA says experts once examined fragments from the area and judged them Soviet satellite debris, but the records were lost in the 1980s.' },
     ],
     tracks: [
       {
@@ -1147,7 +1147,7 @@ export default [
         basis: 'reconstruction',
         points: [
           p(31.3, -117.8, 80000, 0, 'Princeton radar: object at ~80,000 ft'),
-          p(31.3, -117.8, 20000, 1, 'Drops to ~20,000 ft in under a second (radar)'),
+          p(31.3, -117.8, 20000, 1, 'Drops to ~20,000 ft in under a second (as radar operators later told it)'),
           p(31.3, -117.8, 50, 2 * MIN, 'Hovering over white water'),
           p(31.3, -117.79, 12000, 4 * MIN, 'Mirrors Fravor, climbs toward his jet'),
           p(31.29, -117.77, 14000, 4 * MIN + 10, 'Accelerates away'),
@@ -1603,7 +1603,7 @@ export default [
     category: 'landing-trace',
     evidence: ['medical', 'physical-trace', 'official-document'],
     status: 'disputed',
-    explanation: 'RCMP, RCAF and the Condon Committee could not explain it; some soil samples were mildly radioactive, possibly from radium paint. Later marks on Michalak’s body were judged self-inflicted.',
+    explanation: 'RCMP, RCAF and the Condon Committee could not explain it; some soil samples were mildly radioactive, possibly from radium paint. A psychiatrist judged marks that appeared on Michalak’s body a year later to be probably self-inflicted.',
     shape: 'Two glowing oval objects; one landed',
     witnesses: 'Stefan Michalak',
     duration: 'About 30 minutes',
