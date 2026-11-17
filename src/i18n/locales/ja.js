@@ -1178,4 +1178,5 @@ export default {
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "新着：ニューメキシコの緑の火球から、ヨーロッパの空港を閉鎖させたドローンまで、10件の事例を追加",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "アプリが保存するのは場所、ページ番号、短い引用だけで、ページ自体は Internet Archive から読み込みます。",
   "(No text on this page.)": "（このページにはテキストがありません。）",
+  "In a list: move between the rows; Enter opens one": "リスト内：行の間を移動、Enter で開く",
 };

@@ -708,8 +708,14 @@ body.pov #globe::after {
 #story .story-progress { flex: 1; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
 #story .story-progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s; }
 #story [data-story='voice'][aria-pressed='false'] { opacity: 0.55; text-decoration: line-through; }
+/* Between the panels, and clear of the map controls that sit beside the dossier (it hid the lower half of them). */
 @media (min-width: 721px) {
-  body.dossier-open #story { left: calc(var(--left-w) + 22px); right: calc(var(--right-w) + 24px); width: auto; transform: none; }
+  body.dossier-open #story { left: calc(var(--left-w) + 22px); right: calc(var(--right-w) + 82px); width: auto; transform: none; }
+  body.dossier-open.left-collapsed #story { left: 70px; }
+}
+/* On narrower screens that leaves too little room, so the card overlaps the case list instead, as the playback bar does. */
+@media (min-width: 721px) and (max-width: 1180px) {
+  body.dossier-open #story { left: 10px; }
 }
 @media (max-width: 720px) {
   #story { bottom: var(--bottom-gap); }

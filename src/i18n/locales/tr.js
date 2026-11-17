@@ -1178,4 +1178,5 @@ export default {
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Yeni: New Mexico’nun yeşil ateş toplarından Avrupa havalimanlarını kapatan dronlara kadar on yeni vaka",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Uygulama yalnızca yerleri, sayfa numaralarını ve kısa alıntıları saklar; sayfalar Internet Archive’dan okunur.",
   "(No text on this page.)": "(Bu sayfada metin yok.)",
+  "In a list: move between the rows; Enter opens one": "Bir listede: satırlar arasında gezinme; Enter birini açar",
 };

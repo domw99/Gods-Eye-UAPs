@@ -1178,4 +1178,5 @@ export default {
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Baru: sepuluh kasus lagi, dari bola api hijau New Mexico hingga drone yang menutup bandara-bandara Eropa",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "Aplikasi hanya menyimpan tempat, nomor halaman, dan kutipan singkat; halamannya dibaca dari Internet Archive.",
   "(No text on this page.)": "(Tidak ada teks di halaman ini.)",
+  "In a list: move between the rows; Enter opens one": "Dalam daftar: berpindah antarbaris; Enter membuka salah satunya",
 };

@@ -1178,4 +1178,5 @@ export default {
   "New: ten more cases, from New Mexico’s green fireballs to the drones that closed Europe’s airports": "Novedad: diez casos más, desde las bolas de fuego verdes de Nuevo México hasta los drones que cerraron aeropuertos de Europa",
   "The app stores only the places, page numbers and short quotes; the pages are read from the Internet Archive.": "La aplicación solo guarda los lugares, los números de página y citas breves; las páginas se leen en el Internet Archive.",
   "(No text on this page.)": "(No hay texto en esta página.)",
+  "In a list: move between the rows; Enter opens one": "En una lista: pasar de una fila a otra; Intro abre una",
 };

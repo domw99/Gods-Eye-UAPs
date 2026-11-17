@@ -4,6 +4,7 @@ import { glyphSvg } from '../layers/glyphs.js';
 import { EVIDENCE, STATUS, SHAPES, evidenceScore } from '../data/taxonomy.js';
 import { state, update, toggleIn, setLayer, filtersActive, resetFilters, DEFAULT_LAYERS } from '../state.js';
 import { itemColor } from '../layers/items.js';
+import { rove, bindListbox, revealRow } from '../app/listbox.js';
 
 /** Left rail: search, layer toggles, evidence/status filters and results. */
 export const LAYER_DEFS = [
@@ -116,20 +117,22 @@ export function renderList(items) {
       if (it.hasTrack) badges.push(html`<span class="badge path">FLIGHT PATH</span>`);
       if (it.kind === 'case' && it.evidence.some((e) => e === 'video' || e === 'film')) badges.push(html`<span class="badge">VIDEO</span>`);
       if (it.lat == null) badges.push(html`<span class="badge">NO LOCATION</span>`);
-      return html`<li class="case-item" role="option" tabindex="0" data-key="${it.key}" aria-selected="${state.selected === it.key ? 'true' : 'false'}">
+      return html`<li class="case-item" role="option" tabindex="-1" data-key="${it.key}" aria-selected="${state.selected === it.key ? 'true' : 'false'}">
         <span class="dot" style="background:${itemColor(it)};box-shadow:0 0 8px ${itemColor(it)}"></span>
         <div><div class="t">${state.starred.has(it.key) ? html`<span class="star" title="${t('Starred')}">★</span> ` : ''}${it.title}</div><div class="m">${y} · ${it.place}</div><div class="b">${badges}</div></div>
       </li>`;
     })}`,
   );
+  rove(list);
 }
 
 /** Mark the open record's row. `scroll` brings it into view: wanted when a record is opened, not when the list is only redrawn (a layer or filter changed) and the panel would jump away from the control just used. */
 export function markSelected(key, { scroll = true } = {}) {
   for (const li of document.querySelectorAll('#case-list .case-item'))
     li.setAttribute('aria-selected', li.dataset.key === key ? 'true' : 'false');
+  rove(document.getElementById('case-list'));
   const el = scroll && key ? document.querySelector(`#case-list [data-key="${CSS.escape(key)}"]`) : null;
-  el?.scrollIntoView({ block: 'nearest' });
+  if (el) revealRow(el);
 }
 
 // Say which way the panel button goes, as the Moon's panel does. The label is written in English and
@@ -207,6 +210,7 @@ export function bindList({ onSelect }) {
   document.getElementById('active-filters')?.addEventListener('click', clear);
   document.getElementById('layers-reset')?.addEventListener('click', () => update({ layers: { ...DEFAULT_LAYERS } }, 'layers'));
   const list = document.getElementById('case-list');
+  const listKey = bindListbox(list);
   list.addEventListener('click', (e) => {
     if (clear(e)) return;
     const li = e.target.closest('[data-key]');
@@ -221,10 +225,7 @@ export function bindList({ onSelect }) {
       // From the keyboard, carry on in the case file instead of leaving the focus in the list.
       const d = document.getElementById('dossier');
       if (d && !d.classList.contains('hidden')) d.focus({ preventScroll: true });
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      (e.key === 'ArrowDown' ? li.nextElementSibling : li.previousElementSibling)?.focus();
-    }
+    } else listKey(e);
   });
   document.getElementById('skip-link')?.addEventListener('click', (e) => {
     e.preventDefault();
