@@ -18,7 +18,7 @@ import { createBuildingLayer } from './layers/buildings.js';
 import { createLaunchLayer, relativeTime } from './layers/launches.js';
 import { createAirspaceLayer } from './layers/airspace.js';
 import { loadAirspace, areasAt, AIRSPACE_TYPES, formatFt } from './services/airspace.js';
-import { launchesAroundNow, RateLimitError } from './services/launches.js';
+import { launchesAroundNow, launchesNear, RateLimitError } from './services/launches.js';
 import { renderLayers, renderFilters, renderActiveFilters, renderList, bindList, markSelected } from './ui/list.js';
 import { createTimeline, countByYear } from './ui/timeline.js';
 import {
@@ -47,13 +47,11 @@ import { searchPlaces } from './services/places.js';
 import { loadKp, kpThirds, auroraChance } from './services/geomagnetic.js';
 import { loadAirfields, nearestAirfields } from './services/airfields.js';
 import { loadFireballs, fireballRows, fireballsNear, fireballSize, fireballsCover, SIGHT_KM } from './services/fireballs.js';
-import { launchesNear } from './services/launches.js';
 import { rankCandidates, describeChecks, confidenceLabel, HEIGHTS, MOTIONS } from './services/explain.js';
 import { createStory } from './ui/story.js';
 import { toast, esc, html, mount } from './util/dom.js';
 import { formatDMS, haversineKm, bearingDeg } from './util/geo.js';
 import { shapeClasses, evidenceScore, STATUS, EVIDENCE } from './data/taxonomy.js';
-import { classInfo as geipanClassInfo } from './services/geipan.js';
 import { RELEASE } from './config.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -169,18 +167,8 @@ function bluebookPasses(r) {
   return inYearRange(r.year);
 }
 
-/** MUFON journal mentions: civilian investigations with no per-report assessment or shape. */
-function mufonPasses(r) {
-  if (state.starredOnly) return false;
-  if (state.evidence.size) return false;
-  if (state.status.size && !state.status.has('unassessed')) return false;
-  if (state.shape.size) return false;
-  if (state.search && !r.place.toLowerCase().includes(state.search) && !r.quote.toLowerCase().includes(state.search)) return false;
-  return inYearRange(r.year);
-}
-
-/** Research archive mentions: civilian investigations, like the MUFON files. */
-function journalsPasses(r) {
+/** Places named in the MUFON journal and the research archives: civilian investigations with no per-report assessment or shape. */
+function journalPagePasses(r) {
   if (state.starredOnly) return false;
   if (state.evidence.size) return false;
   if (state.status.size && !state.status.has('unassessed')) return false;
@@ -233,11 +221,11 @@ function refresh() {
     layerCounts.bluebook = n.toLocaleString();
   }
   if (mufon && state.layers.mufon) {
-    const n = mufonLayer.filter((i) => mufonPasses(mufon.records[i]));
+    const n = mufonLayer.filter((i) => journalPagePasses(mufon.records[i]));
     layerCounts.mufon = n.toLocaleString();
   }
   if (journals && state.layers.journals) {
-    const n = journalsLayer.filter((i) => journalsPasses(journals.records[i]));
+    const n = journalsLayer.filter((i) => journalPagePasses(journals.records[i]));
     layerCounts.journals = n.toLocaleString();
   }
   if (geipan && state.layers.geipan) {
@@ -1101,7 +1089,7 @@ async function statsData(withNuforc) {
       .filter((x) => x.value),
     geipan: tally(g.records.map((r) => r.cls))
       .sort((a, b) => geipanOrder.indexOf(a[0]) - geipanOrder.indexOf(b[0]))
-      .map(([cls, n]) => ({ label: geipanClassInfo(cls).label, value: n, strong: cls.startsWith('D'), hint: geipanClassInfo(cls).long })),
+      .map(([cls, n]) => ({ label: classInfo(cls).label, value: n, strong: cls.startsWith('D'), hint: classInfo(cls).long })),
     evidence: tally(cases.flatMap((c) => c.evidence || []))
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
@@ -1176,9 +1164,13 @@ function countNuforc(lat, lon) {
 function nearMe() {
   if (!navigator.geolocation) return toast('Location isn’t available in this browser. Search a place instead.', 4000);
   toast('Finding your location…', 2500);
+  // The answer can take seconds (a permission prompt, a slow fix): a record opened meanwhile, or the Moon, wins.
+  const token = selectToken;
+  const current = () => token === selectToken && !isMoonOpen();
   navigator.geolocation.getCurrentPosition(
-    (pos) => showNearby(pos.coords.latitude, pos.coords.longitude, 'you'),
+    (pos) => current() && showNearby(pos.coords.latitude, pos.coords.longitude, 'you'),
     (err) => {
+      if (!current()) return;
       toast(err.code === 1 ? 'Location permission was declined. Search a place instead.' : 'Could not get your location. Search a place instead.', 4500);
       document.getElementById('search').focus();
     },
@@ -1200,7 +1192,9 @@ function describePick(picked) {
   return null;
 }
 
+let hoverTimer = 0; // the hover label waiting for the pointer to rest
 function hideHover() {
+  clearTimeout(hoverTimer); // a label still waiting for the pointer to rest would show again after this
   hoverEl.classList.add('hidden');
   viewer.scene.canvas.style.cursor = '';
 }
@@ -1280,7 +1274,6 @@ handler.setInputAction((click) => {
 
 // Hover: picking renders the scene again and reads it back from the GPU, so it
 // waits until the pointer pauses, and never runs mid-drag.
-let hoverTimer = 0;
 let pointerHeld = false;
 viewer.canvas.addEventListener('pointerdown', () => (pointerHeld = true));
 window.addEventListener('pointerup', () => (pointerHeld = false));
@@ -1342,7 +1335,6 @@ handler.setInputAction((move) => {
     } else hideHover();
   }, 90);
 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-viewer.scene.canvas.addEventListener('pointerleave', () => clearTimeout(hoverTimer));
 viewer.scene.canvas.addEventListener('pointerdown', () => stopTour());
 viewer.scene.canvas.addEventListener('pointerleave', hideHover);
 
@@ -1493,7 +1485,6 @@ bindDossierActions({
   skycheck: () => {
     const item = itemByKey(state.selected) || nearPoint;
     if (!item) return;
-    const token = selectToken; // the answer is for this record: another one opened meanwhile has its own sky check
     if (!state.layers.satellites) setLayer('satellites', true);
     const box = document.getElementById('d-sky'); // the answer belongs in this record's box, even if another is open by then
     renderSkyCheck('loading', box);
@@ -1547,9 +1538,11 @@ bindDossierActions({
   'near-nuforc': async () => {
     if (!nearPoint) return;
     const at = nearPoint;
+    const token = selectToken; // opening a record meanwhile (which leaves nearPoint as it was) takes over
     if (!(await ensureNuforc().catch(() => null))) return; // it says so itself when it can't load
-    if (nearPoint === at) toast(t('{n} civilian reports within 50 km', { n: countNuforc(at.lat, at.lon).toLocaleString(locale()) }), 4000);
-    if (nearPoint === at) showNearby(at.lat, at.lon, at.label, { fly: false });
+    if (nearPoint !== at || token !== selectToken) return;
+    toast(t('{n} civilian reports within 50 km', { n: countNuforc(at.lat, at.lon).toLocaleString(locale()) }), 4000);
+    showNearby(at.lat, at.lon, at.label, { fly: false });
   },
   'explain-user': () => {
     const item = itemByKey(state.selected);
@@ -2261,7 +2254,6 @@ document.getElementById('btn-map').addEventListener('click', () => {
     setGrouping(itemLayer.grouping, { save: false });
     if (targetPhrase) setTarget(targetPhrase);
     if (!pb.bar.classList.contains('hidden')) setPovTitle();
-    shownTilt = null; // the tilt button's title is written again on the next frame
     render.request();
     document.getElementById('btn-tour').textContent = tourTimer ? t('■ STOP') : t('▶ TOUR');
     redrawDossier(); // the open record's text was written in the old language
