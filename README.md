@@ -313,7 +313,7 @@ The first visit on a phone says the app has more room on a computer (once). On p
 ```bash
 git clone https://github.com/domw99/Gods-Eye-UAPs.git
 cd Gods-Eye-UAPs
-npm ci
+npm ci             # Node 22.12 or later
 npm run dev        # http://localhost:5173
 ```
 
